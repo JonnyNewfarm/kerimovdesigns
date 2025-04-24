@@ -1,12 +1,15 @@
 import HeroSection from "@/components/HeroSection";
-import Image from "next/image";
+import MyProjects from "@/components/MyProjects";
+import SmoothScroll from "@/components/SmoothScroll";
 
 export default function Home() {
   return (
-    <div className="bg-[#161515] h-screen w-full text-[#ecebeb]">
-      <HeroSection />
+    <SmoothScroll>
+      <div className="bg-[#242323] min-h-screen w-full text-[#ecebeb]">
+        <HeroSection />
 
-      <div className="h-screen bg-[#161515]"></div>
-    </div>
+        <MyProjects />
+      </div>
+    </SmoothScroll>
   );
 }

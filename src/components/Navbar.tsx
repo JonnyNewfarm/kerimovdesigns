@@ -3,7 +3,7 @@ import BurgerMenu from "./BurgerMenu";
 
 const Navbar = () => {
   return (
-    <div className="bg-[#161515]  font-extrabold text-[16px] text-[#ecebeb] px-20 py-3 flex items-center sticky top-0 z-50 w-full justify-between">
+    <div className="bg-[#242323]  font-extrabold text-[16px] text-[#ecebeb] px-20 py-3 flex items-center sticky top-0 z-50 w-full justify-between">
       <div>
         <h1 className="font-serif lg:hidden font-semibold text-4xl fixed left-6 top-7">
           RK
@@ -18,7 +18,7 @@ const Navbar = () => {
           </div>
           <div className="tracking-tighter">
             <h1 className=" opacity-70 m-0 leading-none">Occupation:</h1>
-            <p className=" m-0 leading-tight">graphic designer</p>
+            <p className=" m-0 leading-tight">Graphic designer</p>
           </div>
           <div className="tracking-tighter">
             <h1 className=" opacity-70 m-0 leading-none">Location:</h1>

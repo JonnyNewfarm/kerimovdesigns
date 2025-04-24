@@ -1,10 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import gsap from "gsap";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import jonny17 from "../../public/jonny17.jpg";
 
 const HeroSection = () => {
   const firstParagraph = useRef(null);
@@ -13,6 +14,13 @@ const HeroSection = () => {
   let xPercent = 0;
   const container = useRef(null);
   const direction = useRef(-1);
+
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ["start end", "end start"],
+  });
+
+  const md = useTransform(scrollYProgress, [0.5, 1], [0, -200]);
 
   const animation = () => {
     if (xPercent < -100) xPercent = 0;
@@ -43,7 +51,10 @@ const HeroSection = () => {
     requestAnimationFrame(animation);
   }, []);
   return (
-    <div className="h-screen flex w-full flex-col lg:flex-row overflow-hidden justify-center items-center px-4">
+    <div
+      ref={container}
+      className="h-screen relative flex w-full flex-col lg:flex-row overflow-hidden justify-center items-center px-4"
+    >
       <div className="h-full absolute w-full lg:w-[60vw] px-8 left-0  top-0 flex justify-center items-end">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -60,7 +71,7 @@ const HeroSection = () => {
         >
           <div
             ref={slider}
-            className="relative flex whitespace-nowrap w-max will-change-transform"
+            className="relative mb-10 flex whitespace-nowrap w-max will-change-transform"
           >
             <p
               ref={firstParagraph}
@@ -79,9 +90,10 @@ const HeroSection = () => {
       </div>
 
       <motion.div
+        style={{ y: md }}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{
-          scale: [0, 1],
+          scale: [0.6, 1],
           opacity: [0, 1, 1],
         }}
         transition={{
@@ -91,7 +103,7 @@ const HeroSection = () => {
         }}
         className="absolute w-[40vw] lg:right-0 h-[40vh] sm:h-[50vh] lg:h-screen"
       >
-        <Image src="/jonny17.jpg" className="object-cover" fill alt="" />
+        <Image src={jonny17} className="object-cover" fill alt="" />
       </motion.div>
     </div>
   );
