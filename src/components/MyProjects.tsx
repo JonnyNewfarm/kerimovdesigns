@@ -14,7 +14,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
 
   return (
     <div className="bg-[#242323] relative flex flex-col justify-center items-center h-screen w-full text-[#ecebeb]">
-      <div className="w-[500px] h-[300px] relative">
+      <div className="md:w-[500px] md:h-[300px] w-[350px] h-[200px] relative">
         <Image
           fill
           className="object-cover"
@@ -26,7 +26,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
         <h1 className="uppercase font-semibold text-2xl">Previous work</h1>
       </div>
 
-      <div className="flex space-x-4 mt-10 items-center text-lg">
+      <div className="flex flex-wrap md:flex-nowrap gap-x-4 gap-y-2 mt-10 justify-center items-center text-lg">
         {projects.slice(0, 5).map((project, index) => (
           <React.Fragment key={project.title}>
             <Link

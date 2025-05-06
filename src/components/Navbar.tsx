@@ -3,14 +3,14 @@ import BurgerMenu from "./BurgerMenu";
 
 const Navbar = () => {
   return (
-    <div className="bg-[#242323]  font-extrabold text-[16px] text-[#ecebeb] px-20 py-3 flex items-center sticky top-0 z-50 w-full justify-between">
+    <div className="bg-[#242323]  font-extrabold text-[16px] text-[#ecebeb] md:px-20 md:py-3 flex  items-center sticky  top-0 z-50 w-full justify-between">
       <div>
-        <h1 className="font-serif lg:hidden font-semibold text-3xl fixed left-6 top-7">
+        <h1 className="md:hidden font-semibold text-black text-3xl fixed left-6 top-7">
           Rustam K
         </h1>
       </div>
       <BurgerMenu />
-      <div className="w-full h-full hidden lg:block">
+      <div className="w-full h-full hidden md:block">
         <div className="flex items-center justify-between">
           <div className="tracking-tighter">
             <h1 className=" opacity-70 m-0 leading-none">Name:</h1>

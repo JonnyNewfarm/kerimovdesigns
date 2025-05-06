@@ -73,16 +73,16 @@ const HeroSection = ({ imgSrc }: LatestProject) => {
             times: [0, 0.4, 1],
             ease: "easeInOut",
           }}
-          className="relative top-[40vh] lg:top-[8vh] text-[#ecebeb] text-3xl"
+          className="relative  md:top-[8vh] text-[#ecebeb] text-3xl"
         >
-          <div>
-            <h1 className="mt-5 text-lg">Latest project</h1>
+          <div className="md:absolute right-0 lg:relative">
+            <h1 className="mt-5 text-lg hidden lg:block">Latest project</h1>
 
             <div>
-              <div className="lg:w-[500px]  relative lg:h-[300px] w-[270px] h-[130px]">
+              <div className="lg:w-[500px]  relative lg:h-[300px] md:w-[400px] md:h-[250px] hidden md:block">
                 <Image fill src={imgSrc} className="object-cover" alt="" />
                 <Link
-                  className="bg-black/80 hover:bg-white hover:text-black absolute bottom-0 text-lg  text-[#ecebeb] flex justify-center items-center py-2 px-5"
+                  className="bg-black/80 hover:bg-white hover:text-black absolute bottom-0 text-sm md:text-lg  text-[#ecebeb] flex justify-center items-center py-2 px-5"
                   href={"#"}
                 >
                   View Project
@@ -106,17 +106,17 @@ const HeroSection = ({ imgSrc }: LatestProject) => {
         >
           <div
             ref={slider}
-            className="relative lg:mb-10 flex whitespace-nowrap w-max will-change-transform"
+            className="relative z-50 md:z-0 lg:mb-10 flex whitespace-nowrap w-max will-change-transform"
           >
             <p
               ref={firstParagraph}
-              className="text-[clamp(6rem,8vw,8rem)] z-50 text-[#ecebeb] m-2.5 uppercase"
+              className="text-[clamp(6rem,8vw,8rem)] z-50 text-black md:text-[#ecebeb] m-2.5 uppercase"
             >
               Graphic designer -
             </p>
             <p
               ref={secondParagraph}
-              className="text-[clamp(6rem,8vw,8rem)] z-50 text-[#ecebeb] m-2.5 uppercase absolute translate-x-full left-0"
+              className="text-[clamp(6rem,8vw,8rem)] z-50 text-black md:text-[#ecebeb] m-2.5 uppercase absolute translate-x-full left-0"
             >
               Graphic designer -
             </p>
@@ -136,7 +136,7 @@ const HeroSection = ({ imgSrc }: LatestProject) => {
           times: [0, 0.4, 1],
           ease: "easeInOut",
         }}
-        className="absolute lg:w-[40vw] lg:right-0 sm:w-[25vw] w-[40vw] h-[33vh]  top-24 lg:top-0 sm:h-[40vh] lg:h-screen"
+        className="absolute md:w-[40vw] md:right-0  w-full h-screen top-0   lg:h-screen"
       >
         <Image src={jonny17} className="object-cover" fill alt="" />
       </motion.div>

@@ -1,6 +1,7 @@
 import { getProjectById } from "@/app/actions";
 import React from "react";
 import SmoothScroll from "../../../components/SmoothScroll";
+import MotionImage from "@/components/MotionImage";
 
 const page = async ({ params }: { params: Promise<{ projectId: string }> }) => {
   const project = await getProjectById((await params).projectId);
@@ -34,20 +35,26 @@ const page = async ({ params }: { params: Promise<{ projectId: string }> }) => {
 
         <div className="min-h-screen mt-30 items-center flex justify-center flex-col gap-y-40">
           {project?.src2 && (
-            <img className="w-[800px] lg:mr-58" src={project.src2} alt="" />
+            <MotionImage>
+              <img className="md:max-w-[800px]" src={project.src2} alt="" />
+            </MotionImage>
           )}
           {project?.src3 && (
-            <img className="w-[800px] lg:ml-58" src={project.src3} alt="" />
+            <MotionImage>
+              <img className="md:w-[800px]" src={project.src3} alt="" />
+            </MotionImage>
           )}
           {project?.srcVideo && (
-            <video
-              className="w-[800px] lg:mr-58"
-              autoPlay
-              muted
-              loop
-              playsInline
-              src={project.srcVideo}
-            />
+            <MotionImage>
+              <video
+                className="md:w-[800px]"
+                autoPlay
+                muted
+                loop
+                playsInline
+                src={project.srcVideo}
+              />
+            </MotionImage>
           )}
         </div>
       </div>
