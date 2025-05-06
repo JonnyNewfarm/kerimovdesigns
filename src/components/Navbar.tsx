@@ -5,8 +5,8 @@ const Navbar = () => {
   return (
     <div className="bg-[#242323]  font-extrabold text-[16px] text-[#ecebeb] px-20 py-3 flex items-center sticky top-0 z-50 w-full justify-between">
       <div>
-        <h1 className="font-serif lg:hidden font-semibold text-4xl fixed left-6 top-7">
-          RK
+        <h1 className="font-serif lg:hidden font-semibold text-3xl fixed left-6 top-7">
+          Rustam K
         </h1>
       </div>
       <BurgerMenu />
@@ -27,9 +27,9 @@ const Navbar = () => {
           <div className="tracking-tighter">
             <h1 className=" opacity-70 m-0 leading-none">Naviation:</h1>
             <div className="flex gap-x-1  m-0 leading-tight">
-              <a href={"#home"}>Home,</a>
-              <a href={"#my-work"}>My work,</a>
-              <a href={"#contact"}>Contact</a>
+              <a href={"/"}>Home,</a>
+              <a href={"/projects"}>My work,</a>
+              <a href={"/contact"}>Contact</a>
             </div>
           </div>
         </div>
