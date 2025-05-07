@@ -3,6 +3,19 @@
 
 
 
-body {
-    font-family: var(--font-lusitana), serif;
+html, body {
+  scrollbar-width: none; 
+  -ms-overflow-style: none;  
+  
+  
+}
+
+
+
+  .bg-dark {
+    background-color:#242323;
+  }
+
+  .light {
+    background-color: #ecebeb;
   }

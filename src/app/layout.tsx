@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import NavbarMobile from "@/components/NavbarMobile";
 
 const lusitana = Montserrat({
   subsets: ["latin"],
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={lusitana.variable}>
         <Navbar />
+        <NavbarMobile />
         {children}
       </body>
     </html>

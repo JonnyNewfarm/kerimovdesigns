@@ -8,14 +8,14 @@ const Burger = () => {
         <div className="flex flex-col text-2xl text-#443c3c gap-3">
           <div className="flex gap-y-6 flex-col">
             <h1 className="text-3xl font-semibold">Navigation</h1>
-            <a className="hover-underline" href={"#home"}>
+            <a className="hover-underline" href={"/"}>
               Home
             </a>
-            <a className="hover-underline" href={"#my-work"}>
+            <a className="hover-underline" href={"/projects"}>
               My work
             </a>
 
-            <a className="hover-underline" href={"#contact"}>
+            <a className="hover-underline" href={"/contact"}>
               Contact
             </a>
           </div>

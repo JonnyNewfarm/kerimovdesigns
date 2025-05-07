@@ -49,13 +49,31 @@ export async function createProject(data: {
 
 export const getProjects = async () => {
   try {
-    const projects = await prisma.project.findMany();
+    const projects = await prisma.project.findMany(
+      {orderBy: { createdAt: "desc" },}
+    );
     return projects;
   } catch (error) {
     console.error("Error fetching projects:", error);
     throw new Error("Failed to fetch projects");
   }
 };
+
+
+
+export const getProjectsMobile = async () => {
+  try {
+    const projects = await prisma.project.findMany({
+      take: 3,
+      orderBy: { createdAt: "desc" },
+    });
+    return projects;
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+    throw new Error("Failed to fetch projects");
+  }
+};
+
 
 
 
@@ -108,3 +126,25 @@ export async function getLatestProject() {
     throw new Error('Failed to fetch latest project');
   }
 }
+
+
+
+export const getProjectsPagnation = async (page = 1, limit = 3) => {
+  try {
+    const skip = (page - 1) * limit;
+
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" }, 
+      }),
+      prisma.project.count(),
+    ]);
+
+    return { projects, total };
+  } catch (error) {
+    console.error("Error fetching paginated projects:", error);
+    throw new Error("Failed to fetch projects");
+  }
+};

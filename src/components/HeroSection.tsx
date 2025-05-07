@@ -10,9 +10,10 @@ import Link from "next/link";
 
 interface LatestProject {
   imgSrc: string;
+  id: string;
 }
 
-const HeroSection = ({ imgSrc }: LatestProject) => {
+const HeroSection = ({ imgSrc, id }: LatestProject) => {
   const firstParagraph = useRef(null);
   const secondParagraph = useRef(null);
 
@@ -79,15 +80,15 @@ const HeroSection = ({ imgSrc }: LatestProject) => {
             <h1 className="mt-5 text-lg hidden lg:block">Latest project</h1>
 
             <div>
-              <div className="lg:w-[500px]  relative lg:h-[300px] md:w-[400px] md:h-[250px] hidden md:block">
+              <Link
+                href={`/project/${id}`}
+                className="lg:w-[500px]  relative lg:h-[300px] md:w-[400px] md:h-[250px] hidden md:block"
+              >
                 <Image fill src={imgSrc} className="object-cover" alt="" />
-                <Link
-                  className="bg-black/80 hover:bg-white hover:text-black absolute bottom-0 text-sm md:text-lg  text-[#ecebeb] flex justify-center items-center py-2 px-5"
-                  href={"#"}
-                >
+                <div className="bg-black/80 hover:bg-white hover:text-black absolute bottom-0 text-sm md:text-lg  text-[#ecebeb] flex justify-center items-center py-2 px-5">
                   View Project
-                </Link>
-              </div>
+                </div>
+              </Link>
             </div>
           </div>
         </motion.div>
@@ -110,13 +111,13 @@ const HeroSection = ({ imgSrc }: LatestProject) => {
           >
             <p
               ref={firstParagraph}
-              className="text-[clamp(6rem,8vw,8rem)] z-50 text-black md:text-[#ecebeb] m-2.5 uppercase"
+              className="text-[clamp(6rem,8vw,8rem)] z-50 text-[#ecebeb] m-2.5 uppercase"
             >
               Graphic designer -
             </p>
             <p
               ref={secondParagraph}
-              className="text-[clamp(6rem,8vw,8rem)] z-50 text-black md:text-[#ecebeb] m-2.5 uppercase absolute translate-x-full left-0"
+              className="text-[clamp(6rem,8vw,8rem)] z-50 text-[#ecebeb] m-2.5 uppercase absolute translate-x-full left-0"
             >
               Graphic designer -
             </p>

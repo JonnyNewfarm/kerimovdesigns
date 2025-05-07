@@ -1,35 +1,32 @@
 import React from "react";
 import BurgerMenu from "./BurgerMenu";
+import { div } from "framer-motion/client";
 
 const Navbar = () => {
   return (
-    <div className="bg-[#242323]  font-extrabold text-[16px] text-[#ecebeb] md:px-20 md:py-3 flex  items-center sticky  top-0 z-50 w-full justify-between">
-      <div>
-        <h1 className="md:hidden font-semibold text-black text-3xl fixed left-6 top-7">
-          Rustam K
-        </h1>
-      </div>
-      <BurgerMenu />
-      <div className="w-full h-full hidden md:block">
-        <div className="flex items-center justify-between">
-          <div className="tracking-tighter">
-            <h1 className=" opacity-70 m-0 leading-none">Name:</h1>
-            <p className=" m-0 leading-tight">Rustam Kerimov</p>
-          </div>
-          <div className="tracking-tighter">
-            <h1 className=" opacity-70 m-0 leading-none">Occupation:</h1>
-            <p className=" m-0 leading-tight">Graphic designer</p>
-          </div>
-          <div className="tracking-tighter">
-            <h1 className=" opacity-70 m-0 leading-none">Location:</h1>
-            <p className=" m-0 leading-tight">Oslo, Norway</p>
-          </div>
-          <div className="tracking-tighter">
-            <h1 className=" opacity-70 m-0 leading-none">Naviation:</h1>
-            <div className="flex gap-x-1  m-0 leading-tight">
-              <a href={"/"}>Home,</a>
-              <a href={"/projects"}>My work,</a>
-              <a href={"/contact"}>Contact</a>
+    <div className="w-full hidden md:block">
+      <div className="bg-[#242323]  font-extrabold text-[16px] text-[#ecebeb] md:px-20 md:py-3 flex  items-center sticky  top-0 z-50 w-full justify-between">
+        <div className="w-full h-full">
+          <div className="flex items-center justify-between">
+            <div className="tracking-tighter">
+              <h1 className=" opacity-70 m-0 leading-none">Name:</h1>
+              <p className=" m-0 leading-tight">Rustam Kerimov</p>
+            </div>
+            <div className="tracking-tighter">
+              <h1 className=" opacity-70 m-0 leading-none">Occupation:</h1>
+              <p className=" m-0 leading-tight">Graphic designer</p>
+            </div>
+            <div className="tracking-tighter">
+              <h1 className=" opacity-70 m-0 leading-none">Location:</h1>
+              <p className=" m-0 leading-tight">Oslo, Norway</p>
+            </div>
+            <div className="tracking-tighter">
+              <h1 className=" opacity-70 m-0 leading-none">Naviation:</h1>
+              <div className="flex gap-x-1  m-0 leading-tight">
+                <a href={"/"}>Home,</a>
+                <a href={"/projects"}>My work,</a>
+                <a href={"/contact"}>Contact</a>
+              </div>
             </div>
           </div>
         </div>
