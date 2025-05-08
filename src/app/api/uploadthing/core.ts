@@ -1,42 +1,39 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 
+// Initialize UploadThing
 const f = createUploadthing();
 
-const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
+// Temporary auth mock function
+const auth = async () => {
+  // Simulate checking authentication, as the user is already authenticated via NextAuth
+  return { id: "admin" }; // Simulating an admin user
+};
 
-// FileRouter for your app, can contain multiple FileRoutes
+// Define file router
 export const ourFileRouter = {
-  // Define as many FileRoutes as you like, each with a unique routeSlug
   imageUploader: f({
     image: {
-      /**
-       * For full list of options and defaults, see the File Route API reference
-       * @see https://docs.uploadthing.com/file-routes#route-config
-       */
       maxFileSize: "4GB",
       maxFileCount: 1,
     },
-    video: { maxFileSize: "4GB" },
+    video: {
+      maxFileSize: "4GB",
+    },
   })
-    // Set permissions and file types for this FileRoute
-    .middleware(async ({ req }) => {
-      // This code runs on your server before upload
-      const user = await auth(req);
+    .middleware(async () => { // Remove the `req` parameter since it's not used
+      const user = await auth();
 
-      // If you throw, the user will not be able to upload
       if (!user) throw new UploadThingError("Unauthorized");
 
-      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      // Attach the userId to metadata
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete for userId:", metadata.userId);
+      console.log("File URL:", file.ufsUrl);
 
-      console.log("file url", file.ufsUrl);
-
-      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      // You can return custom data here as well
       return { uploadedBy: metadata.userId };
     }),
 } satisfies FileRouter;

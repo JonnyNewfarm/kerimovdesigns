@@ -3,7 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import gsap from "gsap";
 import Image from "next/image";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import jonny17 from "../../public/jonny17.jpg";
 import Link from "next/link";
@@ -99,7 +99,7 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
             opacity: [0, 1, 1],
           }}
           transition={{
-            duration: 2,
+            duration: 1,
             times: [0, 0.4, 1],
             ease: "easeInOut",
           }}
@@ -129,7 +129,7 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
         style={{ y: md }}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{
-          scale: [0.6, 1],
+          scale: [0.7, 1],
           opacity: [0, 1, 1],
         }}
         transition={{

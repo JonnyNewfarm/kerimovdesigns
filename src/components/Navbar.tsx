@@ -1,6 +1,4 @@
 import React from "react";
-import BurgerMenu from "./BurgerMenu";
-import { div } from "framer-motion/client";
 
 const Navbar = () => {
   return (

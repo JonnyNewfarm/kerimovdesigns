@@ -1,7 +1,6 @@
 "use client";
 import { UploadButton } from "@/utils/uploadthing";
 import React from "react";
-import { twMerge } from "tailwind-merge";
 import "@uploadthing/react/styles.css";
 
 const UploadImage = ({

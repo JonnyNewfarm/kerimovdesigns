@@ -1,8 +1,7 @@
 "use client";
 import { Project } from "@prisma/client";
-import { div } from "framer-motion/client";
 import Link from "next/link";
-import React, { ReactNode } from "react";
+import React from "react";
 
 interface ProjectsTableMobileProps {
   projects: Project[];
@@ -10,9 +9,9 @@ interface ProjectsTableMobileProps {
 
 const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-20">
       <div className="h-[35vh] flex items-center justify-center">
-        <h1 className="text-3xl mt-20">My work</h1>
+        <h1 className="text-3xl mt-28 uppercase">Previous work</h1>
       </div>
       <div className="flex justify-center items-center">
         <div className="h-full w-full flex gap-y-10 flex-col items-center">
@@ -20,7 +19,7 @@ const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
             <div key={index}>
               <Link
                 key={project.id}
-                href={`/product/${project.id}`}
+                href={`/project/${project.id}`}
                 className="w-[80vw]  flex justify-center "
               >
                 <div className="w-[] h-full p-10 bg-black/60  flex justify-center items-center">

@@ -2,6 +2,7 @@ import { getProjectById } from "@/app/actions";
 import React from "react";
 import SmoothScroll from "../../../components/SmoothScroll";
 import MotionImage from "@/components/MotionImage";
+import Image from "next/image";
 
 const page = async ({ params }: { params: Promise<{ projectId: string }> }) => {
   const project = await getProjectById((await params).projectId);
@@ -30,18 +31,18 @@ const page = async ({ params }: { params: Promise<{ projectId: string }> }) => {
             </div>
           </div>
 
-          <img className="w-[800px]" src={`${project?.src}`} alt="" />
+          <Image className="w-[800px]" src={`${project?.src}`} alt="" />
         </div>
 
         <div className="min-h-screen mt-30 items-center flex justify-center flex-col gap-y-40">
           {project?.src2 && (
             <MotionImage>
-              <img className="md:max-w-[800px]" src={project.src2} alt="" />
+              <Image className="md:max-w-[800px]" src={project.src2} alt="" />
             </MotionImage>
           )}
           {project?.src3 && (
             <MotionImage>
-              <img className="md:w-[800px]" src={project.src3} alt="" />
+              <Image className="md:w-[800px]" src={project.src3} alt="" />
             </MotionImage>
           )}
           {project?.srcVideo && (

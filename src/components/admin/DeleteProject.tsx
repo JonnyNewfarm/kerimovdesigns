@@ -6,7 +6,10 @@ export default async function ProjectsPage() {
 
   return (
     <div>
-      <h1>All Projects</h1>
+      <div className="flex w-full justify-center">
+        <h1>All Projects</h1>
+      </div>
+
       <DeleteProjectCard projects={projects} />
     </div>
   );
