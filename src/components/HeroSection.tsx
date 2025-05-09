@@ -3,7 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import gsap from "gsap";
 import Image from "next/image";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import jonny17 from "../../public/jonny17.jpg";
 import Link from "next/link";
@@ -28,6 +28,19 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
   });
 
   const md = useTransform(scrollYProgress, [0.5, 1], [0, -200]);
+
+  const [isMdScreen, setIsMdScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMdScreen(window.innerWidth >= 768); // Tailwind's md breakpoint
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   const animation = () => {
     if (xPercent < -100) xPercent = 0;
@@ -57,12 +70,13 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
 
     requestAnimationFrame(animation);
   }, []);
+
   return (
     <div
       ref={container}
       className="h-screen relative flex w-full flex-col lg:flex-row overflow-hidden justify-center items-center px-4"
     >
-      <div className="h-full absolute w-full lg:w-[60vw] px-8 left-0  top-0 flex flex-col items-center py-10 justify-between">
+      <div className="h-full absolute w-full lg:w-[60vw] px-8 left-0 top-0 flex flex-col items-center py-10 justify-between">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{
@@ -74,18 +88,18 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
             times: [0, 0.4, 1],
             ease: "easeInOut",
           }}
-          className="relative  md:top-[8vh] text-[#ecebeb] text-3xl"
+          className="relative md:top-[8vh] text-[#ecebeb] text-3xl md:ml-10 lg:ml-0"
         >
           <div className="md:absolute right-0 lg:relative">
-            <h1 className="mt-5 text-lg hidden lg:block">Latest project</h1>
+            <h1 className="mt-5 text-lg hidden md:block">Latest project</h1>
 
-            <div>
+            <div className="">
               <Link
                 href={`/project/${id}`}
-                className="lg:w-[500px]  relative lg:h-[300px] md:w-[400px] md:h-[250px] hidden md:block"
+                className="lg:w-[450px] relative lg:h-[250px] md:w-[400px] md:h-[250px] hidden md:block"
               >
                 <Image fill src={imgSrc} className="object-cover" alt="" />
-                <div className="bg-black/80 hover:bg-white hover:text-black absolute bottom-0 text-sm md:text-lg  text-[#ecebeb] flex justify-center items-center py-2 px-5">
+                <div className="bg-black/80 hover:bg-white hover:text-black absolute bottom-0 text-sm md:text-lg text-[#ecebeb] flex justify-center items-center py-2 px-5">
                   View Project
                 </div>
               </Link>
@@ -126,7 +140,7 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
       </div>
 
       <motion.div
-        style={{ y: md }}
+        style={isMdScreen ? { y: md } : {}}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{
           scale: [0.7, 1],
@@ -137,9 +151,10 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
           times: [0, 0.4, 1],
           ease: "easeInOut",
         }}
-        className="absolute md:w-[40vw] md:right-0  w-full h-screen top-0   lg:h-screen"
+        className="absolute md:w-[40vw] md:right-0 w-full h-screen top-0 lg:h-screen"
       >
         <Image src={jonny17} className="object-cover" fill alt="" />
+        <div className="absolute h-screen w-screen bg-stone-700 z-40 opacity-20 md:hidden" />
       </motion.div>
     </div>
   );

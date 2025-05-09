@@ -3,6 +3,7 @@ import MyProjects from "@/components/MyProjects";
 import MyworkMobile from "@/components/MyworkMobile";
 import SmoothScroll from "@/components/SmoothScroll";
 import { getLatestProject, getProjects, getProjectsMobile } from "./actions";
+import AnimDisplay from "@/components/AnimDisplay";
 
 export default async function Home() {
   const projects = await getProjects();
@@ -23,6 +24,8 @@ export default async function Home() {
         <div className="md:hidden">
           <MyworkMobile projects={projectsMobile} />
         </div>
+
+        <AnimDisplay />
       </div>
     </SmoothScroll>
   );

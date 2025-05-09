@@ -11,6 +11,7 @@ interface ProjectsTableProps {
 
 const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
   const [hoveredProject, setHoveredProject] = useState<number>(0);
+
   return (
     <div className="w-full h-screen flex flex-row-reverse justify-between">
       <div className="lg:w-[60vw] md:w-[40vw] lg:h-[60vh] md:h-[40vh] relative">
@@ -21,7 +22,7 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
           alt={projects[hoveredProject].title}
         />
       </div>
-      <div className="md:w-[60vw] lg:w-[40vw] h-screen flex flex-col p-14  items-center justify-center">
+      <div className="md:w-[60vw] lg:w-[40vw] h-screen flex flex-col p-14 items-center justify-center">
         <div className="w-full">
           <h1 className="mb-3 ml-2.5 font-semibold text-lg">My Projects</h1>
           {projects.map((project, index) => (
@@ -31,8 +32,24 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
               className="border-t-1 w-full py-6 px-2 border-[#ecebeb] text-[#ecebeb] flex justify-between items-center"
               onMouseEnter={() => setHoveredProject(index)}
             >
-              <h1>{project.title}</h1>
-              <h1>{project.role}</h1>
+              <h1
+                className={`transition-transform duration-200 ${
+                  hoveredProject === index
+                    ? "scale-110 opacity-70"
+                    : "scale-100"
+                }`}
+              >
+                {project.title}
+              </h1>
+              <h1
+                className={`transition-transform duration-200 ${
+                  hoveredProject === index
+                    ? "scale-110 opacity-70"
+                    : "scale-100"
+                }`}
+              >
+                {project.role}
+              </h1>
             </Link>
           ))}
 
