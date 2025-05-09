@@ -20,7 +20,7 @@ const Footer = () => {
                 className="flex underline items-center gap-x-1"
                 href="https://www.jonasnygaard.com/"
               >
-                Jonas Nygaard
+                Code by Jonas
               </a>
             </div>
 
