@@ -33,7 +33,7 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMdScreen(window.innerWidth >= 768); // Tailwind's md breakpoint
+      setIsMdScreen(window.innerWidth >= 768);
     };
 
     checkScreenSize();

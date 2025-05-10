@@ -1,4 +1,3 @@
-// src/lib/authOptions.ts
 import { type AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 

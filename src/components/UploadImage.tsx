@@ -15,7 +15,7 @@ const UploadImage = ({
         onClientUploadComplete={(res) => {
           if (res && res.length > 0) {
             const url = res[0].url;
-            onUploadComplete(url); // Pass URL to parent
+            onUploadComplete(url);
             alert("Upload Completed");
           }
         }}

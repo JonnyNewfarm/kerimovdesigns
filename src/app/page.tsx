@@ -1,3 +1,4 @@
+export const revalidate = 60;
 import HeroSection from "@/components/HeroSection";
 import MyProjects from "@/components/MyProjects";
 import MyworkMobile from "@/components/MyworkMobile";
@@ -14,7 +15,7 @@ export default async function Home() {
 
   return (
     <SmoothScroll>
-      <div className="bg-[#242323] min-h-screen w-full text-[#ecebeb] overflow-clip">
+      <div className="bg-[#242323] min-h-screen w-full text-[#ecebeb] overflow-clip border-b-[1px] border-white/50">
         <HeroSection id={latestProject.id} imgSrc={latestProject.src} />
 
         <div className="hidden md:block">

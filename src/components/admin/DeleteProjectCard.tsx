@@ -1,4 +1,3 @@
-// app/projects/ProjectList.tsx (Client Component)
 "use client";
 
 import { deleteProjectById } from "@/app/actions";

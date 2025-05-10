@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from "../../lib/prisma"; // Adjust this path based on your project structure
+import prisma from "../../lib/prisma"; 
 import { revalidatePath } from "next/cache";
 
 export async function createProject(data: {
