@@ -11,7 +11,7 @@ const page = async ({ params }: { params: Promise<{ projectId: string }> }) => {
     <SmoothScroll>
       <div className="min-h-screen bg-[#242323] p-20 border-b-[1px] border-white/50">
         <div className="w-full flex flex-col min-h-screen items-center gap-y-20 justify-center text-[#ecebeb]">
-          <h1 className="text-5xl text-nowrap sm:text-8xl">{project?.title}</h1>
+          <h1 className="text-5xl text-wrap sm:text-8xl">{project?.title}</h1>
 
           <div className="flex flex-col sm:flex-row gap-x-5">
             <div>
