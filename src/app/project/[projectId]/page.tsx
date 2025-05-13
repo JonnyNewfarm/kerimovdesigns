@@ -1,7 +1,6 @@
 import { getProjectById } from "@/app/actions";
 import React from "react";
 import SmoothScroll from "../../../components/SmoothScroll";
-import Image from "next/image";
 import ProjectModalWrapper from "@/components/ProjectModalWrapper";
 
 const page = async ({ params }: { params: { projectId: string } }) => {
