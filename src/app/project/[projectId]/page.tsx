@@ -3,8 +3,15 @@ import React from "react";
 import SmoothScroll from "../../../components/SmoothScroll";
 import ProjectModalWrapper from "@/components/ProjectModalWrapper";
 
-const page = async ({ params }: { params: { projectId: string } }) => {
-  const project = await getProjectById(params.projectId);
+export type ParamsType = Promise<{ projectId: string }>;
+
+type Props = {
+  params: ParamsType;
+};
+
+const Page = async ({ params }: Props) => {
+  const { projectId } = await params;
+  const project = await getProjectById(projectId);
 
   return (
     <SmoothScroll>
@@ -40,4 +47,4 @@ const page = async ({ params }: { params: { projectId: string } }) => {
   );
 };
 
-export default page;
+export default Page;
