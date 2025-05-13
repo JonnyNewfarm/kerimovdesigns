@@ -4,8 +4,22 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import MotionImage from "./MotionImage";
 
+export interface Project {
+  id: string;
+  title: string;
+  src: string;
+  src2?: string | null;
+  src3?: string | null;
+  srcVideo?: string | null;
+  role?: string | null;
+  type?: string | null;
+  tools?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface ProjectModalWrapperProps {
-  project: any;
+  project: Project;
 }
 
 interface ModalImage {
@@ -41,8 +55,8 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
 
   return (
     <>
-      <div className="min-h-screen sm:mt-30  mt-10 items-center flex justify-center flex-col gap-y-26 sm:gap-y-40">
-        {project?.src && (
+      <div className="min-h-screen sm:mt-30 mt-10 items-center flex justify-center flex-col gap-y-26 sm:gap-y-40">
+        {project.src && (
           <MotionImage>
             <Image
               className="cursor-pointer md:max-w-[800px]"
@@ -50,12 +64,12 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
               alt={project.title || "Project Image"}
               width={800}
               height={450}
-              onClick={() => handleImageClick(project.src, "Image 1")}
+              onClick={() => handleImageClick(project.src!, "Image 1")}
             />
           </MotionImage>
         )}
 
-        {project?.src2 && (
+        {project.src2 && (
           <MotionImage>
             <Image
               className="cursor-pointer md:max-w-[800px]"
@@ -63,12 +77,12 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
               alt={project.title || "Project Image 2"}
               width={800}
               height={450}
-              onClick={() => handleImageClick(project.src2, "Image 2")}
+              onClick={() => handleImageClick(project.src2!, "Image 2")}
             />
           </MotionImage>
         )}
 
-        {project?.src3 && (
+        {project.src3 && (
           <MotionImage>
             <Image
               className="cursor-pointer md:max-w-[800px]"
@@ -76,12 +90,12 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
               alt={project.title || "Project Image 3"}
               width={800}
               height={450}
-              onClick={() => handleImageClick(project.src3, "Image 3")}
+              onClick={() => handleImageClick(project.src3!, "Image 3")}
             />
           </MotionImage>
         )}
 
-        {project?.srcVideo && (
+        {project.srcVideo && (
           <MotionImage>
             <video
               className="md:max-w-[800px]"
@@ -95,7 +109,6 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
         )}
       </div>
 
-      {/* Modal Display */}
       {modalImage && (
         <div
           onClick={closeModal}
