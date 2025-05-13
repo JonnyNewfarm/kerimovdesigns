@@ -94,6 +94,24 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
           </MotionImage>
         )}
       </div>
+
+      {/* Modal Display */}
+      {modalImage && (
+        <div
+          onClick={closeModal}
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center cursor-zoom-out"
+        >
+          <Image
+            src={modalImage.src}
+            alt={modalImage.alt}
+            width={1200}
+            height={800}
+            className="max-w-[90%] max-h-[90%] object-contain"
+            priority
+            unoptimized
+          />
+        </div>
+      )}
     </>
   );
 };
