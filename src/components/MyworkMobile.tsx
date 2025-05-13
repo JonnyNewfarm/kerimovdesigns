@@ -41,6 +41,10 @@ const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
               </div>
             </div>
           ))}
+
+          <Link className="border-2 border-white py-2 px-4" href={"/projects"}>
+            All projects
+          </Link>
         </div>
       </div>
     </div>
