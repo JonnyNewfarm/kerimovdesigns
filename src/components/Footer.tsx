@@ -13,11 +13,13 @@ const Footer = () => {
             <div className="flex  justify-between">
               <div className="">
                 <div className="flex gap-x-10">
-                  <div className="flex flex-col justify-start text-2xl font-light">
-                    <h1 className="opacity-70">Navigation</h1>
-                    <Link href={"/"}>Home</Link>
-                    <Link href={"/projects"}>My Work</Link>
-                    <Link href={"/contact"}>Contact</Link>
+                  <div className="hidden md:block">
+                    <div className="flex flex-col justify-start text-2xl font-light">
+                      <h1 className="opacity-70">Navigation</h1>
+                      <Link href={"/"}>Home</Link>
+                      <Link href={"/projects"}>My Work</Link>
+                      <Link href={"/contact"}>Contact</Link>
+                    </div>
                   </div>
                   <div className="hidden md:block">
                     <div className="flex justify-start flex-col text-2xl font-light">
