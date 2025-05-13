@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="h-[420px] text-[#ecebeb] p-14 sticky top-[calc(100vh-420px)] flex flex-col justify-between">
           <div className="w-full h-full flex flex-col justify-between">
             <div className="flex  justify-between">
-              <div className="hidden md:block">
+              <div className="">
                 <div className="flex gap-x-10">
                   <div className="flex flex-col justify-start text-2xl font-light">
                     <h1 className="opacity-70">Navigation</h1>
@@ -19,21 +19,14 @@ const Footer = () => {
                     <Link href={"/projects"}>My Work</Link>
                     <Link href={"/contact"}>Contact</Link>
                   </div>
-
-                  <div className="flex justify-start flex-col text-2xl font-light">
-                    <h1 className="opacity-70">Socials</h1>
-                    <a href="">Instagram</a>
-                    <a href="">LinkedIn</a>
+                  <div className="hidden md:block">
+                    <div className="flex justify-start flex-col text-2xl font-light">
+                      <h1 className="opacity-70">Socials</h1>
+                      <a href="">Instagram</a>
+                      <a href="">LinkedIn</a>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="w-full ">
-                <img
-                  className="w-[70%] md:w-[400px] lg:w-[600px] absolute  left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 md:left-auto md:top-0 md:right-0 md:translate-x-0 md:translate-y-0"
-                  src="/rustam-logos.png"
-                  alt=""
-                />
               </div>
             </div>
 
