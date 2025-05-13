@@ -21,7 +21,7 @@ const Footer = () => {
                       <Link href={"/contact"}>Contact</Link>
                     </div>
                   </div>
-                  <div className="hidden md:block">
+                  <div>
                     <div className="flex justify-start flex-col text-2xl font-light">
                       <h1 className="opacity-70">Socials</h1>
                       <a href="">Instagram</a>
