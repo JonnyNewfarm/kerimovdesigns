@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
+import toast from "react-hot-toast";
 
 const Page = () => {
   const [form, setForm] = useState({
@@ -11,26 +12,79 @@ const Page = () => {
     message: "",
   });
 
+  const [validationErrors, setValidationErrors] = useState<{
+    name?: string;
+    email?: string;
+    message?: string;
+  }>({});
+
+  const [submitted, setSubmitted] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+
+    // Clear error on field change
+    if (validationErrors[e.target.name as keyof typeof validationErrors]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [e.target.name]: undefined,
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors: typeof validationErrors = {};
+
+    if (!form.name.trim()) errors.name = "Name is required.";
+
+    if (!form.email.trim()) {
+      errors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      errors.email = "Email must be valid.";
+    }
+
+    if (!form.message.trim()) {
+      errors.message = "Message is required.";
+    } else if (form.message.length < 10) {
+      errors.message = "Message must be at least 10 characters.";
+    }
+
+    return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      body: JSON.stringify(form),
-      headers: { "Content-Type": "application/json" },
-    });
+    setSubmitted(true);
 
-    const data = await res.json();
-    if (data.success) {
-      alert("Message sent!");
-      window.location.reload();
-    } else {
-      alert("Something went wrong.");
+    const errors = validateForm();
+    setValidationErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      // Validation failed, do not submit
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        body: JSON.stringify(form),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success("Message sent!");
+        setForm({ name: "", email: "", organization: "", message: "" });
+        setValidationErrors({});
+        setSubmitted(false);
+      } else {
+        toast.error("Something went wrong.");
+      }
+    } catch (error) {
+      toast.error("Network error. Please try again later.");
     }
   };
 
@@ -45,41 +99,69 @@ const Page = () => {
           <form
             onSubmit={handleSubmit}
             className="flex flex-col justify-center"
+            noValidate
           >
-            <input
-              className="py-6 border-b-1 px-4 border-b-[#ecebeb] border-t-1"
-              placeholder="Name"
-              name="name"
-              type="text"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-            <input
-              className="py-6 border-b-1 px-4 border-b-[#ecebeb] "
-              placeholder="Email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-            <input
-              className="py-6 border-b-1 px-4 border-b-[#ecebeb] "
-              placeholder="Organization (optional)"
-              name="organization"
-              type="text"
-              value={form.organization}
-              onChange={handleChange}
-            />
-            <textarea
-              className="min-h-[150px] px-4 py-6 border-b-1 border-b-[#ecebeb]"
-              placeholder="Message"
-              name="message"
-              value={form.message}
-              onChange={handleChange}
-              required
-            />
+            <div>
+              <input
+                className="py-6 border-b-1 px-4 border-b-[#ecebeb] border-t-1 w-full"
+                placeholder="Name"
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+              {submitted && validationErrors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.name}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <input
+                className="py-6 border-b-1 px-4 border-b-[#ecebeb] w-full"
+                placeholder="Email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+              />
+              {submitted && validationErrors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.email}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <input
+                className="py-6 border-b-1 px-4 border-b-[#ecebeb] w-full"
+                placeholder="Organization (optional)"
+                name="organization"
+                type="text"
+                value={form.organization}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <textarea
+                className="min-h-[150px] px-4 py-6 border-b-1 border-b-[#ecebeb] w-full"
+                placeholder="Message"
+                name="message"
+                value={form.message}
+                onChange={handleChange}
+                required
+              />
+              {submitted && validationErrors.message && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.message}
+                </p>
+              )}
+            </div>
+
             <button
               type="submit"
               className="mt-4 ml-5 border cursor-pointer max-w-[100px] border-[#ecebeb] py-2 px-6"

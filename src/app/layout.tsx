@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import NavbarMobile from "@/components/NavbarMobile";
 import Footer from "@/components/Footer";
+import { Toaster } from "react-hot-toast";
 
 const lusitana = Montserrat({
   subsets: ["latin"],
@@ -29,6 +30,28 @@ export default function RootLayout({
         <NavbarMobile />
         {children}
         <Footer />
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "#ecebeb",
+              color: "#1c1a17",
+              border: "1px solid #ecebeb",
+            },
+            success: {
+              iconTheme: {
+                primary: "#4ade80",
+                secondary: "#1c1a17",
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: "#f87171",
+                secondary: "#1c1a17",
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );
