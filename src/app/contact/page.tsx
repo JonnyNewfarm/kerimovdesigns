@@ -112,7 +112,7 @@ const Page = () => {
                 required
               />
               {submitted && validationErrors.name && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-700 text-sm mt-1">
                   {validationErrors.name}
                 </p>
               )}
@@ -129,7 +129,7 @@ const Page = () => {
                 required
               />
               {submitted && validationErrors.email && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-700 text-sm mt-1">
                   {validationErrors.email}
                 </p>
               )}
@@ -156,7 +156,7 @@ const Page = () => {
                 required
               />
               {submitted && validationErrors.message && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-700 text-sm mt-1">
                   {validationErrors.message}
                 </p>
               )}
