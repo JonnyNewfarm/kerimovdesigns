@@ -83,7 +83,7 @@ const Page = () => {
       } else {
         toast.error("Something went wrong.");
       }
-    } catch (error) {
+    } catch {
       toast.error("Network error. Please try again later.");
     }
   };
