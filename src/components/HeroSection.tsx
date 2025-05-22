@@ -5,7 +5,7 @@ import gsap from "gsap";
 import Image from "next/image";
 import { useLayoutEffect, useRef, useEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import rustam2 from "../../public/rustam2.jpg";
+import rustam3 from "../../public/rustam3.jpg";
 import Link from "next/link";
 
 interface LatestProject {
@@ -153,7 +153,17 @@ const HeroSection = ({ imgSrc, id }: LatestProject) => {
         }}
         className="absolute md:w-[40vw] md:right-0 w-full h-screen top-0 lg:h-screen"
       >
-        <Image src={rustam2} className="object-cover" fill alt="" />
+        <div
+          className="relative w-full h-full"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+            maskImage:
+              "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+          }}
+        >
+          <Image src={rustam3} className="object-cover" fill alt="" />
+        </div>
         <div className="absolute h-screen w-screen bg-stone-700 z-40 opacity-20 md:hidden" />
       </motion.div>
     </div>
