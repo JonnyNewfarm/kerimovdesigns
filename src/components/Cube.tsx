@@ -10,6 +10,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
+
 import { motion } from "framer-motion-3d";
 
 const Index = () => {
