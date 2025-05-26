@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import { OrbitControls } from "@react-three/drei";
+
 import {
   useMotionValue,
   useSpring,
@@ -11,7 +12,7 @@ import {
 } from "framer-motion";
 import { motion } from "framer-motion-3d";
 
-const index = () => {
+const Index = () => {
   const container = useRef(null);
   const { scrollYProgress } = useScroll({
     target: container,
@@ -54,9 +55,13 @@ const index = () => {
   );
 };
 
-export default index;
-
-function Cube({ progress }: any) {
+export default Index;
+type MotionValueNumber = {
+  get: () => number;
+  set: (v: number) => void;
+  onChange: (callback: (v: number) => void) => () => void;
+};
+function Cube({ progress }: { progress: MotionValueNumber }) {
   const mesh = useRef(null);
 
   const options = {
@@ -68,7 +73,7 @@ function Cube({ progress }: any) {
     y: useSpring(useMotionValue(0), options),
   };
 
-  const manageMouseMove = (e: any) => {
+  const manageMouseMove = (e: MouseEvent) => {
     const { innerWidth, innerHeight } = window;
     const { clientX, clientY } = e;
     const x = -0.5 + clientX / innerWidth;
