@@ -4,7 +4,7 @@ import MyworkMobile from "@/components/MyworkMobile";
 import SmoothScroll from "@/components/SmoothScroll";
 import { getProjects, getProjectsMobile } from "./actions";
 import AnimDisplay from "@/components/AnimDisplay";
-import Cube from "@/components/Cube";
+import CubeSection from "@/components/CubeSection";
 
 export default async function Home() {
   const projects = await getProjects();
@@ -13,7 +13,7 @@ export default async function Home() {
   return (
     <SmoothScroll>
       <div className="bg-[#242323] p-0 relative min-h-screen w-full text-[#ecebeb] overflow-clip border-b-[1px] border-white/50">
-        <Cube />
+        <CubeSection />
 
         <div className="hidden md:block">
           <MyProjects projects={projects} />
