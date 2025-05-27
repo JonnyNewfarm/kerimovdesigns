@@ -55,7 +55,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
 
   return (
     <>
-      <div className="min-h-screen sm:mt-30 mt-10 items-center flex justify-center flex-col gap-y-26 sm:gap-y-40">
+      <div className="min-h-screen sm:mt-20 mt-10 items-center flex justify-center flex-col gap-y-26 sm:gap-y-40">
         {project.src && (
           <MotionImage>
             <Image
