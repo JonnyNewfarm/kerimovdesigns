@@ -20,17 +20,16 @@ export default function Index() {
     <div ref={container} className="h-[150vh]">
       <div className="sticky uppercase top-0 h-screen flex flex-col justify-center items-center">
         <Canvas className="w-full h-3/4">
-          <OrbitControls enableZoom={false} enablePan={false} />
           <ambientLight intensity={2} />
           <directionalLight position={[2, 1, 1]} />
           <Cube scrollProgress={smoothProgress} />
         </Canvas>
 
-        <div className="absolute bottom-16 text-center  px-4">
+        <div className="absolute bottom-14 text-center  px-4">
           <h1 className="text-white/90 text-3xl sm:text-2xl  font-bold">
             Rustam Kerimov
           </h1>
-          <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
+          <h2 className="text-white/90 text-4xl whitespace-nowrap sm:text-4xl font-extrabold">
             Graphic Designer
           </h2>
         </div>
