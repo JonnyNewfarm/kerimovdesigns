@@ -13,7 +13,7 @@ export default function Index() {
     target: container,
     offset: ["start start", "end end"],
   });
-  const progress = useTransform(scrollYProgress, [0, 1], [0, 5]);
+  const progress = useTransform(scrollYProgress, [0, 1], [0, 4.3]);
   const smoothProgress = useSpring(progress, { damping: 20 });
   return (
     <div ref={container} className="h-[150vh]">

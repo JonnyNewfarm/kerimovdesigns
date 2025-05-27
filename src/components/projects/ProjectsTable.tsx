@@ -24,7 +24,9 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
       </div>
       <div className="md:w-[60vw] lg:w-[40vw] h-screen flex flex-col p-14 items-center justify-center">
         <div className="w-full">
-          <h1 className="mb-4 ml-2.5  text-3xl">My Projects</h1>
+          <h1 className="mb-5 ml-2.5 uppercase font-bold  text-3xl">
+            My Projects
+          </h1>
           {projects.map((project, index) => (
             <Link
               href={`/project/${project.id}`}

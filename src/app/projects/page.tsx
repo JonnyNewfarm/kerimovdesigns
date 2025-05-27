@@ -15,14 +15,14 @@ const page = async ({ searchParams }: PageProps) => {
 
   return (
     <SmoothScroll>
-      <div className="bg-dark w-full min-h-screen text-[#ecebeb] border-b-[1px] border-white/50">
+      <div className="bg-dark w-full min-h-screen text-[#ecebeb] md:pt-12 border-b-[1px] border-white/50">
         <div className="w-full h-screen hidden md:block">
           <ProjectsTable projects={projects}>
             {Array.from({ length: Math.ceil(total / 5) }, (_, i) => (
               <a
                 key={i}
                 href={`?page=${i + 1}`}
-                className={`px-3 py-1 border ${currentPage === i + 1 ? "bg-[#ecebeb] text-black" : "text-[#ecebeb]"}`}
+                className={`px-3 py-1 border ${currentPage === i + 1 ? "text-[#ecebeb]" : "text-[#ecebeb]"}}`}
               >
                 {i + 1}
               </a>
@@ -36,7 +36,7 @@ const page = async ({ searchParams }: PageProps) => {
               <a
                 key={i}
                 href={`?page=${i + 1}`}
-                className={`px-3 py-1 border ${currentPage === i + 1 ? "bg-[#ecebeb] text-black" : "text-[#ecebeb]"}`}
+                className={`px-3 py-1 border ${currentPage === i + 1 ? "text-[#ecebeb]" : "text-[#ecebeb]"}`}
               >
                 {i + 1}
               </a>
