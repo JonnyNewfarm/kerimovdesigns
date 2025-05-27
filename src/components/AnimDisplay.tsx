@@ -12,7 +12,7 @@ const AnimDisplay = () => {
           opacity: [0, 1, 1],
         }}
         transition={{
-          duration: 2,
+          duration: 0.8,
           times: [0, 0.4, 1],
           ease: "easeInOut",
         }}
@@ -36,7 +36,7 @@ const AnimDisplay = () => {
           opacity: [0, 1, 1],
         }}
         transition={{
-          duration: 2.2,
+          duration: 0.8,
           times: [0, 0.4, 1],
           ease: "easeInOut",
         }}

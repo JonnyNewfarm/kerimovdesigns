@@ -25,7 +25,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
           opacity: [0, 1, 1],
         }}
         transition={{
-          duration: 1,
+          duration: 0.8,
           times: [0, 0.4, 1],
           ease: "easeInOut",
         }}
@@ -50,7 +50,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
           opacity: [0, 1, 1],
         }}
         transition={{
-          duration: 1.2,
+          duration: 0.8,
           times: [0, 0.4, 1],
           ease: "easeInOut",
         }}
@@ -84,7 +84,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
           opacity: [0, 1, 1],
         }}
         transition={{
-          duration: 1.3,
+          duration: 0.8,
           times: [0, 0.4, 1],
           ease: "easeInOut",
         }}

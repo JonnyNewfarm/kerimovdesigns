@@ -99,7 +99,7 @@ const Page = () => {
             opacity: [0, 1, 1],
           }}
           transition={{
-            duration: 1.7,
+            duration: 0.7,
             times: [0, 0.4, 1],
             ease: "easeInOut",
           }}
@@ -191,7 +191,7 @@ const Page = () => {
             opacity: [0, 1, 1],
           }}
           transition={{
-            duration: 1.5,
+            duration: 0.8,
             times: [0, 0.4, 1],
             ease: "easeInOut",
           }}
