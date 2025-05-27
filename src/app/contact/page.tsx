@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 const Page = () => {
   const [form, setForm] = useState({
@@ -91,7 +92,20 @@ const Page = () => {
   return (
     <SmoothScroll>
       <div className="min-h-screen w-full md:pt-32 text-[#ecebeb] border-b-[1px] border-white/50 gap-y-16 flex flex-col-reverse lg:gap-x-10 lg:flex-row justify-between py-16 px-10 lg:px-30 xl:px-40 bg-[#242323]">
-        <div className="flex flex-col gap-y-20">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          whileInView={{
+            scale: [0.8, 1],
+            opacity: [0, 1, 1],
+          }}
+          transition={{
+            duration: 1.7,
+            times: [0, 0.4, 1],
+            ease: "easeInOut",
+          }}
+          viewport={{ once: true }}
+          className="flex flex-col gap-y-20"
+        >
           <div className="lg:text-7xl hidden lg:block uppercase font-bold sm:text-5xl text-5xl">
             <h1>Let&apos;s create a</h1>
             <h1>project together</h1>
@@ -169,8 +183,21 @@ const Page = () => {
               Send
             </button>
           </form>
-        </div>
-        <div className="flex flex-col gap-y-10 uppercase mt-14 lg:mt-[215px] xl:mt-[260px]">
+        </motion.div>
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          whileInView={{
+            scale: [0.8, 1],
+            opacity: [0, 1, 1],
+          }}
+          transition={{
+            duration: 1.5,
+            times: [0, 0.4, 1],
+            ease: "easeInOut",
+          }}
+          viewport={{ once: true }}
+          className="flex flex-col gap-y-10 uppercase mt-14 lg:mt-[215px] xl:mt-[260px]"
+        >
           <div className="sm:text-6xl text-4xl lg:hidden">
             <h1>Let&apos;s create a</h1>
             <h1>project together</h1>
@@ -188,7 +215,7 @@ const Page = () => {
             <a href="#">Instagram</a>
             <a href="#">LinkedIn</a>
           </div>
-        </div>
+        </motion.div>
       </div>
     </SmoothScroll>
   );

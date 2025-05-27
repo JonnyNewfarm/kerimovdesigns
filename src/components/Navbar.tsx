@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const Navbar = () => {
@@ -21,9 +22,9 @@ const Navbar = () => {
             <div className="tracking-tighter">
               <h1 className=" opacity-70 m-0 leading-none">Naviation:</h1>
               <div className="flex gap-x-1  m-0 leading-tight">
-                <a href={"/"}>Home,</a>
-                <a href={"/projects"}>My work,</a>
-                <a href={"/contact"}>Contact</a>
+                <Link href={"/"}>Home,</Link>
+                <Link href={"/projects"}>My work,</Link>
+                <Link href={"/contact"}>Contact</Link>
               </div>
             </div>
           </div>

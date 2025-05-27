@@ -3,6 +3,7 @@ import { Project } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import React, { ReactNode, useState } from "react";
+import { motion } from "framer-motion";
 
 interface ProjectsTableProps {
   projects: Project[];
@@ -14,15 +15,41 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
 
   return (
     <div className="w-full h-screen flex flex-row-reverse justify-between">
-      <div className="lg:w-[60vw] md:w-[40vw] lg:h-[60vh] md:h-[40vh] relative">
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        whileInView={{
+          scale: [0.8, 1],
+          opacity: [0, 1, 1],
+        }}
+        transition={{
+          duration: 2.2,
+          times: [0, 0.4, 1],
+          ease: "easeInOut",
+        }}
+        viewport={{ once: true }}
+        className="lg:w-[60vw] md:w-[40vw] lg:h-[60vh] md:h-[40vh] relative"
+      >
         <Image
           fill
           className="object-contain"
           src={projects[hoveredProject].src}
           alt={projects[hoveredProject].title}
         />
-      </div>
-      <div className="md:w-[60vw] lg:w-[40vw] h-screen flex flex-col p-14 items-center justify-center">
+      </motion.div>
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        whileInView={{
+          scale: [0.8, 1],
+          opacity: [0, 1, 1],
+        }}
+        transition={{
+          duration: 2.2,
+          times: [0, 0.4, 1],
+          ease: "easeInOut",
+        }}
+        viewport={{ once: true }}
+        className="md:w-[60vw] lg:w-[40vw] h-screen flex flex-col p-14 items-center justify-center"
+      >
         <div className="w-full">
           <h1 className="mb-5 ml-2.5 uppercase font-bold  text-3xl">
             My Projects
@@ -57,7 +84,7 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
 
           <div className="flex justify-center mt-5">{children}</div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

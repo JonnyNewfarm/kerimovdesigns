@@ -12,7 +12,7 @@ export default async function Home() {
 
   return (
     <SmoothScroll>
-      <div className="bg-[#242323] p-0 relative min-h-screen w-full text-[#ecebeb] overflow-clip border-b-[1px] border-white/50">
+      <div className="bg-[#242323] p-0 relative min-h-screen w-full text-[#ecebeb]  border-b-[1px] border-white/50">
         <Cube />
 
         <div className="hidden md:block">
