@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
-    "@react-three/drei": "^10.0.8",
+    "@react-three/drei": "^9.56.9",
     "@react-three/fiber": "^9.1.2",
     "@uploadthing/react": "^7.3.0",
     "bcryptjs": "^3.0.2",
@@ -27,6 +27,7 @@
     "react-icons": "^5.5.0",
     "resend": "^4.5.1",
     "tailwind-merge": "^3.2.0",
+    "three": "^0.176.0",
     "uploadthing": "^7.6.0"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "@types/node": "20.17.30",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
+    "@types/three": "^0.176.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.4.0-canary.51",
     "prisma": "^6.6.0",

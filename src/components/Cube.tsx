@@ -2,6 +2,7 @@
 import React, { useRef } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { Mesh, TextureLoader } from "three";
+
 import { OrbitControls, ScrollControls } from "@react-three/drei";
 import { useScroll } from "framer-motion";
 
