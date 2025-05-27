@@ -196,9 +196,9 @@ const Page = () => {
             ease: "easeInOut",
           }}
           viewport={{ once: true }}
-          className="flex flex-col gap-y-10 uppercase mt-14 lg:mt-[215px] xl:mt-[260px]"
+          className="flex flex-col gap-y-10  mt-14 lg:mt-[215px] xl:mt-[260px]"
         >
-          <div className="sm:text-6xl text-4xl lg:hidden">
+          <div className="sm:text-6xl text-4xl uppercase lg:hidden">
             <h1>Let&apos;s create a</h1>
             <h1>project together</h1>
           </div>
