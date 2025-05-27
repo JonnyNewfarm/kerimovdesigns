@@ -26,7 +26,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
         <h1 className="uppercase font-semibold text-2xl">Previous work</h1>
       </div>
 
-      <div className="flex flex-wrap  gap-x-4 gap-y-2 mt-10 justify-center items-center text-lg">
+      <div className="flex flex-wrap  gap-x-4 gap-y-2 mt-10 justify-center items-center text-lg font-bold uppercase">
         {projects.slice(0, 5).map((project, index) => (
           <React.Fragment key={project.title}>
             <Link

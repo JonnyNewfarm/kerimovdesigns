@@ -51,17 +51,16 @@ export default function Index() {
 const Cube = ({ scrollProgress }: { scrollProgress: any }) => {
   const mesh = useRef<Mesh>(null);
 
-  const texture1 = useLoader(TextureLoader, "/cube/img1.jpg");
-  const texture2 = useLoader(TextureLoader, "/cube/img2.jpg");
-  const texture3 = useLoader(TextureLoader, "/cube/img3.jpg");
-  const texture4 = useLoader(TextureLoader, "/cube/img4.jpg");
-  const texture5 = useLoader(TextureLoader, "/cube/img5.jpg");
-  const texture6 = useLoader(TextureLoader, "/cube/img6.jpg");
+  const texture1 = useLoader(TextureLoader, "/cube/image1.jpg");
+  const texture2 = useLoader(TextureLoader, "/cube/image2.jpg");
+  const texture3 = useLoader(TextureLoader, "/cube/image3.jpg");
+  const texture4 = useLoader(TextureLoader, "/cube/image4.jpg");
+  const texture5 = useLoader(TextureLoader, "/cube/image.jpg");
+  const texture6 = useLoader(TextureLoader, "/cube/image6.jpg");
 
   useFrame(() => {
     if (!mesh.current) return;
 
-    // get current scroll progress value and set rotation
     const value = scrollProgress.get();
     mesh.current.rotation.x = value;
     mesh.current.rotation.y = value;
