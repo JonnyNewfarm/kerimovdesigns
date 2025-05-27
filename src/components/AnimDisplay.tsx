@@ -39,7 +39,7 @@ const AnimDisplay = () => {
           className="text-white lg:w-1/2 text-left"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold mb-4">
-            Smooth visuals, bold impact.
+            Smooth visuals, bold impact
           </h2>
           <p className="text-md md:text-lg lg:text-xl leading-relaxed">
             I create animations that bring rhythm and emotion to design. From
@@ -77,7 +77,7 @@ const AnimDisplay = () => {
           className="text-white lg:w-1/2 text-left lg:text-right"
         >
           <h2 className="text-3xl md:text-4xl px-4 lg:text-5xl font-semibold mb-4">
-            Visual identity that sticks.
+            Visual identity that sticks
           </h2>
           <p className="text-md md:text-lg px-4 lg:text-xl leading-relaxed">
             Whether it’s a logo or a full brand system, I build identities that
