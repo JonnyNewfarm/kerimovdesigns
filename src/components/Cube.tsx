@@ -3,8 +3,9 @@ import React, { useRef } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { Mesh, TextureLoader } from "three";
 
-import { OrbitControls, ScrollControls } from "@react-three/drei";
-import { useScroll } from "framer-motion";
+import { OrbitControls } from "@react-three/drei";
+import { useScroll, useSpring, useTransform } from "framer-motion";
+import Link from "next/link";
 
 export default function Index() {
   const container = useRef(null);
@@ -13,16 +14,36 @@ export default function Index() {
     target: container,
     offset: ["start start", "end end"],
   });
-
+  const progress = useTransform(scrollYProgress, [0, 1], [0, 5]);
+  const smoothProgress = useSpring(progress, { damping: 20 });
   return (
     <div ref={container} className="h-[150vh]">
-      <div className="h-screen sticky top-0">
-        <Canvas>
+      <div className="sticky uppercase top-0 h-screen flex flex-col justify-center items-center">
+        <Canvas className="w-full h-3/4">
           <OrbitControls enableZoom={false} enablePan={false} />
           <ambientLight intensity={2} />
           <directionalLight position={[2, 1, 1]} />
-          <Cube scrollProgress={scrollYProgress} />
+          <Cube scrollProgress={smoothProgress} />
         </Canvas>
+
+        <div className="absolute bottom-16 text-center  px-4">
+          <h1 className="text-white/90 text-3xl sm:text-2xl  font-bold">
+            Rustam Kerimov
+          </h1>
+          <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
+            Graphic Designer
+          </h2>
+        </div>
+        <div className="absolute hidden md:block left-10 bottom-16 text-left  px-4">
+          <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
+            <Link href={"/projects"}>Archives</Link>
+          </h2>
+        </div>
+        <div className="absolute hidden md:block right-10 bottom-16 text-left  px-4">
+          <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
+            <Link href={"/contact"}> Collaborate</Link>
+          </h2>
+        </div>
       </div>
     </div>
   );
@@ -31,15 +52,6 @@ export default function Index() {
 const Cube = ({ scrollProgress }: { scrollProgress: any }) => {
   const mesh = useRef<Mesh>(null);
 
-  useFrame(() => {
-    if (mesh.current) {
-      const offset = scrollProgress.get();
-      mesh.current.rotation.x = offset * 5;
-      mesh.current.rotation.y = offset * 5;
-      mesh.current.rotation.z = offset * 5;
-    }
-  });
-
   const texture1 = useLoader(TextureLoader, "/cube/img1.jpg");
   const texture2 = useLoader(TextureLoader, "/cube/img2.jpg");
   const texture3 = useLoader(TextureLoader, "/cube/img3.jpg");
@@ -47,9 +59,18 @@ const Cube = ({ scrollProgress }: { scrollProgress: any }) => {
   const texture5 = useLoader(TextureLoader, "/cube/img5.jpg");
   const texture6 = useLoader(TextureLoader, "/cube/img6.jpg");
 
+  useFrame(() => {
+    if (!mesh.current) return;
+
+    // get current scroll progress value and set rotation
+    const value = scrollProgress.get();
+    mesh.current.rotation.x = value;
+    mesh.current.rotation.y = value;
+  });
+
   return (
     <mesh ref={mesh}>
-      <boxGeometry args={[2, 2, 2]} />
+      <boxGeometry args={[2.5, 2.5, 2.5]} />
       <meshStandardMaterial map={texture1} attach={"material-0"} />
       <meshStandardMaterial map={texture2} attach={"material-1"} />
       <meshStandardMaterial map={texture3} attach={"material-2"} />
