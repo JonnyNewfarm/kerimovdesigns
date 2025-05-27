@@ -1,56 +1,107 @@
 "use client";
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
 
 const AnimDisplay = () => {
-  return (
-    <div className="min-h-[30vh] pb-10 bg-[#24232] mt-14 lg:mt-0 w-full flex flex-col lg:flex-row items-center justify-center gap-x-10 gap-y-14">
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        whileInView={{
-          scale: [0.8, 1],
-          opacity: [0, 1, 1],
-        }}
-        transition={{
-          duration: 0.8,
-          times: [0, 0.4, 1],
-          ease: "easeInOut",
-        }}
-        viewport={{ once: true }}
-        className="lg:w-[40vw] w-[80vw]"
-      >
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="object-contain"
-          src="/bylarm-anim.mp4"
-        />
-      </motion.div>
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isLg, setIsLg] = useState(false);
 
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        whileInView={{
-          scale: [0.8, 1],
-          opacity: [0, 1, 1],
-        }}
-        transition={{
-          duration: 0.8,
-          times: [0, 0.4, 1],
-          ease: "easeInOut",
-        }}
-        viewport={{ once: true }}
-      >
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="lg:w-[40vw] w-[80vw] hidden lg:block"
-          src="bbs-anim.mp4"
-        />
-      </motion.div>
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsLg(window.innerWidth >= 1024);
+    };
+
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [-200, 250]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full px-6 py-16 bg-[#242323] flex flex-col gap-y-32"
+    >
+      {/* Row 1 - Animations */}
+      <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12">
+        {/* Text left */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-white lg:w-1/2 text-left"
+        >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold mb-4">
+            Smooth visuals, bold impact.
+          </h2>
+          <p className="text-md md:text-lg lg:text-xl leading-relaxed">
+            I create animations that bring rhythm and emotion to design. From
+            subtle transitions to expressive motion — every detail adds life.
+          </p>
+        </motion.div>
+
+        {/* Video right */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          viewport={{ once: true }}
+          className="relative w-full lg:w-1/2 aspect-[16/9]"
+        >
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-contain"
+            src="/bylarm-anim.mp4"
+          />
+        </motion.div>
+      </div>
+
+      {/* Row 2 - Brand Identity */}
+      <div className="w-full flex flex-col lg:flex-row-reverse items-center justify-between gap-6 lg:gap-12">
+        {/* Text right - animated on large screens */}
+        <motion.div
+          style={isLg ? { y } : {}}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-white lg:w-1/2 text-left lg:text-right"
+        >
+          <h2 className="text-3xl md:text-4xl px-4 lg:text-5xl font-semibold mb-4">
+            Visual identity that sticks.
+          </h2>
+          <p className="text-md md:text-lg px-4 lg:text-xl leading-relaxed">
+            Whether it’s a logo or a full brand system, I build identities that
+            are memorable, clear, and uniquely yours. Always tailored, never
+            templated.
+          </p>
+        </motion.div>
+
+        {/* Image left */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          viewport={{ once: true }}
+          className="relative w-full lg:w-1/2 aspect-[3/4]" // adjust as needed
+        >
+          <Image
+            src="/identity2.jpg"
+            alt="Brand Identity"
+            fill
+            className="object-contain"
+          />
+        </motion.div>
+      </div>
     </div>
   );
 };
