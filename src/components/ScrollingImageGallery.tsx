@@ -56,11 +56,11 @@ const ScrollingImageGallery = () => {
 
   return (
     <div className="relative w-full flex border-t border-white items-center overflow-hidden h-[80vh] bg-[#242323]">
-      <div className="absolute gap-y-2 flex  flex-col top-10 left-10">
-        <h1 className="sm:text-4xl text-2xl font-bold ">
+      <div className="absolute flex flex-col top-5 left-5 sm:top-10 sm:left-10 gap-y-1 sm:gap-y-2 max-w-xs sm:max-w-md">
+        <h1 className="text-2xl whitespace-nowrap sm:text-4xl font-bold">
           Logos that get you noticed
         </h1>
-        <p className="text-lg">
+        <p className="text-base sm:text-lg">
           Simple, fresh, and made to stick with your vibe.
         </p>
       </div>
