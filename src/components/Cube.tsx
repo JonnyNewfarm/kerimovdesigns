@@ -25,20 +25,20 @@ export default function Index() {
           <Cube scrollProgress={smoothProgress} />
         </Canvas>
 
-        <div className="absolute bottom-14 text-center  px-4">
-          <h1 className="text-white/90 text-3xl sm:text-2xl  font-bold">
+        <div className="absolute bottom-15 text-center  px-4">
+          <h1 className="text-white/90 text-2xl sm:text-2xl  font-bold">
             Rustam Kerimov
           </h1>
-          <h2 className="text-white/90 text-4xl whitespace-nowrap sm:text-4xl font-extrabold">
+          <h2 className="text-white/90 text-3xl whitespace-nowrap sm:text-4xl font-extrabold">
             Graphic Designer
           </h2>
         </div>
-        <div className="absolute hidden md:block left-10 bottom-16 text-left  px-4">
+        <div className="absolute hidden md:block left-10 bottom-15 text-left  px-4">
           <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
             <Link href={"/projects"}>Archives</Link>
           </h2>
         </div>
-        <div className="absolute hidden md:block right-10 bottom-16 text-left  px-4">
+        <div className="absolute hidden md:block right-10 bottom-15 text-left  px-4">
           <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
             <Link href={"/contact"}> Collaborate</Link>
           </h2>
@@ -69,7 +69,7 @@ const Cube = ({ scrollProgress }: { scrollProgress: any }) => {
 
   return (
     <mesh ref={mesh}>
-      <boxGeometry args={[2.5, 2.5, 2.5]} />
+      <boxGeometry args={[2.3, 2.3, 2.3]} />
       <meshStandardMaterial map={texture1} attach={"material-0"} />
       <meshStandardMaterial map={texture2} attach={"material-1"} />
       <meshStandardMaterial map={texture3} attach={"material-2"} />
