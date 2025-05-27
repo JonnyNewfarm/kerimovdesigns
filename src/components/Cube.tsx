@@ -44,12 +44,12 @@ export default function Index() {
             Graphic Designer
           </h2>
         </div>
-        <div className="absolute hidden md:block left-10 bottom-15 text-left  px-4">
+        <div className="absolute hidden lg:block left-10 bottom-15 text-left  px-4">
           <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
             <Link href={"/projects"}>Archives</Link>
           </h2>
         </div>
-        <div className="absolute hidden md:block right-10 bottom-15 text-left  px-4">
+        <div className="absolute hidden lg:block right-10 bottom-15 text-left  px-4">
           <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
             <Link href={"/contact"}> Collaborate</Link>
           </h2>
