@@ -3,7 +3,7 @@ import React, { useRef } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { Mesh, TextureLoader } from "three";
 
-import { useScroll, useSpring, useTransform } from "framer-motion";
+import { useScroll, useSpring, useTransform, motion } from "framer-motion";
 import Link from "next/link";
 
 export default function Index() {
@@ -16,7 +16,19 @@ export default function Index() {
   const progress = useTransform(scrollYProgress, [0, 1], [0, 4.3]);
   const smoothProgress = useSpring(progress, { damping: 20 });
   return (
-    <div ref={container} className="h-[150vh]">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{
+        opacity: [0, 1, 1],
+      }}
+      transition={{
+        duration: 2,
+        times: [0, 0.4, 1],
+        ease: "easeInOut",
+      }}
+      ref={container}
+      className="h-[150vh]"
+    >
       <div className="sticky uppercase top-0 h-screen flex flex-col justify-center items-center">
         <Canvas className="w-full h-3/4">
           <ambientLight intensity={2} />
@@ -43,7 +55,7 @@ export default function Index() {
           </h2>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
