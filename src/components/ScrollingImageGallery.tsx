@@ -10,7 +10,7 @@ const ScrollingImageGallery = () => {
   const row1 = useRef<HTMLDivElement>(null);
   const row2 = useRef<HTMLDivElement>(null);
   const direction = useRef(-1);
-  const xPercent = useRef(0); // ✅ useRef to persist across frames
+  const xPercent = useRef(0);
 
   const images = [
     "/logos/logo1.jpg",

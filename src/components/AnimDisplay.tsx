@@ -29,9 +29,7 @@ const AnimDisplay = () => {
       ref={containerRef}
       className="w-full px-6 py-16 bg-[#242323] flex flex-col gap-y-32"
     >
-      {/* Row 1 - Animations */}
       <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12">
-        {/* Text left */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -47,7 +45,6 @@ const AnimDisplay = () => {
           </p>
         </motion.div>
 
-        {/* Video right */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           whileInView={{ scale: 1, opacity: 1 }}
@@ -66,9 +63,7 @@ const AnimDisplay = () => {
         </motion.div>
       </div>
 
-      {/* Row 2 - Brand Identity */}
       <div className="w-full flex flex-col lg:flex-row-reverse items-center justify-between gap-6 lg:gap-12">
-        {/* Text right - animated on large screens */}
         <motion.div
           style={isLg ? { y } : {}}
           initial={{ opacity: 0 }}
@@ -86,13 +81,12 @@ const AnimDisplay = () => {
           </p>
         </motion.div>
 
-        {/* Image left */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           whileInView={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
           viewport={{ once: true }}
-          className="relative w-full lg:w-1/2 aspect-[3/4]" // adjust as needed
+          className="relative w-full lg:w-1/2 aspect-[3/4]"
         >
           <Image
             src="/identity2.jpg"
