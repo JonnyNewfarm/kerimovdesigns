@@ -29,7 +29,7 @@ const AnimDisplay = () => {
       ref={containerRef}
       className="w-full px-6 py-16 bg-[#242323] flex flex-col gap-y-32"
     >
-      <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12">
+      <div className="w-full flex flex-col lg:flex-row items-center justify-between lg:px-20 gap-6 lg:gap-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -63,7 +63,7 @@ const AnimDisplay = () => {
         </motion.div>
       </div>
 
-      <div className="w-full flex flex-col lg:flex-row-reverse items-center justify-between gap-6 lg:gap-12">
+      <div className="w-full lg:px-20 flex flex-col lg:flex-row-reverse items-center justify-between gap-6 lg:gap-12">
         <motion.div
           style={isLg ? { y } : {}}
           initial={{ opacity: 0 }}

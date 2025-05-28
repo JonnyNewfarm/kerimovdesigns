@@ -7,7 +7,6 @@ import { useScroll, useSpring, useTransform, motion } from "framer-motion";
 import Link from "next/link";
 import { OrbitControls } from "@react-three/drei";
 
-// Custom hook to detect if screen width is md (768px) or wider
 function useIsMdUp() {
   const [isMdUp, setIsMdUp] = useState(false);
 
@@ -109,7 +108,6 @@ const Cube = ({ scrollProgress }: { scrollProgress: any }) => {
     } else {
       document.body.style.cursor = "auto";
     }
-    // Cleanup on unmount
     return () => {
       document.body.style.cursor = "auto";
     };
