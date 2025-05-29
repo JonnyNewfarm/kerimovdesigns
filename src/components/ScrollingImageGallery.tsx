@@ -48,16 +48,16 @@ const ScrollingImageGallery = () => {
           direction.current = self.direction * -1;
         },
       },
-      x: "-200px",
+      x: "-100px",
     });
 
     requestAnimationFrame(animate);
   }, []);
 
   return (
-    <div className="relative w-full flex  items-center overflow-hidden h-[80vh] bg-[#242323]">
+    <div className="relative w-full flex mt-10  items-center overflow-hidden h-screen bg-[#242323]">
       <div className="absolute flex flex-col top-5 left-5 sm:top-10 sm:left-10 gap-y-1 sm:gap-y-2 max-w-xs sm:max-w-md">
-        <h1 className="text-2xl whitespace-nowrap sm:text-4xl font-bold">
+        <h1 className="text-2xl mt-10 whitespace-nowrap sm:text-4xl font-bold">
           Logos that get you noticed
         </h1>
         <p className="text-base sm:text-lg">
@@ -70,7 +70,10 @@ const ScrollingImageGallery = () => {
       >
         <div ref={row1} className="flex gap-x-16">
           {images.map((src, i) => (
-            <div key={`img1-${i}`} className="relative w-[200px] h-[200px] m-1">
+            <div
+              key={`img1-${i}`}
+              className="relative w-[200px] h-[200px] md:w-[250px] md:h-[250px] m-1 border-[4px] border-white/40"
+            >
               <Image src={src} alt={`img-${i}`} fill className="object-cover" />
             </div>
           ))}
@@ -80,7 +83,10 @@ const ScrollingImageGallery = () => {
           className="flex ml-16 absolute gap-x-16 left-full top-0"
         >
           {images.map((src, i) => (
-            <div key={`img2-${i}`} className="relative w-[200px] h-[200px] m-1">
+            <div
+              key={`img2-${i}`}
+              className="relative w-[200px] h-[200px] md:w-[250px] md:h-[250px] m-1 border-[4px] border-white/40"
+            >
               <Image src={src} alt={`img-${i}`} fill className="object-cover" />
             </div>
           ))}

@@ -27,7 +27,7 @@ const AnimDisplay = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full px-6 py-16 bg-[#242323] flex flex-col gap-y-32"
+      className="w-full px-6 md:px-20 lg:px-1 py-16 bg-[#242323] flex flex-col gap-y-32"
     >
       <div className="w-full flex flex-col lg:flex-row items-center justify-between lg:px-20 gap-6 lg:gap-12">
         <motion.div
@@ -36,7 +36,7 @@ const AnimDisplay = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-white lg:w-1/2 text-left"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-4xl font-semibold uppercase mb-4">
             Smooth visuals, bold impact
           </h2>
           <p className="text-md md:text-lg lg:text-xl leading-relaxed">
@@ -63,7 +63,7 @@ const AnimDisplay = () => {
         </motion.div>
       </div>
 
-      <div className="w-full lg:px-20 flex flex-col lg:flex-row-reverse items-center justify-between gap-6 lg:gap-12">
+      <div className="w-full lg:px-20  flex flex-col lg:flex-row-reverse items-center justify-between gap-6 lg:gap-12">
         <motion.div
           style={isLg ? { y } : {}}
           initial={{ opacity: 0 }}
@@ -71,7 +71,7 @@ const AnimDisplay = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-white lg:w-1/2 text-left lg:text-right"
         >
-          <h2 className="text-3xl md:text-4xl px-4 lg:text-5xl font-semibold mb-4">
+          <h2 className="text-3xl uppercase md:text-4xl px-4 lg:text-4xl font-semibold mb-4">
             Visual identity that sticks
           </h2>
           <p className="text-md md:text-lg px-4 lg:text-xl leading-relaxed">

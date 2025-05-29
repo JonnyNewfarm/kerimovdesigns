@@ -71,7 +71,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
               {project.title}
             </Link>
             {index !== firstRow.length - 1 && (
-              <span className="text-[#ecebeb]">-</span>
+              <span className="text-[#ecebeb]">—</span>
             )}
           </React.Fragment>
         ))}
@@ -105,7 +105,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
               {project.title}
             </Link>
             {index !== secondRow.length - 1 && (
-              <span className="text-[#ecebeb]">-</span>
+              <span className="text-[#ecebeb]">—</span>
             )}
           </React.Fragment>
         ))}
