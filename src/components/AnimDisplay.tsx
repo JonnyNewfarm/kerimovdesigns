@@ -33,7 +33,7 @@ const AnimDisplay = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-white lg:w-1/2 text-left"
         >
           <h2 className="text-3xl md:text-4xl lg:text-4xl font-semibold uppercase mb-4">
@@ -46,9 +46,9 @@ const AnimDisplay = () => {
         </motion.div>
 
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           whileInView={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
           viewport={{ once: true }}
           className="relative w-full lg:w-1/2 aspect-[16/9]"
         >
@@ -68,7 +68,7 @@ const AnimDisplay = () => {
           style={isLg ? { y } : {}}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-white lg:w-1/2 text-left lg:text-right"
         >
           <h2 className="text-3xl uppercase md:text-4xl px-4 lg:text-4xl font-semibold mb-4">
@@ -82,9 +82,9 @@ const AnimDisplay = () => {
         </motion.div>
 
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           whileInView={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
           viewport={{ once: true }}
           className="relative w-full lg:w-1/2 aspect-[3/4]"
         >

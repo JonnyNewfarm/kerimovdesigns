@@ -48,7 +48,7 @@ const ScrollingImageGallery = () => {
           direction.current = self.direction * -1;
         },
       },
-      x: "-100px",
+      x: "-250px",
     });
 
     requestAnimationFrame(animate);
