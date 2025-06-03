@@ -106,7 +106,7 @@ const Page = () => {
           viewport={{ once: true }}
           className="flex flex-col gap-y-20"
         >
-          <div className="lg:text-7xl hidden lg:block uppercase font-bold sm:text-5xl text-5xl">
+          <div className="lg:text-7xl hidden lg:block uppercase font-semibold sm:text-5xl text-5xl">
             <h1>Let&apos;s create a</h1>
             <h1>project together</h1>
           </div>
@@ -205,15 +205,27 @@ const Page = () => {
           <div className="gap-y-3 flex flex-col">
             <h1 className="opacity-70 ">Contact details</h1>
             <p>Rustam Kerimov</p>
-            <p>kerimovrustam8@gmail.com</p>
+            <p>rustam-98@hotmail.com</p>
             <p>+47 45 26 81 63</p>
             <p>Oslo, Norway</p>
           </div>
 
           <div className="gap-y-3 flex flex-col">
             <h1 className="opacity-70 ">Socials</h1>
-            <a href="#">Instagram</a>
-            <a href="#">LinkedIn</a>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.instagram.com/rustam.kerim0v?igsh=MTlhcjl5YzV0bm15cQ%3D%3D&utm_source=qr"
+            >
+              Instagram
+            </a>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://linkedin.com/in/rustam-kerimov-75bb5a331"
+            >
+              LinkedIn
+            </a>
           </div>
         </motion.div>
       </div>

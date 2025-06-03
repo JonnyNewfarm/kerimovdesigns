@@ -47,6 +47,34 @@ export async function createProject(data: {
 
 
 
+
+export async function updateProject(id: string, data: {
+  title?: string;
+  src?: string;
+  src2?: string;
+  src3?: string;
+  srcVideo?: string;
+  role?: string;
+  type?: string;
+  tools?: string;
+}) {
+  try {
+    const updatedProject = await prisma.project.update({
+      where: { id },
+      data,
+    });
+
+    revalidatePath("/projects");
+
+    return { success: true, updatedProject };
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return { success: false, error: "Could not update project" };
+  }
+}
+
+
+
 export const getProjects = async () => {
   try {
     const projects = await prisma.project.findMany(
@@ -99,7 +127,7 @@ export async function deleteProjectById(id: string) {
       where: { id },
     });
 
-    revalidatePath('/projects'); // optional, if you're using ISR or cached routes
+    revalidatePath('/projects');
 
     return { success: true, deleted };
   } catch (error) {

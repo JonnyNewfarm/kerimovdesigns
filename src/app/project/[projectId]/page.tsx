@@ -21,12 +21,12 @@ const Page = async ({ params }: Props) => {
   return (
     <SmoothScroll>
       <div className="min-h-screen pt-32 bg-[#242323] p-20 border-b-[1px] border-white/50">
-        <div className="w-full flex flex-col min-h-screen items-center gap-y-20 sm:gap-y-10 justify-center text-[#ecebeb]">
+        <div className="w-full flex flex-col min-h-screen items-center gap-y-2 sm:gap-y-5 justify-center text-[#ecebeb]">
           <h1 className="text-3xl uppercase text-wrap text-center sm:text-7xl">
             {project.title}
           </h1>
 
-          <div className="flex flex-col mt-10 sm:flex-row gap-x-5">
+          <div className="flex flex-col mt-10 gap-y-5 sm:gap-y-0 sm:flex-row gap-x-5">
             <div>
               <h1 className="mb-2">Role</h1>
               <span className="bg-[#ecebeb] h-[1px] w-[200px] block" />

@@ -4,6 +4,7 @@ import DeleteProject from "@/components/admin/DeleteProject";
 import UploadProject from "@/components/admin/UploadProject";
 import { redirect } from "next/navigation";
 import SignOut from "../../components/admin/SignOut";
+import UpdateProject from "@/components/admin/UpdateProject";
 
 const AdminPage = async () => {
   const session = await getServerSession(authOptions);
@@ -13,13 +14,16 @@ const AdminPage = async () => {
   }
 
   return (
-    <div>
-      <div className="flex sticky bg-white top-0 w-full justify-between px-20 py-10">
-        <h1 className="font-semibold text-lg md:text-xl">Admin page-RK</h1>
-        <SignOut />
+    <div className="bg-[#242323]  z-[99999999] text-white border-b border-w">
+      <SignOut />
+      <div className="w-full flex justify-center">
+        <h1 className="text-4xl font-semibold text-white">Manage Projects</h1>
       </div>
-      <UploadProject />
-      <DeleteProject />
+      <div className="flex flex-col items-center justify-center w-full min-h-screen gap-y-20">
+        <UploadProject />
+        <UpdateProject />
+        <DeleteProject />
+      </div>
     </div>
   );
 };

@@ -7,7 +7,7 @@ export default async function ProjectsPage() {
   return (
     <div>
       <div className="flex w-full justify-center">
-        <h1>All Projects</h1>
+        <h1 className="text-2xl">Delete Projects</h1>
       </div>
 
       <DeleteProjectCard projects={projects} />

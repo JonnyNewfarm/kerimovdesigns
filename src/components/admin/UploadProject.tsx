@@ -42,8 +42,8 @@ export default function UploadProject() {
   };
 
   return (
-    <div className="w-full flex-col gap-y-6 min-h-screen flex items-center justify-center">
-      <h1 className="text-xl">Upload project</h1>
+    <div className="w-full flex-col gap-y-6 text-white min-h-screen flex items-center justify-center">
+      <h1 className="text-2xl text-white">Upload project</h1>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col items-center justify-center gap-y-6"
@@ -97,7 +97,7 @@ export default function UploadProject() {
           </div>
         </div>
         <button
-          className="cursor-pointer border-1 border-black py-2 px-4"
+          className="cursor-pointer border-1 border-white py-2 px-4"
           type="submit"
           disabled={isPending}
         >
