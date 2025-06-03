@@ -48,6 +48,8 @@ const Footer = () => {
               <div>
                 <h1 className="opacity-65">Created by:</h1>
                 <a
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex underline items-center gap-x-1"
                   href="https://www.jonasnygaard.com/"
                 >

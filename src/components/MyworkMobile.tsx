@@ -24,7 +24,7 @@ const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
                 href={`/project/${project.id}`}
                 className="w-[80vw]  flex justify-center "
               >
-                <div className="w-[] h-full p-10 bg-black/60  flex justify-center items-center">
+                <div className="h-full  bg-[#0d0d0d]  flex justify-center items-center">
                   <img
                     alt="project-image"
                     className="object-contain"
