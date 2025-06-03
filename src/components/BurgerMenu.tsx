@@ -13,7 +13,7 @@ const BurgerMenu = () => {
         className="fixed right-0 mr-5 z-50 cursor-pointer"
       >
         <span
-          className={`text-lg font-bold ${isOpen ? "text-black" : "text-white"}`}
+          className={`text-lg font-semibold ${isOpen ? "text-black" : "text-white"}`}
         >
           {isOpen ? "Close" : "Menu"}
         </span>
