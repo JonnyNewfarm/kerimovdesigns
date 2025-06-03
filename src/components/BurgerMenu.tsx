@@ -1,6 +1,6 @@
 "use client";
-
 import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import Burger from "./Burger";
 
 const BurgerMenu = () => {
@@ -10,17 +10,18 @@ const BurgerMenu = () => {
     <>
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed right-0 mr-5  flex items-center justify-center md:hidden cursor-pointer z-50"
+        className="fixed right-0 mr-5 z-50 cursor-pointer"
       >
         <span
-          className={`text-lg font-bold ${
-            isOpen ? "text-black" : "text-white"
-          }  px-4 py-2 rounded `}
+          className={`text-lg font-bold ${isOpen ? "text-black" : "text-white"}`}
         >
           {isOpen ? "Close" : "Menu"}
         </span>
       </div>
-      {isOpen && <Burger />}
+
+      <AnimatePresence mode="wait">
+        {isOpen && <Burger key="burger" />}
+      </AnimatePresence>
     </>
   );
 };
