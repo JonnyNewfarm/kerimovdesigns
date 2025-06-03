@@ -91,7 +91,7 @@ const Cube = ({ scrollProgress }: { scrollProgress: any }) => {
   const texture2 = useLoader(TextureLoader, "/cube-img/image2.jpg");
   const texture3 = useLoader(TextureLoader, "/cube-img/image3.jpg");
   const texture4 = useLoader(TextureLoader, "/cube-img/image4.jpg");
-  const texture5 = useLoader(TextureLoader, "/cube-img/image5.jpg");
+  const texture5 = useLoader(TextureLoader, "/cube-img/rustam.jpg");
   const texture6 = useLoader(TextureLoader, "/cube-img/image6.jpg");
 
   useFrame(() => {
