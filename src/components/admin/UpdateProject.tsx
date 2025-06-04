@@ -80,24 +80,38 @@ export default function UpdateProject() {
           />
 
           <div className="grid grid-cols-2 gap-4">
-            <UploadImage
-              onUploadComplete={(url) => setFormData({ ...formData, src: url })}
-            />
-            <UploadImage
-              onUploadComplete={(url) =>
-                setFormData({ ...formData, src2: url })
-              }
-            />
-            <UploadImage
-              onUploadComplete={(url) =>
-                setFormData({ ...formData, src3: url })
-              }
-            />
-            <UploadImage
-              onUploadComplete={(url) =>
-                setFormData({ ...formData, srcVideo: url })
-              }
-            />
+            <div>
+              <h1>Wide Image</h1>
+              <UploadImage
+                onUploadComplete={(url) =>
+                  setFormData({ ...formData, src: url })
+                }
+              />
+            </div>
+            <div>
+              <h1>Image</h1>
+              <UploadImage
+                onUploadComplete={(url) =>
+                  setFormData({ ...formData, src2: url })
+                }
+              />
+            </div>
+            <div>
+              <h1>Image</h1>
+              <UploadImage
+                onUploadComplete={(url) =>
+                  setFormData({ ...formData, src3: url })
+                }
+              />
+            </div>
+            <div>
+              <h1>Video</h1>
+              <UploadImage
+                onUploadComplete={(url) =>
+                  setFormData({ ...formData, srcVideo: url })
+                }
+              />
+            </div>
           </div>
 
           <button

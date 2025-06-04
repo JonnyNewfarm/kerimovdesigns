@@ -21,7 +21,10 @@ const AdminPage = async () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full min-h-screen gap-y-20">
         <UploadProject />
+        <div className="h-[1px] w-[80%] bg-white/60" />
         <UpdateProject />
+        <div className="h-[1px] w-[80%] bg-white/60" />
+
         <DeleteProject />
       </div>
     </div>
