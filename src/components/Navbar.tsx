@@ -4,7 +4,7 @@ import React from "react";
 const Navbar = () => {
   return (
     <div className="w-full hidden md:block fixed  top-0 z-[9999]">
-      <div className="bg-[#000000]  font-extrabold text-[16px] text-[#ecebeb] md:px-20 md:py-3 flex  items-center  z-50 w-full justify-between">
+      <div className="bg-[#242323]  font-extrabold text-[16px] text-[#ecebeb] md:px-20 md:py-3 flex  items-center  z-50 w-full justify-between">
         <div className="w-full h-full">
           <div className="flex items-center justify-between">
             <div className="tracking-tighter">
