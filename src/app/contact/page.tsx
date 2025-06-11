@@ -91,7 +91,7 @@ const Page = () => {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen w-full md:pt-32 text-[#ecebeb] border-b-[1px] border-white/50 gap-y-16 flex flex-col-reverse lg:gap-x-10 lg:flex-row justify-between py-16 px-10 lg:px-30 xl:px-40 bg-[#242323]">
+      <div className="min-h-screen w-full md:pt-32 text-color border-b-[1px] border-white/50 gap-y-16 flex flex-col-reverse lg:gap-x-10 lg:flex-row justify-between py-16 px-10 lg:px-30 xl:px-40 bg-dark">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           whileInView={{

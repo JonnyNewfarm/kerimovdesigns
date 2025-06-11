@@ -58,7 +58,7 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
             <Link
               href={`/project/${project.id}`}
               key={project.id}
-              className="border-t-1 w-full py-6 px-2 border-[#ecebeb] text-[#ecebeb] flex justify-between items-center"
+              className="border-t-1 w-full py-6 px-2 border-[#ecebeb] text-color flex justify-between items-center"
               onMouseEnter={() => setHoveredProject(index)}
             >
               <h1

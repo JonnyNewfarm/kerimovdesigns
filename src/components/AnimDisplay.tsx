@@ -27,14 +27,14 @@ const AnimDisplay = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full px-6 md:px-20 lg:px-1 py-16 bg-[#242323] flex flex-col gap-y-32"
+      className="w-full px-6 md:px-20 lg:px-1 py-16 bg-dark flex flex-col gap-y-32"
     >
       <div className="w-full flex flex-col lg:flex-row items-center justify-between lg:px-20 gap-6 lg:gap-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-white lg:w-1/2 text-left"
+          className="text-color lg:w-1/2 text-left"
         >
           <h2 className="text-3xl md:text-4xl lg:text-4xl font-semibold uppercase mb-4">
             Smooth visuals, bold impact
@@ -69,7 +69,7 @@ const AnimDisplay = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-white lg:w-1/2 text-left lg:text-right"
+          className="text-color lg:w-1/2 text-left lg:text-right"
         >
           <h2 className="text-3xl uppercase md:text-4xl px-4 lg:text-4xl font-semibold mb-4">
             Visual identity that sticks

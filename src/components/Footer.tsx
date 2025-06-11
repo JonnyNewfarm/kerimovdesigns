@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <div
       style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
-      className="text-white relative h-[420px] bg-[#242323]"
+      className="text-color relative h-[420px] bg-dark"
     >
       <div className="relative h-[calc(100vh+420px)] -top-[100vh] flex-col justify-start">
         <div className="h-[420px] text-[#ecebeb] p-14 sticky top-[calc(100vh-420px)] flex flex-col justify-between">

@@ -16,7 +16,7 @@ const page = async ({ searchParams }: PageProps) => {
 
   return (
     <SmoothScroll>
-      <div className="bg-dark w-full min-h-screen text-[#ecebeb] md:pt-12 border-b-[1px] border-white/50">
+      <div className="bg-dark w-full min-h-screen text-color md:pt-12 border-b-[1px] border-white/50">
         {/* Desktop */}
         <div className="w-full h-screen hidden md:block">
           <Suspense fallback={<ProjectsTableSkeleton />}>
@@ -26,7 +26,7 @@ const page = async ({ searchParams }: PageProps) => {
                   key={i}
                   href={`?page=${i + 1}`}
                   className={`px-3 py-1 border ${
-                    currentPage === i + 1 ? "text-[#ecebeb]" : "text-[#ecebeb]"
+                    currentPage === i + 1 ? "text-color" : "text-color"
                   }`}
                 >
                   {i + 1}
@@ -45,7 +45,7 @@ const page = async ({ searchParams }: PageProps) => {
                   key={i}
                   href={`?page=${i + 1}`}
                   className={`px-3 py-1 border ${
-                    currentPage === i + 1 ? "text-[#ecebeb]" : "text-[#ecebeb]"
+                    currentPage === i + 1 ? "text-color" : "text-color"
                   }`}
                 >
                   {i + 1}

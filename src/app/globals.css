@@ -13,7 +13,11 @@ html, body {
 
 
   .bg-dark {
-    background-color:#242323;
+    background-color:#181c14
+  }
+
+  .text-color {
+    color: #ecdfcc;
   }
 
  

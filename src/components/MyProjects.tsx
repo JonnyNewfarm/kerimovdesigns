@@ -17,7 +17,7 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
   const secondRow = projects.slice(3, 5);
 
   return (
-    <div className="bg-[#242323] relative flex flex-col justify-center items-center h-screen w-full text-[#ecebeb]">
+    <div className="bg-dark relative flex flex-col justify-center items-center h-screen w-full text-color">
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         whileInView={{
@@ -64,14 +64,14 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
               className={`px-2 py-2 transition ${
                 hoveredProject === index
                   ? "text-[#7f7979] scale-110"
-                  : "hover:text-[#ecebeb]"
+                  : "hover:text-color"
               }`}
               onMouseEnter={() => setHoveredProject(index)}
             >
               {project.title}
             </Link>
             {index !== firstRow.length - 1 && (
-              <span className="text-[#ecebeb]">—</span>
+              <span className="text-color">—</span>
             )}
           </React.Fragment>
         ))}
@@ -98,14 +98,14 @@ const MyProjects = ({ projects }: MyProjectsProps) => {
               className={`px-2 py-2 transition ${
                 hoveredProject === index + 3
                   ? "text-[#7f7979] scale-110"
-                  : "hover:text-[#ecebeb]"
+                  : "hover:text-color"
               }`}
               onMouseEnter={() => setHoveredProject(index + 3)}
             >
               {project.title}
             </Link>
             {index !== secondRow.length - 1 && (
-              <span className="text-[#ecebeb]">—</span>
+              <span className="text-color">—</span>
             )}
           </React.Fragment>
         ))}

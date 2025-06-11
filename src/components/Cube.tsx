@@ -59,22 +59,22 @@ export default function Index() {
         </Canvas>
 
         <div className="absolute bottom-15 text-center px-4">
-          <h1 className="text-white/90 text-2xl sm:text-2xl font-bold">
+          <h1 className="text-color text-2xl sm:text-2xl font-bold">
             Rustam Kerimov
           </h1>
-          <h2 className="text-white/90 text-3xl whitespace-nowrap sm:text-4xl font-extrabold">
+          <h2 className="text-color text-3xl whitespace-nowrap sm:text-4xl font-extrabold">
             Graphic Designer
           </h2>
         </div>
 
         <div className="absolute hidden lg:block left-10 bottom-15 text-left px-4">
-          <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
+          <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
             <Link href={"/projects"}>Archives</Link>
           </h2>
         </div>
 
         <div className="absolute hidden lg:block right-10 bottom-15 text-left px-4">
-          <h2 className="text-white/90 text-4xl sm:text-4xl font-extrabold">
+          <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
             <Link href={"/contact"}>Collaborate</Link>
           </h2>
         </div>
