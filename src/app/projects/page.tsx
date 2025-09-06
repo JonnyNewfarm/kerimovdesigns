@@ -30,18 +30,47 @@ const Page = async ({ searchParams }: PageProps) => {
   );
   const totalPages = Math.ceil(total / itemsPerPage);
 
-  const renderPagination = () =>
-    Array.from({ length: totalPages }, (_, i) => (
-      <a
-        key={i}
-        href={`?page=${i + 1}`}
-        className={`px-3 py-1 ${
-          currentPage === i + 1 ? "font-bold text-color" : "text-color/60"
-        }`}
-      >
-        {i + 1} / {totalPages}
-      </a>
-    ));
+  const renderPagination = () => {
+    const prevPage = currentPage > 1 ? currentPage - 1 : null;
+    const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+
+    return (
+      <div className="flex items-center gap-2 mt-4">
+        {/* Only show Previous if there is a previous page */}
+        {prevPage && (
+          <a
+            href={`?page=${prevPage}`}
+            className="px-3 py-1 bg-color/10 rounded text-color"
+          >
+            Previous
+          </a>
+        )}
+
+        {/* Page Numbers */}
+        {Array.from({ length: totalPages }, (_, i) => (
+          <a
+            key={i}
+            href={`?page=${i + 1}`}
+            className={`px-3 py-1 ${
+              currentPage === i + 1 ? "font-bold text-color" : "text-color/60"
+            }`}
+          >
+            {i + 1}
+          </a>
+        ))}
+
+        {/* Only show Next if there is a next page */}
+        {nextPage && (
+          <a
+            href={`?page=${nextPage}`}
+            className="px-3 py-1 bg-color/10 rounded text-color"
+          >
+            Next
+          </a>
+        )}
+      </div>
+    );
+  };
 
   return (
     <SmoothScroll>
