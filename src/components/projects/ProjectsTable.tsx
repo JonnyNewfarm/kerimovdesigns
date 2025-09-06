@@ -15,6 +15,7 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
 
   return (
     <div className="w-full h-screen flex flex-row-reverse justify-between">
+      {/* Image */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         whileInView={{
@@ -36,6 +37,8 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
           alt={projects[hoveredProject].title}
         />
       </motion.div>
+
+      {/* Project List */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         whileInView={{
@@ -48,12 +51,14 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
           ease: "easeInOut",
         }}
         viewport={{ once: true }}
-        className="md:w-[60vw] lg:w-[40vw] h-screen flex flex-col p-14 items-center justify-center"
+        className="md:w-[60vw] lg:w-[40vw] h-screen flex flex-col p-14"
       >
-        <div className="w-full">
-          <h1 className="mb-5 ml-2.5 uppercase font-bold  text-3xl">
-            My Projects
-          </h1>
+        <h1 className="mb-5 ml-2.5 uppercase font-bold text-3xl">
+          My Projects
+        </h1>
+
+        {/* Project Links */}
+        <div className="flex flex-col gap-2 overflow-y-auto max-h-[calc(100vh-200px)]">
           {projects.map((project, index) => (
             <Link
               href={`/project/${project.id}`}
@@ -81,9 +86,10 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
               </h1>
             </Link>
           ))}
-
-          <div className="flex justify-center mt-5">{children}</div>
         </div>
+
+        {/* Pagination */}
+        <div className="flex justify-start mt-5">{children}</div>
       </motion.div>
     </div>
   );

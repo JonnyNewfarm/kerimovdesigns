@@ -1,8 +1,13 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import React from "react";
 
-const Burger = () => {
+interface BurgerProps {
+  closeMenu: () => void;
+}
+
+const Burger: React.FC<BurgerProps> = ({ closeMenu }) => {
   const menuTransition = {
     initial: { x: "100%" },
     enter: {
@@ -26,13 +31,17 @@ const Burger = () => {
       <div className="flex justify-center items-center h-full">
         <div className="flex flex-col gap-6 text-2xl text-[#443c3c]">
           <h1 className="text-3xl font-semibold">Navigation</h1>
-          <Link href="/" className="hover-underline">
+          <Link href="/" className="hover-underline" onClick={closeMenu}>
             Home
           </Link>
-          <Link href="/projects" className="hover-underline">
+          <Link
+            href="/projects"
+            className="hover-underline"
+            onClick={closeMenu}
+          >
             My work
           </Link>
-          <Link href="/contact" className="hover-underline">
+          <Link href="/contact" className="hover-underline" onClick={closeMenu}>
             Contact
           </Link>
         </div>

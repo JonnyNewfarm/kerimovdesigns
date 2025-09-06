@@ -34,7 +34,7 @@ const ProjectsTableMobile = ({
                   />
                 </div>
               </Link>
-              <div className="w-full px-10">
+              <div className="w-full ">
                 <div className="p-5 w-full border-b-1 border-b-white">
                   <h1>{project.title}</h1>
                 </div>

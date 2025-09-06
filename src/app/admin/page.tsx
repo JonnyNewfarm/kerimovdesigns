@@ -5,6 +5,15 @@ import UploadProject from "@/components/admin/UploadProject";
 import { redirect } from "next/navigation";
 import SignOut from "../../components/admin/SignOut";
 import UpdateProject from "@/components/admin/UpdateProject";
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Rustam Kerimov | Projects",
+  description:
+    "Explore the projects and works of Rustam Kerimov, showcasing design and creative skills.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
 
 const AdminPage = async () => {
   const session = await getServerSession(authOptions);

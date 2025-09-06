@@ -9,9 +9,9 @@ interface ProjectsTableMobileProps {
 
 const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
   return (
-    <div className="flex flex-col pb-20">
+    <div className="flex flex-col pb-16">
       <div className="h-[35vh] flex items-center justify-center">
-        <h1 className="text-3xl mt-28 font-semibold uppercase">
+        <h1 className="text-3xl mt-20 font-semibold uppercase">
           Previous work
         </h1>
       </div>
@@ -32,7 +32,7 @@ const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
                   />
                 </div>
               </Link>
-              <div className="w-full px-10">
+              <div className="w-full ">
                 <div className="p-5 w-full border-b-1 border-b-white">
                   <h1>{project.title}</h1>
                 </div>
@@ -44,7 +44,10 @@ const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
             </div>
           ))}
 
-          <Link className="border-2 border-white py-2 px-4" href={"/projects"}>
+          <Link
+            className="border-2 font-semibold uppercase border-white py-2 px-4"
+            href={"/projects"}
+          >
             All projects
           </Link>
         </div>

@@ -6,6 +6,7 @@ import { Mesh, TextureLoader } from "three";
 import { useScroll, useSpring, useTransform, motion } from "framer-motion";
 import Link from "next/link";
 import { OrbitControls } from "@react-three/drei";
+import MagneticComp from "./MagneticComp";
 
 function useIsMdUp() {
   const [isMdUp, setIsMdUp] = useState(false);
@@ -68,15 +69,19 @@ export default function Index() {
         </div>
 
         <div className="absolute hidden lg:block left-10 bottom-15 text-left px-4">
-          <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
-            <Link href={"/projects"}>Archives</Link>
-          </h2>
+          <MagneticComp>
+            <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
+              <Link href={"/projects"}>Archives</Link>
+            </h2>
+          </MagneticComp>
         </div>
 
         <div className="absolute hidden lg:block right-10 bottom-15 text-left px-4">
-          <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
-            <Link href={"/contact"}>Collaborate</Link>
-          </h2>
+          <MagneticComp>
+            <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
+              <Link href={"/contact"}>Collaborate</Link>
+            </h2>
+          </MagneticComp>
         </div>
       </div>
     </motion.div>
