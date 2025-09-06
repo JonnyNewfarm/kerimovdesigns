@@ -21,6 +21,7 @@ const ContactClient = () => {
   }>({});
 
   const [submitted, setSubmitted] = useState(false);
+  const [isSending, setIsSending] = useState(false); // <-- new state
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -58,11 +59,13 @@ const ContactClient = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
+    setIsSending(true); // start sending
 
     const errors = validateForm();
     setValidationErrors(errors);
 
     if (Object.keys(errors).length > 0) {
+      setIsSending(false);
       return;
     }
 
@@ -85,6 +88,8 @@ const ContactClient = () => {
       }
     } catch {
       toast.error("Network error. Please try again later.");
+    } finally {
+      setIsSending(false); // stop sending
     }
   };
 
@@ -177,11 +182,13 @@ const ContactClient = () => {
             <button
               type="submit"
               className="mt-4 ml-5 border-2 font-semibold text-lg cursor-pointer max-w-[100px] border-[#ecebeb] py-2 px-6"
+              disabled={isSending} // disable while sending
             >
-              Send
+              {isSending ? "Sending..." : "Send"} {/* <-- change text */}
             </button>
           </form>
         </motion.div>
+
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           whileInView={{
