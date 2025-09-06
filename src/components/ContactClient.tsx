@@ -181,7 +181,7 @@ const ContactClient = () => {
             </div>
             <button
               type="submit"
-              className="mt-4 ml-5 border-2 font-semibold max-w-[200px] text-lg cursor-pointer border-[#ecebeb] py-2 px-6"
+              className="mt-4 ml-5 border-2 hover:scale-103 transition-transform ease-in-out font-semibold max-w-[200px] text-lg cursor-pointer border-[#ecebeb] py-2 px-6"
               disabled={isSending}
             >
               {isSending ? "Sending..." : "Send"}

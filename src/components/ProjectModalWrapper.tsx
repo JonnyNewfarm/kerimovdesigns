@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import MotionImage from "./MotionImage";
 
 export interface Project {
@@ -30,6 +31,7 @@ interface ModalImage {
 const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
   const [modalImage, setModalImage] = useState<ModalImage | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
     setIsClient(true);
@@ -44,18 +46,26 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
   }, []);
 
   const handleImageClick = (src: string, alt: string) => {
+    setScale(1);
     setModalImage({ src, alt });
   };
 
   const closeModal = () => {
     setModalImage(null);
+    setScale(1);
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.stopPropagation();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setScale((prev) => Math.min(Math.max(prev + delta, 1), 3)); // Zoom between 1x and 3x
   };
 
   if (!isClient) return null;
 
   return (
     <>
-      <div className="min-h-screen  sm:mt-20 mt-14 justify-center items-center flex  flex-col gap-y-26 sm:gap-y-40">
+      <div className="min-h-screen sm:mt-20 mt-14 flex flex-col gap-y-26 sm:gap-y-40 justify-center items-center">
         {project.src && (
           <MotionImage>
             <Image
@@ -109,22 +119,44 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
         )}
       </div>
 
-      {modalImage && (
-        <div
-          onClick={closeModal}
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center cursor-zoom-out"
-        >
-          <Image
-            src={modalImage.src}
-            alt={modalImage.alt}
-            width={1200}
-            height={800}
-            className="max-w-[90%] max-h-[90%] object-contain"
-            priority
-            unoptimized
-          />
-        </div>
-      )}
+      {/* Fullscreen Modal with zoom */}
+      <AnimatePresence>
+        {modalImage && (
+          <AnimatePresence>
+            {modalImage && (
+              <motion.div
+                onClick={closeModal}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed top-0 md:top-7 left-0 w-full h-screen z-50 bg-black/90 flex items-center justify-center cursor-zoom-out"
+              >
+                <motion.div
+                  onWheel={handleWheel}
+                  drag
+                  dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale }}
+                  exit={{ scale: 0.8 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  className="flex items-center justify-center"
+                >
+                  <Image
+                    src={modalImage.src}
+                    alt={modalImage.alt}
+                    width={1200}
+                    height={800}
+                    className="max-w-[90vw] max-h-[90vh] object-contain"
+                    priority
+                    unoptimized
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+      </AnimatePresence>
     </>
   );
 };
