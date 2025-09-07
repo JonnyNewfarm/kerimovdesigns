@@ -32,14 +32,14 @@ export default function DeleteProjectCard({
       {projects.map((project) => (
         <div
           key={project.id}
-          className="border p-4 my-2 flex flex-col max-w-[500px]"
+          className="border border-stone-300/20 p-4 my-2 flex flex-col max-w-[500px]"
         >
-          <h2>{project.title}</h2>
+          <h2 className="text-lg">{project.title}</h2>
           <img src={project.src} alt="" />
           <button
             onClick={() => handleDelete(project.id)}
             disabled={isPending}
-            className="text-red-600 underline cursor-pointer"
+            className="text-red-600 border-red-700 border w-full py-1.5 mt-2 max-w-[170px] cursor-pointer"
           >
             {isPending ? "Deleting..." : "Delete"}
           </button>

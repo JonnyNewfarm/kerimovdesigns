@@ -36,7 +36,6 @@ const Page = async ({ searchParams }: PageProps) => {
 
     return (
       <div className="flex items-center gap-2 mt-4">
-        {/* Only show Previous if there is a previous page */}
         {prevPage && (
           <a
             href={`?page=${prevPage}`}
@@ -46,7 +45,6 @@ const Page = async ({ searchParams }: PageProps) => {
           </a>
         )}
 
-        {/* Page Numbers */}
         {Array.from({ length: totalPages }, (_, i) => (
           <a
             key={i}
@@ -59,7 +57,6 @@ const Page = async ({ searchParams }: PageProps) => {
           </a>
         ))}
 
-        {/* Only show Next if there is a next page */}
         {nextPage && (
           <a
             href={`?page=${nextPage}`}
@@ -75,7 +72,6 @@ const Page = async ({ searchParams }: PageProps) => {
   return (
     <SmoothScroll>
       <div className="bg-dark w-full min-h-screen text-color md:pt-12 border-b-[1px] border-white/50">
-        {/* Desktop Table */}
         <div className="w-full hidden md:block h-screen">
           <Suspense fallback={<ProjectsTableSkeleton />}>
             <ProjectsTable projects={projects}>

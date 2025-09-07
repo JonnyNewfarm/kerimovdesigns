@@ -1,7 +1,20 @@
+"use client";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Footer = () => {
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      setTime(now.toLocaleTimeString());
+    };
+
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <div
       style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
@@ -63,8 +76,8 @@ const Footer = () => {
               </div>
 
               <div className="hidden md:block">
-                <h1 className="opacity-65">Phone:</h1>
-                <h1>+47 45 26 81 63</h1>
+                <h1 className="opacity-65">My time:</h1>
+                <h1>{time}</h1>
               </div>
 
               <div>

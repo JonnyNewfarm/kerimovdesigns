@@ -11,6 +11,11 @@ const UploadImage = ({
   return (
     <div>
       <UploadButton
+        appearance={{
+          button: "bg-stone-300   text-white py-2 px-4 rounded",
+          container: "",
+          allowedContent: "text-[#242323]",
+        }}
         endpoint="imageUploader"
         onClientUploadComplete={(res) => {
           if (res && res.length > 0) {

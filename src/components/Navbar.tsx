@@ -22,9 +22,24 @@ const Navbar = () => {
             <div className="tracking-tighter">
               <h1 className=" opacity-70 m-0 leading-none">Naviation:</h1>
               <div className="flex gap-x-1  m-0 leading-tight">
-                <Link href={"/"}>Home,</Link>
-                <Link href={"/projects"}>My work,</Link>
-                <Link href={"/contact"}>Contact</Link>
+                <Link
+                  className="hover:scale-103 transition-transform ease-in-out"
+                  href={"/"}
+                >
+                  Home,
+                </Link>
+                <Link
+                  className="hover:scale-103 transition-transform ease-in-out"
+                  href={"/projects"}
+                >
+                  My work,
+                </Link>
+                <Link
+                  className="hover:scale-103 transition-transform ease-in-out"
+                  href={"/contact"}
+                >
+                  Contact
+                </Link>
               </div>
             </div>
           </div>
