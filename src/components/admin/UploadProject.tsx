@@ -10,6 +10,12 @@ export default function UploadProject() {
   const [imageUrl, setImageUrl] = useState("");
   const [imageUrl2, setImageUrl2] = useState("");
   const [imageUrl3, setImageUrl3] = useState("");
+  const [imageUrl4, setImageUrl4] = useState("");
+  const [imageUrl5, setImageUrl5] = useState("");
+  const [imageUrl6, setImageUrl6] = useState("");
+  const [imageUrl7, setImageUrl7] = useState("");
+  const [imageUrl8, setImageUrl8] = useState("");
+  const [imageUrl9, setImageUrl9] = useState("");
   const [srcVideo, setSrcVideo] = useState("");
   const [showModal, setShowModal] = useState(false);
 
@@ -33,6 +39,12 @@ export default function UploadProject() {
         src: imageUrl,
         src2: imageUrl2,
         src3: imageUrl3,
+        src4: imageUrl4,
+        src5: imageUrl5,
+        src6: imageUrl6,
+        src7: imageUrl7,
+        src8: imageUrl8,
+        src9: imageUrl9,
         srcVideo: srcVideo,
         role,
         type,
@@ -76,12 +88,17 @@ export default function UploadProject() {
           required
         />
 
-        {/* Hidden fields for uploaded URLs */}
         <input type="hidden" name="src" value={imageUrl} />
-        <input type="hidden" name="src" value={imageUrl2} />
-        <input type="hidden" name="src" value={imageUrl3} />
+        <input type="hidden" name="src2" value={imageUrl2} />
+        <input type="hidden" name="src3" value={imageUrl3} />
+        <input type="hidden" name="src4" value={imageUrl4} />
+        <input type="hidden" name="src5" value={imageUrl5} />
+        <input type="hidden" name="src6" value={imageUrl6} />
+        <input type="hidden" name="src7" value={imageUrl7} />
+        <input type="hidden" name="src8" value={imageUrl8} />
+        <input type="hidden" name="src" value={imageUrl9} />
+        <input type="hidden" name="srcVideo" value={srcVideo} />
 
-        {/* Button to open modal */}
         <button
           type="button"
           onClick={() => setShowModal(true)}
@@ -99,7 +116,6 @@ export default function UploadProject() {
         </button>
       </form>
 
-      {/* Modal */}
       <AnimatePresence>
         {showModal && (
           <motion.div
@@ -109,7 +125,8 @@ export default function UploadProject() {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-stone-900 flex flex-col  p-6 rounded-md max-w-lg w-full"
+              style={{ scrollbarWidth: "thin" }}
+              className="bg-stone-900 overflow-y-scroll max-h-[80vh] flex flex-col  p-6 rounded-md max-w-xl w-full"
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
@@ -145,6 +162,45 @@ export default function UploadProject() {
                     <UploadImage onUploadComplete={setImageUrl3} />
                   </div>
                 </div>
+                <div className="flex flex-col items-start">
+                  <span className="mb-1 text-sm font-medium">Image</span>
+                  <div className="w-full flex justify-start">
+                    <UploadImage onUploadComplete={setImageUrl4} />
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-start">
+                  <span className="mb-1 text-sm font-medium">Image</span>
+                  <div className="w-full flex justify-start">
+                    <UploadImage onUploadComplete={setImageUrl5} />
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-start">
+                  <span className="mb-1 text-sm font-medium">Image</span>
+                  <div className="w-full flex justify-start">
+                    <UploadImage onUploadComplete={setImageUrl6} />
+                  </div>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="mb-1 text-sm font-medium">Image</span>
+                  <div className="w-full flex justify-start">
+                    <UploadImage onUploadComplete={setImageUrl7} />
+                  </div>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="mb-1 text-sm font-medium">Image</span>
+                  <div className="w-full flex justify-start">
+                    <UploadImage onUploadComplete={setImageUrl8} />
+                  </div>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="mb-1 text-sm font-medium">Image</span>
+                  <div className="w-full flex justify-start">
+                    <UploadImage onUploadComplete={setImageUrl9} />
+                  </div>
+                </div>
+
                 <div className="flex flex-col items-start">
                   <span className="mb-1 text-sm font-medium">Video?</span>
                   <div className="w-full flex justify-start">

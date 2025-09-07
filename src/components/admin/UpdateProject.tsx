@@ -17,6 +17,12 @@ export default function UpdateProject() {
     })();
   }, []);
 
+  useEffect(() => {
+    if (!selectedProjectId) return;
+    const project = projects.find((p) => p.id === selectedProjectId);
+    if (project) setFormData(project);
+  }, [selectedProjectId, projects]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -30,13 +36,26 @@ export default function UpdateProject() {
     });
   };
 
+  const imageFields = [
+    { label: "Wide Image", name: "src" },
+    { label: "Image 2", name: "src2" },
+    { label: "Image 3", name: "src3" },
+    { label: "Image 4", name: "src4" },
+    { label: "Image 5", name: "src5" },
+    { label: "Image 6", name: "src6" },
+    { label: "Image 7", name: "src7" },
+    { label: "Image 8", name: "src8" },
+    { label: "Image 9", name: "src9" },
+    { label: "Video", name: "srcVideo" },
+  ];
+
   return (
     <div className="w-full py-12 flex flex-col items-center p-10 justify-center">
       <h1 className="text-2xl mb-4 text-white">Update Project</h1>
 
       <select
         onChange={(e) => setSelectedProjectId(e.target.value)}
-        className="mb-6 p-2 border w-80 border-white text-white bg-[#242323]"
+        className="mb-6 p-2 border w-full max-w-lg border-white text-white bg-[#181c14]"
         value={selectedProjectId}
       >
         <option value="" className="text-white">
@@ -52,66 +71,31 @@ export default function UpdateProject() {
       {selectedProjectId && (
         <form
           onSubmit={handleUpdate}
-          className="flex flex-col items-center gap-y-4"
+          className="flex flex-col items-center gap-y-4 w-full max-w-lg"
         >
-          <input
-            className="border px-3 py-2 w-80"
-            name="title"
-            placeholder="Title"
-            onChange={handleChange}
-          />
-          <input
-            className="border px-3 py-2 w-80"
-            name="role"
-            placeholder="Role"
-            onChange={handleChange}
-          />
-          <input
-            className="border px-3 py-2 w-80"
-            name="type"
-            placeholder="Type"
-            onChange={handleChange}
-          />
-          <input
-            className="border px-3 py-2 w-80"
-            name="tools"
-            placeholder="Tools"
-            onChange={handleChange}
-          />
+          {["title", "role", "type", "tools"].map((field) => (
+            <input
+              key={field}
+              className="border px-3 py-2 w-full"
+              name={field}
+              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+              value={formData[field] || ""}
+              onChange={handleChange}
+            />
+          ))}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h1>Wide Image</h1>
-              <UploadImage
-                onUploadComplete={(url) =>
-                  setFormData({ ...formData, src: url })
-                }
-              />
-            </div>
-            <div>
-              <h1>Image</h1>
-              <UploadImage
-                onUploadComplete={(url) =>
-                  setFormData({ ...formData, src2: url })
-                }
-              />
-            </div>
-            <div>
-              <h1>Image</h1>
-              <UploadImage
-                onUploadComplete={(url) =>
-                  setFormData({ ...formData, src3: url })
-                }
-              />
-            </div>
-            <div>
-              <h1>Video</h1>
-              <UploadImage
-                onUploadComplete={(url) =>
-                  setFormData({ ...formData, srcVideo: url })
-                }
-              />
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
+            {imageFields.map(({ label, name }) => (
+              <div key={name} className="flex flex-col items-center">
+                <h2 className="mb-1 text-sm font-medium">{label}</h2>
+                <UploadImage
+                  onUploadComplete={(url) =>
+                    setFormData({ ...formData, [name]: url })
+                  }
+                  initialUrl={formData[name]}
+                />
+              </div>
+            ))}
           </div>
 
           <button

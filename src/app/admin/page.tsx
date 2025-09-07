@@ -23,12 +23,11 @@ const AdminPage = async () => {
   }
 
   return (
-    <div className="bg-[#242323]  z-[99999] text-white border-b border-w">
-      <div className="bg-[#242323] sticky w-full z-50 h-12 top-0 left-0"></div>
-      <SignOut />
-      <div className="w-full flex justify-center">
-        <h1 className="text-4xl font-semibold text-white">Manage Projects</h1>
+    <div className="bg-[#181c14]  z-[99999] text-white border-b ">
+      <div className="bg-[#181c14] sticky w-full z-50 h-12 top-0 left-0">
+        <SignOut />
       </div>
+
       <div className="flex flex-col items-center justify-center w-full min-h-screen gap-y-20">
         <UploadProject />
         <UpdateProject />

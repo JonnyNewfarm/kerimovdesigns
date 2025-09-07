@@ -14,6 +14,12 @@ model Project {
   src       String   @db.String
   src2      String?  @db.String
   src3      String?  @db.String
+  src4      String?  @db.String
+  src5      String?  @db.String
+  src6      String?  @db.String
+  src7      String?  @db.String
+  src8      String?  @db.String
+  src9      String?  @db.String
   srcVideo  String?  @db.String
   role      String?
   type      String?

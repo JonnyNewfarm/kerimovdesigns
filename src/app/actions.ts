@@ -9,6 +9,13 @@ export async function createProject(data: {
   src: string;
   src2?: string;
   src3?: string
+  src4?: string
+  src5?: string
+  src6?: string
+  src7?: string
+  src8?: string
+  src9?: string
+  
   srcVideo?: string
   role?: string
   type?: string
@@ -27,6 +34,12 @@ export async function createProject(data: {
         src: data.src,
         src2: data.src2!,
         src3: data.src3!,
+        src4: data.src4!,
+        src5: data.src5!,
+        src6: data.src6!,
+        src7: data.src7!,
+        src8: data.src8!,
+        src9: data.src9!,
         srcVideo: data.srcVideo!,
         role: data.role!,
         type: data.type!,
@@ -53,6 +66,12 @@ export async function updateProject(id: string, data: {
   src?: string;
   src2?: string;
   src3?: string;
+  src4?: string;
+  src5?: string;
+  src6?: string;
+  src7?: string;
+  src8?: string;
+  src9?: string;
   srcVideo?: string;
   role?: string;
   type?: string;
