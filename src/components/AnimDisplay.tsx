@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import Image from "next/image";
 
 const AnimDisplay = () => {
   const containerRef = useRef<HTMLDivElement>(null);
