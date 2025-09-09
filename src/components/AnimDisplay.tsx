@@ -37,11 +37,14 @@ const AnimDisplay = () => {
           className="text-color lg:w-1/2 text-left"
         >
           <h2 className="text-3xl md:text-4xl lg:text-4xl font-semibold uppercase mb-4">
-            Smooth visuals, bold impact
+            Hi, I’m Rustam — a 27-year-old passionate graphic designer.{" "}
           </h2>
           <p className="text-md md:text-lg lg:text-xl leading-relaxed">
-            I create animations that bring rhythm and emotion to design. From
-            subtle transitions to expressive motion — every detail adds life.
+            I specialize in creating visual identities, animations, and logos
+            that bring ideas to life. Design, for me, is more than work — it’s a
+            way of turning imagination into something people can see and feel.
+            My inspiration comes from everywhere: art, movies, and the world
+            around me.
           </p>
         </motion.div>
 
@@ -63,7 +66,7 @@ const AnimDisplay = () => {
         </motion.div>
       </div>
 
-      <div className="w-full lg:px-20  flex flex-col lg:flex-row-reverse items-center justify-between gap-6 lg:gap-12">
+      <div className="w-full lg:px-20  flex flex-col lg:flex-row-reverse items-center justify-between  lg:gap-12">
         <motion.div
           style={isLg ? { y } : {}}
           initial={{ opacity: 0 }}
@@ -72,12 +75,13 @@ const AnimDisplay = () => {
           className="text-color lg:w-1/2 text-left lg:text-right"
         >
           <h2 className="text-3xl uppercase md:text-4xl px-4 lg:text-4xl font-semibold mb-4">
-            Visual identity that sticks
+            Creative & Aspirational
           </h2>
           <p className="text-md md:text-lg px-4 lg:text-xl leading-relaxed">
-            Whether it’s a logo or a full brand system, I build identities that
-            are memorable, clear, and uniquely yours. Always tailored, never
-            templated.
+            I design with the purpose of giving each client a unique identity
+            that speaks to who they are. Whether it’s a complete brand system or
+            a simple logo, my focus is on creating work that connects, stands
+            out, and lasts.
           </p>
         </motion.div>
 
@@ -86,13 +90,15 @@ const AnimDisplay = () => {
           whileInView={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
           viewport={{ once: true }}
-          className="relative w-full lg:w-1/2 aspect-[3/4]"
+          className="relative w-full lg:w-1/2 mt-6 md:mt-0 md:aspect-[3/4]"
         >
-          <Image
-            src="/identity2.jpg"
-            alt="Brand Identity"
-            fill
-            className="object-contain"
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-contain"
+            src="/echo-vid.mp4"
           />
         </motion.div>
       </div>
