@@ -5,7 +5,6 @@ import SmoothScroll from "@/components/SmoothScroll";
 import { getProjects, getProjectsMobile } from "./actions";
 import AnimDisplay from "@/components/AnimDisplay";
 import Cube from "@/components/Cube";
-import LogoParallax from "@/components/LogoParallax";
 
 export default async function Home() {
   const projects = await getProjects();
@@ -25,7 +24,6 @@ export default async function Home() {
         </div>
 
         <AnimDisplay />
-        <LogoParallax />
       </div>
     </SmoothScroll>
   );
