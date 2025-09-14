@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import NavbarMobile from "@/components/NavbarMobile";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
+import ClientPageTransitionWrapper from "@/components/ClientPageTransitionWrapper"; // client wrapper
 
 const lusitana = Montserrat({
   subsets: ["latin"],
@@ -20,20 +21,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <head>
-        {/* Favicon */}
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={lusitana.variable}>
         <Navbar />
         <NavbarMobile />
-        {children}
+
+        <ClientPageTransitionWrapper>{children}</ClientPageTransitionWrapper>
+
         <Footer />
+
         <Toaster
           position="top-center"
           toastOptions={{
@@ -43,16 +44,10 @@ export default function RootLayout({
               border: "1px solid #ecebeb",
             },
             success: {
-              iconTheme: {
-                primary: "#4ade80",
-                secondary: "#1c1a17",
-              },
+              iconTheme: { primary: "#4ade80", secondary: "#1c1a17" },
             },
             error: {
-              iconTheme: {
-                primary: "#f87171",
-                secondary: "#1c1a17",
-              },
+              iconTheme: { primary: "#f87171", secondary: "#1c1a17" },
             },
           }}
         />
