@@ -218,6 +218,7 @@ const ContactClient = () => {
           <div className="gap-y-3 flex flex-col">
             <h1 className="opacity-70 ">Socials</h1>
             <a
+              className="hover:scale-105 transition-transform ease-in-out"
               target="_blank"
               rel="noopener noreferrer"
               href="https://www.instagram.com/rustam.kerim0v?igsh=MTlhcjl5YzV0bm15cQ%3D%3D&utm_source=qr"
@@ -225,6 +226,7 @@ const ContactClient = () => {
               Instagram
             </a>
             <a
+              className="hover:scale-105 transition-transform ease-in-out"
               target="_blank"
               rel="noopener noreferrer"
               href="https://linkedin.com/in/rustam-kerimov-75bb5a331"
