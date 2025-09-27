@@ -71,7 +71,7 @@ const Page = async ({ searchParams }: PageProps) => {
 
   return (
     <SmoothScroll>
-      <div className="bg-dark w-full min-h-screen text-color md:pt-12 border-b-[1px] border-white/50">
+      <div className="bg-dark w-full min-h-screen text-color md:pt-12 border-b-[1px] border-stone-400/20">
         <div className="w-full hidden md:block h-screen">
           <Suspense fallback={<ProjectsTableSkeleton />}>
             <ProjectsTable projects={projects}>

@@ -42,7 +42,7 @@ const Page = async ({ params }: Props) => {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen pt-32 bg-dark p-10 border-b-[1px] border-white/50">
+      <div className="min-h-screen pt-32 bg-dark p-10 border-b-[1px] border-stone-400/20">
         <div className="w-full flex flex-col min-h-screen items-center gap-y-2 sm:gap-y-5 justify-center text-color">
           <h1 className="text-3xl uppercase text-wrap text-center sm:text-7xl">
             {project.title}

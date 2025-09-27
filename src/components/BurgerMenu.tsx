@@ -59,7 +59,7 @@ const BurgerMenu = () => {
             exit={{ x: "100%", opacity: 0 }}
             transition={{ duration: 0.35, ease: "easeInOut" }}
             className="z-40 fixed right-0 top-0 h-[100vh] w-[80vw] p-20 
-             bg-gradient-to-br from-[#181c14] via-[#2d2d2ae6] to-[#1c1a17a9]
+             bg-gradient-to-br from-[#181c14] via-[#2d2d2aea] to-[#1c1a17a9]
              backdrop-blur-md text-stone-300"
           >
             <div className="flex justify-center items-center h-full">
@@ -71,7 +71,9 @@ const BurgerMenu = () => {
               >
                 <div className="flex justify-center items-center h-full">
                   <div className="flex flex-col gap-6 text-2xl text-stone-50">
-                    <h1 className="text-3xl font-semibold">Navigation</h1>
+                    <h1 className="text-3xl text-stone-200 font-semibold">
+                      Navigation
+                    </h1>
                     <Link
                       onClick={() => setIsOpen(false)}
                       href="/"

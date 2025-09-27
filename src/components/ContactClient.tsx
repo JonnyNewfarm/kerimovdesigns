@@ -95,7 +95,7 @@ const ContactClient = () => {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen w-full md:pt-32 text-color border-b-[1px] border-white/50 gap-y-16 flex flex-col-reverse lg:gap-x-10 lg:flex-row justify-between py-16 px-10 lg:px-30 xl:px-40 bg-dark">
+      <div className="min-h-screen w-full md:pt-32 text-color border-b-[1px] border-stone-400/20 gap-y-16 flex flex-col-reverse lg:gap-x-10 lg:flex-row justify-between py-16 px-10 lg:px-30 xl:px-40 bg-dark">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           whileInView={{
@@ -108,7 +108,7 @@ const ContactClient = () => {
             ease: "easeInOut",
           }}
           viewport={{ once: true }}
-          className="flex flex-col gap-y-20"
+          className="flex flex-col gap-y-16"
         >
           <div className="lg:text-7xl hidden lg:block uppercase font-semibold sm:text-5xl text-5xl">
             <h1>Let&apos;s create a</h1>
@@ -119,9 +119,10 @@ const ContactClient = () => {
             className="flex flex-col justify-center"
             noValidate
           >
+            <h1 className="text-stone-300">Feel free to send me a message:</h1>
             <div>
               <input
-                className="py-6 border-b-1 px-4 border-b-[#ecebeb] text-lg border-t-1 w-full"
+                className="py-6 outline-none border-b-1 px-4 border-b-[#ecebeb]  text-lg  w-full"
                 placeholder="Name"
                 name="name"
                 type="text"
@@ -135,10 +136,9 @@ const ContactClient = () => {
                 </p>
               )}
             </div>
-
             <div>
               <input
-                className="py-6 border-b-1 px-4 text-lg border-b-[#ecebeb] w-full"
+                className="py-6 outline-none border-b-1 px-4 text-lg border-b-[#ecebeb] w-full"
                 placeholder="Email"
                 name="email"
                 type="email"
@@ -152,10 +152,9 @@ const ContactClient = () => {
                 </p>
               )}
             </div>
-
             <div>
               <input
-                className="py-6 border-b-1 px-4 text-lg border-b-[#ecebeb] w-full"
+                className="py-6 outline-none border-b-1 px-4 text-lg border-b-[#ecebeb] w-full"
                 placeholder="Organization (optional)"
                 name="organization"
                 type="text"
@@ -163,10 +162,9 @@ const ContactClient = () => {
                 onChange={handleChange}
               />
             </div>
-
             <div>
               <textarea
-                className="min-h-[150px] px-4 py-6 text-lg border-b-1 border-b-[#ecebeb] w-full"
+                className="min-h-[150px] outline-none px-4 py-6 text-lg border-b-1 border-b-[#ecebeb] w-full"
                 placeholder="Message"
                 name="message"
                 value={form.message}
