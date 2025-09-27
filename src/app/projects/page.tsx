@@ -80,7 +80,6 @@ const Page = async ({ searchParams }: PageProps) => {
           </Suspense>
         </div>
 
-        {/* Mobile Table */}
         <div className="w-full md:hidden min-h-screen">
           <Suspense fallback={<ProjectsTableSkeleton />}>
             <ProjectsTableMobile projects={projects}>

@@ -45,7 +45,7 @@ const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
           ))}
 
           <Link
-            className="border-2 font-semibold uppercase border-white py-2 px-4"
+            className="border-2 font-semibold uppercase border-[#ecdfcc] py-2 px-4"
             href={"/projects"}
           >
             All projects

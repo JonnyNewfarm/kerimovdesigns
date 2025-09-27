@@ -207,7 +207,7 @@ const ContactClient = () => {
             <h1>Let&apos;s create a</h1>
             <h1>project together</h1>
           </div>
-          <div className="gap-y-3 flex flex-col">
+          <div className="gap-y-2 flex text-stone-50 flex-col">
             <h1 className="opacity-70 ">Contact details</h1>
             <p>Rustam Kerimov</p>
             <p>rustam-98@hotmail.com</p>
@@ -215,7 +215,7 @@ const ContactClient = () => {
             <p>Oslo, Norway</p>
           </div>
 
-          <div className="gap-y-3 flex flex-col">
+          <div className="gap-y-2 flex text-stone-50 flex-col">
             <h1 className="opacity-70 ">Socials</h1>
             <a
               className="hover:scale-105 transition-transform ease-in-out"

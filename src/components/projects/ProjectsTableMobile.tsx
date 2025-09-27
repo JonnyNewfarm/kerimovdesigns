@@ -15,7 +15,7 @@ const ProjectsTableMobile = ({
   return (
     <div className="flex flex-col bg-bg-dark pb-20">
       <div className="h-[35vh] flex items-center justify-center">
-        <h1 className="text-3xl uppercase font-bold mt-28">My Projects</h1>
+        <h1 className="text-3xl uppercase font-bold mt-20">My Projects</h1>
       </div>
       <div className="flex justify-center items-center">
         <div className="h-full w-full flex gap-y-10 flex-col items-center">
