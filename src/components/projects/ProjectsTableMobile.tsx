@@ -36,6 +36,7 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   return (
     <div className="w-[80vw] flex flex-col items-center">
@@ -44,7 +45,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         className="w-full flex justify-center"
       >
         <div className="h-[200px] w-full bg-black/60 flex justify-center items-center relative">
-          {!isLoaded && (
+          {!isLoaded && !hasError && (
             <div className="absolute inset-0 animate-pulse bg-[#21271cc9]"></div>
           )}
           <img
@@ -54,7 +55,13 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
               isLoaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={() => setIsLoaded(true)}
+            onError={() => setHasError(true)}
           />
+          {hasError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-white">
+              Image failed to load
+            </div>
+          )}
         </div>
       </Link>
       <div className="w-full">
