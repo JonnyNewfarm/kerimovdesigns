@@ -1,5 +1,6 @@
 "use client";
 import { Project } from "@prisma/client";
+import Image from "next/image";
 import Link from "next/link";
 import React, { ReactNode, useState } from "react";
 
@@ -44,17 +45,18 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         href={`/project/${project.id}`}
         className="w-full flex justify-center"
       >
-        <div className="h-[200px] w-full bg-black/60 flex justify-center items-center relative">
+        <div className="h-[200px] w-full flex justify-center items-center relative">
           {!isLoaded && !hasError && (
             <div className="absolute inset-0 animate-pulse bg-[#21271cc9]"></div>
           )}
-          <img
+          <Image
             alt="project-image"
             src={project.src}
-            className={`object-contain transition-opacity duration-500 ${
+            fill
+            className={`object-contain w-full h-full transition-opacity duration-500 ${
               isLoaded ? "opacity-100" : "opacity-0"
             }`}
-            onLoad={() => setIsLoaded(true)}
+            onLoadingComplete={() => setIsLoaded(true)}
             onError={() => setHasError(true)}
           />
           {hasError && (

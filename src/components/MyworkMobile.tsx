@@ -1,5 +1,6 @@
 "use client";
 import { Project } from "@prisma/client";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -25,9 +26,11 @@ const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
                 className="w-[80vw]  flex justify-center "
               >
                 <div className="h-full  bg-[#0d0d0d]  flex justify-center items-center">
-                  <img
+                  <Image
                     alt="project-image"
                     className="object-contain"
+                    width={800}
+                    height={450}
                     src={project.src}
                   />
                 </div>
