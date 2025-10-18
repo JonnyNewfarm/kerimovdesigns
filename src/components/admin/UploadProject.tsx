@@ -146,7 +146,6 @@ export default function UploadProject() {
                   <span className="mb-1 text-sm font-medium">Wide Image</span>
                   <div className="w-full flex justify-start">
                     {" "}
-                    {/* <-- wrap fixes centering */}
                     <UploadImage onUploadComplete={setImageUrl} />
                   </div>
                 </div>

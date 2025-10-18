@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import NavbarMobile from "@/components/NavbarMobile";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
-import ClientPageTransitionWrapper from "@/components/ClientPageTransitionWrapper"; // client wrapper
+import ClientPageTransitionWrapper from "@/components/ClientPageTransitionWrapper";
 
 const lusitana = Montserrat({
   subsets: ["latin"],

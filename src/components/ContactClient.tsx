@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import MagneticComp from "./MagneticComp";
 
 const ContactClient = () => {
   const [form, setForm] = useState({

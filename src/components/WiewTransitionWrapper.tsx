@@ -19,24 +19,19 @@ export default function ViewTransitionWrapper({
   const [currentPath, setCurrentPath] = useState(pathname);
   const [showOverlay, setShowOverlay] = useState(false);
 
-  // client dimensions
   const [viewport, setViewport] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
     setViewport({ w: window.innerWidth, h: window.innerHeight });
   }, []);
 
-  // sequence overlay animation on route change
   useEffect(() => {
     if (pathname === currentPath) return;
 
-    // show overlay (expand)
     setShowOverlay(true);
 
-    // after expand duration, swap page
     const swapTimeout = setTimeout(() => {
       setCurrentPath(pathname);
-      // then hide overlay (shrink)
       const hideTimeout = setTimeout(() => {
         setShowOverlay(false);
       }, duration * 1000);
@@ -51,7 +46,6 @@ export default function ViewTransitionWrapper({
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* page content */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentPath}
@@ -65,7 +59,6 @@ export default function ViewTransitionWrapper({
         </motion.div>
       </AnimatePresence>
 
-      {/* overlay */}
       {viewport.w > 0 && viewport.h > 0 && (
         <motion.svg
           className="fixed inset-0 z-[9999] w-full h-full pointer-events-none"

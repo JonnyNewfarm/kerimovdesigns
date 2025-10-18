@@ -15,7 +15,6 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
 
   return (
     <div className="w-full h-screen flex flex-row-reverse justify-between">
-      {/* Image */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         whileInView={{
@@ -38,7 +37,6 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
         />
       </motion.div>
 
-      {/* Project List */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         whileInView={{
@@ -57,7 +55,6 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
           My Projects
         </h1>
 
-        {/* Project Links */}
         <div className="flex flex-col gap-2 overflow-y-auto max-h-[calc(100vh-200px)]">
           {projects.map((project, index) => (
             <Link
@@ -88,7 +85,6 @@ const ProjectsTable = ({ projects, children }: ProjectsTableProps) => {
           ))}
         </div>
 
-        {/* Pagination */}
         <div className="flex justify-start mt-5">{children}</div>
       </motion.div>
     </div>

@@ -5,7 +5,7 @@ import "@uploadthing/react/styles.css";
 
 interface UploadImageProps {
   onUploadComplete: (url: string) => void;
-  initialUrl?: string; // optional preloaded image/video
+  initialUrl?: string;
 }
 
 const UploadImage: React.FC<UploadImageProps> = ({
@@ -37,7 +37,7 @@ const UploadImage: React.FC<UploadImageProps> = ({
         onClientUploadComplete={(res) => {
           if (res && res.length > 0) {
             const url = res[0].url;
-            setPreview(url); // update preview
+            setPreview(url);
             onUploadComplete(url);
             alert("Upload Completed");
           }

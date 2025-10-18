@@ -31,17 +31,17 @@ export default function SafePageTransition({ children }: Props) {
       opacity: 1,
       transition: {
         type: "spring",
-        stiffness: 30, // softer spring
-        damping: 20, // slightly less damping for smoother motion
-        mass: 1.5, // heavier mass = slower
-        delay: 0.1, // optional small delay
+        stiffness: 30,
+        damping: 20,
+        mass: 1.5,
+        delay: 0.1,
       },
     },
     exit: {
       y: -80,
       opacity: 0,
       transition: {
-        duration: 1.2, // longer exit
+        duration: 1.2,
         ease: [0.76, 0, 0.24, 1],
       },
     },
