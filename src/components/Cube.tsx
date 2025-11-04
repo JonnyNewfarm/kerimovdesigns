@@ -47,9 +47,9 @@ export default function Index() {
       animate={{ opacity: [0, 1, 1] }}
       transition={{ duration: 2, times: [0, 0.4, 1], ease: "easeInOut" }}
       ref={container}
-      className="h-[150vh]"
+      className="min-h-[150dvh]"
     >
-      <div className="sticky uppercase top-0 h-screen flex flex-col justify-center items-center">
+      <div className="sticky uppercase top-0 h-[100dvh] flex flex-col justify-center items-center overflow-hidden">
         <Canvas className="w-full h-3/4">
           {isMdUp && <OrbitControls enableZoom={false} enablePan={false} />}
           <ambientLight intensity={2} />
@@ -57,7 +57,7 @@ export default function Index() {
           <Cube scrollProgress={smoothProgress} />
         </Canvas>
 
-        <div className="absolute bottom-15 text-center px-4">
+        <div className="absolute bottom-5 lg:bottom-11 text-center px-4">
           <h1 className="text-color text-2xl -mb-1 sm:text-2xl font-bold">
             Rustam Kerimov
           </h1>
@@ -76,7 +76,7 @@ export default function Index() {
           </h2>
         </div>
 
-        <div className="absolute hidden lg:block left-10 bottom-15 text-left px-4">
+        <div className="absolute hidden lg:block left-10 bottom-10 text-left px-4">
           <MagneticComp>
             <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
               <Link href={"/projects"}>Archives</Link>
@@ -84,7 +84,7 @@ export default function Index() {
           </MagneticComp>
         </div>
 
-        <div className="absolute hidden lg:block right-10 bottom-15 text-left px-4">
+        <div className="absolute hidden lg:block right-10 bottom-10 text-left px-4">
           <MagneticComp>
             <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
               <Link href={"/contact"}>Collaborate</Link>

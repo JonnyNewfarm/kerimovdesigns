@@ -14,9 +14,9 @@ const ProjectsTableMobile = ({
   children,
 }: ProjectsTableMobileProps) => {
   return (
-    <div className="flex flex-col bg-bg-dark pb-20">
-      <div className="h-[35vh] flex items-center justify-center">
-        <h1 className="text-3xl uppercase font-bold mt-20">My Projects</h1>
+    <div className="flex flex-col bg-dark pb-20">
+      <div className=" flex items-center justify-center">
+        <h1 className="text-3xl uppercase font-bold mb-5 mt-20">My Projects</h1>
       </div>
       <div className="flex justify-center items-center">
         <div className="h-full w-full flex gap-y-10 flex-col items-center">
@@ -53,9 +53,10 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
             alt="project-image"
             src={project.src}
             fill
-            className={`object-contain w-full h-full transition-opacity duration-500 ${
-              isLoaded ? "opacity-100" : "opacity-0"
-            }`}
+            className={`transition-opacity duration-500
+              object-contain sm:object-cover
+              w-full h-full
+              ${isLoaded ? "opacity-100" : "opacity-0"}`}
             onLoadingComplete={() => setIsLoaded(true)}
             onError={() => setHasError(true)}
           />
@@ -66,6 +67,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           )}
         </div>
       </Link>
+
       <div className="w-full">
         <div className="p-5 w-full border-b border-white">
           <h1>{project.title}</h1>

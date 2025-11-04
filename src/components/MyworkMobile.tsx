@@ -11,8 +11,8 @@ interface ProjectsTableMobileProps {
 const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
   return (
     <div className="flex flex-col pb-16">
-      <div className="h-[35vh] flex items-center justify-center">
-        <h1 className="text-3xl mt-20 font-semibold uppercase">
+      <div className=" flex items-center justify-center">
+        <h1 className="text-3xl mt-20 mb-8 font-semibold uppercase">
           Previous work
         </h1>
       </div>
