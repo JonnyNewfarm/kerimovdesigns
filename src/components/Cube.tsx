@@ -57,7 +57,7 @@ export default function Index() {
           <Cube scrollProgress={smoothProgress} />
         </Canvas>
 
-        <div className="absolute bottom-5 lg:bottom-11 text-center px-4">
+        <div className="absolute bottom-4 lg:bottom-11 text-center px-4">
           <h1 className="text-color text-2xl -mb-1 sm:text-2xl font-bold">
             Rustam Kerimov
           </h1>
@@ -109,15 +109,28 @@ const Cube = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
     useLoader(TextureLoader, "/cube-img/image6.jpg"),
   ];
 
+  const isMobile =
+    typeof window !== "undefined" ? window.innerWidth < 768 : false;
+  const targetScaleRef = useRef(1);
+
   useFrame(() => {
     if (!mesh.current) return;
     const value = scrollProgress.get();
     mesh.current.rotation.x = value;
     mesh.current.rotation.y = value * 1.2;
-    const targetScale = hovered ? 1.1 : 1;
-    mesh.current.scale.x += (targetScale - mesh.current.scale.x) * 0.1;
-    mesh.current.scale.y = mesh.current.scale.x;
-    mesh.current.scale.z = mesh.current.scale.x;
+
+    if (isMobile) {
+      mesh.current.scale.set(1, 1, 1); // Fix mobile jitter
+    } else {
+      // Desktop: smooth hover scale
+      const targetScale = hovered ? 1.1 : 1;
+      targetScaleRef.current += (targetScale - targetScaleRef.current) * 0.1;
+      mesh.current.scale.set(
+        targetScaleRef.current,
+        targetScaleRef.current,
+        targetScaleRef.current
+      );
+    }
   });
 
   useEffect(() => {
