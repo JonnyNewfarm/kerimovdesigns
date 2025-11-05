@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { Mesh, TextureLoader } from "three";
 import {
@@ -58,7 +58,7 @@ export default function Index() {
         </Canvas>
 
         <div className="absolute bottom-4 lg:bottom-11 text-center px-4">
-          <h1 className="text-color text-2xl -mb-1 sm:text-2xl font-bold">
+          <h1 className="text-color text-2xl  -mb-1 sm:text-2xl font-bold">
             Rustam Kerimov
           </h1>
 
@@ -99,6 +99,12 @@ export default function Index() {
 const Cube = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const mesh = useRef<Mesh>(null);
   const [hovered, setHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const targetScaleRef = useRef(1);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
 
   const textures = [
     useLoader(TextureLoader, "/cube-img/image1.jpg"),
@@ -109,20 +115,23 @@ const Cube = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
     useLoader(TextureLoader, "/cube-img/image6.jpg"),
   ];
 
-  const isMobile =
-    typeof window !== "undefined" ? window.innerWidth < 768 : false;
-  const targetScaleRef = useRef(1);
+  useLayoutEffect(() => {
+    if (mesh.current) {
+      const baseScale = isMobile ? 1 : 1;
+      mesh.current.scale.set(baseScale, baseScale, baseScale);
+    }
+  }, [isMobile]);
 
   useFrame(() => {
     if (!mesh.current) return;
+
     const value = scrollProgress.get();
     mesh.current.rotation.x = value;
     mesh.current.rotation.y = value * 1.2;
 
     if (isMobile) {
-      mesh.current.scale.set(1, 1, 1); // Fix mobile jitter
+      mesh.current.scale.set(1, 1, 1);
     } else {
-      // Desktop: smooth hover scale
       const targetScale = hovered ? 1.1 : 1;
       targetScaleRef.current += (targetScale - targetScaleRef.current) * 0.1;
       mesh.current.scale.set(
