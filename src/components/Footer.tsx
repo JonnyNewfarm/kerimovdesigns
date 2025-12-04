@@ -17,18 +17,14 @@ const Footer = () => {
       style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
       className="text-color relative h-[420px] bg-dark"
     >
-      {/* Wrapper to control sticky behavior */}
-      <div className="relative h-[420px]">
-        {/* Sticky footer that appears as you scroll */}
+      <div className="relative h-[calc(100vh+420px)] -top-[100vh]">
         <div
           className="sticky top-[calc(100vh-420px)] h-[420px] flex flex-col justify-between p-6 md:p-14 text-[#ecebeb]"
           style={{
-            // This helps smooth out mobile fractional pixel jumps
             WebkitBackfaceVisibility: "hidden",
             backfaceVisibility: "hidden",
           }}
         >
-          {/* Top section: Navigation + Socials */}
           <div className="flex flex-col md:flex-row justify-between gap-6 md:gap-x-10">
             <div className="hidden md:flex flex-col text-2xl font-light">
               <h1 className="opacity-70 mb-2">Navigation</h1>
