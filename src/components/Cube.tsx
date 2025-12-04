@@ -109,10 +109,10 @@ const Cube = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const textures = [
     useLoader(TextureLoader, "/cube-img/image1.jpg"),
     useLoader(TextureLoader, "/cube-img/image2.jpg"),
-    useLoader(TextureLoader, "/cube-img/cubeimg5.jpg"),
+    useLoader(TextureLoader, "/cube-img/cubeimg5.png"),
     useLoader(TextureLoader, "/cube-img/image4.jpg"),
     useLoader(TextureLoader, "/cube-img/rustam.jpg"),
-    useLoader(TextureLoader, "/cube-img/image6.jpg"),
+    useLoader(TextureLoader, "/cube-img/image3.jpg"),
   ];
 
   useLayoutEffect(() => {

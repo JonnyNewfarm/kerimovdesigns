@@ -83,14 +83,14 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
 
   return (
     <>
-      <div className="min-h-[70vh] sm:mt-20 mt-10  mb-20 flex flex-col gap-y-20 sm:gap-y-40 justify-center items-center">
+      <div className="min-h-[70vh]  sm:mt-20 mt-10  mb-20 flex flex-col gap-y-20 sm:gap-y-40 justify-center items-center">
         {images.map((src, index) => (
           <MotionImage key={index}>
             <Image
-              className="cursor-pointer md:max-w-[800px]"
+              className="cursor-pointer md:max-w-[850px]"
               src={src}
               alt={project.title || `Project Image ${index + 1}`}
-              width={800}
+              width={850}
               height={450}
               onClick={() => handleImageClick(src, `Image ${index + 1}`)}
             />
@@ -100,7 +100,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
         {project.srcVideo && (
           <MotionImage>
             <video
-              className="md:max-w-[800px]"
+              className="md:max-w-[850px]"
               autoPlay
               muted
               loop
