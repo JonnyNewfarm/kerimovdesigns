@@ -83,11 +83,11 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
 
   return (
     <>
-      <div className="min-h-[70vh]  sm:mt-20 mt-10  mb-20 flex flex-col gap-y-20 sm:gap-y-40 justify-center items-center">
+      <div className="min-h-[70vh]  sm:mt-20 mt-10  mb-20 flex flex-col gap-y-18 sm:gap-y-40 justify-center items-center">
         {images.map((src, index) => (
           <MotionImage key={index}>
             <Image
-              className="cursor-pointer md:max-w-[850px]"
+              className="cursor-pointer md:max-w-[750px] lg:max-w-[950px]"
               src={src}
               alt={project.title || `Project Image ${index + 1}`}
               width={850}
