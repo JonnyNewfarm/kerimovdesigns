@@ -5,13 +5,13 @@ import { FaRegCopyright } from "react-icons/fa";
 
 const NavbarMobile = () => {
   return (
-    <div className="w-full z-50 text-color py-3 px-10 items-center bg-transparent fixed md:hidden flex justify-between">
+    <div className="fixed left-0 top-0 z-50 flex w-full items-center justify-between  bg-dark/70 px-6 py-4 text-color backdrop-blur-md md:hidden">
       <Link
         href="/"
-        className="text-lg flex items-center mt-1 justify-center gap-x-1"
+        className="flex items-center justify-center gap-x-2 text-sm uppercase tracking-[0.18em]"
       >
-        <FaRegCopyright size={18} />
-        <h1 className="">Kerimov Designs</h1>
+        <FaRegCopyright size={14} />
+        <h1>Kerimov Designs</h1>
       </Link>
 
       <BurgerMenu />
