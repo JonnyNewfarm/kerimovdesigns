@@ -570,7 +570,7 @@ function DesktopProjectItem({
               <motion.div
                 animate={{
                   scale: isDimmed ? baseScale * 0.94 : baseScale,
-                  filter: isDimmed ? "blur(6px)" : "blur(0px)",
+                  filter: isDimmed ? "blur(4px)" : "blur(0px)",
                   opacity: isDimmed ? 0.7 : 1,
                 }}
                 transition={{
