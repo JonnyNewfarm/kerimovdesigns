@@ -38,7 +38,6 @@ type LayoutItem = {
   scale: number;
   drift: number;
   driftDirection: 1 | -1;
-  entrance: "blur" | "clean";
 };
 
 type MobileLayoutItem = {
@@ -78,7 +77,6 @@ const desktopLayout: LayoutItem[] = [
     scale: 0.9,
     drift: 95,
     driftDirection: -1,
-    entrance: "blur",
   },
   {
     left: "60%",
@@ -94,7 +92,6 @@ const desktopLayout: LayoutItem[] = [
     scale: 0.75,
     drift: 90,
     driftDirection: 1,
-    entrance: "clean",
   },
   {
     left: "22%",
@@ -110,7 +107,6 @@ const desktopLayout: LayoutItem[] = [
     scale: 0.9,
     drift: 90,
     driftDirection: -1,
-    entrance: "blur",
   },
   {
     left: "85%",
@@ -126,7 +122,6 @@ const desktopLayout: LayoutItem[] = [
     scale: 0.76,
     drift: 95,
     driftDirection: 1,
-    entrance: "clean",
   },
   {
     left: "55%",
@@ -142,7 +137,6 @@ const desktopLayout: LayoutItem[] = [
     scale: 0.6,
     drift: 76,
     driftDirection: -1,
-    entrance: "blur",
   },
   {
     left: "85%",
@@ -158,7 +152,6 @@ const desktopLayout: LayoutItem[] = [
     scale: 0.9,
     drift: 34,
     driftDirection: 1,
-    entrance: "clean",
   },
 ];
 
@@ -397,8 +390,6 @@ export default function MyProjects({ projects }: MyProjectsProps) {
               drift={item.drift}
               driftDirection={item.driftDirection}
               scrollYProgress={scrollYProgress}
-              entrance={item.entrance}
-              delay={index * 0.08}
               isActive={isActive}
               isDimmed={isDimmed}
               onHoverStart={() => setHoveredId(project.id)}
@@ -426,7 +417,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
 
       <div className="block md:hidden">
         <div
-          className="relative  w-full"
+          className="relative w-full"
           style={{
             maxWidth: MOBILE_CONTAINER_MAX_WIDTH,
             height: mobileSectionHeight,
@@ -508,8 +499,6 @@ function DesktopProjectItem({
   drift,
   driftDirection,
   scrollYProgress,
-  entrance,
-  delay,
   isActive,
   isDimmed,
   onHoverStart,
@@ -523,8 +512,6 @@ function DesktopProjectItem({
   drift: number;
   driftDirection: 1 | -1;
   scrollYProgress: MotionValue<number>;
-  entrance: "blur" | "clean";
-  delay: number;
   isActive: boolean;
   isDimmed: boolean;
   onHoverStart: () => void;
@@ -608,6 +595,7 @@ function DesktopProjectItem({
                     </motion.div>
                   </div>
                 </motion.div>
+
                 <div className="mt-5">
                   <p className="text-[18px] uppercase tracking-[0.22em] text-color">
                     {projectNumber} - {project.title}
