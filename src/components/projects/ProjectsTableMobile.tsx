@@ -1,4 +1,5 @@
 "use client";
+
 import { Project } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,77 +8,102 @@ import React, { ReactNode, useState } from "react";
 interface ProjectsTableMobileProps {
   projects: Project[];
   children: ReactNode;
+  startIndex: number;
 }
 
 const ProjectsTableMobile = ({
   projects,
   children,
+  startIndex,
 }: ProjectsTableMobileProps) => {
-  return (
-    <div className="flex flex-col bg-dark pb-20">
-      <div className=" flex items-center justify-center">
-        <h1 className="text-3xl uppercase font-bold mb-5 mt-20">My Projects</h1>
+  if (!projects.length) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-dark text-color">
+        No projects
       </div>
-      <div className="flex justify-center items-center">
-        <div className="h-full w-full flex gap-y-10 flex-col items-center">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+    );
+  }
 
-          <div className="flex justify-center">{children}</div>
-        </div>
+  return (
+    <section className="bg-dark pb-24 text-color">
+      <div className="px-6 pt-28">
+        <p className="mb-4 text-[10px] uppercase tracking-[0.28em] text-white/40">
+          Selected Work
+        </p>
+
+        <h1 className="text-4xl uppercase leading-[0.95] tracking-[-0.04em]">
+          My Projects
+        </h1>
       </div>
-    </div>
+
+      <div className="mt-12 flex flex-col gap-16 px-6">
+        {projects.map((project, index) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            number={startIndex + index + 1}
+          />
+        ))}
+      </div>
+
+      <div className="mt-16 border-t border-white/15 px-6 pt-8">{children}</div>
+    </section>
   );
 };
 
 interface ProjectCardProps {
   project: Project;
+  number: number;
 }
 
-const ProjectCard = ({ project }: ProjectCardProps) => {
+const ProjectCard = ({ project, number }: ProjectCardProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
   return (
-    <div className="w-[80vw] flex flex-col items-center">
-      <Link
-        href={`/project/${project.id}`}
-        className="w-full flex justify-center"
-      >
-        <div className="h-[200px] w-full flex justify-center items-center relative">
+    <article className="flex flex-col">
+      <Link href={`/project/${project.id}`} className="block">
+        <div className="relative h-[240px] w-full overflow-hidden border border-white/15">
           {!isLoaded && !hasError && (
-            <div className="absolute inset-0 animate-pulse bg-[#21271cc9]"></div>
+            <div className="absolute inset-0 animate-pulse bg-white/5" />
           )}
+
           <Image
-            alt="project-image"
             src={project.src}
+            alt={project.title}
             fill
-            className={`transition-opacity duration-500
-              object-contain sm:object-cover
-              w-full h-full
-              ${isLoaded ? "opacity-100" : "opacity-0"}`}
+            className={`object-cover transition-opacity duration-700 ${
+              isLoaded ? "opacity-100" : "opacity-0"
+            }`}
             onLoadingComplete={() => setIsLoaded(true)}
             onError={() => setHasError(true)}
           />
+
           {hasError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-white">
-              Image failed to load
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm uppercase tracking-[0.2em]">
+              Image error
             </div>
           )}
         </div>
       </Link>
 
-      <div className="w-full">
-        <div className="p-5 w-full border-b border-white">
-          <h1>{project.title}</h1>
-        </div>
-        <div className="p-5 flex justify-between text-sm">
-          <h1>{project.role}</h1>
-          <h1>{project.tools}</h1>
+      <div className="mt-6 border-t border-white/15 pt-6">
+        <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/35">
+          {String(number).padStart(2, "0")}
+        </p>
+
+        <h2 className="text-2xl uppercase leading-[0.95] tracking-[-0.04em]">
+          {project.title}
+        </h2>
+
+        <div className="mt-6 flex justify-between border-t border-white/15 pt-4 text-xs uppercase tracking-[0.18em] text-white/55">
+          <span>{project.role}</span>
+          <span className="max-w-[45%] text-right truncate">
+            {project.tools}
+          </span>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

@@ -1,27 +1,25 @@
 export const revalidate = 60;
+
 import MyProjects from "@/components/MyProjects";
-import MyworkMobile from "@/components/MyworkMobile";
 import SmoothScroll from "@/components/SmoothScroll";
-import { getProjects, getProjectsMobile } from "./actions";
+import { getProjects } from "./actions";
 import AnimDisplay from "@/components/AnimDisplay";
 import Cube from "@/components/Cube";
 
 export default async function Home() {
   const projects = await getProjects();
-  const projectsMobile = await getProjectsMobile();
 
   return (
     <SmoothScroll>
-      <div className="bg-dark p-0 relative min-h-screen w-full text-color  border-b-[1px] border-stone-400/20">
+      <div className="bg-dark p-0 relative min-h-screen w-full text-color border-b-[1px] border-stone-400/20">
         <Cube />
 
-        <div className="hidden md:block">
+        <div>
           <MyProjects projects={projects} />
         </div>
 
-        <div className="md:hidden">
-          <MyworkMobile projects={projectsMobile} />
-        </div>
+        {/* hvis du vil bruke mobile-prosjektene også */}
+        {/* <MyworkMobile projects={projectsMobile} /> */}
 
         <AnimDisplay />
       </div>

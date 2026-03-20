@@ -26,45 +26,41 @@ const Page = async ({ searchParams }: PageProps) => {
 
   const { projects, total } = await getProjectsPagnation(
     currentPage,
-    itemsPerPage
+    itemsPerPage,
   );
+
   const totalPages = Math.ceil(total / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
 
   const renderPagination = () => {
     const prevPage = currentPage > 1 ? currentPage - 1 : null;
     const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 
     return (
-      <div className="flex items-center gap-2 mt-4">
-        {prevPage && (
-          <a
-            href={`?page=${prevPage}`}
-            className="px-3 py-1 bg-color/10 rounded text-color"
-          >
-            Previous
-          </a>
-        )}
+      <div className="flex items-center gap-8">
+        <a
+          href={prevPage ? `?page=${prevPage}` : "#"}
+          aria-disabled={!prevPage}
+          className={`leading-none transition-all duration-300 ${
+            prevPage
+              ? "text-color text-4xl hover:opacity-60"
+              : "pointer-events-none text-color/20 text-2xl"
+          }`}
+        >
+          ←
+        </a>
 
-        {Array.from({ length: totalPages }, (_, i) => (
-          <a
-            key={i}
-            href={`?page=${i + 1}`}
-            className={`px-3 py-1 ${
-              currentPage === i + 1 ? "font-bold text-color" : "text-color/60"
-            }`}
-          >
-            {i + 1}
-          </a>
-        ))}
-
-        {nextPage && (
-          <a
-            href={`?page=${nextPage}`}
-            className="px-3 py-1 bg-color/10 rounded text-color"
-          >
-            Next
-          </a>
-        )}
+        <a
+          href={nextPage ? `?page=${nextPage}` : "#"}
+          aria-disabled={!nextPage}
+          className={`leading-none transition-all duration-300 ${
+            nextPage
+              ? "text-color text-4xl hover:opacity-60"
+              : "pointer-events-none text-color/20 text-2xl"
+          }`}
+        >
+          →
+        </a>
       </div>
     );
   };
@@ -72,9 +68,9 @@ const Page = async ({ searchParams }: PageProps) => {
   return (
     <SmoothScroll>
       <div className="bg-dark w-full min-h-screen text-color md:pt-12 border-b-[1px] border-stone-400/20">
-        <div className="w-full hidden md:block h-screen">
+        <div className="w-full hidden md:block min-h-screen">
           <Suspense fallback={<ProjectsTableSkeleton />}>
-            <ProjectsTable projects={projects}>
+            <ProjectsTable projects={projects} startIndex={startIndex}>
               {renderPagination()}
             </ProjectsTable>
           </Suspense>
@@ -82,7 +78,7 @@ const Page = async ({ searchParams }: PageProps) => {
 
         <div className="w-full md:hidden min-h-screen">
           <Suspense fallback={<ProjectsTableSkeleton />}>
-            <ProjectsTableMobile projects={projects}>
+            <ProjectsTableMobile projects={projects} startIndex={startIndex}>
               {renderPagination()}
             </ProjectsTableMobile>
           </Suspense>

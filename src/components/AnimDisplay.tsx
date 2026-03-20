@@ -42,6 +42,8 @@ const AnimDisplay = () => {
             I specialize in creating visual identities, animations, and logos
             that bring ideas to life. Design, for me, is more than work — it’s a
             way of turning imagination into something people can see and feel.
+          </p>
+          <p className="text-md mt-3 md:text-lg lg:text-xl leading-relaxed">
             My inspiration comes from everywhere: art, movies, and the world
             around me.
           </p>

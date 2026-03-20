@@ -42,33 +42,59 @@ const Page = async ({ params }: Props) => {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen pt-32 bg-dark p-7 sm:p-14 border-b-[1px] border-stone-400/20">
-        <div className="w-full flex flex-col min-h-screen items-center gap-y-2 sm:gap-y-5 justify-center text-color">
-          <h1 className="text-3xl uppercase text-wrap text-center sm:text-7xl">
-            {project.title}
-          </h1>
+      <div className="min-h-screen bg-dark border-b border-stone-400/20 text-color">
+        <div className="px-7 pt-32 pb-16 sm:px-14">
+          <div className="mx-auto w-full max-w-[1600px]">
+            {/* Top hero */}
+            <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:items-start">
+              {/* Left side */}
+              <div className="lg:col-span-8 xl:col-span-9">
+                <div className="mb-8">
+                  <p className="text-xs uppercase tracking-[0.25em] text-white/50">
+                    Selected Project
+                  </p>
+                </div>
 
-          <div className="flex w-full flex-col justify-center mt-10 gap-y-5 sm:gap-y-0 sm:flex-row gap-x-5">
-            <div>
-              <h1 className="mb-2">Role</h1>
-              <span className="bg-[#ecebeb] h-[1px] w-full sm:w-[200px] block" />
-              <p className="mt-2">{project.role}</p>
+                <h1 className="max-w-[1100px] text-left text-5xl uppercase leading-[0.9] tracking-[-0.04em] sm:text-7xl md:text-8xl xl:text-[10rem]">
+                  {project.title}
+                </h1>
+              </div>
+
+              {/* Right side meta */}
+              <div className="lg:col-span-4 xl:col-span-3 lg:pt-24">
+                <div className="flex flex-col gap-8">
+                  <div>
+                    <h2 className="mb-3 text-xs uppercase tracking-[0.22em] text-white/50">
+                      Role
+                    </h2>
+                    <span className="mb-3 block h-px w-full bg-[#ecebeb]/30" />
+                    <p className="text-base leading-relaxed">{project.role}</p>
+                  </div>
+
+                  <div>
+                    <h2 className="mb-3 text-xs uppercase tracking-[0.22em] text-white/50">
+                      Type
+                    </h2>
+                    <span className="mb-3 block h-px w-full bg-[#ecebeb]/30" />
+                    <p className="text-base leading-relaxed">{project.type}</p>
+                  </div>
+
+                  <div>
+                    <h2 className="mb-3 text-xs uppercase tracking-[0.22em] text-white/50">
+                      Tools
+                    </h2>
+                    <span className="mb-3 block h-px w-full bg-[#ecebeb]/30" />
+                    <p className="text-base leading-relaxed">{project.tools}</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <h1 className="mb-2">Type</h1>
-              <span className="bg-[#ecebeb] h-[1px] w-full sm:w-[200px] block" />
-              <p className="mt-2">{project.type}</p>
-            </div>
-
-            <div>
-              <h1 className="mb-2">Tools</h1>
-              <span className="bg-[#ecebeb] h-[1px] w-full sm:w-[200px] block" />
-              <p className="mt-2">{project.tools}</p>
+            {/* Space before content/modal */}
+            <div className="mt-20 sm:mt-28 lg:mt-32">
+              <ProjectModalWrapper project={project} />
             </div>
           </div>
-
-          <ProjectModalWrapper project={project} />
         </div>
       </div>
     </SmoothScroll>
