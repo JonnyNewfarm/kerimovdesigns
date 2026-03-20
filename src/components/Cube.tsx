@@ -58,7 +58,7 @@ export default function Index() {
     const timer = setTimeout(() => {
       sessionStorage.setItem("hero-intro-seen", "true");
       setIntroDone(true);
-    }, 2400);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);

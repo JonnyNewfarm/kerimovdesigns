@@ -21,6 +21,33 @@ html, body {
     color: #ecdfcc;
   }
 
+.hero-intro-logo path {
+  fill: transparent;
+  stroke: #ecdfcc;
+  stroke-width: 0.8;
+  stroke-dasharray: 350;
+  stroke-dashoffset: 350;
+  animation: textAnimation 4s ease-in-out;
+}
+
+@keyframes textAnimation {
+  0% {
+    stroke-dashoffset: 350;
+    fill: transparent;
+  }
+
+  
+
+  82% {
+    fill: transparent;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+
 
 
   ::view-transition-old(*) {
