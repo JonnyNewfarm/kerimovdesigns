@@ -62,7 +62,7 @@ const AnimDisplay = () => {
             muted
             playsInline
             className="w-full h-full object-contain"
-            src="/bylarm-anim.mp4"
+            src="/bylarm-new.mp4"
           />
         </motion.div>
       </div>
@@ -101,7 +101,7 @@ const AnimDisplay = () => {
             muted
             playsInline
             className="w-full h-full object-contain"
-            src="/echo-vid.mp4"
+            src="/echo-new.mp4"
           />
         </motion.div>
       </div>

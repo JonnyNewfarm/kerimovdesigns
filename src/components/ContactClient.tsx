@@ -97,7 +97,6 @@ const ContactClient = () => {
       <section className="min-h-screen border-b border-stone-400/20 bg-dark text-color">
         <div className="mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-7 pb-16 pt-32 sm:px-14 lg:px-20 xl:px-24">
           <div className="grid flex-1 grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-10 xl:gap-16">
-            {/* Left side */}
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -225,7 +224,6 @@ const ContactClient = () => {
               </form>
             </motion.div>
 
-            {/* Right side */}
             <motion.aside
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}

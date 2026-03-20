@@ -45,9 +45,7 @@ const Page = async ({ params }: Props) => {
       <div className="min-h-screen bg-dark border-b border-stone-400/20 text-color">
         <div className="px-7 pt-32 pb-16 sm:px-14">
           <div className="mx-auto w-full max-w-[1600px]">
-            {/* Top hero */}
             <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:items-start">
-              {/* Left side */}
               <div className="lg:col-span-8 xl:col-span-9">
                 <div className="mb-8">
                   <p className="text-xs uppercase tracking-[0.25em] text-white/50">
@@ -60,7 +58,6 @@ const Page = async ({ params }: Props) => {
                 </h1>
               </div>
 
-              {/* Right side meta */}
               <div className="lg:col-span-4 xl:col-span-3 lg:pt-24">
                 <div className="flex flex-col gap-8">
                   <div>
@@ -90,7 +87,6 @@ const Page = async ({ params }: Props) => {
               </div>
             </div>
 
-            {/* Space before content/modal */}
             <div className="mt-20 sm:mt-28 lg:mt-32">
               <ProjectModalWrapper project={project} />
             </div>
