@@ -12,6 +12,7 @@ import {
 import { Project } from "@prisma/client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import MagneticComp from "@/components/MagneticComp";
+import { usePathname } from "next/navigation";
 
 type ProjectWithMeta = Project & {
   role?: string | null;
@@ -319,6 +320,12 @@ export default function MyProjects({ projects }: MyProjectsProps) {
   const [activeMobileId, setActiveMobileId] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement | null>(null);
   const viewportWidth = useViewportWidth();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setHoveredId(null);
+    setActiveMobileId(null);
+  }, [pathname]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
