@@ -4,7 +4,7 @@ import { Project } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import React, { ReactNode, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface ProjectsTableProps {
   projects: Project[];
@@ -117,25 +117,22 @@ const ProjectsTable = ({
           className="mt-14 flex flex-col lg:col-span-7 lg:mt-0 lg:min-h-[calc(100vh-7rem)] xl:col-span-8"
         >
           <div className="ml-auto flex w-full max-w-[820px] flex-col">
-            <div className="relative overflow-hidden border border-[#ecebeb]/20">
-              <AnimatePresence initial={false} mode="sync">
-                <motion.div
-                  key={activeProject.id}
-                  initial={{ opacity: 0, scale: 1.01 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.005 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="relative h-[38vh] w-full sm:h-[46vh] lg:h-[52vh] xl:h-[60vh]"
-                >
-                  <Image
-                    fill
-                    src={activeProject.src}
-                    alt={activeProject.title}
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 60vw"
-                  />
-                </motion.div>
-              </AnimatePresence>
+            <div className="relative h-[38vh] w-full overflow-hidden border border-[#ecebeb]/20 sm:h-[46vh] lg:h-[52vh] xl:h-[60vh]">
+              <motion.div
+                key={activeProject.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  fill
+                  src={activeProject.src}
+                  alt={activeProject.title}
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 60vw"
+                />
+              </motion.div>
             </div>
 
             <div className="mt-6 border-t border-[#ecebeb]/20 pt-6">

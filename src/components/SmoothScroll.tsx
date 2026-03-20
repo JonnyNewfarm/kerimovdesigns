@@ -7,7 +7,7 @@ const SmoothScrollerContext = createContext<Lenis | null>(null);
 
 export const useSmoothScroller = () => useContext(SmoothScrollerContext);
 
-export default function ScrollSection({
+export default function SmoothScroll({
   children,
 }: {
   children: React.ReactNode;
@@ -15,18 +15,25 @@ export default function ScrollSection({
   const [lenisRef, setLenis] = useState<Lenis | null>(null);
 
   useEffect(() => {
-    const scroller = new Lenis();
+    const scroller = new Lenis({
+      duration: 1.1,
+      smoothWheel: true,
+      syncTouch: false,
+    });
+
     setLenis(scroller);
 
-    function raf(time: number) {
-      scroller.raf(time);
-      requestAnimationFrame(raf);
-    }
+    let frameId = 0;
 
-    const rafId = requestAnimationFrame(raf);
+    const raf = (time: number) => {
+      scroller.raf(time);
+      frameId = requestAnimationFrame(raf);
+    };
+
+    frameId = requestAnimationFrame(raf);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      cancelAnimationFrame(frameId);
       scroller.destroy();
     };
   }, []);
