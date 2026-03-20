@@ -67,8 +67,8 @@ const Page = async ({ searchParams }: PageProps) => {
 
   return (
     <SmoothScroll>
-      <div className="bg-dark w-full min-h-screen text-color md:pt-12 border-b-[1px] border-stone-400/20">
-        <div className="w-full hidden md:block min-h-screen">
+      <div className="bg-dark w-full min-h-screen border-b-[1px] border-stone-400/20 text-color md:pt-12">
+        <div className="hidden min-h-screen w-full md:block">
           <Suspense fallback={<ProjectsTableSkeleton />}>
             <ProjectsTable projects={projects} startIndex={startIndex}>
               {renderPagination()}
@@ -76,7 +76,7 @@ const Page = async ({ searchParams }: PageProps) => {
           </Suspense>
         </div>
 
-        <div className="w-full md:hidden min-h-screen">
+        <div className="min-h-screen w-full md:hidden">
           <Suspense fallback={<ProjectsTableSkeleton />}>
             <ProjectsTableMobile projects={projects} startIndex={startIndex}>
               {renderPagination()}

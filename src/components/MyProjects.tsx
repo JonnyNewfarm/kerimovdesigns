@@ -72,9 +72,9 @@ const desktopLayout: LayoutItem[] = [
     left2xl: "15%",
     top: 160,
     topMd: 160,
-    topLg: 160,
-    topXl: 160,
-    top2xl: 160,
+    topLg: 170,
+    topXl: 170,
+    top2xl: 170,
     scale: 0.9,
     drift: 95,
     driftDirection: -1,
@@ -375,7 +375,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             06
           </span>
           <p className="text-3xl uppercase tracking-[0.22em] text-color/70">
-            Selected Work
+            Recent Work
           </p>
         </div>
 
@@ -437,7 +437,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
               06
             </span>
             <p className="text-xl uppercase tracking-[0.22em] text-color/70">
-              Selected Work
+              Recent Work
             </p>
           </div>
 
@@ -547,14 +547,8 @@ function DesktopProjectItem({
         top,
         left: getSafeDesktopLeft(left, baseScale),
       }}
-      initial={
-        useBlurEntrance
-          ? { y: 60, scale: 0.95, filter: "blur(18px)" }
-          : { y: 36 }
-      }
-      whileInView={
-        useBlurEntrance ? { y: 0, scale: 1, filter: "blur(0px)" } : { y: 0 }
-      }
+      initial={useBlurEntrance ? { y: 60 } : { y: 36 }}
+      whileInView={useBlurEntrance ? { y: 0, scale: 1 } : { y: 0 }}
       viewport={{ once: true, amount: 0.14 }}
       transition={{
         duration: useBlurEntrance ? 1.05 : 0.8,
@@ -623,61 +617,42 @@ function DesktopProjectItem({
                     </motion.div>
                   </div>
                 </motion.div>
-
                 <div className="mt-5">
                   <p className="text-[18px] uppercase tracking-[0.22em] text-color">
                     {projectNumber} - {project.title}
                   </p>
 
-                  <AnimatePresence initial={false}>
-                    {isActive && (
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: 8,
-                          height: 0,
-                          filter: "blur(8px)",
-                        }}
-                        animate={{
-                          opacity: 1,
-                          y: 0,
-                          height: "auto",
-                          filter: "blur(0px)",
-                        }}
-                        exit={{
-                          opacity: 0,
-                          y: 6,
-                          height: 0,
-                          filter: "blur(6px)",
-                        }}
-                        transition={{
-                          duration: 0.42,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pt-3 space-y-1.5">
-                          {project.role && (
-                            <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
-                              {project.role}
-                            </p>
-                          )}
-
-                          {project.type && (
-                            <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
-                              {project.type}
-                            </p>
-                          )}
-
-                          {tools && (
-                            <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
-                              {tools}
-                            </p>
-                          )}
-                        </div>
-                      </motion.div>
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      opacity: isActive ? 1 : 0,
+                      y: isActive ? 0 : 6,
+                    }}
+                    transition={{
+                      duration: 0.22,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="pt-3 space-y-1.5 pointer-events-none"
+                    style={{ willChange: "transform, opacity" }}
+                  >
+                    {project.role && (
+                      <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
+                        {project.role}
+                      </p>
                     )}
-                  </AnimatePresence>
+
+                    {project.type && (
+                      <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
+                        {project.type}
+                      </p>
+                    )}
+
+                    {tools && (
+                      <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
+                        {tools}
+                      </p>
+                    )}
+                  </motion.div>
                 </div>
               </motion.div>
             </Link>

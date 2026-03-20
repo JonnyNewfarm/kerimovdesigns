@@ -18,9 +18,6 @@ export default async function Home() {
           <MyProjects projects={projects} />
         </div>
 
-        {/* hvis du vil bruke mobile-prosjektene også */}
-        {/* <MyworkMobile projects={projectsMobile} /> */}
-
         <AnimDisplay />
       </div>
     </SmoothScroll>

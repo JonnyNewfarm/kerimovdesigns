@@ -58,8 +58,16 @@ const ProjectsTable = ({
                 <Link
                   href={`/project/${project.id}`}
                   key={project.id}
-                  onMouseEnter={() => setHoveredProject(index)}
-                  onFocus={() => setHoveredProject(index)}
+                  onMouseEnter={() => {
+                    if (hoveredProject !== index) {
+                      setHoveredProject(index);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (hoveredProject !== index) {
+                      setHoveredProject(index);
+                    }
+                  }}
                   className="group flex w-full items-center justify-between gap-6 border-b border-[#ecebeb]/20 py-5 transition-opacity duration-300 hover:opacity-100"
                 >
                   <div className="flex min-w-0 items-start gap-4">
@@ -110,21 +118,21 @@ const ProjectsTable = ({
         >
           <div className="ml-auto flex w-full max-w-[820px] flex-col">
             <div className="relative overflow-hidden border border-[#ecebeb]/20">
-              <AnimatePresence mode="wait">
+              <AnimatePresence initial={false} mode="sync">
                 <motion.div
                   key={activeProject.id}
-                  initial={{ opacity: 0, scale: 1.04 }}
+                  initial={{ opacity: 0, scale: 1.01 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.01 }}
-                  transition={{ duration: 0.45, ease: "easeOut" }}
+                  exit={{ opacity: 0, scale: 1.005 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                   className="relative h-[38vh] w-full sm:h-[46vh] lg:h-[52vh] xl:h-[60vh]"
                 >
                   <Image
                     fill
-                    priority
                     src={activeProject.src}
                     alt={activeProject.title}
                     className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 60vw"
                   />
                 </motion.div>
               </AnimatePresence>
