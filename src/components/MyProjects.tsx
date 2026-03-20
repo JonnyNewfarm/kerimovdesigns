@@ -531,7 +531,6 @@ function DesktopProjectItem({
   onHoverEnd: () => void;
 }) {
   const tools = formatTools(project.tools);
-  const useBlurEntrance = entrance === "blur";
   const projectNumber = formatProjectNumber(index);
 
   const driftY = useTransform(
@@ -546,14 +545,6 @@ function DesktopProjectItem({
       style={{
         top,
         left: getSafeDesktopLeft(left, baseScale),
-      }}
-      initial={useBlurEntrance ? { y: 60 } : { y: 36 }}
-      whileInView={useBlurEntrance ? { y: 0, scale: 1 } : { y: 0 }}
-      viewport={{ once: true, amount: 0.14 }}
-      transition={{
-        duration: useBlurEntrance ? 1.05 : 0.8,
-        delay,
-        ease: [0.22, 1, 0.36, 1],
       }}
     >
       <motion.div style={{ y: driftY, willChange: "transform" }}>
