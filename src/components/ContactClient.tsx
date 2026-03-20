@@ -215,9 +215,7 @@ const ContactClient = () => {
                     disabled={isSending}
                     className="border border-[#ecebeb] px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] transition-opacity duration-300 hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {isSending
-                      ? "Sending..."
-                      : `Send ${window.innerWidth > 800 ? "message" : ""}`}
+                    {isSending ? "Sending..." : "Send message"}
                   </button>
 
                   <p className="text-sm text-white/40">
