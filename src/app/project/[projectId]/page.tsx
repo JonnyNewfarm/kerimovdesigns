@@ -45,44 +45,41 @@ const Page = async ({ params }: Props) => {
       <div className="min-h-screen bg-dark border-b border-stone-400/20 text-color">
         <div className="px-7 pt-32 pb-16 sm:px-14">
           <div className="mx-auto w-full max-w-[1600px]">
-            <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:items-start">
-              <div className="lg:col-span-8 xl:col-span-9">
-                <div className="mb-8">
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/50">
-                    Selected Project
+            <div className="max-w-[1200px]">
+              <p className="mb-8 text-xs uppercase tracking-[0.25em] text-white/50">
+                Selected Project
+              </p>
+
+              <h1 className="text-left text-5xl uppercase leading-[0.9] tracking-[-0.04em] sm:text-7xl md:text-8xl xl:text-[10rem]">
+                {project.title}
+              </h1>
+
+              <div className="mt-12 grid grid-cols-1 gap-8 border-t border-[#ecebeb]/20 pt-6 sm:grid-cols-3 sm:gap-10">
+                <div>
+                  <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                    Role
+                  </p>
+                  <p className="text-sm leading-relaxed text-white/85 sm:text-base">
+                    {project.role}
                   </p>
                 </div>
 
-                <h1 className="max-w-[1100px] text-left text-5xl uppercase leading-[0.9] tracking-[-0.04em] sm:text-7xl md:text-8xl xl:text-[10rem]">
-                  {project.title}
-                </h1>
-              </div>
+                <div>
+                  <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                    Type
+                  </p>
+                  <p className="text-sm leading-relaxed text-white/85 sm:text-base">
+                    {project.type}
+                  </p>
+                </div>
 
-              <div className="lg:col-span-4 xl:col-span-3 lg:pt-24">
-                <div className="flex flex-col gap-8">
-                  <div>
-                    <h2 className="mb-3 text-xs uppercase tracking-[0.22em] text-white/50">
-                      Role
-                    </h2>
-                    <span className="mb-3 block h-px w-full bg-[#ecebeb]/30" />
-                    <p className="text-base leading-relaxed">{project.role}</p>
-                  </div>
-
-                  <div>
-                    <h2 className="mb-3 text-xs uppercase tracking-[0.22em] text-white/50">
-                      Type
-                    </h2>
-                    <span className="mb-3 block h-px w-full bg-[#ecebeb]/30" />
-                    <p className="text-base leading-relaxed">{project.type}</p>
-                  </div>
-
-                  <div>
-                    <h2 className="mb-3 text-xs uppercase tracking-[0.22em] text-white/50">
-                      Tools
-                    </h2>
-                    <span className="mb-3 block h-px w-full bg-[#ecebeb]/30" />
-                    <p className="text-base leading-relaxed">{project.tools}</p>
-                  </div>
+                <div>
+                  <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                    Tools
+                  </p>
+                  <p className="text-sm leading-relaxed text-white/85 sm:text-base">
+                    {project.tools}
+                  </p>
                 </div>
               </div>
             </div>
