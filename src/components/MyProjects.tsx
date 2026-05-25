@@ -455,13 +455,6 @@ export default function MyProjects({ projects }: MyProjectsProps) {
                 scrollYProgress={scrollYProgress}
                 entrance={item.entrance}
                 delay={index * 0.06}
-                isActive={isActive}
-                isDimmed={isDimmed}
-                onToggle={() =>
-                  setActiveMobileId((prev) =>
-                    prev === project.id ? null : project.id,
-                  )
-                }
               />
             );
           })}
@@ -653,9 +646,6 @@ function MobileProjectItem({
   scrollYProgress,
   entrance,
   delay,
-  isActive,
-  isDimmed,
-  onToggle,
 }: {
   project: ProjectWithMeta;
   index: number;
@@ -667,11 +657,7 @@ function MobileProjectItem({
   scrollYProgress: MotionValue<number>;
   entrance: "blur" | "clean";
   delay: number;
-  isActive: boolean;
-  isDimmed: boolean;
-  onToggle: () => void;
 }) {
-  const tools = formatTools(project.tools);
   const useBlurEntrance = entrance === "blur";
   const projectNumber = formatProjectNumber(index);
 
@@ -701,101 +687,29 @@ function MobileProjectItem({
       }}
     >
       <motion.div style={{ y: driftY, willChange: "transform" }}>
-        <div
-          className="block text-left"
-          onClick={onToggle}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              onToggle();
-            }
-          }}
-        >
-          <Link href={`/project/${project.id}`} className="block">
-            <motion.div
-              animate={{
-                filter: isDimmed ? "blur(5px)" : "blur(0px)",
-                opacity: isDimmed ? 0.72 : 1,
-              }}
-              transition={{
-                duration: 0.5,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              <div
-                className="relative overflow-hidden"
-                style={{
-                  width: cardWidth,
-                  height: cardHeight,
-                }}
-              >
-                <Image
-                  fill
-                  src={project.src}
-                  alt={project.title}
-                  className="object-cover"
-                  sizes="(max-width: 767px) 320px, 320px"
-                />
-              </div>
+        <Link href={`/project/${project.id}`} className="block">
+          <div
+            className="relative overflow-hidden"
+            style={{
+              width: cardWidth,
+              height: cardHeight,
+            }}
+          >
+            <Image
+              fill
+              src={project.src}
+              alt={project.title}
+              className="object-cover"
+              sizes="(max-width: 767px) 320px, 320px"
+            />
+          </div>
 
-              <div className="mt-4">
-                <p className="text-[14px] uppercase tracking-[0.22em] text-color">
-                  {projectNumber} - {project.title}
-                </p>
-
-                <AnimatePresence initial={false}>
-                  {isActive && (
-                    <motion.div
-                      initial={{
-                        opacity: 0,
-                        y: 8,
-                        height: 0,
-                        filter: "blur(8px)",
-                      }}
-                      animate={{
-                        opacity: 1,
-                        y: 0,
-                        height: "auto",
-                        filter: "blur(0px)",
-                      }}
-                      exit={{
-                        opacity: 0,
-                        y: 6,
-                        height: 0,
-                        filter: "blur(6px)",
-                      }}
-                      transition={{
-                        duration: 0.4,
-                        ease: [0.22, 1, 0.36, 1],
-                      }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pt-3 space-y-1.5">
-                        {project.role && (
-                          <p className="text-[10px] uppercase tracking-[0.18em] text-color/55">
-                            {project.role}
-                          </p>
-                        )}
-                        {project.type && (
-                          <p className="text-[10px] uppercase tracking-[0.18em] text-color/55">
-                            {project.type}
-                          </p>
-                        )}
-                        {tools && (
-                          <p className="text-[10px] uppercase tracking-[0.18em] text-color/55">
-                            {tools}
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          </Link>
-        </div>
+          <div className="mt-4">
+            <p className="text-[14px] uppercase tracking-[0.22em] text-color">
+              {projectNumber} - {project.title}
+            </p>
+          </div>
+        </Link>
       </motion.div>
     </motion.div>
   );
