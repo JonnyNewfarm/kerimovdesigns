@@ -1,180 +1,330 @@
 "use client";
 
 import { Project } from "@prisma/client";
-import Image from "next/image";
 import Link from "next/link";
-import React, { ReactNode, useState } from "react";
-import { motion } from "framer-motion";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useTexture } from "@react-three/drei";
+import WaveImage from "@/components/projects/WaveImage";
 
 interface ProjectsTableProps {
   projects: Project[];
-  children: ReactNode;
+  children?: ReactNode;
   startIndex: number;
 }
+
+const PROJECTS_PER_VIEW = 5;
 
 const ProjectsTable = ({
   projects,
   children,
   startIndex,
 }: ProjectsTableProps) => {
-  const [hoveredProject, setHoveredProject] = useState<number>(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [direction, setDirection] = useState<1 | -1>(1);
 
-  if (!projects.length) {
+  const projectImages = useMemo(() => {
+    return projects.map((project) => project.src).filter(Boolean);
+  }, [projects]);
+
+  const totalPages = Math.ceil(projects.length / PROJECTS_PER_VIEW);
+
+  const visibleProjects = useMemo(() => {
+    const start = pageIndex * PROJECTS_PER_VIEW;
+    const end = start + PROJECTS_PER_VIEW;
+
+    return projects.slice(start, end);
+  }, [projects, pageIndex]);
+
+  const activeProject = projects[activeIndex];
+
+  const canGoPrevPage = pageIndex > 0;
+  const canGoNextPage = pageIndex < totalPages - 1;
+
+  useEffect(() => {
+    projectImages.forEach((src) => {
+      useTexture.preload(src);
+    });
+  }, [projectImages]);
+
+  const setProjectIndex = (index: number) => {
+    if (!projects.length) return;
+
+    const safeIndex = Math.min(Math.max(index, 0), projects.length - 1);
+    setActiveIndex(safeIndex);
+  };
+
+  const goToPrevPage = () => {
+    if (!canGoPrevPage) return;
+
+    const nextPage = pageIndex - 1;
+    const nextActiveIndex = nextPage * PROJECTS_PER_VIEW;
+
+    setDirection(-1);
+    setPageIndex(nextPage);
+    setActiveIndex(nextActiveIndex);
+  };
+
+  const goToNextPage = () => {
+    if (!canGoNextPage) return;
+
+    const nextPage = pageIndex + 1;
+    const nextActiveIndex = nextPage * PROJECTS_PER_VIEW;
+
+    setDirection(1);
+    setPageIndex(nextPage);
+    setActiveIndex(nextActiveIndex);
+  };
+
+  if (!projects.length || !activeProject) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-dark px-7 text-color sm:px-14">
+      <section className="flex min-h-screen w-full items-center justify-center bg-dark px-7 text-color sm:px-14">
         <p className="text-sm uppercase tracking-[0.2em] text-white/50">
           No projects found
         </p>
-      </div>
+      </section>
     );
   }
 
-  const activeProject = projects[hoveredProject];
-
   return (
-    <section className="min-h-screen w-full bg-dark text-color">
-      <div className="mx-auto grid min-h-screen w-full max-w-[1800px] grid-cols-1 px-7 pb-10 pt-28 sm:px-14 lg:grid-cols-12 lg:gap-10 lg:px-20 xl:px-24">
-        <motion.div
-          initial={{ opacity: 0, y: 36 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          viewport={{ once: true }}
-          className="flex flex-col lg:col-span-5 lg:h-[calc(100vh-7rem)] lg:pr-8 xl:col-span-4"
-        >
-          <div className="mb-10 shrink-0">
-            <p className="mb-4 text-[10px] uppercase tracking-[0.3em] text-white/45 sm:text-xs">
+    <section className="w-full bg-dark text-color">
+      <div className="mx-auto grid min-h-screen w-full max-w-[1800px] grid-cols-1 gap-10 px-7 pb-12 pt-28 sm:px-14 md:grid-cols-12 md:px-16 md:pt-32 lg:px-20 xl:px-24">
+        <aside className="flex min-h-0 flex-col md:col-span-5 md:h-[calc(100vh-9rem)] md:pr-6 xl:col-span-4">
+          <div className="mb-8 shrink-0">
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+              viewport={{ once: true }}
+              className="mb-4 text-[10px] uppercase tracking-[0.35em] text-white/45 sm:text-xs"
+            >
               Selected Work
-            </p>
-            <h1 className="max-w-[420px] text-4xl uppercase leading-[0.9] tracking-[-0.05em] sm:text-6xl xl:text-7xl">
+            </motion.p>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 26 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              viewport={{ once: true }}
+              className="max-w-[460px] text-[clamp(4rem,6vw,6.4rem)] uppercase leading-[0.88] tracking-[-0.06em]"
+            >
               My Projects
-            </h1>
+            </motion.h1>
           </div>
 
-          <div className="flex-1 overflow-y-auto border-t border-[#ecebeb]/20 pr-2">
-            {projects.map((project, index) => {
-              const isActive = hoveredProject === index;
-
-              return (
-                <Link
-                  href={`/project/${project.id}`}
-                  key={project.id}
-                  onMouseEnter={() => {
-                    if (hoveredProject !== index) {
-                      setHoveredProject(index);
-                    }
-                  }}
-                  onFocus={() => {
-                    if (hoveredProject !== index) {
-                      setHoveredProject(index);
-                    }
-                  }}
-                  className="group flex w-full items-center justify-between gap-6 border-b border-[#ecebeb]/20 py-5 transition-opacity duration-300 hover:opacity-100"
-                >
-                  <div className="flex min-w-0 items-start gap-4">
-                    <span
-                      className={`mt-1 text-[10px] uppercase tracking-[0.22em] transition-opacity duration-300 sm:text-xs ${
-                        isActive ? "opacity-100" : "opacity-35"
-                      }`}
-                    >
-                      {String(startIndex + index + 1).padStart(2, "0")}
-                    </span>
-
-                    <div className="min-w-0">
-                      <h2
-                        className={`truncate text-xl uppercase leading-none tracking-[-0.03em] transition-all duration-300 sm:text-2xl xl:text-3xl ${
-                          isActive
-                            ? "translate-x-2 opacity-100"
-                            : "translate-x-0 opacity-75"
-                        }`}
-                      >
-                        {project.title}
-                      </h2>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0 text-right">
-                    <p
-                      className={`text-xs uppercase tracking-[0.18em] transition-all duration-300 sm:text-sm ${
-                        isActive ? "opacity-70" : "opacity-35"
-                      }`}
-                    >
-                      {project.role}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="shrink-0">{children}</div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 36 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.08 }}
-          viewport={{ once: true }}
-          className="mt-14 flex flex-col lg:col-span-7 lg:mt-0 lg:min-h-[calc(100vh-7rem)] xl:col-span-8"
-        >
-          <div className="ml-auto flex w-full max-w-[820px] flex-col">
-            <div className="relative h-[38vh] w-full overflow-hidden border border-[#ecebeb]/20 sm:h-[46vh] lg:h-[52vh] xl:h-[60vh]">
+          <div className="relative min-h-[390px] flex-1 overflow-hidden border-t border-[#ecebeb]/20">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
-                key={activeProject.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
+                key={pageIndex}
+                custom={direction}
+                initial={{
+                  opacity: 0,
+                  x: direction === 1 ? 48 : -48,
+                  filter: "blur(8px)",
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  filter: "blur(0px)",
+                }}
+                exit={{
+                  opacity: 0,
+                  x: direction === 1 ? -48 : 48,
+                  filter: "blur(8px)",
+                }}
+                transition={{
+                  duration: 0.42,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
                 className="absolute inset-0"
               >
-                <Image
-                  fill
-                  src={activeProject.src}
-                  alt={activeProject.title}
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 60vw"
-                />
-              </motion.div>
-            </div>
+                {visibleProjects.map((project, index) => {
+                  const realIndex = pageIndex * PROJECTS_PER_VIEW + index;
+                  const isActive = activeIndex === realIndex;
 
-            <div className="mt-6 border-t border-[#ecebeb]/20 pt-6">
-              <p className="mb-3 text-[10px] uppercase tracking-[0.25em] text-white/40 sm:text-xs">
-                Featured Project
+                  return (
+                    <Link
+                      key={project.id}
+                      href={`/project/${project.id}`}
+                      onMouseEnter={() => setProjectIndex(realIndex)}
+                      onFocus={() => setProjectIndex(realIndex)}
+                      className="group flex min-h-[78px] w-full items-center justify-between gap-6 border-b border-[#ecebeb]/20 py-5 text-left transition-opacity duration-300"
+                    >
+                      <div className="flex min-w-0 items-start gap-4">
+                        <span
+                          className={`mt-1 text-[10px] uppercase tracking-[0.22em] transition-all duration-300 sm:text-xs ${
+                            isActive ? "text-white opacity-100" : "opacity-35"
+                          }`}
+                        >
+                          {String(startIndex + realIndex + 1).padStart(2, "0")}
+                        </span>
+
+                        <div className="min-w-0">
+                          <h2
+                            className={`truncate uppercase leading-none tracking-[-0.045em] transition-all duration-500 ${
+                              isActive
+                                ? "translate-x-3 text-[clamp(1.75rem,2.1vw,2.65rem)] text-white opacity-100"
+                                : "translate-x-0 text-[clamp(1.45rem,1.75vw,2.15rem)] text-white/45 opacity-80"
+                            }`}
+                          >
+                            {project.title}
+                          </h2>
+                        </div>
+                      </div>
+
+                      <p
+                        className={`hidden shrink-0 text-right text-xs uppercase tracking-[0.22em] transition-all duration-300 lg:block ${
+                          isActive ? "opacity-70" : "opacity-25"
+                        }`}
+                      >
+                        {project.role}
+                      </p>
+                    </Link>
+                  );
+                })}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="mt-6 flex shrink-0 items-center justify-between border-t border-[#ecebeb]/20 pt-5">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 sm:text-xs">
+              Browse projects
+            </p>
+
+            <div className="flex items-center gap-5">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/50 sm:text-xs">
+                {String(pageIndex + 1).padStart(2, "0")} /{" "}
+                {String(totalPages).padStart(2, "0")}
               </p>
 
-              <h2 className="max-w-[700px] text-3xl uppercase leading-[0.92] tracking-[-0.04em] sm:text-5xl xl:text-6xl">
-                {activeProject.title}
-              </h2>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={goToPrevPage}
+                  disabled={!canGoPrevPage}
+                  aria-label="Previous projects"
+                  className={`flex h-9 w-9 items-center justify-center border border-white/15 text-lg leading-none transition-all duration-300 ${
+                    canGoPrevPage
+                      ? "text-white hover:border-white/45 hover:bg-white hover:text-black"
+                      : "cursor-not-allowed text-white/20 opacity-40"
+                  }`}
+                >
+                  ←
+                </button>
 
-              <div className="mt-8 grid grid-cols-1 gap-8 border-t border-[#ecebeb]/20 pt-6 sm:grid-cols-3">
-                <div>
-                  <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
-                    Role
-                  </p>
-                  <p className="text-sm text-white/85 sm:text-base">
-                    {activeProject.role}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
-                    Type
-                  </p>
-                  <p className="text-sm text-white/85 sm:text-base">
-                    {activeProject.type}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
-                    Tools
-                  </p>
-                  <p className="text-sm text-white/85 sm:text-base">
-                    {activeProject.tools}
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={goToNextPage}
+                  disabled={!canGoNextPage}
+                  aria-label="Next projects"
+                  className={`flex h-9 w-9 items-center justify-center border border-white/15 text-lg leading-none transition-all duration-300 ${
+                    canGoNextPage
+                      ? "text-white hover:border-white/45 hover:bg-white hover:text-black"
+                      : "cursor-not-allowed text-white/20 opacity-40"
+                  }`}
+                >
+                  →
+                </button>
               </div>
             </div>
           </div>
-        </motion.div>
+
+          {children ? <div className="mt-8 shrink-0">{children}</div> : null}
+        </aside>
+
+        <main className="flex min-h-0 flex-col md:col-span-7 xl:col-span-8">
+          <div className="ml-auto flex w-full max-w-[1080px] flex-col">
+            <Link
+              href={`/project/${activeProject.id}`}
+              className="relative block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer overflow-hidden"
+              aria-label={`Open project ${activeProject.title}`}
+            >
+              <WaveImage
+                src={activeProject.src}
+                allSrcs={projectImages}
+                amplitude={0.05}
+                waveLength={5}
+                speed={0.032}
+                segments={32}
+              />
+            </Link>
+
+            <div className="mt-7 min-h-0 border-t border-[#ecebeb]/20 pt-7">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeProject.id}
+                  initial={{
+                    opacity: 0,
+                    y: 18,
+                    filter: "blur(8px)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -14,
+                    filter: "blur(8px)",
+                  }}
+                  transition={{
+                    duration: 0.34,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/40 sm:text-xs">
+                    Featured Project
+                  </p>
+
+                  <Link href={`/project/${activeProject.id}`}>
+                    <h2 className="max-w-[980px] text-[clamp(2.8rem,4.6vw,5.8rem)] uppercase leading-[0.88] tracking-[-0.055em] transition-opacity duration-300 hover:opacity-70">
+                      {activeProject.title}
+                    </h2>
+                  </Link>
+
+                  <div className="mt-6 grid grid-cols-1 gap-6 border-t border-[#ecebeb]/20 pt-6 sm:grid-cols-3">
+                    <div>
+                      <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                        Role
+                      </p>
+                      <p className="text-sm text-white/90 sm:text-base">
+                        {activeProject.role}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                        Type
+                      </p>
+                      <p className="text-sm text-white/90 sm:text-base">
+                        {activeProject.type}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                        Tools
+                      </p>
+                      <p className="text-sm text-white/90 sm:text-base">
+                        {activeProject.tools}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Link
+                    href={`/project/${activeProject.id}`}
+                    className="mt-6 inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-white/45 transition-opacity duration-300 hover:opacity-60 sm:text-xs"
+                  >
+                    Open Project
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </main>
       </div>
     </section>
   );

@@ -6,6 +6,17 @@ type HeroIntroProps = {
   isDone: boolean;
 };
 
+const images = [
+  "/cube-img/image1.jpg",
+  "/cube-img/image2.jpg",
+  "/cube-img/cubeimg5.png",
+  "/cube-img/image4.jpg",
+  "/cube-img/image3.jpg",
+  "/cube-img/rustam.jpg",
+];
+
+const ease = [0.76, 0, 0.24, 1] as const;
+
 export default function HeroIntro({ isDone }: HeroIntroProps) {
   return (
     <AnimatePresence>
@@ -14,42 +25,92 @@ export default function HeroIntro({ isDone }: HeroIntroProps) {
           initial={{ opacity: 1 }}
           exit={{
             opacity: 0,
-            transition: { duration: 0.6, ease: [0.76, 0, 0.24, 1] },
+            transition: {
+              duration: 0.55,
+              delay: 0.15,
+              ease,
+            },
           }}
-          className="absolute inset-0 z-50 flex items-center justify-center bg-[#181c14]"
+          className="absolute inset-0 z-50 bg-[#181c14]"
         >
-          <div className="flex flex-col items-center gap-8">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.97 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <svg
-                className="hero-intro-logo"
-                width="300"
-                height="300"
-                viewBox="0 0 169 90"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M5.72205e-06 89.6V0H33.536C41.1307 0 47.6587 1.23734 53.12 3.71201C58.5813 6.10134 62.7627 9.6 65.664 14.208C68.6507 18.7307 70.144 24.2347 70.144 30.72C70.144 37.0347 68.6507 42.496 65.664 47.104C62.7627 51.6267 58.5813 55.1253 53.12 57.6C47.6587 59.9893 41.1307 61.184 33.536 61.184H5.248L9.47201 56.832V89.6H5.72205e-06ZM61.184 89.6L38.144 57.088H48.384L71.552 89.6H61.184ZM9.47201 57.6L5.248 53.12H33.28C42.24 53.12 49.024 51.1573 53.632 47.232C58.3253 43.3067 60.672 37.8027 60.672 30.72C60.672 23.552 58.3253 18.0053 53.632 14.08C49.024 10.1547 42.24 8.192 33.28 8.192H5.248L9.47201 3.71201V57.6ZM100.692 67.328L100.308 55.808L154.58 0H165.46L125.908 41.472L120.532 47.232L100.692 67.328ZM92.5 89.6V0H101.972V89.6H92.5ZM156.884 89.6L118.228 45.056L124.628 38.144L168.148 89.6H156.884Z" />
-              </svg>
-            </motion.div>
-
+          <div className="relative h-full w-full overflow-hidden">
             <motion.p
-              initial={{ y: 16, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{
-                delay: 0.7,
                 duration: 0.7,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="text-[10px] uppercase tracking-[0.45em] text-[#ecdfcc]/65"
+              className="absolute left-1/2 top-[18%] -translate-x-1/2 text-[10px] uppercase tracking-[0.45em] text-[#ecdfcc]/65"
             >
               Portfolio Experience
             </motion.p>
 
-            <ProgressLine />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative h-3/4 w-full">
+                <div className="absolute left-1/2 top-[50.5%] h-[245px] w-[245px] -translate-x-1/2 -translate-y-1/2 md:h-[285px] md:w-[285px]">
+                  {images.map((src, index) => {
+                    const isTopImage = src.includes("rustam");
+
+                    return (
+                      <motion.img
+                        key={src}
+                        src={src}
+                        alt=""
+                        draggable={false}
+                        initial={{
+                          opacity: 0,
+                          x: getInitialX(index),
+                          y: getInitialY(index),
+                          scale: 0.88,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                          y: 0,
+                          scale: isTopImage ? 1 : 0.96,
+                        }}
+                        transition={{
+                          opacity: {
+                            duration: 0.35,
+                            delay: index * 0.07,
+                          },
+                          x: {
+                            duration: 1.15,
+                            delay: 0.55 + index * 0.04,
+                            ease,
+                          },
+                          y: {
+                            duration: 1.15,
+                            delay: 0.55 + index * 0.04,
+                            ease,
+                          },
+                          scale: {
+                            duration: 1.15,
+                            delay: 0.55 + index * 0.04,
+                            ease,
+                          },
+                        }}
+                        className="absolute left-1/2 top-1/2 h-[245px] w-[245px] -translate-x-1/2 -translate-y-1/2 object-cover md:h-[285px] md:w-[285px]"
+                        style={{
+                          zIndex: isTopImage ? 20 : index,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{
+                duration: 2.4,
+                ease,
+              }}
+              className="absolute bottom-[18%] left-1/2 h-[1px] w-[180px] origin-left -translate-x-1/2 bg-[#ecdfcc]/60"
+            />
           </div>
         </motion.div>
       )}
@@ -57,19 +118,22 @@ export default function HeroIntro({ isDone }: HeroIntroProps) {
   );
 }
 
-function ProgressLine() {
-  return (
-    <div className="relative h-[1px] w-[180px] overflow-hidden bg-[#ecdfcc]/15">
-      <motion.div
-        initial={{ x: "-100%" }}
-        animate={{ x: "100%" }}
-        transition={{
-          duration: 1.6,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute top-0 left-0 h-full w-1/2 bg-[#ecdfcc]"
-      />
-    </div>
-  );
+function getInitialX(index: number) {
+  const desktopPositions = [-460, -280, -110, 110, 280, 460];
+
+  if (typeof window !== "undefined" && window.innerWidth < 768) {
+    return 0;
+  }
+
+  return desktopPositions[index] ?? 0;
+}
+
+function getInitialY(index: number) {
+  const mobilePositions = [-380, -230, -80, 80, 230, 380];
+
+  if (typeof window !== "undefined" && window.innerWidth < 768) {
+    return mobilePositions[index] ?? 0;
+  }
+
+  return 0;
 }

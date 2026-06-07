@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getProjectsPagnation } from "../actions";
+import { getProjects, getProjectsPagnation } from "../actions";
 import ProjectsTable from "@/components/projects/ProjectsTable";
 import ProjectsTableSkeleton from "@/components/ProjectsTableSkeleton";
 import ProjectsTableMobile from "@/components/projects/ProjectsTableMobile";
@@ -21,10 +21,13 @@ interface PageProps {
 
 const Page = async ({ searchParams }: PageProps) => {
   const resolvedSearchParams = await searchParams;
+
   const currentPage = parseInt(resolvedSearchParams.page || "1", 10);
   const itemsPerPage = 5;
 
-  const { projects, total } = await getProjectsPagnation(
+  const desktopProjects = await getProjects();
+
+  const { projects: mobileProjects, total } = await getProjectsPagnation(
     currentPage,
     itemsPerPage,
   );
@@ -67,18 +70,19 @@ const Page = async ({ searchParams }: PageProps) => {
 
   return (
     <SmoothScroll>
-      <div className="bg-dark w-full min-h-screen border-b-[1px] border-stone-400/20 text-color md:pt-12">
-        <div className="hidden min-h-screen w-full md:block">
+      <div className="w-full bg-dark text-color">
+        <div className="hidden w-full md:block">
           <Suspense fallback={<ProjectsTableSkeleton />}>
-            <ProjectsTable projects={projects} startIndex={startIndex}>
-              {renderPagination()}
-            </ProjectsTable>
+            <ProjectsTable projects={desktopProjects} startIndex={0} />
           </Suspense>
         </div>
 
         <div className="min-h-screen w-full md:hidden">
           <Suspense fallback={<ProjectsTableSkeleton />}>
-            <ProjectsTableMobile projects={projects} startIndex={startIndex}>
+            <ProjectsTableMobile
+              projects={mobileProjects}
+              startIndex={startIndex}
+            >
               {renderPagination()}
             </ProjectsTableMobile>
           </Suspense>

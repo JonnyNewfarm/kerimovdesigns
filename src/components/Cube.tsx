@@ -58,7 +58,7 @@ export default function Index() {
     const timer = setTimeout(() => {
       sessionStorage.setItem("hero-intro-seen", "true");
       setIntroDone(true);
-    }, 3000);
+    }, 2800);
 
     return () => clearTimeout(timer);
   }, []);
@@ -78,7 +78,10 @@ export default function Index() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={introDone ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              duration: 0.45,
+              ease: [0.76, 0, 0.24, 1],
+            }}
             className="w-full h-full"
           >
             <Canvas className="w-full h-3/4">
