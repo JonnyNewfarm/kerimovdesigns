@@ -20,6 +20,7 @@ function useIsMdUp() {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
+
     setIsMdUp(mediaQuery.matches);
 
     function handleChange(e: MediaQueryListEvent) {
@@ -27,6 +28,7 @@ function useIsMdUp() {
     }
 
     mediaQuery.addEventListener("change", handleChange);
+
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
@@ -36,7 +38,11 @@ function useIsMdUp() {
 export default function Index() {
   const container = useRef<HTMLDivElement | null>(null);
   const isMdUp = useIsMdUp();
-  const [introDone, setIntroDone] = useState(false);
+
+  // null = vi har ikke sjekket sessionStorage ennå
+  // false = vis intro
+  // true = intro ferdig / allerede sett
+  const [introDone, setIntroDone] = useState<boolean | null>(null);
 
   const { scrollYProgress } = useScroll({
     target: container,
@@ -55,6 +61,8 @@ export default function Index() {
       return;
     }
 
+    setIntroDone(false);
+
     const timer = setTimeout(() => {
       sessionStorage.setItem("hero-intro-seen", "true");
       setIntroDone(true);
@@ -63,11 +71,15 @@ export default function Index() {
     return () => clearTimeout(timer);
   }, []);
 
+  if (introDone === null) {
+    return <div ref={container} className="min-h-[150dvh] bg-[#181c14]" />;
+  }
+
   return (
     <motion.div
       ref={container}
       className="min-h-[150dvh]"
-      initial={{ opacity: 0 }}
+      initial={!introDone ? { opacity: 0 } : false}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
@@ -212,6 +224,7 @@ const Cube = ({
     }
 
     const targetScale = hovered && introDone ? 1.1 : 1;
+
     targetScaleRef.current += (targetScale - targetScaleRef.current) * 0.1;
 
     mesh.current.scale.set(
@@ -236,6 +249,7 @@ const Cube = ({
       onPointerOut={() => setHovered(false)}
     >
       <boxGeometry args={[2.3, 2.3, 2.3]} />
+
       {textures.map((tex, i) => (
         <meshStandardMaterial key={i} attach={`material-${i}`} map={tex} />
       ))}
