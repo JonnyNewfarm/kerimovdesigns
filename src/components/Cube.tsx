@@ -20,7 +20,6 @@ function useIsMdUp() {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
-
     setIsMdUp(mediaQuery.matches);
 
     function handleChange(e: MediaQueryListEvent) {
@@ -28,7 +27,6 @@ function useIsMdUp() {
     }
 
     mediaQuery.addEventListener("change", handleChange);
-
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
@@ -39,10 +37,10 @@ export default function Index() {
   const container = useRef<HTMLDivElement | null>(null);
   const isMdUp = useIsMdUp();
 
-  // null = vi har ikke sjekket sessionStorage ennå
-  // false = vis intro
-  // true = intro ferdig / allerede sett
-  const [introDone, setIntroDone] = useState<boolean | null>(null);
+  const [introDone, setIntroDone] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("hero-intro-seen") === "true";
+  });
 
   const { scrollYProgress } = useScroll({
     target: container,
@@ -61,8 +59,6 @@ export default function Index() {
       return;
     }
 
-    setIntroDone(false);
-
     const timer = setTimeout(() => {
       sessionStorage.setItem("hero-intro-seen", "true");
       setIntroDone(true);
@@ -71,24 +67,19 @@ export default function Index() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (introDone === null) {
-    return <div ref={container} className="min-h-[150dvh] bg-[#181c14]" />;
-  }
-
   return (
     <motion.div
       ref={container}
       className="min-h-[150dvh]"
-      initial={!introDone ? { opacity: 0 } : false}
+      initial={false}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
     >
       <div className="sticky top-0 h-[100dvh] overflow-hidden flex flex-col items-center justify-center uppercase relative">
         <HeroIntro isDone={introDone} />
 
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={introDone ? { opacity: 1 } : { opacity: 0 }}
             transition={{
               duration: 0.45,
@@ -106,7 +97,7 @@ export default function Index() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={false}
           animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{
             duration: 0.9,
@@ -134,7 +125,7 @@ export default function Index() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{
             duration: 0.9,
@@ -151,7 +142,7 @@ export default function Index() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{
             duration: 0.9,
@@ -224,7 +215,6 @@ const Cube = ({
     }
 
     const targetScale = hovered && introDone ? 1.1 : 1;
-
     targetScaleRef.current += (targetScale - targetScaleRef.current) * 0.1;
 
     mesh.current.scale.set(
