@@ -2,9 +2,8 @@
 
 import { Project } from "@prisma/client";
 import Link from "next/link";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTexture } from "@react-three/drei";
 import WaveImage from "@/components/projects/WaveImage";
 
 interface ProjectsTableProps {
@@ -24,10 +23,6 @@ const ProjectsTable = ({
   const [pageIndex, setPageIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
 
-  const projectImages = useMemo(() => {
-    return projects.map((project) => project.src).filter(Boolean);
-  }, [projects]);
-
   const totalPages = Math.ceil(projects.length / PROJECTS_PER_VIEW);
 
   const visibleProjects = useMemo(() => {
@@ -39,14 +34,16 @@ const ProjectsTable = ({
 
   const activeProject = projects[activeIndex];
 
+  const nearbyImages = useMemo(() => {
+    return [
+      projects[activeIndex - 1]?.src,
+      activeProject?.src,
+      projects[activeIndex + 1]?.src,
+    ].filter(Boolean) as string[];
+  }, [projects, activeIndex, activeProject?.src]);
+
   const canGoPrevPage = pageIndex > 0;
   const canGoNextPage = pageIndex < totalPages - 1;
-
-  useEffect(() => {
-    projectImages.forEach((src) => {
-      useTexture.preload(src);
-    });
-  }, [projectImages]);
 
   const setProjectIndex = (index: number) => {
     if (!projects.length) return;
@@ -237,17 +234,19 @@ const ProjectsTable = ({
           <div className="ml-auto flex w-full max-w-[1080px] flex-col">
             <Link
               href={`/project/${activeProject.id}`}
-              className="relative block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer overflow-hidden"
+              className="relative z-10 block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer"
               aria-label={`Open project ${activeProject.title}`}
             >
-              <WaveImage
-                src={activeProject.src}
-                allSrcs={projectImages}
-                amplitude={0.05}
-                waveLength={5}
-                speed={0.032}
-                segments={32}
-              />
+              <div className="absolute inset-0 z-10 overflow-visible">
+                <WaveImage
+                  src={activeProject.src}
+                  allSrcs={nearbyImages}
+                  amplitude={0.035}
+                  waveLength={5}
+                  speed={0.032}
+                  segments={16}
+                />
+              </div>
             </Link>
 
             <div className="mt-7 min-h-0 border-t border-[#ecebeb]/20 pt-7">
