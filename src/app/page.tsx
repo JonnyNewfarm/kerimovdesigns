@@ -5,14 +5,16 @@ import SmoothScroll from "@/components/SmoothScroll";
 import { getProjects } from "./actions";
 import AnimDisplay from "@/components/AnimDisplay";
 import Cube from "@/components/Cube";
+import ServicesReveal from "@/components/ServicesReveal";
 
 export default async function Home() {
   const projects = await getProjects();
 
   return (
     <SmoothScroll>
-      <div className="bg-dark p-0 relative min-h-screen w-full text-color border-b-[1px] border-stone-400/20">
+      <div className="bg-dark p-0 relative min-h-screen w-full text-color ">
         <Cube />
+        <ServicesReveal />
 
         <div>
           <MyProjects projects={projects} />

@@ -1,112 +1,155 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+
+import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-const AnimDisplay = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const animations = [
+  {
+    title: "Echo",
+    type: "Animated graphics",
+    description:
+      "A high-energy visual piece built around movement, contrast and bold screen composition.",
+    video: "/echo-new.mp4",
+  },
+  {
+    title: "By:Larm",
+    type: "Motion identity",
+    description:
+      "A playful animated direction with sharp pacing, graphic rhythm and a strong visual mood.",
+    video: "/bylarm-new.mp4",
+  },
+];
+
+export default function AnimDisplay() {
+  const sectionRef = useRef<HTMLDivElement | null>(null);
   const [isLg, setIsLg] = useState(false);
 
   useEffect(() => {
     const checkScreen = () => setIsLg(window.innerWidth >= 1024);
+
     checkScreen();
     window.addEventListener("resize", checkScreen);
+
     return () => window.removeEventListener("resize", checkScreen);
   }, []);
 
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: sectionRef,
     offset: ["start end", "end start"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], [-200, 250]);
+  const firstY = useTransform(scrollYProgress, [0, 1], [-30, 45]);
+  const secondY = useTransform(scrollYProgress, [0, 1], [35, -35]);
+  const titleY = useTransform(scrollYProgress, [0, 1], [25, -25]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full px-6 md:px-20 lg:px-1 py-16 bg-dark flex flex-col gap-y-32"
-      style={{ transform: "translateZ(0)" }} // GPU hint for mobile Safari
+    <section
+      ref={sectionRef}
+      className="relative w-full overflow-hidden bg-dark px-4 py-24 text-color md:px-10 md:py-32 lg:px-16"
     >
-      {/* Section 1 */}
-      <div className="w-full flex flex-col lg:flex-row items-center justify-between lg:px-20 gap-6 lg:gap-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }} // <-- ADD THIS
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-color lg:w-1/2 text-left"
-        >
-          <h2 className="text-3xl md:text-4xl lg:text-4xl font-semibold uppercase mb-4">
-            Hi, I’m Rustam — a 27-year-old passionate graphic designer.
-          </h2>
-          <p className="text-md md:text-lg lg:text-xl leading-relaxed">
-            I specialize in creating visual identities, animations, and logos
-            that bring ideas to life. Design, for me, is more than work — it’s a
-            way of turning imagination into something people can see and feel.
-          </p>
-          <p className="text-md mt-3 md:text-lg lg:text-xl leading-relaxed">
-            My inspiration comes from everywhere: art, movies, and the world
-            around me.
-          </p>
-        </motion.div>
+      <div className="mx-auto w-full max-w-[1800px]">
+        <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-[1.1fr_0.7fr] md:items-end">
+          <motion.div
+            style={isLg ? { y: titleY } : undefined}
+            initial={{ opacity: 0, y: 24, filter: "blur(5px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{
+              duration: 0.9,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            <p className="mb-5 text-xs font-black uppercase tracking-[0.24em] text-color/45 md:text-sm">
+              Animation work
+            </p>
+
+            <h2 className="max-w-[1100px] text-[14vw] font-black uppercase leading-[0.88] tracking-[-0.05em] md:text-[8vw] lg:text-[5.8vw]">
+              Motion with visual attitude.
+            </h2>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, amount: 0.45 }}
+            transition={{
+              duration: 0.85,
+              delay: 0.1,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="max-w-[460px] text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg"
+          >
+            Animated visuals shaped through rhythm, graphic detail and
+            expressive motion.
+          </motion.p>
+        </div>
+
+        <div className="flex flex-col gap-20 lg:gap-28">
+          {animations.map((item, index) => {
+            const videoY = index === 0 ? firstY : secondY;
+
+            return (
+              <motion.article
+                key={item.title}
+                style={isLg ? { y: videoY } : undefined}
+                initial={{ opacity: 0, y: 34, filter: "blur(7px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, amount: 0.22 }}
+                transition={{
+                  duration: 0.95,
+                  delay: index * 0.08,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className={`grid grid-cols-1 gap-5 ${
+                  index === 1 ? "lg:ml-auto lg:w-[65%]" : "lg:w-[65%]"
+                }`}
+              >
+                <div className="group relative aspect-video w-full overflow-hidden bg-color/[0.04]">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.01]"
+                    src={item.video}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-[0.45fr_1fr] md:items-start">
+                  <div>
+                    <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-color/40">
+                      0{index + 1} / {item.type}
+                    </p>
+
+                    <h3 className="text-[6vw] font-black uppercase leading-[0.86] tracking-[-0.04em] text-color md:text-[5vw] lg:text-[3.6vw]">
+                      {item.title}
+                    </h3>
+                  </div>
+
+                  <p className="max-w-[620px] text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg">
+                    {item.description}
+                  </p>
+                </div>
+              </motion.article>
+            );
+          })}
+        </div>
 
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          viewport={{ once: true }}
-          className="relative w-full lg:w-1/2 aspect-[16/9]"
+          initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{
+            duration: 0.95,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="mt-24 md:mt-32 lg:mt-40"
         >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-contain"
-            src="/bylarm-new.mp4"
-          />
+          <h2 className="max-w-[1300px] text-[12vw] font-semibold uppercase leading-[0.9] tracking-[-0.075em] md:text-[6.4vw] lg:text-[5vw]">
+            Designed to move with rhythm, weight and character.
+          </h2>
         </motion.div>
       </div>
-
-      {/* Section 2 */}
-      <div className="w-full lg:px-20 flex flex-col lg:flex-row-reverse items-center justify-between gap-6 lg:gap-12">
-        <motion.div
-          style={isLg ? { y } : {}} // <-- ONLY apply scroll transform on desktop
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }} // <-- ADD THIS
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-color lg:w-1/2 text-left lg:text-right"
-        >
-          <h2 className="text-3xl uppercase md:text-4xl lg:text-4xl font-semibold mb-4">
-            Creative & Aspirational
-          </h2>
-          <p className="text-md md:text-lg lg:text-xl leading-relaxed">
-            I design with the purpose of giving each client a unique identity
-            that speaks to who they are. Whether it’s a complete brand system or
-            a simple logo, my focus is on creating work that connects, stands
-            out, and lasts.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          viewport={{ once: true }}
-          className="relative w-full lg:w-1/2 md:mt-0 md:aspect-[3/4]"
-        >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-contain"
-            src="/echo-new.mp4"
-          />
-        </motion.div>
-      </div>
-    </div>
+    </section>
   );
-};
-
-export default AnimDisplay;
+}

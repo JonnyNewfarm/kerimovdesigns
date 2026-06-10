@@ -104,9 +104,9 @@ const ProjectsTable = ({
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
               viewport={{ once: true }}
-              className="max-w-[460px] text-[clamp(4rem,6vw,6.4rem)] uppercase leading-[0.88] tracking-[-0.06em]"
+              className="max-w-[460px] text-[clamp(3rem,5vw,5.4rem)] font-black uppercase leading-[0.88] tracking-[-0.06em]"
             >
-              My Projects
+              My <br /> work
             </motion.h1>
           </div>
 

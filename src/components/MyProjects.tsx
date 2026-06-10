@@ -64,16 +64,16 @@ const MOBILE_CARD_BASE_HEIGHT = 214;
 
 const desktopLayout: LayoutItem[] = [
   {
-    left: "15%",
-    leftMd: "15%",
-    leftLg: "15%",
-    leftXl: "15%",
-    left2xl: "15%",
-    top: 160,
-    topMd: 160,
-    topLg: 170,
-    topXl: 170,
-    top2xl: 170,
+    left: "74%",
+    leftMd: "74%",
+    leftLg: "74%",
+    leftXl: "84%",
+    left2xl: "84%",
+    top: 175,
+    topMd: 175,
+    topLg: 175,
+    topXl: 180,
+    top2xl: 180,
     scale: 0.9,
     drift: 95,
     driftDirection: -1,
@@ -87,8 +87,8 @@ const desktopLayout: LayoutItem[] = [
     top: 550,
     topMd: 550,
     topLg: 550,
-    topXl: 300,
-    top2xl: 300,
+    topXl: 560,
+    top2xl: 560,
     scale: 0.75,
     drift: 90,
     driftDirection: 1,
@@ -265,8 +265,10 @@ function useViewportWidth() {
 
   useEffect(() => {
     const update = () => setWidth(window.innerWidth);
+
     update();
     window.addEventListener("resize", update);
+
     return () => window.removeEventListener("resize", update);
   }, []);
 
@@ -278,6 +280,7 @@ function getResponsiveDesktopTop(item: LayoutItem, width: number) {
   if (width >= 1280 && item.topXl !== undefined) return item.topXl;
   if (width >= 1024 && item.topLg !== undefined) return item.topLg;
   if (width >= 768 && item.topMd !== undefined) return item.topMd;
+
   return item.top;
 }
 
@@ -286,21 +289,25 @@ function getResponsiveDesktopLeft(item: LayoutItem, width: number) {
   if (width >= 1280 && item.leftXl !== undefined) return item.leftXl;
   if (width >= 1024 && item.leftLg !== undefined) return item.leftLg;
   if (width >= 768 && item.leftMd !== undefined) return item.leftMd;
+
   return item.left;
 }
 
 function getResponsiveMobileTop(item: MobileLayoutItem, width: number) {
   if (width >= 640 && item.topSm !== undefined) return item.topSm;
+
   return item.top;
 }
 
 function getResponsiveMobileLeft(item: MobileLayoutItem, width: number) {
   if (width >= 640 && item.leftSm !== undefined) return item.leftSm;
+
   return item.left;
 }
 
 function getResponsiveMobileScale(item: MobileLayoutItem, width: number) {
   if (width >= 640 && item.scaleSm !== undefined) return item.scaleSm;
+
   return item.scale;
 }
 
@@ -311,6 +318,7 @@ function formatProjectNumber(index: number) {
 export default function MyProjects({ projects }: MyProjectsProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [activeMobileId, setActiveMobileId] = useState<string | null>(null);
+
   const sectionRef = useRef<HTMLElement | null>(null);
   const viewportWidth = useViewportWidth();
   const pathname = usePathname();
@@ -336,6 +344,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
         const resolvedTop = getResponsiveDesktopTop(item, viewportWidth);
         const imageHeight = BASE_HEIGHT * item.scale;
         const textBlockHeight = 120;
+
         return resolvedTop + imageHeight + textBlockHeight;
       }),
       2200,
@@ -357,20 +366,38 @@ export default function MyProjects({ projects }: MyProjectsProps) {
   return (
     <section
       ref={sectionRef}
-      className="bg-dark text-color relative w-full mt-14 mb-20 overflow-hidden"
+      className="relative mt-14 mb-20 w-full overflow-hidden bg-dark text-color"
     >
       <div
-        className="relative hidden w-full md:block"
+        className="relative hidden w-full lg:block"
         style={{ height: desktopSectionHeight }}
       >
-        <div className="absolute left-[12%] top-16 z-30 flex items-start gap-3">
-          <span className="text-[11px] uppercase tracking-[0.18em] text-color/45">
-            06
-          </span>
-          <p className="text-3xl uppercase tracking-[0.22em] text-color/70">
-            Recent Work
-          </p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 28, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{
+            duration: 0.9,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="absolute left-[12%] top-[280px] xl:top-[210px] z-30 max-w-[760px]"
+        >
+          <div className="mb-6 flex items-center gap-4">
+            <span className="text-[18px] uppercase tracking-[0.18em] text-color/45">
+              06
+            </span>
+
+            <span className="text-[13px] font-black uppercase tracking-[0.28em] text-color/45">
+              Selected projects
+            </span>
+          </div>
+
+          <h2 className="text-[clamp(72px,7.4vw,150px)] font-black uppercase leading-[0.82] tracking-[-0.085em] text-color">
+            Recent
+            <br />
+            Work
+          </h2>
+        </motion.div>
 
         {visibleProjects.map((project, index) => {
           const item = desktopLayout[index % desktopLayout.length];
@@ -400,11 +427,11 @@ export default function MyProjects({ projects }: MyProjectsProps) {
 
         <Link
           href="/projects"
-          className="absolute left-[8%] top-[2480px] z-40 group"
+          className="group absolute left-[8%] top-[2580px] z-40"
         >
           <MagneticComp>
-            <div className="leading-[0.8] uppercase tracking-[-0.04em]">
-              <p className="text-6xl flex gap-x-2 items-center text-color/70 transition group-hover:text-color">
+            <div className="uppercase leading-[0.8] tracking-[-0.04em]">
+              <p className="flex items-center gap-x-2 text-6xl text-color/70 transition group-hover:text-color">
                 view —
               </p>
               <p className="text-6xl text-color/70 transition group-hover:text-color">
@@ -415,7 +442,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
         </Link>
       </div>
 
-      <div className="block md:hidden">
+      <div className="block lg:hidden">
         <div
           className="relative w-full"
           style={{
@@ -423,12 +450,21 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             height: mobileSectionHeight,
           }}
         >
-          <div className="absolute left-[8%] top-10 z-30 flex items-start gap-2">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-color/45">
-              06
-            </span>
-            <p className="text-xl uppercase tracking-[0.22em] text-color/70">
-              Recent Work
+          <div className="absolute left-[8%] -top-3 z-30">
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-[0.18em] text-color/45">
+                06
+              </span>
+
+              <span className="text-[10px] font-black uppercase tracking-[0.22em] text-color/45">
+                Selected projects
+              </span>
+            </div>
+
+            <p className="text-4xl font-black uppercase leading-[0.82] tracking-[-0.07em] text-color/80">
+              Recent
+              <br />
+              Work
             </p>
           </div>
 
@@ -437,10 +473,6 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             const resolvedLeft = getResponsiveMobileLeft(item, viewportWidth);
             const resolvedTop = getResponsiveMobileTop(item, viewportWidth);
             const resolvedScale = getResponsiveMobileScale(item, viewportWidth);
-
-            const isActive = activeMobileId === project.id;
-            const isDimmed =
-              activeMobileId !== null && activeMobileId !== project.id;
 
             return (
               <MobileProjectItem
@@ -461,14 +493,14 @@ export default function MyProjects({ projects }: MyProjectsProps) {
 
           <Link
             href="/projects"
-            className="absolute left-[8%] z-40 group"
+            className="group absolute left-[8%] z-40"
             style={{
               top: mobileSectionHeight - 90,
             }}
           >
             <MagneticComp>
-              <div className="leading-[0.8] uppercase tracking-[-0.04em]">
-                <p className="text-4xl flex gap-x-2 items-center text-color/70 transition group-hover:text-color">
+              <div className="uppercase leading-[0.8] tracking-[-0.04em]">
+                <p className="flex items-center gap-x-2 text-4xl text-color/70 transition group-hover:text-color">
                   view —
                 </p>
                 <p className="text-4xl text-color/70 transition group-hover:text-color">
@@ -513,6 +545,32 @@ function DesktopProjectItem({
   const tools = formatTools(project.tools);
   const projectNumber = formatProjectNumber(index);
 
+  const panelPositions = [
+    "leftOfCard",
+    "leftOfCard",
+    "rightOfCard",
+    "leftOfCard",
+    "leftOfCard",
+    "leftOfCard",
+  ] as const;
+
+  const panelPosition = panelPositions[index] ?? "rightOfCard";
+
+  const automaticPanelTop = baseScale < 0.7 ? 105 : baseScale < 0.8 ? 54 : 12;
+
+  const panelTopOverrides = [null, null, null, null, 84, null] as const;
+
+  const panelTop = panelTopOverrides[index] ?? automaticPanelTop;
+
+  const automaticPanelGap = baseScale < 0.7 ? 10 : baseScale < 0.8 ? 18 : 32;
+
+  const panelGapOverrides = [34, null, null, 20, 30, null] as const;
+
+  const panelGap = panelGapOverrides[index] ?? automaticPanelGap;
+
+  const visualImageEdge = (BASE_WIDTH * (1 + baseScale)) / 2;
+  const panelOffset = visualImageEdge + panelGap;
+
   const driftY = useTransform(
     scrollYProgress,
     [0, 1],
@@ -534,7 +592,7 @@ function DesktopProjectItem({
             animate={isActive ? "hover" : "rest"}
             onHoverStart={onHoverStart}
             onHoverEnd={onHoverEnd}
-            className="group"
+            className="group relative"
             style={{ transformOrigin: "center center" }}
           >
             <Link href={`/project/${project.id}`} className="block">
@@ -589,45 +647,89 @@ function DesktopProjectItem({
                   </div>
                 </motion.div>
 
-                <div className="mt-5">
-                  <p className="text-[18px] uppercase tracking-[0.22em] text-color">
-                    {projectNumber} - {project.title}
-                  </p>
+                <div className="mt-5 flex items-baseline gap-4">
+                  <span className="text-3xl uppercase leading-none tracking-[-0.08em] text-color">
+                    {projectNumber}
+                  </span>
 
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      opacity: isActive ? 1 : 0,
-                      y: isActive ? 0 : 6,
-                    }}
-                    transition={{
-                      duration: 0.22,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    className="pt-3 space-y-1.5 pointer-events-none"
-                    style={{ willChange: "transform, opacity" }}
-                  >
-                    {project.role && (
-                      <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
-                        {project.role}
-                      </p>
-                    )}
-
-                    {project.type && (
-                      <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
-                        {project.type}
-                      </p>
-                    )}
-
-                    {tools && (
-                      <p className="text-[14px] uppercase tracking-[0.18em] text-color/55">
-                        {tools}
-                      </p>
-                    )}
-                  </motion.div>
+                  <span className="text-[16px] uppercase tracking-[0.24em] text-color/70">
+                    {project.title}
+                  </span>
                 </div>
               </motion.div>
             </Link>
+
+            <AnimatePresence>
+              {isActive && (
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    x: panelPosition === "leftOfCard" ? -18 : 18,
+                    filter: "blur(10px)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                    filter: "blur(0px)",
+                  }}
+                  exit={{
+                    opacity: 0,
+                    x: panelPosition === "leftOfCard" ? -12 : 12,
+                    filter: "blur(8px)",
+                  }}
+                  transition={{
+                    duration: 0.35,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className={`pointer-events-none absolute z-50 w-[280px] ${
+                    panelPosition === "leftOfCard" ? "text-right" : ""
+                  }`}
+                  style={{
+                    top: panelTop,
+                    right:
+                      panelPosition === "leftOfCard" ? panelOffset : "auto",
+                    left:
+                      panelPosition === "rightOfCard" ? panelOffset : "auto",
+                    transformOrigin:
+                      panelPosition === "leftOfCard" ? "right top" : "left top",
+                  }}
+                >
+                  <div className="space-y-5">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-color/40">
+                        Selected project
+                      </p>
+
+                      <p className="mt-2 text-2xl uppercase leading-none tracking-[-0.04em] text-color">
+                        {project.title}
+                      </p>
+                    </div>
+
+                    <div className="h-px w-full bg-color/20" />
+
+                    <div className="space-y-2">
+                      {project.role && (
+                        <p className="text-[13px] uppercase tracking-[0.18em] text-color/55">
+                          {project.role}
+                        </p>
+                      )}
+
+                      {project.type && (
+                        <p className="text-[13px] uppercase tracking-[0.18em] text-color/55">
+                          {project.type}
+                        </p>
+                      )}
+
+                      {tools && (
+                        <p className="text-[13px] uppercase leading-6 tracking-[0.18em] text-color/55">
+                          {tools}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </MagneticComp>
       </motion.div>
