@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import WaveLinkText from "./WaveLink";
 
 const Footer = () => {
   const [time, setTime] = useState("");
@@ -25,7 +26,7 @@ const Footer = () => {
 
   return (
     <footer className="relative overflow-hidden bg-dark px-4 py-10 text-color md:px-10 lg:px-16">
-      <div className="mx-auto flex min-h-[520px] w-full max-w-[1800px] flex-col justify-between border-t border-stone-400/20 pt-8">
+      <div className="mx-auto flex min-h-[520px] w-full max-w-[1800px] flex-col justify-between  pt-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-[1.2fr_0.8fr] md:items-start">
           <div>
             <p className="mb-6 text-xs font-black uppercase tracking-[0.24em] text-color/45 md:text-sm">
@@ -46,15 +47,15 @@ const Footer = () => {
 
               <div className="flex flex-col gap-1 text-xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-color/80 md:text-3xl">
                 <Link href="/" className="transition hover:text-color">
-                  Home
+                  <WaveLinkText text="Home" />
                 </Link>
 
                 <Link href="/projects" className="transition hover:text-color">
-                  My Work
+                  <WaveLinkText text="My work" />
                 </Link>
 
                 <Link href="/contact" className="transition hover:text-color">
-                  Contact
+                  <WaveLinkText text="Contact" />
                 </Link>
               </div>
             </div>
@@ -71,7 +72,7 @@ const Footer = () => {
                   href="https://www.instagram.com/rustam.kerim0v?igsh=MTlhcjl5YzV0bm15cQ%3D%3D&utm_source=qr"
                   className="transition hover:text-color"
                 >
-                  Instagram
+                  <WaveLinkText text="Instagram" />
                 </a>
 
                 <a
@@ -80,7 +81,7 @@ const Footer = () => {
                   href="https://linkedin.com/in/rustam-kerimov-75bb5a331"
                   className="transition hover:text-color"
                 >
-                  LinkedIn
+                  <WaveLinkText text="LinkedIn" />
                 </a>
               </div>
             </div>
@@ -96,7 +97,7 @@ const Footer = () => {
               href="https://www.jonasnygaard.com/"
               className="transition hover:text-color"
             >
-              Newfarm Studio
+              <WaveLinkText text="Newfarm Studio" />
             </a>
           </div>
 

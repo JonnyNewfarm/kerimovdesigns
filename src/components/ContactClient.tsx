@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import WaveLinkText from "./WaveLink";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -341,27 +342,17 @@ together`}
                   </TextReveal>
 
                   <div className="flex flex-col gap-2">
-                    <a
-                      href="https://www.jonasnygaard.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition duration-500 hover:tracking-[0.22em] hover:text-color"
-                    >
-                      Rustam Kerimov
-                    </a>
+                    <p>Rustam Kerimov</p>
 
                     <a
                       href="mailto:rustam-98@hotmail.com"
-                      className="normal-case tracking-normal transition duration-500 hover:text-color"
+                      className="w-fit normal-case tracking-normal"
                     >
-                      rustam-98@hotmail.com
+                      <WaveLinkText text="rustam-98@hotmail.com" />
                     </a>
 
-                    <a
-                      href="tel:+4745268163"
-                      className="transition duration-500 hover:tracking-[0.22em] hover:text-color"
-                    >
-                      +47 45 26 81 63
+                    <a href="tel:+4745268163" className="w-fit">
+                      <WaveLinkText text="+47 45 26 81 63" />
                     </a>
 
                     <p>Oslo, Norway</p>
@@ -399,18 +390,18 @@ together`}
                       target="_blank"
                       rel="noopener noreferrer"
                       href="https://www.instagram.com/rustam.kerim0v?igsh=MTlhcjl5YzV0bm15cQ%3D%3D&utm_source=qr"
-                      className="transition duration-500 hover:tracking-[0.22em] hover:text-color"
+                      className="w-fit"
                     >
-                      Instagram
+                      <WaveLinkText text="Instagram" />
                     </a>
 
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
                       href="https://linkedin.com/in/rustam-kerimov-75bb5a331"
-                      className="transition duration-500 hover:tracking-[0.22em] hover:text-color"
+                      className="w-fit"
                     >
-                      LinkedIn
+                      <WaveLinkText text="LinkedIn" />
                     </a>
                   </div>
                 </motion.div>
@@ -571,13 +562,9 @@ together`}
                   disabled={isSending}
                   className="group relative w-fit cursor-pointer overflow-hidden border border-color bg-color px-8 py-4 text-sm font-black uppercase tracking-[0.2em] text-dark transition disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  <span className="inline-block transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[160%]">
-                    {isSending ? "Sending..." : "Send message"}
-                  </span>
-
-                  <span className="absolute left-8 top-4 inline-block translate-y-[160%] transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
-                    {isSending ? "Sending..." : "Send message"}
-                  </span>
+                  <WaveLinkText
+                    text={isSending ? "Sending..." : "Send message"}
+                  />
                 </button>
 
                 <p className="max-w-[360px] text-sm font-bold leading-[1.35] text-color/40">

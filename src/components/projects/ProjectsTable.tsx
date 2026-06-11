@@ -5,6 +5,7 @@ import Link from "next/link";
 import React, { ReactNode, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import WaveImage from "@/components/projects/WaveImage";
+import WaveLinkText from "../WaveLink";
 
 interface ProjectsTableProps {
   projects: Project[];
@@ -88,7 +89,7 @@ const ProjectsTable = ({
     <section className="w-full bg-dark text-color">
       <div className="mx-auto grid min-h-screen w-full max-w-[1800px] grid-cols-1 gap-10 px-7 pb-12 pt-28 sm:px-14 md:grid-cols-12 md:px-16 md:pt-32 lg:px-20 xl:px-24">
         <aside className="flex min-h-0 flex-col md:col-span-5 md:h-[calc(100vh-9rem)] md:pr-6 xl:col-span-4">
-          <div className="mb-8 shrink-0">
+          <div className="mb-8 flex min-h-[calc(clamp(3rem,5vw,5.4rem)*1.76+1.5rem)] shrink-0 items-end">
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -98,16 +99,6 @@ const ProjectsTable = ({
             >
               Selected Work
             </motion.p>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 26 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              viewport={{ once: true }}
-              className="max-w-[460px] text-[clamp(3rem,5vw,5.4rem)] font-black uppercase leading-[0.88] tracking-[-0.06em]"
-            >
-              My <br /> work
-            </motion.h1>
           </div>
 
           <div className="relative min-h-[390px] flex-1 overflow-hidden border-t border-[#ecebeb]/20">
@@ -249,7 +240,7 @@ const ProjectsTable = ({
               </div>
             </Link>
 
-            <div className="mt-7 min-h-0 border-t border-[#ecebeb]/20 pt-7">
+            <div className="mt-7 min-h-0  pt-7">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeProject.id}
@@ -314,10 +305,9 @@ const ProjectsTable = ({
 
                   <Link
                     href={`/project/${activeProject.id}`}
-                    className="mt-6 inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-white/45 transition-opacity duration-300 hover:opacity-60 sm:text-xs"
+                    className="mt-6 inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-white/80 font-black transition-opacity duration-300 hover:opacity-60 sm:text-xs"
                   >
-                    Open Project
-                    <span aria-hidden="true">→</span>
+                    <WaveLinkText text="Open Project" />
                   </Link>
                 </motion.div>
               </AnimatePresence>

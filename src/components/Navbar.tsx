@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
+import WaveLinkText from "./WaveLink";
 
 const Navbar = () => {
   return (
@@ -26,24 +27,18 @@ const Navbar = () => {
 
             <div className="tracking-tighter">
               <h1 className="opacity-70 m-0 leading-none">Navigation:</h1>
+
               <div className="flex gap-x-1 m-0 leading-tight">
-                <Link
-                  className="hover:scale-103 transition-transform ease-in-out"
-                  href="/"
-                >
-                  Home,
+                <Link href="/" className="inline-block">
+                  <WaveLinkText text="Home," />
                 </Link>
-                <Link
-                  className="hover:scale-103 transition-transform ease-in-out"
-                  href="/projects"
-                >
-                  My work,
+
+                <Link href="/projects" className="inline-block">
+                  <WaveLinkText text="My work," />
                 </Link>
-                <Link
-                  className="hover:scale-103 transition-transform ease-in-out"
-                  href="/contact"
-                >
-                  Contact
+
+                <Link href="/contact" className="inline-block">
+                  <WaveLinkText text="Contact" />
                 </Link>
               </div>
             </div>
