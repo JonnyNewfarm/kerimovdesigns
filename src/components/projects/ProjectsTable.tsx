@@ -95,7 +95,7 @@ const ProjectsTable = ({
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: "easeOut" }}
               viewport={{ once: true }}
-              className="mb-4 text-[10px] uppercase tracking-[0.35em] text-white/45 sm:text-xs"
+              className="mb-4 text-[10px] uppercase tracking-[0.35em] text-white/80 font-black sm:text-xs"
             >
               Selected Work
             </motion.p>

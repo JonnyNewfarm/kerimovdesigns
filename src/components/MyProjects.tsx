@@ -392,7 +392,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             </span>
           </div>
 
-          <h2 className="text-[clamp(72px,7.4vw,150px)] font-black uppercase leading-[0.82] tracking-[-0.085em] text-color">
+          <h2 className="text-[clamp(72px,7.4vw,150px)] font-black uppercase leading-[0.82] tracking-[-0.045em] text-color">
             Recent
             <br />
             Work

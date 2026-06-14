@@ -24,7 +24,7 @@ export default function ServicesReveal() {
           </p>
         </div>
 
-        <h2 className="select-none text-[10vw] font-black uppercase leading-[0.9] tracking-[-0.075em] text-color md:text-[8.4vw] lg:text-[6.45vw]">
+        <h2 className="select-none text-[10vw] font-black uppercase leading-[0.9] tracking-[-0.045em] text-color md:text-[8.4vw] lg:text-[6.45vw]">
           {bigText.map((line, index) => (
             <motion.span
               key={line}
