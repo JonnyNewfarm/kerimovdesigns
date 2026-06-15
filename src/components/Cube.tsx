@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { Mesh, TextureLoader } from "three";
+import { Mesh, Texture, TextureLoader, SRGBColorSpace } from "three";
 import {
   useScroll,
   useSpring,
@@ -89,8 +89,10 @@ export default function Index() {
           >
             <Canvas className="w-full h-3/4">
               {isMdUp && <OrbitControls enableZoom={false} enablePan={false} />}
+
               <ambientLight intensity={2} />
               <directionalLight position={[2, 1, 1]} />
+
               <Cube scrollProgress={smoothProgress} introDone={introDone} />
             </Canvas>
           </motion.div>
@@ -174,14 +176,21 @@ const Cube = ({
   const [isMobile, setIsMobile] = useState(false);
   const targetScaleRef = useRef(1);
 
-  const textures = [
-    useLoader(TextureLoader, "/cube-img/image1.jpg"),
-    useLoader(TextureLoader, "/cube-img/image2.jpg"),
-    useLoader(TextureLoader, "/cube-img/cubeimg5.png"),
-    useLoader(TextureLoader, "/cube-img/image4.jpg"),
-    useLoader(TextureLoader, "/cube-img/rustam.jpg"),
-    useLoader(TextureLoader, "/cube-img/image3.jpg"),
-  ];
+  const textures = useLoader(TextureLoader, [
+    "/cube-img/image1.jpg",
+    "/cube-img/image2.jpg",
+    "/cube-img/cubeimg5.png",
+    "/cube-img/image4.jpg",
+    "/cube-img/rustam.jpg",
+    "/cube-img/image3.jpg",
+  ]) as Texture[];
+
+  useEffect(() => {
+    textures.forEach((texture) => {
+      texture.colorSpace = SRGBColorSpace;
+      texture.needsUpdate = true;
+    });
+  }, [textures]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -240,9 +249,28 @@ const Cube = ({
     >
       <boxGeometry args={[2.3, 2.3, 2.3]} />
 
-      {textures.map((tex, i) => (
-        <meshStandardMaterial key={i} attach={`material-${i}`} map={tex} />
-      ))}
+      {textures.map((texture, index) => {
+        const isMainImage = index === 4;
+
+        if (isMainImage) {
+          return (
+            <meshBasicMaterial
+              key={index}
+              attach={`material-${index}`}
+              map={texture}
+              toneMapped={false}
+            />
+          );
+        }
+
+        return (
+          <meshStandardMaterial
+            key={index}
+            attach={`material-${index}`}
+            map={texture}
+          />
+        );
+      })}
     </mesh>
   );
 };
