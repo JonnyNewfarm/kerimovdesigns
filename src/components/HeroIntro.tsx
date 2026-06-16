@@ -1,23 +1,110 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type HeroIntroProps = {
   isDone: boolean;
 };
 
-const images = [
-  "/cube-img/image1.jpg",
-  "/cube-img/image2.jpg",
-  "/cube-img/cubeimg5.png",
-  "/cube-img/image4.jpg",
-  "/cube-img/image3.jpg",
-  "/cube-img/rustam.jpg",
+type IntroProject = {
+  title: string;
+  images: [string, string, string];
+};
+
+const introProjects: IntroProject[] = [
+  {
+    title: "Drømmenes Melodi",
+    images: [
+      "/cube-img/dream-1-rotate.jpg",
+      "/cube-img/dream-2.jpg",
+      "/cube-img/dream-3.jpg",
+    ],
+  },
+  {
+    title: "Art Exhibition",
+    images: [
+      "/cube-img/caiman-rotate.jpg",
+      "/cube-img/caiman-1.jpg",
+      "/cube-img/caiman-2.jpg",
+    ],
+  },
+  {
+    title: "Rustam Kerimov",
+    images: [
+      "/cube-img/rustam-4.jpg",
+      "/cube-img/rustam-3.jpg",
+      "/cube-img/rustam-5.jpg",
+    ],
+  },
 ];
 
 const ease = [0.76, 0, 0.24, 1] as const;
 
+const imageTransition = {
+  duration: 0.75,
+  ease,
+};
+
 export default function HeroIntro({ isDone }: HeroIntroProps) {
+  const [imagesReady, setImagesReady] = useState(false);
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
+
+  const activeProject = introProjects[activeProjectIndex];
+
+  const allImages = useMemo(() => {
+    return introProjects.flatMap((project) => project.images);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function preloadImages() {
+      await Promise.all(
+        allImages.map((src) => {
+          return new Promise<void>((resolve) => {
+            const img = new window.Image();
+
+            img.onload = () => resolve();
+            img.onerror = () => {
+              console.error("Hero intro image failed:", src);
+              resolve();
+            };
+
+            img.src = src;
+          });
+        }),
+      );
+
+      if (mounted) {
+        setImagesReady(true);
+      }
+    }
+
+    preloadImages();
+
+    return () => {
+      mounted = false;
+    };
+  }, [allImages]);
+
+  useEffect(() => {
+    if (!imagesReady) return;
+
+    const caimanTimer = window.setTimeout(() => {
+      setActiveProjectIndex(1);
+    }, 1150);
+
+    const rustamTimer = window.setTimeout(() => {
+      setActiveProjectIndex(2);
+    }, 2300);
+
+    return () => {
+      window.clearTimeout(caimanTimer);
+      window.clearTimeout(rustamTimer);
+    };
+  }, [imagesReady]);
+
   return (
     <AnimatePresence>
       {!isDone && (
@@ -26,7 +113,7 @@ export default function HeroIntro({ isDone }: HeroIntroProps) {
           exit={{
             opacity: 0,
             transition: {
-              duration: 0.55,
+              duration: 0.6,
               delay: 0.15,
               ease,
             },
@@ -36,77 +123,64 @@ export default function HeroIntro({ isDone }: HeroIntroProps) {
           <div className="relative h-full w-full overflow-hidden">
             <motion.p
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{
+                opacity: imagesReady ? 1 : 0,
+                y: imagesReady ? 0 : 10,
+              }}
               transition={{
                 duration: 0.7,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="absolute left-1/2 top-[18%] -translate-x-1/2 text-[10px] uppercase tracking-[0.45em] text-[#ecdfcc]/65"
+              className="absolute left-1/2 top-[18%] -translate-x-1/2 whitespace-nowrap text-[10px] uppercase tracking-[0.45em] text-[#ecdfcc]/65"
             >
               Portfolio Experience
             </motion.p>
 
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative h-3/4 w-full">
-                <div className="absolute left-1/2 top-[50.5%] h-[245px] w-[245px] -translate-x-1/2 -translate-y-1/2 md:h-[285px] md:w-[285px]">
-                  {images.map((src, index) => {
-                    const isTopImage = src.includes("rustam");
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{
+                  opacity: imagesReady ? 1 : 0,
+                  scale: imagesReady ? 1 : 0.98,
+                }}
+                transition={{
+                  duration: 0.65,
+                  ease,
+                }}
+                className="relative h-[245px] w-[245px] bg-[#181c14] md:h-[285px] md:w-[285px]"
+                style={
+                  {
+                    "--intro-gap": "8px",
+                  } as React.CSSProperties
+                }
+              >
+                <ImageSlot
+                  className="absolute left-0 top-0 h-full w-[calc(62%-var(--intro-gap)/2)] overflow-hidden bg-[#181c14]"
+                  src={activeProject.images[0]}
+                  direction="left"
+                />
 
-                    return (
-                      <motion.img
-                        key={src}
-                        src={src}
-                        alt=""
-                        draggable={false}
-                        initial={{
-                          opacity: 0,
-                          x: getInitialX(index),
-                          y: getInitialY(index),
-                          scale: 0.88,
-                        }}
-                        animate={{
-                          opacity: 1,
-                          x: 0,
-                          y: 0,
-                          scale: isTopImage ? 1 : 0.96,
-                        }}
-                        transition={{
-                          opacity: {
-                            duration: 0.35,
-                            delay: index * 0.07,
-                          },
-                          x: {
-                            duration: 1.15,
-                            delay: 0.55 + index * 0.04,
-                            ease,
-                          },
-                          y: {
-                            duration: 1.15,
-                            delay: 0.55 + index * 0.04,
-                            ease,
-                          },
-                          scale: {
-                            duration: 1.15,
-                            delay: 0.55 + index * 0.04,
-                            ease,
-                          },
-                        }}
-                        className="absolute left-1/2 top-1/2 h-[245px] w-[245px] -translate-x-1/2 -translate-y-1/2 object-cover md:h-[285px] md:w-[285px]"
-                        style={{
-                          zIndex: isTopImage ? 20 : index,
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
+                <ImageSlot
+                  className="absolute right-0 top-0 h-[calc(46%-var(--intro-gap)/2)] w-[calc(38%-var(--intro-gap)/2)] overflow-hidden bg-[#181c14]"
+                  src={activeProject.images[1]}
+                  direction="right"
+                />
+
+                <ImageSlot
+                  className="absolute bottom-0 right-0 h-[calc(54%-var(--intro-gap)/2)] w-[calc(38%-var(--intro-gap)/2)] overflow-hidden bg-[#181c14]"
+                  src={activeProject.images[2]}
+                  direction="right"
+                />
+              </motion.div>
             </div>
 
             <motion.div
               initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
+              animate={{
+                scaleX: imagesReady ? 1 : 0,
+              }}
               transition={{
-                duration: 2.4,
+                duration: 3.2,
                 ease,
               }}
               className="absolute bottom-[18%] left-1/2 h-[1px] w-[180px] origin-left -translate-x-1/2 bg-[#ecdfcc]/60"
@@ -118,22 +192,106 @@ export default function HeroIntro({ isDone }: HeroIntroProps) {
   );
 }
 
-function getInitialX(index: number) {
-  const desktopPositions = [-460, -280, -110, 110, 280, 460];
+function ImageSlot({
+  className,
+  src,
+  direction = "left",
+}: {
+  className: string;
+  src: string;
+  direction?: "left" | "right";
+}) {
+  const [currentImage, setCurrentImage] = useState(src);
+  const [previousImage, setPreviousImage] = useState<string | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  if (typeof window !== "undefined" && window.innerWidth < 768) {
-    return 0;
-  }
+  const currentImageRef = useRef(src);
+  const firstRenderRef = useRef(true);
 
-  return desktopPositions[index] ?? 0;
+  const enterX = direction === "left" ? "-42%" : "42%";
+  const exitX = direction === "left" ? "42%" : "-42%";
+
+  useEffect(() => {
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+      currentImageRef.current = src;
+      setCurrentImage(src);
+      return;
+    }
+
+    if (currentImageRef.current === src) return;
+
+    const oldImage = currentImageRef.current;
+
+    setPreviousImage(oldImage);
+    setCurrentImage(src);
+    setIsAnimating(true);
+
+    currentImageRef.current = src;
+
+    const timeout = window.setTimeout(() => {
+      setPreviousImage(null);
+      setIsAnimating(false);
+    }, imageTransition.duration * 1000);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [src]);
+
+  return (
+    <div className={className}>
+      {previousImage && (
+        <motion.div
+          key={`previous-${previousImage}`}
+          initial={{
+            x: "0%",
+            opacity: 1,
+          }}
+          animate={{
+            x: exitX,
+            opacity: 0,
+          }}
+          transition={imageTransition}
+          className="absolute inset-0"
+        >
+          <HeroImage src={previousImage} />
+        </motion.div>
+      )}
+
+      <motion.div
+        key={`current-${currentImage}`}
+        initial={
+          isAnimating
+            ? {
+                x: enterX,
+                opacity: 0,
+              }
+            : {
+                x: "0%",
+                opacity: 1,
+              }
+        }
+        animate={{
+          x: "0%",
+          opacity: 1,
+        }}
+        transition={imageTransition}
+        className="absolute inset-0"
+      >
+        <HeroImage src={currentImage} />
+      </motion.div>
+    </div>
+  );
 }
 
-function getInitialY(index: number) {
-  const mobilePositions = [-380, -230, -80, 80, 230, 380];
-
-  if (typeof window !== "undefined" && window.innerWidth < 768) {
-    return mobilePositions[index] ?? 0;
-  }
-
-  return 0;
+function HeroImage({ src }: { src: string }) {
+  return (
+    <img
+      src={src}
+      alt=""
+      draggable={false}
+      className="absolute inset-0 h-full w-full object-cover"
+    />
+  );
 }

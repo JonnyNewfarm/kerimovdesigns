@@ -278,7 +278,7 @@ const ContactClient = () => {
                 as="h1"
                 mode="lines"
                 delay={0.12}
-                className="max-w-[1250px] text-[17vw] font-black uppercase leading-[0.78] tracking-[-0.05em] text-color md:text-[10vw] lg:text-[8vw]"
+                className="max-w-[1250px] text-[17vw] font-black uppercase leading-[0.78] tracking-[-0.02em] text-color md:text-[10vw] lg:text-[8vw]"
               >
                 {`Let's create
 a project

@@ -1,8 +1,26 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { Mesh, Texture, TextureLoader, SRGBColorSpace } from "three";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useLayoutEffect,
+  useMemo,
+} from "react";
+import {
+  Canvas,
+  useFrame,
+  useLoader,
+  ThreeEvent,
+  useThree,
+} from "@react-three/fiber";
+import {
+  Mesh,
+  Texture,
+  TextureLoader,
+  SRGBColorSpace,
+  CanvasTexture,
+} from "three";
 import {
   useScroll,
   useSpring,
@@ -11,6 +29,7 @@ import {
   MotionValue,
 } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { OrbitControls } from "@react-three/drei";
 import MagneticComp from "./MagneticComp";
 import HeroIntro from "./HeroIntro";
@@ -33,9 +52,306 @@ function useIsMdUp() {
   return isMdUp;
 }
 
+const HERO_BG_COLOR = "#181c14";
+
+const cubeProjects: {
+  title: string;
+  subtitle: string;
+  images: string[];
+  href?: string;
+}[] = [
+  {
+    title: "Rustam Kerimov",
+    subtitle: "Graphic Designer",
+    images: [
+      "/cube-img/rustam-4.jpg",
+      "/cube-img/rustam-3.jpg",
+      "/cube-img/rustam-5.jpg",
+    ],
+  },
+  {
+    title: "Echo Festival",
+    subtitle: "View Project",
+    href: "/project/692fa8ade953917a4953f016",
+    images: [
+      "/cube-img/echo-1.jpg",
+      "/cube-img/echo-2.jpg",
+      "/cube-img/echo-3.jpg",
+    ],
+  },
+  {
+    title: "i-D Magazine",
+    subtitle: "View Project",
+    href: "/project/692f9a5d6a4755436ddef92b",
+    images: [
+      "/cube-img/id-mag-1.jpg",
+      "/cube-img/id-mag-2.jpg",
+      "/cube-img/id-mag-3.jpg",
+    ],
+  },
+  {
+    title: "Art Exhibition",
+    subtitle: "View Project",
+    href: "/project/6930b50f931d3caa254b3237",
+    images: [
+      "/cube-img/cubeimg5.png",
+      "/cube-img/caiman-1.jpg",
+      "/cube-img/caiman-2.jpg",
+    ],
+  },
+  {
+    title: "Drømmenes Melodi",
+    subtitle: "View Project",
+    href: "/project/69300cd7a94f6af6c6b7d9d8",
+    images: [
+      "/cube-img/dream-1.jpg",
+      "/cube-img/dream-2.jpg",
+      "/cube-img/dream-3.jpg",
+    ],
+  },
+  {
+    title: "Maltesers Package",
+    subtitle: "View Project",
+    href: "/project/692f8cfc17ad2ca258e981de",
+    images: [
+      "/cube-img/maltesers-1.jpg",
+      "/cube-img/maltesers-2.jpg",
+      "/cube-img/maltesers-3.jpg",
+    ],
+  },
+];
+
+type CubeProject = (typeof cubeProjects)[number];
+
+type CollageTile = {
+  imageSlot: 0 | 1 | 2;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotate?: boolean;
+};
+
+/**
+ * Three.js BoxGeometry material order:
+ *
+ * 0 = right
+ * 1 = left
+ * 2 = top
+ * 3 = bottom
+ * 4 = front
+ * 5 = back
+ *
+ * Rustam er projectIndex 0.
+ * Derfor ligger 0 på materialIndex 4.
+ */
+const BOX_FACE_PROJECT_INDEXES = [1, 2, 3, 4, 0, 5];
+
+const faceCollageLayout: CollageTile[] = [
+  { imageSlot: 0, x: 0, y: 0, width: 0.62, height: 1 },
+  { imageSlot: 1, x: 0.62, y: 0, width: 0.38, height: 0.46 },
+  { imageSlot: 2, x: 0.62, y: 0.46, width: 0.38, height: 0.54 },
+];
+
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement | HTMLCanvasElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  rotate = false,
+) {
+  const imageWidth =
+    image instanceof HTMLImageElement
+      ? image.naturalWidth || image.width
+      : image.width;
+
+  const imageHeight =
+    image instanceof HTMLImageElement
+      ? image.naturalHeight || image.height
+      : image.height;
+
+  if (!imageWidth || !imageHeight) return;
+
+  ctx.save();
+
+  if (rotate) {
+    ctx.translate(x + width / 2, y + height / 2);
+    ctx.rotate(Math.PI / 2);
+
+    drawImageCover(ctx, image, -height / 2, -width / 2, height, width, false);
+
+    ctx.restore();
+    return;
+  }
+
+  const imageRatio = imageWidth / imageHeight;
+  const tileRatio = width / height;
+
+  let sourceWidth = imageWidth;
+  let sourceHeight = imageHeight;
+  let sourceX = 0;
+  let sourceY = 0;
+
+  if (imageRatio > tileRatio) {
+    sourceWidth = imageHeight * tileRatio;
+    sourceX = (imageWidth - sourceWidth) / 2;
+  } else {
+    sourceHeight = imageWidth / tileRatio;
+    sourceY = (imageHeight - sourceHeight) / 2;
+  }
+
+  ctx.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    x,
+    y,
+    width,
+    height,
+  );
+
+  ctx.restore();
+}
+
+function createCollageTexture(
+  textures: Texture[],
+  tiles: CollageTile[],
+  shouldRotateLargeImage = false,
+) {
+  const size = 1024;
+  const gap = 34;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) return null;
+
+  ctx.clearRect(0, 0, size, size);
+
+  ctx.fillStyle = HERO_BG_COLOR;
+  ctx.fillRect(0, 0, size, size);
+
+  tiles.forEach((tile) => {
+    const texture = textures[tile.imageSlot];
+    const image = texture?.image as HTMLImageElement | HTMLCanvasElement;
+
+    if (!image) return;
+
+    const x = tile.x * size;
+    const y = tile.y * size;
+    const width = tile.width * size;
+    const height = tile.height * size;
+
+    const insetLeft = x === 0 ? 0 : gap / 2;
+    const insetTop = y === 0 ? 0 : gap / 2;
+    const insetRight = x + width >= size ? 0 : gap / 2;
+    const insetBottom = y + height >= size ? 0 : gap / 2;
+
+    const drawX = x + insetLeft;
+    const drawY = y + insetTop;
+    const drawWidth = width - insetLeft - insetRight;
+    const drawHeight = height - insetTop - insetBottom;
+
+    const isLargeImage = tile.imageSlot === 0;
+
+    drawImageCover(
+      ctx,
+      image,
+      drawX,
+      drawY,
+      drawWidth,
+      drawHeight,
+      shouldRotateLargeImage && isLargeImage,
+    );
+  });
+
+  const collageTexture = new CanvasTexture(canvas);
+
+  collageTexture.colorSpace = SRGBColorSpace;
+  collageTexture.needsUpdate = true;
+
+  return collageTexture;
+}
+
+function createBlurredTexture(texture: Texture) {
+  const image = texture.image as HTMLImageElement | HTMLCanvasElement;
+
+  if (!image) return null;
+
+  const width =
+    image instanceof HTMLImageElement
+      ? image.naturalWidth || image.width
+      : image.width;
+
+  const height =
+    image instanceof HTMLImageElement
+      ? image.naturalHeight || image.height
+      : image.height;
+
+  if (!width || !height) return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) return null;
+
+  ctx.clearRect(0, 0, width, height);
+
+  ctx.filter = "blur(6px) brightness(0.80)";
+  ctx.drawImage(image, 0, 0, width, height);
+
+  const blurredTexture = new CanvasTexture(canvas);
+
+  blurredTexture.colorSpace = SRGBColorSpace;
+
+  blurredTexture.wrapS = texture.wrapS;
+  blurredTexture.wrapT = texture.wrapT;
+  blurredTexture.repeat.copy(texture.repeat);
+  blurredTexture.offset.copy(texture.offset);
+  blurredTexture.center.copy(texture.center);
+  blurredTexture.rotation = texture.rotation;
+  blurredTexture.flipY = texture.flipY;
+
+  blurredTexture.needsUpdate = true;
+
+  return blurredTexture;
+}
+
+function waitForTextureImage(texture: Texture) {
+  const image = texture.image as HTMLImageElement | undefined;
+
+  if (!image) return Promise.resolve();
+
+  if (image.complete && image.naturalWidth > 0) {
+    return Promise.resolve();
+  }
+
+  if (typeof image.decode === "function") {
+    return image.decode().catch(() => undefined);
+  }
+
+  return new Promise<void>((resolve) => {
+    image.onload = () => resolve();
+    image.onerror = () => resolve();
+  });
+}
+
 export default function Index() {
   const container = useRef<HTMLDivElement | null>(null);
   const isMdUp = useIsMdUp();
+
+  const [activeCubeProject, setActiveCubeProject] =
+    useState<CubeProject | null>(null);
 
   const [introDone, setIntroDone] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -85,7 +401,7 @@ export default function Index() {
               duration: 0.45,
               ease: [0.76, 0, 0.24, 1],
             }}
-            className="w-full h-full"
+            className="w-full h-full relative"
           >
             <Canvas className="w-full h-3/4">
               {isMdUp && <OrbitControls enableZoom={false} enablePan={false} />}
@@ -93,8 +409,24 @@ export default function Index() {
               <ambientLight intensity={2} />
               <directionalLight position={[2, 1, 1]} />
 
-              <Cube scrollProgress={smoothProgress} introDone={introDone} />
+              <Cube
+                scrollProgress={smoothProgress}
+                introDone={introDone}
+                onActiveProjectChange={setActiveCubeProject}
+              />
             </Canvas>
+
+            {activeCubeProject && introDone && (
+              <div className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 text-center whitespace-nowrap select-none uppercase ">
+                <p className="mb-2 text-[10px] font-bold tracking-[0.55em] text-white">
+                  {activeCubeProject.subtitle}
+                </p>
+
+                <h3 className="text-3xl font-black tracking-[-0.05em] text-white md:text-5xl">
+                  {activeCubeProject.title}
+                </h3>
+              </div>
+            )}
           </motion.div>
         </div>
 
@@ -106,7 +438,7 @@ export default function Index() {
             delay: introDone ? 0.15 : 0,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className="absolute bottom-4 lg:bottom-11 text-center px-4 z-10"
+          className="absolute bottom-4 lg:bottom-11 text-center px-4 z-10 pointer-events-none"
         >
           <h1 className="text-color text-2xl -mb-1 sm:text-2xl font-bold">
             Rustam Kerimov
@@ -167,29 +499,121 @@ export default function Index() {
 const Cube = ({
   scrollProgress,
   introDone,
+  onActiveProjectChange,
 }: {
   scrollProgress: MotionValue<number>;
   introDone: boolean;
+  onActiveProjectChange: (project: CubeProject | null) => void;
 }) => {
+  const router = useRouter();
   const mesh = useRef<Mesh>(null);
+
+  const { camera, raycaster, pointer } = useThree();
+
   const [hovered, setHovered] = useState(false);
+  const [activeMaterialIndex, setActiveMaterialIndex] = useState<number | null>(
+    null,
+  );
   const [isMobile, setIsMobile] = useState(false);
+  const [collageTextures, setCollageTextures] = useState<
+    (CanvasTexture | null)[]
+  >([]);
+  const [blurredTextures, setBlurredTextures] = useState<
+    (CanvasTexture | null)[]
+  >([]);
+
+  const hoveredRef = useRef(false);
+  const hasPointerEnteredRef = useRef(false);
+  const activeMaterialIndexRef = useRef<number | null>(null);
   const targetScaleRef = useRef(1);
 
-  const textures = useLoader(TextureLoader, [
-    "/cube-img/image1.jpg",
-    "/cube-img/image2.jpg",
-    "/cube-img/cubeimg5.png",
-    "/cube-img/image4.jpg",
-    "/cube-img/rustam.jpg",
-    "/cube-img/image3.jpg",
-  ]) as Texture[];
+  const allImagePaths = useMemo(
+    () => cubeProjects.flatMap((project) => project.images),
+    [],
+  );
+
+  const textures = useLoader(TextureLoader, allImagePaths) as Texture[];
+
+  const activeProject =
+    activeMaterialIndex !== null
+      ? cubeProjects[BOX_FACE_PROJECT_INDEXES[activeMaterialIndex]]
+      : null;
 
   useEffect(() => {
-    textures.forEach((texture) => {
-      texture.colorSpace = SRGBColorSpace;
-      texture.needsUpdate = true;
-    });
+    let cancelled = false;
+
+    let generatedCollageTextures: (CanvasTexture | null)[] = [];
+    let generatedBlurredTextures: (CanvasTexture | null)[] = [];
+
+    async function buildTextures() {
+      textures.forEach((texture) => {
+        texture.colorSpace = SRGBColorSpace;
+        texture.needsUpdate = true;
+      });
+
+      await Promise.all(
+        textures.map((texture) => waitForTextureImage(texture)),
+      );
+
+      if (cancelled) return;
+
+      const textureGroups = cubeProjects.map((project, projectIndex) => {
+        const startIndex = cubeProjects
+          .slice(0, projectIndex)
+          .reduce((total, currentProject) => {
+            return total + currentProject.images.length;
+          }, 0);
+
+        return textures.slice(startIndex, startIndex + project.images.length);
+      });
+
+      generatedCollageTextures = BOX_FACE_PROJECT_INDEXES.map(
+        (projectIndex) => {
+          const projectTextures = textureGroups[projectIndex];
+
+          const shouldRotateLargeImage = projectIndex !== 0;
+
+          return createCollageTexture(
+            projectTextures,
+            faceCollageLayout,
+            shouldRotateLargeImage,
+          );
+        },
+      );
+
+      generatedBlurredTextures = generatedCollageTextures.map((texture) =>
+        texture ? createBlurredTexture(texture) : null,
+      );
+
+      if (cancelled) {
+        generatedCollageTextures.forEach((texture) => {
+          texture?.dispose();
+        });
+
+        generatedBlurredTextures.forEach((texture) => {
+          texture?.dispose();
+        });
+
+        return;
+      }
+
+      setCollageTextures(generatedCollageTextures);
+      setBlurredTextures(generatedBlurredTextures);
+    }
+
+    buildTextures();
+
+    return () => {
+      cancelled = true;
+
+      generatedCollageTextures.forEach((texture) => {
+        texture?.dispose();
+      });
+
+      generatedBlurredTextures.forEach((texture) => {
+        texture?.dispose();
+      });
+    };
   }, [textures]);
 
   useEffect(() => {
@@ -218,12 +642,46 @@ const Cube = ({
     mesh.current.rotation.x = value;
     mesh.current.rotation.y = value * 1.2;
 
+    if (hasPointerEnteredRef.current) {
+      raycaster.setFromCamera(pointer, camera);
+
+      const intersects = raycaster.intersectObject(mesh.current, false);
+      const currentIntersection = intersects[0];
+
+      if (introDone && currentIntersection?.face) {
+        const materialIndex = currentIntersection.face.materialIndex ?? 0;
+        const projectIndex = BOX_FACE_PROJECT_INDEXES[materialIndex];
+
+        if (!hoveredRef.current) {
+          hoveredRef.current = true;
+          setHovered(true);
+        }
+
+        if (activeMaterialIndexRef.current !== materialIndex) {
+          activeMaterialIndexRef.current = materialIndex;
+          setActiveMaterialIndex(materialIndex);
+          onActiveProjectChange(cubeProjects[projectIndex]);
+        }
+      } else {
+        if (hoveredRef.current) {
+          hoveredRef.current = false;
+          setHovered(false);
+        }
+
+        if (activeMaterialIndexRef.current !== null) {
+          activeMaterialIndexRef.current = null;
+          setActiveMaterialIndex(null);
+          onActiveProjectChange(null);
+        }
+      }
+    }
+
     if (isMobile) {
       mesh.current.scale.set(1, 1, 1);
       return;
     }
 
-    const targetScale = hovered && introDone ? 1.1 : 1;
+    const targetScale = hoveredRef.current && introDone ? 1.1 : 1;
     targetScaleRef.current += (targetScale - targetScaleRef.current) * 0.1;
 
     mesh.current.scale.set(
@@ -237,27 +695,83 @@ const Cube = ({
     const canvas = document.querySelector("canvas");
     if (!canvas) return;
 
-    canvas.style.cursor = hovered && introDone ? "pointer" : "default";
-  }, [hovered, introDone]);
+    const hasLink = Boolean(activeProject?.href);
+
+    canvas.style.cursor =
+      hovered && introDone && hasLink ? "pointer" : "default";
+  }, [hovered, introDone, activeProject]);
+
+  function handleClick(event: ThreeEvent<MouseEvent>) {
+    if (!introDone) return;
+
+    event.stopPropagation();
+
+    const materialIndex = activeMaterialIndexRef.current;
+
+    if (materialIndex === null) return;
+
+    const projectIndex = BOX_FACE_PROJECT_INDEXES[materialIndex];
+    const project = cubeProjects[projectIndex];
+
+    if (!project?.href) return;
+
+    router.push(project.href);
+  }
+
+  function handlePointerEnter() {
+    if (!introDone) return;
+
+    hasPointerEnteredRef.current = true;
+  }
+
+  function handlePointerLeave() {
+    hasPointerEnteredRef.current = false;
+    hoveredRef.current = false;
+    activeMaterialIndexRef.current = null;
+
+    setHovered(false);
+    setActiveMaterialIndex(null);
+    onActiveProjectChange(null);
+  }
+
+  const texturesReady =
+    collageTextures.length === BOX_FACE_PROJECT_INDEXES.length &&
+    collageTextures.every(Boolean) &&
+    blurredTextures.length === BOX_FACE_PROJECT_INDEXES.length &&
+    blurredTextures.every(Boolean);
+
+  if (!texturesReady) {
+    return null;
+  }
 
   return (
     <mesh
       ref={mesh}
       position={[0, 0, 0]}
-      onPointerOver={() => introDone && setHovered(true)}
-      onPointerOut={() => setHovered(false)}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      onClick={handleClick}
     >
       <boxGeometry args={[2.3, 2.3, 2.3]} />
 
-      {textures.map((texture, index) => {
-        const isMainImage = index === 4;
+      {BOX_FACE_PROJECT_INDEXES.map((projectIndex, materialIndex) => {
+        const isRustam = projectIndex === 0;
+        const isActiveFace =
+          hovered && introDone && activeMaterialIndex === materialIndex;
 
-        if (isMainImage) {
+        const normalTexture = collageTextures[materialIndex];
+
+        const textureMap =
+          isActiveFace && blurredTextures[materialIndex]
+            ? blurredTextures[materialIndex]
+            : normalTexture;
+
+        if (isRustam) {
           return (
             <meshBasicMaterial
-              key={index}
-              attach={`material-${index}`}
-              map={texture}
+              key={materialIndex}
+              attach={`material-${materialIndex}`}
+              map={textureMap}
               toneMapped={false}
             />
           );
@@ -265,9 +779,9 @@ const Cube = ({
 
         return (
           <meshStandardMaterial
-            key={index}
-            attach={`material-${index}`}
-            map={texture}
+            key={materialIndex}
+            attach={`material-${materialIndex}`}
+            map={textureMap}
           />
         );
       })}

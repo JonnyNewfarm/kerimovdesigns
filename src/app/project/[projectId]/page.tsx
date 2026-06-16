@@ -50,7 +50,7 @@ const Page = async ({ params }: Props) => {
                 Selected Project
               </p>
 
-              <h1 className="text-left text-5xl uppercase leading-[0.9] tracking-[-0.04em] sm:text-7xl md:text-8xl xl:text-[10rem]">
+              <h1 className="text-left text-5xl uppercase font-black leading-[0.9] tracking-[-0.04em] sm:text-7xl md:text-7xl xl:text-[9rem]">
                 {project.title}
               </h1>
 
