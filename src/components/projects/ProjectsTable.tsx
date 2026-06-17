@@ -186,19 +186,26 @@ const ProjectsTable = ({
                 {String(totalPages).padStart(2, "0")}
               </p>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={goToPrevPage}
                   disabled={!canGoPrevPage}
                   aria-label="Previous projects"
-                  className={`flex h-9 w-9 items-center justify-center border border-white/15 text-lg leading-none transition-all duration-300 ${
+                  className={`group relative cursor-pointer flex h-9 w-9 items-center justify-center text-lg leading-none ${
                     canGoPrevPage
-                      ? "text-white hover:border-white/45 hover:bg-white hover:text-black"
+                      ? "text-white"
                       : "cursor-not-allowed text-white/20 opacity-40"
                   }`}
                 >
-                  ←
+                  <span className="absolute left-0 top-0 h-px w-full origin-right scale-x-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-0" />
+                  <span className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-0" />
+                  <span className="absolute left-0 top-0 h-full w-px origin-bottom scale-y-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-0" />
+                  <span className="absolute right-0 top-0 h-full w-px origin-top scale-y-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-0" />
+
+                  <span className="relative transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-x-1">
+                    ←
+                  </span>
                 </button>
 
                 <button
@@ -206,13 +213,20 @@ const ProjectsTable = ({
                   onClick={goToNextPage}
                   disabled={!canGoNextPage}
                   aria-label="Next projects"
-                  className={`flex h-9 w-9 items-center justify-center border border-white/15 text-lg leading-none transition-all duration-300 ${
+                  className={`group relative cursor-pointer flex h-9 w-9 items-center justify-center text-lg leading-none ${
                     canGoNextPage
-                      ? "text-white hover:border-white/45 hover:bg-white hover:text-black"
+                      ? "text-white"
                       : "cursor-not-allowed text-white/20 opacity-40"
                   }`}
                 >
-                  →
+                  <span className="absolute left-0 top-0 h-px w-full origin-left scale-x-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-0" />
+                  <span className="absolute bottom-0 left-0 h-px w-full origin-right scale-x-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-0" />
+                  <span className="absolute left-0 top-0 h-full w-px origin-top scale-y-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-0" />
+                  <span className="absolute right-0 top-0 h-full w-px origin-bottom scale-y-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-0" />
+
+                  <span className="relative transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1">
+                    →
+                  </span>
                 </button>
               </div>
             </div>

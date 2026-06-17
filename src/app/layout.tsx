@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import NavbarMobile from "@/components/NavbarMobile";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
-import ClientPageTransitionWrapper from "@/components/ClientPageTransitionWrapper";
+import SafePageTransition from "@/components/ClientPageTransitionWrapper";
 
 const lusitana = Montserrat({
   subsets: ["latin"],
@@ -31,7 +31,7 @@ export default function RootLayout({
         <Navbar />
         <NavbarMobile />
 
-        <ClientPageTransitionWrapper>{children}</ClientPageTransitionWrapper>
+        <SafePageTransition>{children}</SafePageTransition>
 
         <Footer />
 

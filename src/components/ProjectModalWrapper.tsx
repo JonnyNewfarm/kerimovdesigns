@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import MotionImage from "./MotionImage";
 
 export interface Project {
@@ -29,47 +29,81 @@ interface ProjectModalWrapperProps {
   project: Project;
 }
 
-interface ModalImage {
-  src: string;
-  alt: string;
-}
+type ImageDimensions = {
+  width: number;
+  height: number;
+};
+
+const imageLayout = [
+  {
+    row: "justify-start",
+    offset: "translate-x-0 sm:translate-x-10 lg:translate-x-20",
+    size: "max-w-[280px] sm:max-w-[360px] lg:max-w-[430px]",
+  },
+  {
+    row: "justify-end",
+    offset: "translate-x-0 sm:-translate-x-12 lg:-translate-x-32",
+    size: "max-w-[240px] sm:max-w-[330px] lg:max-w-[390px]",
+  },
+  {
+    row: "justify-center",
+    offset: "translate-x-0 sm:-translate-x-24 lg:-translate-x-40",
+    size: "max-w-[260px] sm:max-w-[350px] lg:max-w-[420px]",
+  },
+  {
+    row: "justify-end",
+    offset: "translate-x-0 sm:-translate-x-4 lg:-translate-x-16",
+    size: "max-w-[300px] sm:max-w-[380px] lg:max-w-[460px]",
+  },
+  {
+    row: "justify-start",
+    offset: "translate-x-0 sm:translate-x-32 lg:translate-x-56",
+    size: "max-w-[230px] sm:max-w-[320px] lg:max-w-[380px]",
+  },
+  {
+    row: "justify-center",
+    offset: "translate-x-0 sm:translate-x-24 lg:translate-x-44",
+    size: "max-w-[270px] sm:max-w-[360px] lg:max-w-[440px]",
+  },
+  {
+    row: "justify-start",
+    offset: "translate-x-0 sm:translate-x-4 lg:translate-x-24",
+    size: "max-w-[250px] sm:max-w-[340px] lg:max-w-[400px]",
+  },
+  {
+    row: "justify-end",
+    offset: "translate-x-0 sm:-translate-x-20 lg:-translate-x-48",
+    size: "max-w-[280px] sm:max-w-[370px] lg:max-w-[430px]",
+  },
+  {
+    row: "justify-center",
+    offset: "translate-x-0 sm:translate-x-8 lg:translate-x-16",
+    size: "max-w-[240px] sm:max-w-[330px] lg:max-w-[390px]",
+  },
+];
 
 const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
-  const [modalImage, setModalImage] = useState<ModalImage | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
+  const [imageDimensions, setImageDimensions] = useState<
+    Record<number, ImageDimensions>
+  >({});
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setModalImage(null);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const handleImageClick = (src: string, alt: string) => {
-    setScale(1);
-    setModalImage({ src, alt });
-  };
-
-  const closeModal = () => {
-    setModalImage(null);
-    setScale(1);
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.stopPropagation();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setScale((prev) => Math.min(Math.max(prev + delta, 1), 3));
-  };
-
-  if (!isClient) return null;
-
-  const images = [
+  const images = useMemo(() => {
+    return [
+      project.src,
+      project.src2,
+      project.src3,
+      project.src4,
+      project.src5,
+      project.src6,
+      project.src7,
+      project.src8,
+      project.src9,
+    ].filter(Boolean) as string[];
+  }, [
     project.src,
     project.src2,
     project.src3,
@@ -79,72 +113,224 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
     project.src7,
     project.src8,
     project.src9,
-  ].filter(Boolean) as string[];
+  ]);
+
+  const activeImage = activeIndex !== null ? images[activeIndex] : null;
+  const activeDimensions =
+    activeIndex !== null ? imageDimensions[activeIndex] : null;
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    images.forEach((src, index) => {
+      const img = new window.Image();
+
+      img.src = src;
+
+      const markAsReady = () => {
+        setLoadedImages((prev) => ({
+          ...prev,
+          [index]: true,
+        }));
+
+        setImageDimensions((prev) => ({
+          ...prev,
+          [index]: {
+            width: img.naturalWidth || 850,
+            height: img.naturalHeight || 450,
+          },
+        }));
+      };
+
+      if (img.decode) {
+        img
+          .decode()
+          .then(markAsReady)
+          .catch(() => {
+            if (img.complete) {
+              markAsReady();
+            } else {
+              img.onload = markAsReady;
+            }
+          });
+      } else {
+        img.onload = markAsReady;
+      }
+    });
+  }, [images]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActiveIndex(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const openImage = (index: number) => {
+    if (!loadedImages[index] || !imageDimensions[index]) return;
+
+    setHoveredIndex(null);
+    setActiveIndex(index);
+  };
+
+  const closeImage = () => {
+    setActiveIndex(null);
+    setHoveredIndex(null);
+  };
+
+  if (!isClient) return null;
 
   return (
-    <>
-      <div className="min-h-[70vh]  sm:mt-20 mt-10  mb-20 flex flex-col gap-y-18 sm:gap-y-40 justify-center items-center">
-        {images.map((src, index) => (
-          <MotionImage key={index}>
-            <Image
-              className="cursor-pointer md:max-w-[750px] lg:max-w-[950px]"
-              src={src}
-              alt={project.title || `Project Image ${index + 1}`}
-              width={850}
-              height={450}
-              onClick={() => handleImageClick(src, `Image ${index + 1}`)}
-            />
-          </MotionImage>
-        ))}
+    <LayoutGroup>
+      <div className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden">
+        <div className="min-h-[70vh] sm:mt-20 mt-10 mb-20 flex w-full flex-col gap-y-20 sm:gap-y-32 px-4 sm:px-8">
+          {images.map((src, index) => {
+            const imageNumber = String(index + 1).padStart(2, "0");
+            const isActive = activeIndex === index;
+            const isLoaded = loadedImages[index];
 
-        {project.srcVideo && (
-          <MotionImage>
-            <video
-              className="md:max-w-[850px]"
-              autoPlay
-              muted
-              loop
-              playsInline
-              src={project.srcVideo}
-            />
-          </MotionImage>
-        )}
+            const shouldBlur =
+              (hoveredIndex !== null && hoveredIndex !== index) ||
+              (activeIndex !== null && activeIndex !== index);
+
+            const layout = imageLayout[index % imageLayout.length];
+            const dimensions = imageDimensions[index];
+
+            return (
+              <div
+                key={`${src}-${index}`}
+                className={`flex w-full ${layout.row}`}
+              >
+                <MotionImage>
+                  <motion.div
+                    layoutId={`project-image-${index}`}
+                    className={`group relative w-full ${layout.size} ${layout.offset}`}
+                    onMouseEnter={() => {
+                      if (activeIndex === null) {
+                        setHoveredIndex(index);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (activeIndex === null) {
+                        setHoveredIndex(null);
+                      }
+                    }}
+                    animate={{
+                      opacity: isActive ? 0 : shouldBlur ? 0.45 : 1,
+                      filter: shouldBlur ? "blur(5px)" : "blur(0px)",
+                    }}
+                    style={{
+                      pointerEvents: isActive ? "none" : "auto",
+                    }}
+                    transition={{
+                      opacity: {
+                        duration: 0.45,
+                        ease: [0.22, 1, 0.36, 1],
+                      },
+                      filter: {
+                        duration: 0.45,
+                        ease: [0.22, 1, 0.36, 1],
+                      },
+                      layout: {
+                        duration: 0.85,
+                        ease: [0.16, 1, 0.3, 1],
+                      },
+                    }}
+                  >
+                    <Image
+                      unoptimized
+                      className={`h-auto w-full ${
+                        isLoaded ? "cursor-pointer" : "cursor-wait"
+                      }`}
+                      src={src}
+                      alt={project.title || `Project Image ${index + 1}`}
+                      width={dimensions?.width || 850}
+                      height={dimensions?.height || 450}
+                      sizes="(max-width: 768px) 80vw, 520px"
+                      priority={index < 3}
+                      onLoad={() => {
+                        setLoadedImages((prev) => ({
+                          ...prev,
+                          [index]: true,
+                        }));
+                      }}
+                      onClick={() => openImage(index)}
+                    />
+
+                    <div className="pointer-events-none absolute left-4 top-4 opacity-0 transition duration-500 group-hover:opacity-100">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-white mix-blend-difference">
+                        {imageNumber}
+                      </span>
+                    </div>
+                  </motion.div>
+                </MotionImage>
+              </div>
+            );
+          })}
+
+          {project.srcVideo && (
+            <div className="flex w-full justify-center">
+              <MotionImage>
+                <video
+                  className="h-auto w-full max-w-[520px]"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  src={project.srcVideo}
+                />
+              </MotionImage>
+            </div>
+          )}
+        </div>
       </div>
 
       <AnimatePresence>
-        {modalImage && (
+        {activeIndex !== null && activeImage && (
           <motion.div
-            onClick={closeModal}
-            initial={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            initial={false}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed top-0 md:top-7 left-0 w-full h-screen z-50 bg-black/90 flex items-center justify-center cursor-zoom-out"
+            exit={{ opacity: 1 }}
           >
             <motion.div
-              onWheel={handleWheel}
-              drag
-              dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
-              dragElastic={0.2}
-              initial={{ scale: 0.8 }}
-              animate={{ scale }}
-              exit={{ scale: 0.8 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex items-center justify-center"
+              layoutId={`project-image-${activeIndex}`}
+              className="pointer-events-auto relative cursor-pointer"
+              onClick={closeImage}
+              transition={{
+                layout: {
+                  duration: 0.85,
+                  ease: [0.16, 1, 0.3, 1],
+                },
+              }}
             >
               <Image
-                src={modalImage.src}
-                alt={modalImage.alt}
-                width={1200}
-                height={800}
-                className="max-w-[90vw] max-h-[90vh] object-contain"
-                priority
                 unoptimized
+                src={activeImage}
+                alt={project.title || `Project Image ${activeIndex + 1}`}
+                width={activeDimensions?.width || 850}
+                height={activeDimensions?.height || 450}
+                sizes="(max-width: 768px) 90vw, 850px"
+                priority
+                className="h-auto w-auto max-h-[82vh] max-w-[78vw] object-contain"
               />
+
+              <div className="pointer-events-none absolute left-4 top-4">
+                <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-white mix-blend-difference">
+                  {String(activeIndex + 1).padStart(2, "0")}
+                </span>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </LayoutGroup>
   );
 };
 

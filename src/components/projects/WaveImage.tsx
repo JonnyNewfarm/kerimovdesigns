@@ -12,16 +12,70 @@ interface WaveImageProps {
   waveLength?: number;
   speed?: number;
   segments?: number;
+  debugDelay?: number;
 }
 
 const textureCache = new Map<string, THREE.Texture>();
 const loadingCache = new Map<string, Promise<THREE.Texture>>();
 
-function createFallbackTexture() {
-  const data = new Uint8Array([12, 12, 12, 255]);
-  const texture = new THREE.DataTexture(data, 1, 1, THREE.RGBAFormat);
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function drawSpacedText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  startX: number,
+  y: number,
+  letterSpacing: number,
+) {
+  let currentX = startX;
+
+  for (const char of text) {
+    ctx.fillText(char, currentX, y);
+    currentX += ctx.measureText(char).width + letterSpacing;
+  }
+}
+
+function createLoadingTexture() {
+  const width = 1600;
+  const height = 1000;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+
+  if (ctx) {
+    ctx.fillStyle = "#080808";
+    ctx.fillRect(0, 0, width, height);
+
+    const text = "LOADING IMAGE";
+
+    // Litt innenfor kanten så den ikke blir croppet av cover-scaling
+    const x = 110;
+    const y = height - 150;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    ctx.font = "900 40px Montserrat, Arial, Helvetica, sans-serif";
+    ctx.textBaseline = "bottom";
+
+    drawSpacedText(ctx, text, x, y, 8);
+
+    ctx.restore();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
 
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  texture.anisotropy = 1;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
   texture.needsUpdate = true;
 
   return texture;
@@ -84,7 +138,7 @@ function WaveModel({
   speed = 0.032,
   segments = 16,
 }: {
-  texture: THREE.Texture | null;
+  texture: THREE.Texture;
   amplitude?: number;
   waveLength?: number;
   speed?: number;
@@ -94,8 +148,6 @@ function WaveModel({
     useRef<THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>(null);
 
   const { viewport } = useThree();
-
-  const fallbackTexture = useMemo(() => createFallbackTexture(), []);
 
   const uniforms = useRef({
     uTime: {
@@ -108,7 +160,7 @@ function WaveModel({
       value: waveLength,
     },
     uTexture: {
-      value: texture || fallbackTexture,
+      value: texture,
     },
     vUvScale: {
       value: new THREE.Vector2(1, 1),
@@ -116,7 +168,7 @@ function WaveModel({
   });
 
   useEffect(() => {
-    if (!texture || !image.current) return;
+    if (!image.current) return;
 
     image.current.material.uniforms.uTexture.value = texture;
     image.current.material.needsUpdate = true;
@@ -179,37 +231,45 @@ export default function WaveImage({
   waveLength = 5,
   speed = 0.032,
   segments = 16,
+  debugDelay = 0,
 }: WaveImageProps) {
-  const [currentTexture, setCurrentTexture] = useState<THREE.Texture | null>(
-    () => textureCache.get(src) || null,
-  );
+  const loadingTexture = useMemo(() => createLoadingTexture(), []);
 
-  const [isLoading, setIsLoading] = useState(!textureCache.has(src));
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(textureCache.has(src));
+  const [currentTexture, setCurrentTexture] = useState<THREE.Texture>(() => {
+    return textureCache.get(src) || loadingTexture;
+  });
 
   useEffect(() => {
     let isMounted = true;
 
-    setIsLoading(!textureCache.has(src));
+    const cachedTexture = textureCache.get(src);
 
-    loadTexture(src)
-      .then((texture) => {
+    if (cachedTexture && debugDelay === 0) {
+      setCurrentTexture(cachedTexture);
+
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    setCurrentTexture(loadingTexture);
+
+    Promise.all([loadTexture(src), wait(debugDelay)])
+      .then(([texture]) => {
         if (!isMounted) return;
 
         setCurrentTexture(texture);
-        setHasLoadedOnce(true);
-        setIsLoading(false);
       })
       .catch(() => {
         if (!isMounted) return;
 
-        setIsLoading(false);
+        setCurrentTexture(loadingTexture);
       });
 
     return () => {
       isMounted = false;
     };
-  }, [src]);
+  }, [src, loadingTexture, debugDelay]);
 
   useEffect(() => {
     const preloadSources = allSrcs.filter((imageSrc) => imageSrc !== src);
@@ -222,7 +282,7 @@ export default function WaveImage({
   }, [allSrcs, src]);
 
   return (
-    <div className="absolute inset-0 z-10 h-full w-full  bg-dark ">
+    <div className="absolute inset-0 z-10 h-full w-full bg-dark">
       <Canvas
         className="absolute inset-0 z-50 h-full w-full"
         camera={{
@@ -250,15 +310,6 @@ export default function WaveImage({
           segments={segments}
         />
       </Canvas>
-
-      {isLoading && (
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-dark/40">
-          <div className="flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-white/60 sm:text-xs">
-            <span className="h-2 w-2 animate-pulse bg-white/70" />
-            {hasLoadedOnce ? "Loading image" : "Preparing image"}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
