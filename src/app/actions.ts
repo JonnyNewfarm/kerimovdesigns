@@ -1,67 +1,26 @@
-'use server';
+"use server";
 
-import prisma from "../../lib/prisma"; 
+import prisma from "../../lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function createProject(data: {
+type ProjectData = {
   title: string;
-  
   src: string;
   src2?: string;
-  src3?: string
-  src4?: string
-  src5?: string
-  src6?: string
-  src7?: string
-  src8?: string
-  src9?: string
-  
-  srcVideo?: string
-  role?: string
-  type?: string
-  tools?: string
-}) {
-  try {
-    console.log("Saving project with image src:", data.src, typeof data.src);
+  src3?: string;
+  src4?: string;
+  src5?: string;
+  src6?: string;
+  src7?: string;
+  src8?: string;
+  src9?: string;
+  srcVideo?: string;
+  role?: string;
+  type?: string;
+  tools?: string;
+};
 
-    if (!data.src || typeof data.src !== "string") {
-      throw new Error("Invalid image src passed to DB.");
-    }
-
-    const project = await prisma.project.create({
-      data: {
-        title: data.title,
-        src: data.src,
-        src2: data.src2!,
-        src3: data.src3!,
-        src4: data.src4!,
-        src5: data.src5!,
-        src6: data.src6!,
-        src7: data.src7!,
-        src8: data.src8!,
-        src9: data.src9!,
-        srcVideo: data.srcVideo!,
-        role: data.role!,
-        type: data.type!,
-        tools: data.tools!
-
-
-      },
-    });
-
-    revalidatePath("/projects"); 
-
-    return { success: true, project };
-  } catch (error) {
-    console.error("Error creating project:", error);
-    return { success: false, error: "Could not create project" };
-  }
-}
-
-
-
-
-export async function updateProject(id: string, data: {
+type UpdateProjectData = {
   title?: string;
   src?: string;
   src2?: string;
@@ -76,44 +35,127 @@ export async function updateProject(id: string, data: {
   role?: string;
   type?: string;
   tools?: string;
-}) {
+};
+
+export async function createProject(data: ProjectData) {
   try {
-    const updatedProject = await prisma.project.update({
-      where: { id },
-      data,
+    console.log("Saving project with image src:", data.src, typeof data.src);
+
+    if (!data.title || typeof data.title !== "string") {
+      throw new Error("Invalid title passed to DB.");
+    }
+
+    if (!data.src || typeof data.src !== "string") {
+      throw new Error("Invalid image src passed to DB.");
+    }
+
+    const project = await prisma.project.create({
+      data: {
+        title: data.title,
+        src: data.src,
+        src2: data.src2 || "",
+        src3: data.src3 || "",
+        src4: data.src4 || "",
+        src5: data.src5 || "",
+        src6: data.src6 || "",
+        src7: data.src7 || "",
+        src8: data.src8 || "",
+        src9: data.src9 || "",
+        srcVideo: data.srcVideo || "",
+        role: data.role || "",
+        type: data.type || "",
+        tools: data.tools || "",
+      },
     });
 
+    revalidatePath("/");
     revalidatePath("/projects");
+    revalidatePath("/admin");
 
-    return { success: true, updatedProject };
+    return {
+      success: true,
+      project,
+    };
   } catch (error) {
-    console.error("Error updating project:", error);
-    return { success: false, error: "Could not update project" };
+    console.error("Error creating project:", error);
+
+    return {
+      success: false,
+      error: "Could not create project",
+    };
   }
 }
 
+export async function updateProject(id: string, data: UpdateProjectData) {
+  try {
+    if (!id) {
+      throw new Error("Project ID is required");
+    }
 
+    const updatedProject = await prisma.project.update({
+      where: {
+        id,
+      },
+      data: {
+        title: data.title || "",
+        src: data.src || "",
+        src2: data.src2 || "",
+        src3: data.src3 || "",
+        src4: data.src4 || "",
+        src5: data.src5 || "",
+        src6: data.src6 || "",
+        src7: data.src7 || "",
+        src8: data.src8 || "",
+        src9: data.src9 || "",
+        srcVideo: data.srcVideo || "",
+        role: data.role || "",
+        type: data.type || "",
+        tools: data.tools || "",
+      },
+    });
+
+    revalidatePath("/");
+    revalidatePath("/projects");
+    revalidatePath("/admin");
+
+    return {
+      success: true,
+      updatedProject,
+    };
+  } catch (error) {
+    console.error("Error updating project:", error);
+
+    return {
+      success: false,
+      error: "Could not update project",
+    };
+  }
+}
 
 export const getProjects = async () => {
   try {
-    const projects = await prisma.project.findMany(
-      {orderBy: { createdAt: "desc" },}
-    );
+    const projects = await prisma.project.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
     return projects;
   } catch (error) {
     console.error("Error fetching projects:", error);
     throw new Error("Failed to fetch projects");
   }
 };
-
-
 
 export const getProjectsMobile = async () => {
   try {
     const projects = await prisma.project.findMany({
       take: 3,
-      orderBy: { createdAt: "desc" },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
+
     return projects;
   } catch (error) {
     console.error("Error fetching projects:", error);
@@ -121,60 +163,61 @@ export const getProjectsMobile = async () => {
   }
 };
 
-
-
-
 export const getProjectById = async (id: string) => {
   try {
-    const product = await prisma.project.findUnique({
-      where: { id },
+    const project = await prisma.project.findUnique({
+      where: {
+        id,
+      },
     });
 
-    return product;
+    return project;
   } catch (error) {
-    console.error('Error fetching product by ID:', error);
-    throw new Error('Failed to fetch product');
+    console.error("Error fetching project by ID:", error);
+    throw new Error("Failed to fetch project");
   }
 };
-
-
-;
 
 export async function deleteProjectById(id: string) {
   try {
     const deleted = await prisma.project.delete({
-      where: { id },
+      where: {
+        id,
+      },
     });
 
-    revalidatePath('/projects');
+    revalidatePath("/");
+    revalidatePath("/projects");
+    revalidatePath("/admin");
 
-    return { success: true, deleted };
+    return {
+      success: true,
+      deleted,
+    };
   } catch (error) {
-    console.error('Error deleting project:', error);
-    return { success: false, error: 'Failed to delete project' };
+    console.error("Error deleting project:", error);
+
+    return {
+      success: false,
+      error: "Failed to delete project",
+    };
   }
 }
-
-
-
-
 
 export async function getLatestProject() {
   try {
     const latestProject = await prisma.project.findFirst({
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     return latestProject;
   } catch (error) {
-    console.error('Error fetching latest project:', error);
-    throw new Error('Failed to fetch latest project');
+    console.error("Error fetching latest project:", error);
+    throw new Error("Failed to fetch latest project");
   }
 }
-
-
 
 export const getProjectsPagnation = async (page = 1, limit = 3) => {
   try {
@@ -184,12 +227,17 @@ export const getProjectsPagnation = async (page = 1, limit = 3) => {
       prisma.project.findMany({
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" }, 
+        orderBy: {
+          createdAt: "desc",
+        },
       }),
       prisma.project.count(),
     ]);
 
-    return { projects, total };
+    return {
+      projects,
+      total,
+    };
   } catch (error) {
     console.error("Error fetching paginated projects:", error);
     throw new Error("Failed to fetch projects");
