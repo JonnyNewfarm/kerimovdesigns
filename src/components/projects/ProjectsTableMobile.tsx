@@ -31,7 +31,7 @@ const ProjectsTableMobile = ({
           Selected Work
         </p>
 
-        <h1 className="text-4xl uppercase leading-[0.95] tracking-[-0.04em]">
+        <h1 className="text-4xl uppercase font-black leading-[0.95] tracking-[-0.04em]">
           My Projects
         </h1>
       </div>
