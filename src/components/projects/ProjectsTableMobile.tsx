@@ -27,7 +27,7 @@ const ProjectsTableMobile = ({
   return (
     <section className="bg-dark pb-24 text-color">
       <div className="px-6 pt-28">
-        <p className="mb-4 text-[10px] uppercase tracking-[0.28em] text-white/40">
+        <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-white/40">
           Selected Work
         </p>
 
@@ -46,7 +46,7 @@ const ProjectsTableMobile = ({
         ))}
       </div>
 
-      <div className="mt-16 border-t border-white/15 px-6 pt-8">{children}</div>
+      <div className="mt-16  px-6 pt-8">{children}</div>
     </section>
   );
 };
@@ -87,7 +87,7 @@ const ProjectCard = ({ project, number }: ProjectCardProps) => {
         </div>
       </Link>
 
-      <div className="mt-6 border-t border-white/15 pt-6">
+      <div className="mt-4 ">
         <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/35">
           {String(number).padStart(2, "0")}
         </p>
