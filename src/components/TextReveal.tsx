@@ -19,6 +19,7 @@ type TextRevealProps = {
   rotate?: number;
   blur?: number;
   viewport?: boolean;
+  htmlFor?: string;
 };
 
 export default function TextReveal({
@@ -35,6 +36,7 @@ export default function TextReveal({
   rotate,
   blur = 10,
   viewport = true,
+  htmlFor,
 }: TextRevealProps) {
   const MotionTag = motion[as] as any;
 
@@ -95,6 +97,7 @@ export default function TextReveal({
 
   return (
     <MotionTag
+      htmlFor={as === "label" ? htmlFor : undefined}
       variants={containerVariants}
       initial="hidden"
       whileInView={viewport ? "visible" : undefined}
