@@ -13,6 +13,7 @@ import { Project } from "@prisma/client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import MagneticComp from "@/components/MagneticComp";
 import { usePathname } from "next/navigation";
+import TransitionLink from "./TransitionLink";
 
 type ProjectWithMeta = Project & {
   role?: string | null;
@@ -425,8 +426,9 @@ export default function MyProjects({ projects }: MyProjectsProps) {
           );
         })}
 
-        <Link
+        <TransitionLink
           href="/projects"
+          transitionLabel="My Work"
           className="group absolute left-[8%] top-[2580px] z-40"
         >
           <MagneticComp>
@@ -439,7 +441,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
               </p>
             </div>
           </MagneticComp>
-        </Link>
+        </TransitionLink>
       </div>
 
       <div className="block lg:hidden">
@@ -491,8 +493,9 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             );
           })}
 
-          <Link
+          <TransitionLink
             href="/projects"
+            transitionLabel="My work"
             className="group absolute left-[8%] z-40"
             style={{
               top: mobileSectionHeight - 90,
@@ -508,7 +511,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
                 </p>
               </div>
             </MagneticComp>
-          </Link>
+          </TransitionLink>
         </div>
       </div>
     </section>
@@ -595,7 +598,11 @@ function DesktopProjectItem({
             className="group relative"
             style={{ transformOrigin: "center center" }}
           >
-            <Link href={`/project/${project.id}`} className="block">
+            <TransitionLink
+              href={`/project/${project.id}`}
+              transitionLabel={project.title}
+              className="block"
+            >
               <motion.div
                 animate={{
                   scale: isDimmed ? baseScale * 0.94 : baseScale,
@@ -657,7 +664,7 @@ function DesktopProjectItem({
                   </span>
                 </div>
               </motion.div>
-            </Link>
+            </TransitionLink>
 
             <AnimatePresence>
               {isActive && (

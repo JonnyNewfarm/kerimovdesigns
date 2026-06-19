@@ -1,11 +1,16 @@
 "use client";
 
 import { Project } from "@prisma/client";
-import Link from "next/link";
 import React, { ReactNode, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import WaveImage from "@/components/projects/WaveImage";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import WaveLinkText from "../WaveLink";
+import TransitionLink from "@/components/TransitionLink";
+import TextReveal from "../TextReveal";
 
 interface ProjectsTableProps {
   projects: Project[];
@@ -15,6 +20,8 @@ interface ProjectsTableProps {
 
 const PROJECTS_PER_VIEW = 5;
 
+const ease = [0.22, 1, 0.36, 1] as const;
+
 const ProjectsTable = ({
   projects,
   children,
@@ -23,6 +30,22 @@ const ProjectsTable = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [pageIndex, setPageIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
+  const [isHoveringImage, setIsHoveringImage] = useState(false);
+
+  const imageMouseX = useMotionValue(0);
+  const imageMouseY = useMotionValue(0);
+
+  const cursorX = useSpring(imageMouseX, {
+    stiffness: 180,
+    damping: 22,
+    mass: 0.4,
+  });
+
+  const cursorY = useSpring(imageMouseY, {
+    stiffness: 180,
+    damping: 22,
+    mass: 0.4,
+  });
 
   const totalPages = Math.ceil(projects.length / PROJECTS_PER_VIEW);
 
@@ -34,14 +57,6 @@ const ProjectsTable = ({
   }, [projects, pageIndex]);
 
   const activeProject = projects[activeIndex];
-
-  const nearbyImages = useMemo(() => {
-    return [
-      projects[activeIndex - 1]?.src,
-      activeProject?.src,
-      projects[activeIndex + 1]?.src,
-    ].filter(Boolean) as string[];
-  }, [projects, activeIndex, activeProject?.src]);
 
   const canGoPrevPage = pageIndex > 0;
   const canGoNextPage = pageIndex < totalPages - 1;
@@ -75,12 +90,37 @@ const ProjectsTable = ({
     setActiveIndex(nextActiveIndex);
   };
 
+  const handleImageMouseMove = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    imageMouseX.set(event.clientX - rect.left);
+    imageMouseY.set(event.clientY - rect.top);
+  };
+
+  const handleImageMouseEnter = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    imageMouseX.set(event.clientX - rect.left);
+    imageMouseY.set(event.clientY - rect.top);
+    setIsHoveringImage(true);
+  };
+
+  const handleImageMouseLeave = () => {
+    setIsHoveringImage(false);
+  };
+
   if (!projects.length || !activeProject) {
     return (
       <section className="flex min-h-screen w-full items-center justify-center bg-dark px-7 text-color sm:px-14">
-        <p className="text-sm uppercase tracking-[0.2em] text-white/50">
+        <TextReveal
+          as="p"
+          mode="words"
+          className="text-sm uppercase tracking-[0.2em] text-white/50"
+        >
           No projects found
-        </p>
+        </TextReveal>
       </section>
     );
   }
@@ -90,15 +130,14 @@ const ProjectsTable = ({
       <div className="mx-auto grid min-h-screen w-full max-w-[1800px] grid-cols-1 gap-10 px-7 pb-12 pt-28 sm:px-14 md:grid-cols-12 md:px-16 md:pt-32 lg:px-20 xl:px-24">
         <aside className="flex min-h-0 flex-col md:col-span-5 md:h-[calc(100vh-9rem)] md:pr-6 xl:col-span-4">
           <div className="mb-8 flex min-h-[calc(clamp(3rem,5vw,5.4rem)*1.76+1.5rem)] shrink-0 items-end">
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, ease: "easeOut" }}
-              viewport={{ once: true }}
-              className="mb-4 text-[10px] uppercase tracking-[0.35em] text-white/80 font-black sm:text-xs"
+            <TextReveal
+              as="p"
+              mode="words"
+              delay={0.05}
+              className="mb-4 text-[10px] font-black uppercase tracking-[0.35em] text-white/80 sm:text-xs"
             >
               Selected Work
-            </motion.p>
+            </TextReveal>
           </div>
 
           <div className="relative min-h-[390px] flex-1 overflow-hidden border-t border-[#ecebeb]/20">
@@ -132,9 +171,11 @@ const ProjectsTable = ({
                   const isActive = activeIndex === realIndex;
 
                   return (
-                    <Link
+                    <TransitionLink
                       key={project.id}
                       href={`/project/${project.id}`}
+                      transitionLabel={project.title}
+                      direction="right"
                       onMouseEnter={() => setProjectIndex(realIndex)}
                       onFocus={() => setProjectIndex(realIndex)}
                       className="group flex min-h-[78px] w-full items-center justify-between gap-6 border-b border-[#ecebeb]/20 py-5 text-left transition-opacity duration-300"
@@ -160,15 +201,7 @@ const ProjectsTable = ({
                           </h2>
                         </div>
                       </div>
-
-                      <p
-                        className={`hidden shrink-0 text-right text-xs uppercase tracking-[0.22em] transition-all duration-300 lg:block ${
-                          isActive ? "opacity-70" : "opacity-25"
-                        }`}
-                      >
-                        {project.role}
-                      </p>
-                    </Link>
+                    </TransitionLink>
                   );
                 })}
               </motion.div>
@@ -192,7 +225,7 @@ const ProjectsTable = ({
                   onClick={goToPrevPage}
                   disabled={!canGoPrevPage}
                   aria-label="Previous projects"
-                  className={`group relative cursor-pointer flex h-9 w-9 items-center justify-center text-lg leading-none ${
+                  className={`group relative flex h-9 w-9 cursor-pointer items-center justify-center text-lg leading-none ${
                     canGoPrevPage
                       ? "text-white"
                       : "cursor-not-allowed text-white/20 opacity-40"
@@ -213,7 +246,7 @@ const ProjectsTable = ({
                   onClick={goToNextPage}
                   disabled={!canGoNextPage}
                   aria-label="Next projects"
-                  className={`group relative cursor-pointer flex h-9 w-9 items-center justify-center text-lg leading-none ${
+                  className={`group relative flex h-9 w-9 cursor-pointer items-center justify-center text-lg leading-none ${
                     canGoNextPage
                       ? "text-white"
                       : "cursor-not-allowed text-white/20 opacity-40"
@@ -237,24 +270,45 @@ const ProjectsTable = ({
 
         <main className="flex min-h-0 flex-col md:col-span-7 xl:col-span-8">
           <div className="ml-auto flex w-full max-w-[1080px] flex-col">
-            <Link
+            <TransitionLink
               href={`/project/${activeProject.id}`}
-              className="relative z-10 block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer"
+              transitionLabel={activeProject.title}
+              direction="right"
+              onMouseMove={handleImageMouseMove}
+              onMouseEnter={handleImageMouseEnter}
+              onMouseLeave={handleImageMouseLeave}
+              className="group relative z-10 block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer overflow-hidden isolate"
               aria-label={`Open project ${activeProject.title}`}
             >
-              <div className="absolute inset-0 z-10 overflow-visible">
-                <WaveImage
-                  src={activeProject.src}
-                  allSrcs={nearbyImages}
-                  amplitude={0.035}
-                  waveLength={5}
-                  speed={0.032}
-                  segments={16}
-                />
-              </div>
-            </Link>
+              <img
+                src={activeProject.src}
+                alt={activeProject.title}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              />
 
-            <div className="mt-7 min-h-0  pt-7">
+              <motion.div
+                aria-hidden="true"
+                style={{
+                  x: cursorX,
+                  y: cursorY,
+                }}
+                animate={{
+                  opacity: isHoveringImage ? 1 : 0,
+                  scale: isHoveringImage ? 1 : 0.35,
+                }}
+                transition={{
+                  opacity: { duration: 0.2, ease: "easeOut" },
+                  scale: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+                }}
+                className="pointer-events-none absolute left-0 top-0 z-20 hidden -translate-x-1/2 -translate-y-1/2 mix-blend-difference lg:flex"
+              >
+                <div className="text-center text-[7vw] font-black uppercase leading-[0.78] tracking-[-0.035em] text-white md:text-[5.8vw] lg:text-[4.8vw]">
+                  View case
+                </div>
+              </motion.div>
+            </TransitionLink>
+
+            <div className="mt-7 min-h-0 pt-7">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeProject.id}
@@ -278,51 +332,101 @@ const ProjectsTable = ({
                     ease: [0.22, 1, 0.36, 1],
                   }}
                 >
-                  <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/40 sm:text-xs">
+                  <TextReveal
+                    as="p"
+                    mode="words"
+                    delay={0.02}
+                    className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/40 sm:text-xs"
+                  >
                     Featured Project
-                  </p>
+                  </TextReveal>
 
-                  <Link href={`/project/${activeProject.id}`}>
-                    <h2 className="max-w-[980px] text-[clamp(2.8rem,4.6vw,5.8rem)] uppercase leading-[0.88] tracking-[-0.055em] transition-opacity duration-300 hover:opacity-70">
+                  <TransitionLink
+                    href={`/project/${activeProject.id}`}
+                    transitionLabel={activeProject.title}
+                    direction="right"
+                    className="inline-block"
+                  >
+                    <TextReveal
+                      as="h2"
+                      mode="words"
+                      delay={0.08}
+                      className="max-w-[980px] text-[clamp(2.8rem,4.6vw,5.8rem)] font-black uppercase leading-[0.88] tracking-[-0.035em] transition-opacity duration-300 hover:opacity-70"
+                    >
                       {activeProject.title}
-                    </h2>
-                  </Link>
+                    </TextReveal>
+                  </TransitionLink>
 
                   <div className="mt-6 grid grid-cols-1 gap-6 border-t border-[#ecebeb]/20 pt-6 sm:grid-cols-3">
                     <div>
-                      <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                      <TextReveal
+                        as="p"
+                        mode="words"
+                        delay={0.12}
+                        className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
+                      >
                         Role
-                      </p>
-                      <p className="text-sm text-white/90 sm:text-base">
-                        {activeProject.role}
-                      </p>
+                      </TextReveal>
+
+                      <TextReveal
+                        as="p"
+                        mode="words"
+                        delay={0.18}
+                        className="text-sm text-white/90 sm:text-base"
+                      >
+                        {activeProject.role ?? ""}
+                      </TextReveal>
                     </div>
 
                     <div>
-                      <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                      <TextReveal
+                        as="p"
+                        mode="words"
+                        delay={0.16}
+                        className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
+                      >
                         Type
-                      </p>
-                      <p className="text-sm text-white/90 sm:text-base">
-                        {activeProject.type}
-                      </p>
+                      </TextReveal>
+
+                      <TextReveal
+                        as="p"
+                        mode="words"
+                        delay={0.22}
+                        className="text-sm text-white/90 sm:text-base"
+                      >
+                        {activeProject.type ?? ""}
+                      </TextReveal>
                     </div>
 
                     <div>
-                      <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                      <TextReveal
+                        as="p"
+                        mode="words"
+                        delay={0.2}
+                        className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
+                      >
                         Tools
-                      </p>
-                      <p className="text-sm text-white/90 sm:text-base">
-                        {activeProject.tools}
-                      </p>
+                      </TextReveal>
+
+                      <TextReveal
+                        as="p"
+                        mode="words"
+                        delay={0.26}
+                        className="text-sm text-white/90 sm:text-base"
+                      >
+                        {activeProject.tools ?? ""}
+                      </TextReveal>
                     </div>
                   </div>
 
-                  <Link
+                  <TransitionLink
                     href={`/project/${activeProject.id}`}
-                    className="mt-6 inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-white/80 font-black transition-opacity duration-300 hover:opacity-60 sm:text-xs"
+                    transitionLabel="Open Project"
+                    direction="right"
+                    className="mt-6 inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.28em] text-white/80 transition-opacity duration-300 hover:opacity-60 sm:text-xs"
                   >
                     <WaveLinkText text="Open Project" />
-                  </Link>
+                  </TransitionLink>
                 </motion.div>
               </AnimatePresence>
             </div>

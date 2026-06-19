@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import TransitionLink from "./TransitionLink";
 
 const menuLinks = [
   { label: "Home", href: "/" },
@@ -12,9 +13,25 @@ const menuLinks = [
 
 const BurgerMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [instantClose, setInstantClose] = useState(false);
+
+  const pathname = usePathname();
+  const previousPathname = useRef(pathname);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (previousPathname.current !== pathname) {
+      setInstantClose(true);
+      setIsOpen(false);
+      previousPathname.current = pathname;
+
+      requestAnimationFrame(() => {
+        setInstantClose(false);
+      });
+    }
+  }, [pathname]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -68,7 +85,7 @@ const BurgerMenu = () => {
           pointerEvents: isOpen ? "auto" : "none",
         }}
         transition={{
-          duration: 0.35,
+          duration: instantClose ? 0 : 0.35,
           ease: "easeInOut",
         }}
         className="fixed inset-0 z-40 bg-black/45 backdrop-blur-sm"
@@ -79,10 +96,10 @@ const BurgerMenu = () => {
         initial={false}
         animate={{
           y: isOpen ? "0%" : "-100%",
-          opacity: isOpen ? 1 : 1,
+          opacity: 1,
         }}
         transition={{
-          duration: 0.65,
+          duration: instantClose ? 0 : 0.65,
           ease: [0.76, 0, 0.24, 1],
         }}
         className="fixed inset-0 z-50 flex min-h-screen flex-col bg-dark px-6 pb-10 pt-28 text-color"
@@ -97,7 +114,7 @@ const BurgerMenu = () => {
             y: isOpen ? 0 : 18,
           }}
           transition={{
-            duration: 0.4,
+            duration: instantClose ? 0 : 0.4,
             delay: isOpen ? 0.2 : 0,
             ease: [0.22, 1, 0.36, 1],
           }}
@@ -123,14 +140,15 @@ const BurgerMenu = () => {
                   y: isOpen ? 0 : 20,
                 }}
                 transition={{
-                  duration: 0.4,
+                  duration: instantClose ? 0 : 0.4,
                   delay: isOpen ? 0.25 + index * 0.08 : 0,
                   ease: [0.22, 1, 0.36, 1],
                 }}
               >
-                <Link
-                  onClick={() => setIsOpen(false)}
+                <TransitionLink
                   href={link.href}
+                  transitionLabel={link.label}
+                  direction="right"
                   className="flex items-center justify-between border-b border-white/10 py-6"
                 >
                   <span className="text-2xl uppercase leading-none tracking-[-0.04em]">
@@ -140,7 +158,7 @@ const BurgerMenu = () => {
                   <span className="text-xs uppercase tracking-[0.18em] text-white/35">
                     0{index + 1}
                   </span>
-                </Link>
+                </TransitionLink>
               </motion.div>
             ))}
           </nav>
@@ -152,7 +170,7 @@ const BurgerMenu = () => {
               y: isOpen ? 0 : 18,
             }}
             transition={{
-              duration: 0.4,
+              duration: instantClose ? 0 : 0.4,
               delay: isOpen ? 0.45 : 0,
               ease: [0.22, 1, 0.36, 1],
             }}

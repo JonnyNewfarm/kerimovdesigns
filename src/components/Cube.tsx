@@ -27,12 +27,26 @@ import {
   useTransform,
   motion,
   MotionValue,
+  AnimatePresence,
 } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { OrbitControls } from "@react-three/drei";
 import MagneticComp from "./MagneticComp";
 import HeroIntro from "./HeroIntro";
+import TextReveal from "./TextReveal";
+
+const ease = [0.22, 1, 0.36, 1] as const;
+
+type TextRevealProps = {
+  children: string;
+  as?: "p" | "h1" | "h2" | "h3" | "span";
+  className?: string;
+  delay?: number;
+  once?: boolean;
+  mode?: "words" | "lines";
+  amount?: number;
+};
 
 function useIsMdUp() {
   const [isMdUp, setIsMdUp] = useState(false);
@@ -132,19 +146,6 @@ type CollageTile = {
   rotate?: boolean;
 };
 
-/**
- * Three.js BoxGeometry material order:
- *
- * 0 = right
- * 1 = left
- * 2 = top
- * 3 = bottom
- * 4 = front
- * 5 = back
- *
- * Rustam er projectIndex 0.
- * Derfor ligger 0 på materialIndex 4.
- */
 const BOX_FACE_PROJECT_INDEXES = [1, 2, 3, 4, 0, 5];
 
 const faceCollageLayout: CollageTile[] = [
@@ -439,7 +440,7 @@ export default function Index() {
       initial={false}
       animate={{ opacity: 1 }}
     >
-      <div className="sticky top-0 h-[100dvh] overflow-hidden flex flex-col items-center justify-center uppercase relative">
+      <div className="sticky top-0 flex h-[100dvh] flex-col items-center justify-center overflow-hidden uppercase relative">
         <HeroIntro isDone={introDone} />
 
         <div className="absolute inset-0 flex items-center justify-center">
@@ -450,9 +451,9 @@ export default function Index() {
               duration: 0.45,
               ease: [0.76, 0, 0.24, 1],
             }}
-            className="w-full h-full relative"
+            className="relative h-full w-full"
           >
-            <Canvas className="w-full h-3/4">
+            <Canvas className="h-3/4 w-full">
               {isMdUp && <OrbitControls enableZoom={false} enablePan={false} />}
 
               <ambientLight intensity={2} />
@@ -465,17 +466,53 @@ export default function Index() {
               />
             </Canvas>
 
-            {activeCubeProject && introDone && (
-              <div className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 text-center whitespace-nowrap select-none uppercase ">
-                <p className="mb-2 text-[10px] font-bold tracking-[0.55em] text-white">
-                  {activeCubeProject.subtitle}
-                </p>
+            <AnimatePresence mode="wait">
+              {activeCubeProject && introDone && (
+                <motion.div
+                  key={activeCubeProject.title}
+                  initial={{
+                    opacity: 0,
+                    y: 18,
+                    filter: "blur(8px)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -14,
+                    filter: "blur(8px)",
+                  }}
+                  transition={{
+                    duration: 0.34,
+                    ease,
+                  }}
+                  className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center uppercase"
+                >
+                  <TextReveal
+                    as="p"
+                    mode="words"
+                    delay={0.02}
+                    amount={0.2}
+                    className="mb-2 text-[10px] font-bold tracking-[0.55em] text-white"
+                  >
+                    {activeCubeProject.subtitle}
+                  </TextReveal>
 
-                <h3 className="text-3xl font-black tracking-[-0.05em] text-white md:text-5xl">
-                  {activeCubeProject.title}
-                </h3>
-              </div>
-            )}
+                  <TextReveal
+                    as="h3"
+                    mode="words"
+                    delay={0.06}
+                    amount={0.2}
+                    className="text-3xl font-black tracking-[-0.05em] text-white md:text-5xl"
+                  >
+                    {activeCubeProject.title}
+                  </TextReveal>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
 
@@ -485,26 +522,40 @@ export default function Index() {
           transition={{
             duration: 0.9,
             delay: introDone ? 0.15 : 0,
-            ease: [0.22, 1, 0.36, 1],
+            ease,
           }}
-          className="absolute bottom-4 lg:bottom-11 text-center px-4 z-10 pointer-events-none"
+          className="pointer-events-none absolute bottom-4 z-10 px-4 text-center lg:bottom-11"
         >
-          <h1 className="text-color text-2xl -mb-1 sm:text-2xl font-bold">
-            Rustam Kerimov
-          </h1>
+          {introDone && (
+            <>
+              <TextReveal
+                as="h1"
+                mode="words"
+                delay={0.05}
+                className="-mb-1 text-2xl font-bold text-color sm:text-2xl"
+              >
+                Rustam Kerimov
+              </TextReveal>
 
-          <motion.div
-            className="bg-stone-500 mx-auto mt-1 rounded-3xl"
-            style={{
-              width: lineWidth,
-              height: "2px",
-              originX: 0,
-            }}
-          />
+              <motion.div
+                className="mx-auto mt-1 rounded-3xl bg-stone-500"
+                style={{
+                  width: lineWidth,
+                  height: "2px",
+                  originX: 0,
+                }}
+              />
 
-          <h2 className="text-color text-3xl whitespace-nowrap sm:text-4xl font-extrabold">
-            Graphic Designer
-          </h2>
+              <TextReveal
+                as="h2"
+                mode="words"
+                delay={0.12}
+                className="whitespace-nowrap text-3xl font-extrabold text-color sm:text-4xl"
+              >
+                Graphic Designer
+              </TextReveal>
+            </>
+          )}
         </motion.div>
 
         <motion.div
@@ -513,15 +564,24 @@ export default function Index() {
           transition={{
             duration: 0.9,
             delay: introDone ? 0.25 : 0,
-            ease: [0.22, 1, 0.36, 1],
+            ease,
           }}
-          className="absolute hidden lg:block left-10 bottom-10 text-left px-4 z-10"
+          className="absolute bottom-10 left-10 z-10 hidden px-4 text-left lg:block"
         >
-          <MagneticComp>
-            <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
-              <Link href="/projects">Archives</Link>
-            </h2>
-          </MagneticComp>
+          {introDone && (
+            <MagneticComp>
+              <Link href="/projects" className="inline-block">
+                <TextReveal
+                  as="span"
+                  mode="words"
+                  delay={0.05}
+                  className="text-4xl font-extrabold text-color sm:text-4xl"
+                >
+                  Archives
+                </TextReveal>
+              </Link>
+            </MagneticComp>
+          )}
         </motion.div>
 
         <motion.div
@@ -530,15 +590,24 @@ export default function Index() {
           transition={{
             duration: 0.9,
             delay: introDone ? 0.3 : 0,
-            ease: [0.22, 1, 0.36, 1],
+            ease,
           }}
-          className="absolute hidden lg:block right-10 bottom-10 text-left px-4 z-10"
+          className="absolute bottom-10 right-10 z-10 hidden px-4 text-left lg:block"
         >
-          <MagneticComp>
-            <h2 className="text-color text-4xl sm:text-4xl font-extrabold">
-              <Link href="/contact">Collaborate</Link>
-            </h2>
-          </MagneticComp>
+          {introDone && (
+            <MagneticComp>
+              <Link href="/contact" className="inline-block">
+                <TextReveal
+                  as="span"
+                  mode="words"
+                  delay={0.05}
+                  className="text-4xl font-extrabold text-color sm:text-4xl"
+                >
+                  Collaborate
+                </TextReveal>
+              </Link>
+            </MagneticComp>
+          )}
         </motion.div>
       </div>
     </motion.div>

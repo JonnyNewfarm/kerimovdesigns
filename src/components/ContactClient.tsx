@@ -5,94 +5,9 @@ import SmoothScroll from "@/components/SmoothScroll";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import WaveLinkText from "./WaveLink";
+import TextReveal from "./TextReveal";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-
-type TextRevealProps = {
-  children: string;
-  as?: "p" | "h1" | "h2" | "h3" | "span" | "label";
-  className?: string;
-  delay?: number;
-  once?: boolean;
-  mode?: "words" | "lines";
-  htmlFor?: string;
-};
-
-function TextReveal({
-  children,
-  as = "p",
-  className = "",
-  delay = 0,
-  once = true,
-  mode = "words",
-  htmlFor,
-}: TextRevealProps) {
-  const MotionTag = motion[as] as any;
-
-  const items =
-    mode === "lines"
-      ? children.split("\n").filter((line) => line.trim().length > 0)
-      : children.split(" ");
-
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        delayChildren: delay,
-        staggerChildren: mode === "lines" ? 0.11 : 0.028,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: {
-      y: "115%",
-      opacity: 0,
-      rotate: mode === "lines" ? 2.5 : 1.5,
-      filter: "blur(10px)",
-    },
-    visible: {
-      y: "0%",
-      opacity: 1,
-      rotate: 0,
-      filter: "blur(0px)",
-      transition: {
-        duration: mode === "lines" ? 1 : 0.75,
-        ease,
-      },
-    },
-  };
-
-  return (
-    <MotionTag
-      htmlFor={htmlFor}
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once, amount: 0.35 }}
-      className={className}
-    >
-      {items.map((item, index) => (
-        <span
-          key={`${item}-${index}`}
-          className={
-            mode === "lines"
-              ? "block overflow-hidden"
-              : "inline-block overflow-hidden align-top"
-          }
-        >
-          <motion.span
-            variants={itemVariants}
-            className="inline-block will-change-transform"
-          >
-            {item}
-            {mode === "words" && index !== items.length - 1 ? "\u00A0" : null}
-          </motion.span>
-        </span>
-      ))}
-    </MotionTag>
-  );
-}
 
 type FadeInProps = {
   children: React.ReactNode;

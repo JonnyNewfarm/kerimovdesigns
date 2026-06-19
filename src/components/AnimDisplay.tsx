@@ -10,6 +10,9 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
+import TextReveal from "./TextReveal";
+
+const ease = [0.22, 1, 0.36, 1] as const;
 
 const animations = [
   {
@@ -176,13 +179,23 @@ export default function AnimDisplay() {
                 }`}
               >
                 <div>
-                  <p className="mb-5 text-xs font-black uppercase tracking-[0.24em] text-color/45 md:text-sm">
+                  <TextReveal
+                    as="p"
+                    mode="words"
+                    delay={0.05}
+                    className="mb-5 text-xs font-black uppercase tracking-[0.24em] text-color/45 md:text-sm"
+                  >
                     {item.title}
-                  </p>
+                  </TextReveal>
 
-                  <h2 className="max-w-[1100px] text-[14vw] font-black uppercase leading-[0.88] tracking-[-0.05em] md:text-[8vw] lg:text-[5.8vw]">
+                  <TextReveal
+                    as="h2"
+                    mode="words"
+                    delay={0.12}
+                    className="max-w-[1100px] text-[14vw] font-black uppercase leading-[0.88] tracking-[-0.05em] md:text-[8vw] lg:text-[5.8vw]"
+                  >
                     {item.heading}
-                  </h2>
+                  </TextReveal>
                 </div>
 
                 {item.video ? (
@@ -239,38 +252,49 @@ export default function AnimDisplay() {
 
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-[0.45fr_1fr] md:items-start">
                   <div>
-                    <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-color/40">
-                      0{index + 1} / {item.type}
-                    </p>
+                    <TextReveal
+                      as="p"
+                      mode="words"
+                      delay={0.08}
+                      className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-color/40"
+                    >
+                      {`0${index + 1} / ${item.type}`}
+                    </TextReveal>
 
-                    <h3 className="text-[6vw] font-black uppercase leading-[0.86] tracking-[-0.04em] text-color md:text-[5vw] lg:text-[3.6vw]">
+                    <TextReveal
+                      as="h3"
+                      mode="words"
+                      delay={0.14}
+                      className="text-[6vw] font-black uppercase leading-[0.86] tracking-[-0.04em] text-color md:text-[5vw] lg:text-[3.6vw]"
+                    >
                       {item.title}
-                    </h3>
+                    </TextReveal>
                   </div>
 
-                  <p className="max-w-[620px] text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg">
+                  <TextReveal
+                    as="p"
+                    mode="words"
+                    delay={0.2}
+                    className="max-w-[620px] text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg"
+                  >
                     {item.description}
-                  </p>
+                  </TextReveal>
                 </div>
               </motion.article>
             );
           })}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{
-            duration: 0.95,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="mt-24 md:mt-32 lg:mt-40"
-        >
-          <h2 className="max-w-[1300px] text-[12vw] font-semibold uppercase leading-[0.9] tracking-[-0.035em] md:text-[6.4vw] lg:text-[5vw]">
+        <div className="mt-24 md:mt-32 lg:mt-40">
+          <TextReveal
+            as="h2"
+            mode="words"
+            delay={0.05}
+            className="max-w-[1300px] text-[12vw] font-semibold uppercase leading-[0.9] tracking-[-0.035em] md:text-[6.4vw] lg:text-[5vw]"
+          >
             Selected work across motion and identity.
-          </h2>
-        </motion.div>
+          </TextReveal>
+        </div>
       </div>
     </section>
   );

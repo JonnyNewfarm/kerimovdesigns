@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import React from "react";
 import WaveLinkText from "./WaveLink";
+import TransitionLink from "./TransitionLink";
 
 const Navbar = () => {
   return (
@@ -29,17 +29,32 @@ const Navbar = () => {
               <h1 className="opacity-70 m-0 leading-none">Navigation:</h1>
 
               <div className="flex gap-x-1 m-0 leading-tight">
-                <Link href="/" className="inline-block">
+                <TransitionLink
+                  href="/"
+                  transitionLabel="Home"
+                  direction="right"
+                  className="inline-block"
+                >
                   <WaveLinkText text="Home," />
-                </Link>
+                </TransitionLink>
 
-                <Link href="/projects" className="inline-block">
+                <TransitionLink
+                  href="/projects"
+                  transitionLabel="My work"
+                  direction="left"
+                  className="inline-block"
+                >
                   <WaveLinkText text="My work," />
-                </Link>
+                </TransitionLink>
 
-                <Link href="/contact" className="inline-block">
+                <TransitionLink
+                  href="/contact"
+                  transitionLabel="Contact"
+                  direction="right"
+                  className="inline-block"
+                >
                   <WaveLinkText text="Contact" />
-                </Link>
+                </TransitionLink>
               </div>
             </div>
           </div>

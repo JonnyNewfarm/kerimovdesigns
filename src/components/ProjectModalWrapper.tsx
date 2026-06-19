@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import MotionImage from "./MotionImage";
+import TextReveal from "./TextReveal";
 
 export interface Project {
   id: string;
@@ -33,6 +34,8 @@ type ImageDimensions = {
   width: number;
   height: number;
 };
+
+const ease = [0.22, 1, 0.36, 1] as const;
 
 const imageLayout = [
   {
@@ -81,6 +84,43 @@ const imageLayout = [
     size: "max-w-[240px] sm:max-w-[330px] lg:max-w-[390px]",
   },
 ];
+
+const getTitleLines = (title: string) => {
+  const words = title.trim().split(/\s+/).filter(Boolean);
+
+  if (words.length <= 1) return title;
+
+  if (words.length === 2) {
+    return `${words[0]}\n${words[1]}`;
+  }
+
+  if (words.length === 3) {
+    return `${words[0]}\n${words[1]}\n${words[2]}`;
+  }
+
+  const firstLineCount = Math.ceil(words.length / 2);
+
+  return `${words.slice(0, firstLineCount).join(" ")}\n${words
+    .slice(firstLineCount)
+    .join(" ")}`;
+};
+
+const fieldVariants = {
+  hidden: {
+    opacity: 0,
+    y: 30,
+    filter: "blur(8px)",
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.85,
+      ease,
+    },
+  },
+};
 
 const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -188,8 +228,88 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
 
   return (
     <LayoutGroup>
+      <section className="mx-auto w-full max-w-[1600px] px-7 pt-32 sm:px-14">
+        <div className="max-w-[1200px]">
+          <TextReveal
+            as="p"
+            mode="words"
+            delay={0.05}
+            className="mb-8 text-xs font-black uppercase tracking-[0.25em] text-white/50"
+          >
+            Selected Project
+          </TextReveal>
+
+          <TextReveal
+            as="h1"
+            mode="lines"
+            delay={0.12}
+            className="text-left text-5xl font-black uppercase leading-[0.9] tracking-[-0.04em] text-color sm:text-7xl md:text-7xl xl:text-[9rem]"
+          >
+            {getTitleLines(project.title)}
+          </TextReveal>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  delayChildren: 0.28,
+                  staggerChildren: 0.08,
+                },
+              },
+            }}
+            className="mt-12 grid grid-cols-1 gap-8 border-t border-[#ecebeb]/20 pt-6 sm:grid-cols-3 sm:gap-10"
+          >
+            <motion.div variants={fieldVariants}>
+              <TextReveal
+                as="p"
+                mode="words"
+                className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
+              >
+                Role
+              </TextReveal>
+
+              <p className="text-sm leading-relaxed text-white/85 sm:text-base">
+                {project.role}
+              </p>
+            </motion.div>
+
+            <motion.div variants={fieldVariants}>
+              <TextReveal
+                as="p"
+                mode="words"
+                className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
+              >
+                Type
+              </TextReveal>
+
+              <p className="text-sm leading-relaxed text-white/85 sm:text-base">
+                {project.type}
+              </p>
+            </motion.div>
+
+            <motion.div variants={fieldVariants}>
+              <TextReveal
+                as="p"
+                mode="words"
+                className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
+              >
+                Tools
+              </TextReveal>
+
+              <p className="text-sm leading-relaxed text-white/85 sm:text-base">
+                {project.tools}
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       <div className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden">
-        <div className="min-h-[70vh] sm:mt-20 mt-10 mb-20 flex w-full flex-col gap-y-20 sm:gap-y-32 px-4 sm:px-8">
+        <div className="mb-20 mt-20 flex min-h-[70vh] w-full flex-col gap-y-20 px-4 sm:mt-28 sm:gap-y-32 sm:px-8 lg:mt-32">
           {images.map((src, index) => {
             const imageNumber = String(index + 1).padStart(2, "0");
             const isActive = activeIndex === index;
@@ -294,7 +414,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
       <AnimatePresence>
         {activeIndex !== null && activeImage && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
             initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 1 }}

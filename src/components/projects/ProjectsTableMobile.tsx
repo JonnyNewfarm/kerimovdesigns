@@ -4,6 +4,7 @@ import { Project } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import React, { ReactNode, useState } from "react";
+import TransitionLink from "../TransitionLink";
 
 interface ProjectsTableMobileProps {
   projects: Project[];
@@ -62,7 +63,12 @@ const ProjectCard = ({ project, number }: ProjectCardProps) => {
 
   return (
     <article className="flex flex-col">
-      <Link href={`/project/${project.id}`} className="block">
+      <TransitionLink
+        href={`/project/${project.id}`}
+        direction="left"
+        transitionLabel={project.title}
+        className="block"
+      >
         <div className="relative h-[240px] w-full overflow-hidden border border-white/15">
           {!isLoaded && !hasError && (
             <div className="absolute inset-0 animate-pulse bg-white/5" />
@@ -85,7 +91,7 @@ const ProjectCard = ({ project, number }: ProjectCardProps) => {
             </div>
           )}
         </div>
-      </Link>
+      </TransitionLink>
 
       <div className="mt-4 ">
         <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/35">

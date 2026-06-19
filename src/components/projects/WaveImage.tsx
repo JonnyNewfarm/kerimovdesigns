@@ -13,6 +13,17 @@ interface WaveImageProps {
   speed?: number;
   segments?: number;
   debugDelay?: number;
+
+  /**
+   * Hvor lenge wave-effekten varer når bildet byttes.
+   */
+  transitionDuration?: number;
+
+  /**
+   * Hvis true får bildet wave også første gang det loader.
+   * Jeg anbefaler false for en roligere projects-side.
+   */
+  waveOnInitialLoad?: boolean;
 }
 
 const textureCache = new Map<string, THREE.Texture>();
@@ -52,8 +63,6 @@ function createLoadingTexture() {
     ctx.fillRect(0, 0, width, height);
 
     const text = "LOADING IMAGE";
-
-    // Litt innenfor kanten så den ikke blir croppet av cover-scaling
     const x = 110;
     const y = height - 150;
 
@@ -131,30 +140,41 @@ function loadTexture(src: string) {
   return promise;
 }
 
+function easeOutCubic(value: number) {
+  return 1 - Math.pow(1 - value, 3);
+}
+
 function WaveModel({
   texture,
-  amplitude = 0.05,
+  amplitude = 0.035,
   waveLength = 5,
   speed = 0.032,
   segments = 16,
+  waveTrigger = 0,
+  transitionDuration = 0.7,
 }: {
   texture: THREE.Texture;
   amplitude?: number;
   waveLength?: number;
   speed?: number;
   segments?: number;
+  waveTrigger?: number;
+  transitionDuration?: number;
 }) {
   const image =
     useRef<THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>(null);
 
   const { viewport } = useThree();
 
+  const waveElapsedRef = useRef(transitionDuration);
+  const waveStrengthRef = useRef(0);
+
   const uniforms = useRef({
     uTime: {
       value: 0,
     },
     uAmplitude: {
-      value: amplitude,
+      value: 0,
     },
     uWaveLength: {
       value: waveLength,
@@ -174,7 +194,14 @@ function WaveModel({
     image.current.material.needsUpdate = true;
   }, [texture]);
 
-  useFrame(() => {
+  useEffect(() => {
+    if (waveTrigger <= 0) return;
+
+    waveElapsedRef.current = 0;
+    waveStrengthRef.current = 1;
+  }, [waveTrigger]);
+
+  useFrame((_, delta) => {
     if (!image.current) return;
 
     const material = image.current.material;
@@ -203,8 +230,21 @@ function WaveModel({
       uvScale.set(planeAspect / imageAspect, 1);
     }
 
-    material.uniforms.uTime.value += speed;
-    material.uniforms.uAmplitude.value = amplitude;
+    if (waveStrengthRef.current > 0) {
+      waveElapsedRef.current += delta;
+
+      const rawProgress = Math.min(
+        waveElapsedRef.current / transitionDuration,
+        1,
+      );
+
+      const easedProgress = easeOutCubic(rawProgress);
+      waveStrengthRef.current = 1 - easedProgress;
+
+      material.uniforms.uTime.value += speed;
+    }
+
+    material.uniforms.uAmplitude.value = amplitude * waveStrengthRef.current;
     material.uniforms.uWaveLength.value = waveLength;
   });
 
@@ -227,13 +267,20 @@ function WaveModel({
 export default function WaveImage({
   src,
   allSrcs = [],
-  amplitude = 0.05,
+  amplitude = 0.035,
   waveLength = 5,
   speed = 0.032,
   segments = 16,
   debugDelay = 0,
+  transitionDuration = 0.7,
+  waveOnInitialLoad = false,
 }: WaveImageProps) {
   const loadingTexture = useMemo(() => createLoadingTexture(), []);
+
+  const previousSrcRef = useRef<string | null>(null);
+  const hasLoadedFirstImageRef = useRef(false);
+
+  const [waveTrigger, setWaveTrigger] = useState(0);
 
   const [currentTexture, setCurrentTexture] = useState<THREE.Texture>(() => {
     return textureCache.get(src) || loadingTexture;
@@ -242,10 +289,29 @@ export default function WaveImage({
   useEffect(() => {
     let isMounted = true;
 
+    const previousSrc = previousSrcRef.current;
+    const isNewSrc = previousSrc !== null && previousSrc !== src;
+
+    previousSrcRef.current = src;
+
+    const shouldTriggerWave = () => {
+      if (waveOnInitialLoad && !hasLoadedFirstImageRef.current) {
+        return true;
+      }
+
+      return isNewSrc;
+    };
+
     const cachedTexture = textureCache.get(src);
 
     if (cachedTexture && debugDelay === 0) {
       setCurrentTexture(cachedTexture);
+
+      if (shouldTriggerWave()) {
+        setWaveTrigger((current) => current + 1);
+      }
+
+      hasLoadedFirstImageRef.current = true;
 
       return () => {
         isMounted = false;
@@ -259,6 +325,12 @@ export default function WaveImage({
         if (!isMounted) return;
 
         setCurrentTexture(texture);
+
+        if (shouldTriggerWave()) {
+          setWaveTrigger((current) => current + 1);
+        }
+
+        hasLoadedFirstImageRef.current = true;
       })
       .catch(() => {
         if (!isMounted) return;
@@ -269,7 +341,7 @@ export default function WaveImage({
     return () => {
       isMounted = false;
     };
-  }, [src, loadingTexture, debugDelay]);
+  }, [src, loadingTexture, debugDelay, waveOnInitialLoad]);
 
   useEffect(() => {
     const preloadSources = allSrcs.filter((imageSrc) => imageSrc !== src);
@@ -308,6 +380,8 @@ export default function WaveImage({
           waveLength={waveLength}
           speed={speed}
           segments={segments}
+          waveTrigger={waveTrigger}
+          transitionDuration={transitionDuration}
         />
       </Canvas>
     </div>
