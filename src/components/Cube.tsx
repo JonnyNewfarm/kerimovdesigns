@@ -522,11 +522,7 @@ export default function Index() {
 
             {activeCubeProject && introDone && (
               <div className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center uppercase">
-                <div
-                  className="pointer-events-auto"
-                  onPointerEnter={handleProjectOverlayEnter}
-                  onPointerLeave={handleProjectOverlayLeave}
-                >
+                <div className="pointer-events-none">
                   <p className="mb-2 text-[10px] font-bold tracking-[0.55em] text-white">
                     {activeCubeProject.subtitle}
                   </p>
@@ -539,7 +535,9 @@ export default function Index() {
                     <TransitionLink
                       href={activeCubeProject.href}
                       transitionLabel={activeCubeProject.title}
-                      className="mt-5 inline-block border border-white px-5 py-3 text-xs font-bold tracking-[0.35em] text-white transition hover:bg-white hover:text-black"
+                      onPointerEnter={handleProjectOverlayEnter}
+                      onPointerLeave={handleProjectOverlayLeave}
+                      className="pointer-events-auto mt-5 inline-block border border-white px-5 py-3 text-xs font-bold tracking-[0.35em] text-white transition hover:bg-white hover:text-black"
                     >
                       View case
                     </TransitionLink>
