@@ -12,13 +12,11 @@ export default async function Home() {
 
   return (
     <SmoothScroll>
-      <div className="bg-dark p-0 relative min-h-screen w-full text-color ">
+      <div className="relative min-h-screen w-full bg-dark p-0 text-color">
         <Cube />
         <ServicesReveal />
 
-        <div>
-          <MyProjects projects={projects} />
-        </div>
+        <MyProjects projects={projects} />
 
         <AnimDisplay />
       </div>

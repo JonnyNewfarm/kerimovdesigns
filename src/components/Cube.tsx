@@ -494,7 +494,7 @@ export default function Index() {
                   <TextReveal
                     as="p"
                     mode="words"
-                    delay={0.02}
+                    delay={0}
                     amount={0.2}
                     className="mb-2 text-[10px] font-bold tracking-[0.55em] text-white"
                   >
@@ -504,7 +504,7 @@ export default function Index() {
                   <TextReveal
                     as="h3"
                     mode="words"
-                    delay={0.06}
+                    delay={0.01}
                     amount={0.2}
                     className="text-3xl font-black tracking-[-0.05em] text-white md:text-5xl"
                   >

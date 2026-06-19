@@ -1,14 +1,22 @@
 "use client";
 
-import { Project } from "@prisma/client";
 import Image from "next/image";
-import Link from "next/link";
 import React, { ReactNode, useState } from "react";
 import TransitionLink from "../TransitionLink";
 
+type ProjectListItem = {
+  id: string;
+  title: string;
+  src: string;
+  role: string | null;
+  type: string | null;
+  tools: string | null;
+  createdAt?: Date;
+};
+
 interface ProjectsTableMobileProps {
-  projects: Project[];
-  children: ReactNode;
+  projects: ProjectListItem[];
+  children?: ReactNode;
   startIndex: number;
 }
 
@@ -32,7 +40,7 @@ const ProjectsTableMobile = ({
           Selected Work
         </p>
 
-        <h1 className="text-4xl uppercase font-black leading-[0.95] tracking-[-0.04em]">
+        <h1 className="text-4xl font-black uppercase leading-[0.95] tracking-[-0.04em]">
           My Projects
         </h1>
       </div>
@@ -47,13 +55,13 @@ const ProjectsTableMobile = ({
         ))}
       </div>
 
-      <div className="mt-16  px-6 pt-8">{children}</div>
+      {children ? <div className="mt-16 px-6 pt-8">{children}</div> : null}
     </section>
   );
 };
 
 interface ProjectCardProps {
-  project: Project;
+  project: ProjectListItem;
   number: number;
 }
 
@@ -78,6 +86,7 @@ const ProjectCard = ({ project, number }: ProjectCardProps) => {
             src={project.src}
             alt={project.title}
             fill
+            sizes="100vw"
             className={`object-cover transition-opacity duration-700 ${
               isLoaded ? "opacity-100" : "opacity-0"
             }`}
@@ -93,7 +102,7 @@ const ProjectCard = ({ project, number }: ProjectCardProps) => {
         </div>
       </TransitionLink>
 
-      <div className="mt-4 ">
+      <div className="mt-4">
         <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/35">
           {String(number).padStart(2, "0")}
         </p>
@@ -103,9 +112,10 @@ const ProjectCard = ({ project, number }: ProjectCardProps) => {
         </h2>
 
         <div className="mt-6 flex justify-between border-t border-white/15 pt-4 text-xs uppercase tracking-[0.18em] text-white/55">
-          <span>{project.role}</span>
-          <span className="max-w-[45%] text-right truncate">
-            {project.tools}
+          <span>{project.role ?? ""}</span>
+
+          <span className="max-w-[45%] truncate text-right">
+            {project.tools ?? ""}
           </span>
         </div>
       </div>

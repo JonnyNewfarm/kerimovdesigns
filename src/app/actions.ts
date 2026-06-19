@@ -39,8 +39,6 @@ type UpdateProjectData = {
 
 export async function createProject(data: ProjectData) {
   try {
-    console.log("Saving project with image src:", data.src, typeof data.src);
-
     if (!data.title || typeof data.title !== "string") {
       throw new Error("Invalid title passed to DB.");
     }
@@ -97,26 +95,27 @@ export async function updateProject(id: string, data: UpdateProjectData) {
         id,
       },
       data: {
-        title: data.title || "",
-        src: data.src || "",
-        src2: data.src2 || "",
-        src3: data.src3 || "",
-        src4: data.src4 || "",
-        src5: data.src5 || "",
-        src6: data.src6 || "",
-        src7: data.src7 || "",
-        src8: data.src8 || "",
-        src9: data.src9 || "",
-        srcVideo: data.srcVideo || "",
-        role: data.role || "",
-        type: data.type || "",
-        tools: data.tools || "",
+        ...(data.title !== undefined && { title: data.title }),
+        ...(data.src !== undefined && { src: data.src }),
+        ...(data.src2 !== undefined && { src2: data.src2 }),
+        ...(data.src3 !== undefined && { src3: data.src3 }),
+        ...(data.src4 !== undefined && { src4: data.src4 }),
+        ...(data.src5 !== undefined && { src5: data.src5 }),
+        ...(data.src6 !== undefined && { src6: data.src6 }),
+        ...(data.src7 !== undefined && { src7: data.src7 }),
+        ...(data.src8 !== undefined && { src8: data.src8 }),
+        ...(data.src9 !== undefined && { src9: data.src9 }),
+        ...(data.srcVideo !== undefined && { srcVideo: data.srcVideo }),
+        ...(data.role !== undefined && { role: data.role }),
+        ...(data.type !== undefined && { type: data.type }),
+        ...(data.tools !== undefined && { tools: data.tools }),
       },
     });
 
     revalidatePath("/");
     revalidatePath("/projects");
     revalidatePath("/admin");
+    revalidatePath(`/project/${id}`);
 
     return {
       success: true,
@@ -132,11 +131,20 @@ export async function updateProject(id: string, data: UpdateProjectData) {
   }
 }
 
-export const getProjects = async () => {
+export async function getProjects() {
   try {
     const projects = await prisma.project.findMany({
       orderBy: {
         createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        src: true,
+        role: true,
+        type: true,
+        tools: true,
+        createdAt: true,
       },
     });
 
@@ -145,26 +153,39 @@ export const getProjects = async () => {
     console.error("Error fetching projects:", error);
     throw new Error("Failed to fetch projects");
   }
-};
+}
 
-export const getProjectsMobile = async () => {
+export async function getProjectsMobile() {
   try {
     const projects = await prisma.project.findMany({
       take: 3,
       orderBy: {
         createdAt: "desc",
       },
+      select: {
+        id: true,
+        title: true,
+        src: true,
+        role: true,
+        type: true,
+        tools: true,
+        createdAt: true,
+      },
     });
 
     return projects;
   } catch (error) {
-    console.error("Error fetching projects:", error);
+    console.error("Error fetching mobile projects:", error);
     throw new Error("Failed to fetch projects");
   }
-};
+}
 
-export const getProjectById = async (id: string) => {
+export async function getProjectById(id: string) {
   try {
+    if (!id) {
+      throw new Error("Project ID is required");
+    }
+
     const project = await prisma.project.findUnique({
       where: {
         id,
@@ -176,10 +197,14 @@ export const getProjectById = async (id: string) => {
     console.error("Error fetching project by ID:", error);
     throw new Error("Failed to fetch project");
   }
-};
+}
 
 export async function deleteProjectById(id: string) {
   try {
+    if (!id) {
+      throw new Error("Project ID is required");
+    }
+
     const deleted = await prisma.project.delete({
       where: {
         id,
@@ -210,6 +235,15 @@ export async function getLatestProject() {
       orderBy: {
         createdAt: "desc",
       },
+      select: {
+        id: true,
+        title: true,
+        src: true,
+        role: true,
+        type: true,
+        tools: true,
+        createdAt: true,
+      },
     });
 
     return latestProject;
@@ -219,16 +253,27 @@ export async function getLatestProject() {
   }
 }
 
-export const getProjectsPagnation = async (page = 1, limit = 3) => {
+export async function getProjectsPagination(page = 1, limit = 5) {
   try {
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(page, 1);
+    const safeLimit = Math.max(limit, 1);
+    const skip = (safePage - 1) * safeLimit;
 
     const [projects, total] = await Promise.all([
       prisma.project.findMany({
         skip,
-        take: limit,
+        take: safeLimit,
         orderBy: {
           createdAt: "desc",
+        },
+        select: {
+          id: true,
+          title: true,
+          src: true,
+          role: true,
+          type: true,
+          tools: true,
+          createdAt: true,
         },
       }),
       prisma.project.count(),
@@ -242,4 +287,4 @@ export const getProjectsPagnation = async (page = 1, limit = 3) => {
     console.error("Error fetching paginated projects:", error);
     throw new Error("Failed to fetch projects");
   }
-};
+}

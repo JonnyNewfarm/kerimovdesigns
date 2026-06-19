@@ -1,6 +1,5 @@
 "use client";
 
-import { Project } from "@prisma/client";
 import React, { ReactNode, useMemo, useState } from "react";
 import {
   AnimatePresence,
@@ -12,15 +11,23 @@ import WaveLinkText from "../WaveLink";
 import TransitionLink from "@/components/TransitionLink";
 import TextReveal from "../TextReveal";
 
+type ProjectListItem = {
+  id: string;
+  title: string;
+  src: string;
+  role: string | null;
+  type: string | null;
+  tools: string | null;
+  createdAt?: Date;
+};
+
 interface ProjectsTableProps {
-  projects: Project[];
+  projects: ProjectListItem[];
   children?: ReactNode;
   startIndex: number;
 }
 
 const PROJECTS_PER_VIEW = 5;
-
-const ease = [0.22, 1, 0.36, 1] as const;
 
 const ProjectsTable = ({
   projects,
@@ -47,7 +54,10 @@ const ProjectsTable = ({
     mass: 0.4,
   });
 
-  const totalPages = Math.ceil(projects.length / PROJECTS_PER_VIEW);
+  const totalPages = Math.max(
+    Math.ceil(projects.length / PROJECTS_PER_VIEW),
+    1,
+  );
 
   const visibleProjects = useMemo(() => {
     const start = pageIndex * PROJECTS_PER_VIEW;
@@ -277,7 +287,7 @@ const ProjectsTable = ({
               onMouseMove={handleImageMouseMove}
               onMouseEnter={handleImageMouseEnter}
               onMouseLeave={handleImageMouseLeave}
-              className="group relative z-10 block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer overflow-hidden isolate"
+              className="group relative isolate z-10 block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer overflow-hidden"
               aria-label={`Open project ${activeProject.title}`}
             >
               <img

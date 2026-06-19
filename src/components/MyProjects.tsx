@@ -9,20 +9,23 @@ import {
   useTransform,
   MotionValue,
 } from "framer-motion";
-import { Project } from "@prisma/client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import MagneticComp from "@/components/MagneticComp";
 import { usePathname } from "next/navigation";
 import TransitionLink from "./TransitionLink";
 
-type ProjectWithMeta = Project & {
-  role?: string | null;
-  type?: string | null;
-  tools?: string[] | string | null;
+type ProjectListItem = {
+  id: string;
+  title: string;
+  src: string;
+  role: string | null;
+  type: string | null;
+  tools: string[] | string | null;
+  createdAt?: Date;
 };
 
 interface MyProjectsProps {
-  projects: ProjectWithMeta[];
+  projects: ProjectListItem[];
 }
 
 type LayoutItem = {
@@ -225,7 +228,7 @@ const mobileLayout: MobileLayoutItem[] = [
   },
 ];
 
-function formatTools(tools: ProjectWithMeta["tools"]) {
+function formatTools(tools: ProjectListItem["tools"]) {
   if (!tools) return "";
   if (Array.isArray(tools)) return tools.join(", ");
   return tools;
@@ -318,7 +321,6 @@ function formatProjectNumber(index: number) {
 
 export default function MyProjects({ projects }: MyProjectsProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [activeMobileId, setActiveMobileId] = useState<string | null>(null);
 
   const sectionRef = useRef<HTMLElement | null>(null);
   const viewportWidth = useViewportWidth();
@@ -326,7 +328,6 @@ export default function MyProjects({ projects }: MyProjectsProps) {
 
   useEffect(() => {
     setHoveredId(null);
-    setActiveMobileId(null);
   }, [pathname]);
 
   const { scrollYProgress } = useScroll({
@@ -367,7 +368,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative mt-14 mb-20 w-full overflow-hidden bg-dark text-color"
+      className="relative mb-20 mt-14 w-full overflow-hidden bg-dark text-color"
     >
       <div
         className="relative hidden w-full lg:block"
@@ -381,7 +382,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             duration: 0.9,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className="absolute left-[12%] top-[280px] xl:top-[210px] z-30 max-w-[760px]"
+          className="absolute left-[12%] top-[280px] z-30 max-w-[760px] xl:top-[210px]"
         >
           <div className="mb-6 flex items-center gap-4">
             <span className="text-[18px] uppercase tracking-[0.18em] text-color/45">
@@ -452,7 +453,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             height: mobileSectionHeight,
           }}
         >
-          <div className="absolute left-[8%] -top-3 z-30">
+          <div className="absolute -top-3 left-[8%] z-30">
             <div className="mb-2 flex items-center gap-2">
               <span className="text-[10px] uppercase tracking-[0.18em] text-color/45">
                 06
@@ -532,7 +533,7 @@ function DesktopProjectItem({
   onHoverStart,
   onHoverEnd,
 }: {
-  project: ProjectWithMeta;
+  project: ProjectListItem;
   index: number;
   left: string;
   top: number;
@@ -756,7 +757,7 @@ function MobileProjectItem({
   entrance,
   delay,
 }: {
-  project: ProjectWithMeta;
+  project: ProjectListItem;
   index: number;
   left: string;
   top: number;

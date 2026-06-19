@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getProjects, getProjectsPagnation } from "../actions";
+import { getProjectsPagination } from "../actions";
 import ProjectsTable from "@/components/projects/ProjectsTable";
 import ProjectsTableSkeleton from "@/components/ProjectsTableSkeleton";
 import ProjectsTableMobile from "@/components/projects/ProjectsTableMobile";
@@ -30,14 +30,12 @@ const Page = async ({ searchParams }: PageProps) => {
 
   const itemsPerPage = 5;
 
-  const [desktopProjects, paginatedResult] = await Promise.all([
-    getProjects(),
-    getProjectsPagnation(currentPage, itemsPerPage),
-  ]);
+  const { projects, total } = await getProjectsPagination(
+    currentPage,
+    itemsPerPage,
+  );
 
-  const { projects: mobileProjects, total } = paginatedResult;
-
-  const totalPages = Math.ceil(total / itemsPerPage);
+  const totalPages = Math.max(Math.ceil(total / itemsPerPage), 1);
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   const prevPage = currentPage > 1 ? currentPage - 1 : null;
@@ -48,24 +46,21 @@ const Page = async ({ searchParams }: PageProps) => {
       <div className="w-full bg-dark text-color">
         <div className="hidden w-full md:block">
           <Suspense fallback={<ProjectsTableSkeleton />}>
-            <ProjectsTable projects={desktopProjects} startIndex={0} />
+            <ProjectsTable projects={projects} startIndex={startIndex} />
           </Suspense>
         </div>
 
         <div className="min-h-screen w-full md:hidden">
           <Suspense fallback={<ProjectsTableSkeleton />}>
-            <ProjectsTableMobile
-              projects={mobileProjects}
-              startIndex={startIndex}
-            >
-              <div className="mt-10 flex w-full items-center justify-between  pt-6">
+            <ProjectsTableMobile projects={projects} startIndex={startIndex}>
+              <div className="mt-10 flex w-full items-center justify-between pt-6">
                 <Link
                   href={prevPage ? `/projects?page=${prevPage}` : "#"}
                   aria-disabled={!prevPage}
                   prefetch={!!prevPage}
                   className={`group flex min-h-12 min-w-12 items-center justify-center border border-color/25 px-4 text-sm uppercase tracking-[0.18em] transition-all duration-300 ${
                     prevPage
-                      ? "text-color font-black"
+                      ? "font-black text-color"
                       : "pointer-events-none border-color/10 text-color/20"
                   }`}
                 >
@@ -87,7 +82,7 @@ const Page = async ({ searchParams }: PageProps) => {
                   prefetch={!!nextPage}
                   className={`group flex min-h-12 min-w-12 items-center justify-center border border-color/25 px-4 text-sm uppercase tracking-[0.18em] transition-all duration-300 ${
                     nextPage
-                      ? "text-color font-black"
+                      ? "font-black text-color"
                       : "pointer-events-none border-color/10 text-color/20"
                   }`}
                 >
