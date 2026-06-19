@@ -747,7 +747,11 @@ function MobileProjectItem({
       }}
     >
       <motion.div style={{ y: driftY, willChange: "transform" }}>
-        <Link href={`/project/${project.id}`} className="block">
+        <TransitionLink
+          href={`/project/${project.id}`}
+          transitionLabel={project.title}
+          className="block"
+        >
           <div
             className="relative overflow-hidden"
             style={{
@@ -769,7 +773,7 @@ function MobileProjectItem({
               {projectNumber} - {project.title}
             </p>
           </div>
-        </Link>
+        </TransitionLink>
       </motion.div>
     </div>
   );
