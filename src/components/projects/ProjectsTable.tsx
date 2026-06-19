@@ -364,7 +364,7 @@ const ProjectsTable = ({
                     <TextReveal
                       as="h2"
                       mode="words"
-                      delay={0.08}
+                      delay={0.01}
                       className="max-w-[980px] text-[clamp(2.8rem,4.6vw,5.8rem)] font-black uppercase leading-[0.88] tracking-[-0.035em] transition-opacity duration-300 hover:opacity-70"
                     >
                       {activeProject.title}
