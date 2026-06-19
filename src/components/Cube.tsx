@@ -7,13 +7,7 @@ import React, {
   useLayoutEffect,
   useMemo,
 } from "react";
-import {
-  Canvas,
-  useFrame,
-  useLoader,
-  ThreeEvent,
-  useThree,
-} from "@react-three/fiber";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import {
   Mesh,
   Texture,
@@ -27,26 +21,15 @@ import {
   useTransform,
   motion,
   MotionValue,
-  AnimatePresence,
 } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { OrbitControls } from "@react-three/drei";
 import MagneticComp from "./MagneticComp";
 import HeroIntro from "./HeroIntro";
-import TextReveal from "./TextReveal";
+import TextReveal from "@/components/TextReveal";
+import TransitionLink from "./TransitionLink";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-
-type TextRevealProps = {
-  children: string;
-  as?: "p" | "h1" | "h2" | "h3" | "span";
-  className?: string;
-  delay?: number;
-  once?: boolean;
-  mode?: "words" | "lines";
-  amount?: number;
-};
 
 function useIsMdUp() {
   const [isMdUp, setIsMdUp] = useState(false);
@@ -401,6 +384,12 @@ export default function Index() {
   const [activeCubeProject, setActiveCubeProject] =
     useState<CubeProject | null>(null);
 
+  const activeCubeProjectRef = useRef<CubeProject | null>(null);
+  const isProjectOverlayHoveredRef = useRef(false);
+  const overlayLeaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
   const [introDone, setIntroDone] = useState(() => {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem("hero-intro-seen") === "true";
@@ -416,6 +405,54 @@ export default function Index() {
   const progress = useTransform(scrollYProgress, [0, 1], [0, 4.3]);
   const smoothProgress = useSpring(progress, { damping: 20 });
   const lineWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+  function clearOverlayTimeout() {
+    if (overlayLeaveTimeoutRef.current) {
+      clearTimeout(overlayLeaveTimeoutRef.current);
+      overlayLeaveTimeoutRef.current = null;
+    }
+  }
+
+  function handleActiveProjectChange(project: CubeProject | null) {
+    clearOverlayTimeout();
+
+    if (project) {
+      activeCubeProjectRef.current = project;
+      setActiveCubeProject(project);
+      return;
+    }
+
+    overlayLeaveTimeoutRef.current = setTimeout(() => {
+      if (isProjectOverlayHoveredRef.current) return;
+
+      activeCubeProjectRef.current = null;
+      setActiveCubeProject(null);
+    }, 140);
+  }
+
+  function handleProjectOverlayEnter() {
+    isProjectOverlayHoveredRef.current = true;
+    clearOverlayTimeout();
+
+    if (activeCubeProjectRef.current) {
+      setActiveCubeProject(activeCubeProjectRef.current);
+    }
+  }
+
+  function handleProjectOverlayLeave() {
+    isProjectOverlayHoveredRef.current = false;
+
+    overlayLeaveTimeoutRef.current = setTimeout(() => {
+      activeCubeProjectRef.current = null;
+      setActiveCubeProject(null);
+    }, 140);
+  }
+
+  useEffect(() => {
+    return () => {
+      clearOverlayTimeout();
+    };
+  }, []);
 
   useEffect(() => {
     const hasSeenIntro = sessionStorage.getItem("hero-intro-seen");
@@ -440,7 +477,7 @@ export default function Index() {
       initial={false}
       animate={{ opacity: 1 }}
     >
-      <div className="sticky top-0 flex h-[100dvh] flex-col items-center justify-center overflow-hidden uppercase relative">
+      <div className="sticky top-0 relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden uppercase">
         <HeroIntro isDone={introDone} />
 
         <div className="absolute inset-0 flex items-center justify-center">
@@ -462,57 +499,37 @@ export default function Index() {
               <Cube
                 scrollProgress={smoothProgress}
                 introDone={introDone}
-                onActiveProjectChange={setActiveCubeProject}
+                onActiveProjectChange={handleActiveProjectChange}
               />
             </Canvas>
 
-            <AnimatePresence mode="wait">
-              {activeCubeProject && introDone && (
-                <motion.div
-                  key={activeCubeProject.title}
-                  initial={{
-                    opacity: 0,
-                    y: 18,
-                    filter: "blur(8px)",
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    filter: "blur(0px)",
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: -14,
-                    filter: "blur(8px)",
-                  }}
-                  transition={{
-                    duration: 0.34,
-                    ease,
-                  }}
-                  className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center uppercase"
+            {activeCubeProject && introDone && (
+              <div className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center uppercase">
+                <div
+                  className="pointer-events-auto"
+                  onPointerEnter={handleProjectOverlayEnter}
+                  onPointerLeave={handleProjectOverlayLeave}
                 >
-                  <TextReveal
-                    as="p"
-                    mode="words"
-                    delay={0}
-                    amount={0.2}
-                    className="mb-2 text-[10px] font-bold tracking-[0.55em] text-white"
-                  >
+                  <p className="mb-2 text-[10px] font-bold tracking-[0.55em] text-white">
                     {activeCubeProject.subtitle}
-                  </TextReveal>
+                  </p>
 
-                  <TextReveal
-                    as="h3"
-                    mode="words"
-                    delay={0.01}
-                    amount={0.2}
-                    className="text-3xl font-black tracking-[-0.05em] text-white md:text-5xl"
-                  >
+                  <h3 className="text-3xl font-black tracking-[-0.05em] text-white md:text-5xl">
                     {activeCubeProject.title}
-                  </TextReveal>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  </h3>
+
+                  {activeCubeProject.href && (
+                    <TransitionLink
+                      href={activeCubeProject.href}
+                      transitionLabel={activeCubeProject.title}
+                      className="mt-5 inline-block border border-white px-5 py-3 text-xs font-bold tracking-[0.35em] text-white transition hover:bg-white hover:text-black"
+                    >
+                      View case
+                    </TransitionLink>
+                  )}
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
 
@@ -531,6 +548,7 @@ export default function Index() {
               <TextReveal
                 as="h1"
                 mode="words"
+                viewport={false}
                 delay={0.05}
                 className="-mb-1 text-2xl font-bold text-color sm:text-2xl"
               >
@@ -549,6 +567,7 @@ export default function Index() {
               <TextReveal
                 as="h2"
                 mode="words"
+                viewport={false}
                 delay={0.12}
                 className="whitespace-nowrap text-3xl font-extrabold text-color sm:text-4xl"
               >
@@ -574,6 +593,7 @@ export default function Index() {
                 <TextReveal
                   as="span"
                   mode="words"
+                  viewport={false}
                   delay={0.05}
                   className="text-4xl font-extrabold text-color sm:text-4xl"
                 >
@@ -600,6 +620,7 @@ export default function Index() {
                 <TextReveal
                   as="span"
                   mode="words"
+                  viewport={false}
                   delay={0.05}
                   className="text-4xl font-extrabold text-color sm:text-4xl"
                 >
@@ -623,7 +644,6 @@ const Cube = ({
   introDone: boolean;
   onActiveProjectChange: (project: CubeProject | null) => void;
 }) => {
-  const router = useRouter();
   const mesh = useRef<Mesh>(null);
 
   const { camera, raycaster, pointer } = useThree();
@@ -651,11 +671,6 @@ const Cube = ({
   );
 
   const textures = useLoader(TextureLoader, allImagePaths) as Texture[];
-
-  const activeProject =
-    activeMaterialIndex !== null
-      ? cubeProjects[BOX_FACE_PROJECT_INDEXES[activeMaterialIndex]]
-      : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -809,33 +824,6 @@ const Cube = ({
     );
   });
 
-  useEffect(() => {
-    const canvas = document.querySelector("canvas");
-    if (!canvas) return;
-
-    const hasLink = Boolean(activeProject?.href);
-
-    canvas.style.cursor =
-      hovered && introDone && hasLink ? "pointer" : "default";
-  }, [hovered, introDone, activeProject]);
-
-  function handleClick(event: ThreeEvent<MouseEvent>) {
-    if (!introDone) return;
-
-    event.stopPropagation();
-
-    const materialIndex = activeMaterialIndexRef.current;
-
-    if (materialIndex === null) return;
-
-    const projectIndex = BOX_FACE_PROJECT_INDEXES[materialIndex];
-    const project = cubeProjects[projectIndex];
-
-    if (!project?.href) return;
-
-    router.push(project.href);
-  }
-
   function handlePointerEnter() {
     if (!introDone) return;
 
@@ -868,7 +856,6 @@ const Cube = ({
       position={[0, 0, 0]}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
-      onClick={handleClick}
     >
       <boxGeometry args={[2.3, 2.3, 2.3]} />
 
