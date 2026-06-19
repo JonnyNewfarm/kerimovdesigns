@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import MotionImage from "./MotionImage";
 import TextReveal from "./TextReveal";
 
 export interface Project {
@@ -327,85 +326,81 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                 key={`${src}-${index}`}
                 className={`flex w-full ${layout.row}`}
               >
-                <MotionImage>
-                  <motion.div
-                    layoutId={`project-image-${index}`}
-                    className={`group relative w-full ${layout.size} ${layout.offset}`}
-                    onMouseEnter={() => {
-                      if (activeIndex === null) {
-                        setHoveredIndex(index);
-                      }
+                <motion.div
+                  layoutId={`project-image-${index}`}
+                  className={`group relative w-full ${layout.size} ${layout.offset}`}
+                  onMouseEnter={() => {
+                    if (activeIndex === null) {
+                      setHoveredIndex(index);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (activeIndex === null) {
+                      setHoveredIndex(null);
+                    }
+                  }}
+                  animate={{
+                    opacity: isActive ? 0 : shouldBlur ? 0.45 : 1,
+                    filter: shouldBlur ? "blur(5px)" : "blur(0px)",
+                  }}
+                  style={{
+                    pointerEvents: isActive ? "none" : "auto",
+                  }}
+                  transition={{
+                    opacity: {
+                      duration: 0.45,
+                      ease: [0.22, 1, 0.36, 1],
+                    },
+                    filter: {
+                      duration: 0.45,
+                      ease: [0.22, 1, 0.36, 1],
+                    },
+                    layout: {
+                      duration: 0.85,
+                      ease: [0.16, 1, 0.3, 1],
+                    },
+                  }}
+                >
+                  <Image
+                    unoptimized
+                    className={`h-auto w-full ${
+                      isLoaded ? "cursor-pointer" : "cursor-wait"
+                    }`}
+                    src={src}
+                    alt={project.title || `Project Image ${index + 1}`}
+                    width={dimensions?.width || 850}
+                    height={dimensions?.height || 450}
+                    sizes="(max-width: 768px) 80vw, 520px"
+                    priority={index < 3}
+                    onLoad={() => {
+                      setLoadedImages((prev) => ({
+                        ...prev,
+                        [index]: true,
+                      }));
                     }}
-                    onMouseLeave={() => {
-                      if (activeIndex === null) {
-                        setHoveredIndex(null);
-                      }
-                    }}
-                    animate={{
-                      opacity: isActive ? 0 : shouldBlur ? 0.45 : 1,
-                      filter: shouldBlur ? "blur(5px)" : "blur(0px)",
-                    }}
-                    style={{
-                      pointerEvents: isActive ? "none" : "auto",
-                    }}
-                    transition={{
-                      opacity: {
-                        duration: 0.45,
-                        ease: [0.22, 1, 0.36, 1],
-                      },
-                      filter: {
-                        duration: 0.45,
-                        ease: [0.22, 1, 0.36, 1],
-                      },
-                      layout: {
-                        duration: 0.85,
-                        ease: [0.16, 1, 0.3, 1],
-                      },
-                    }}
-                  >
-                    <Image
-                      unoptimized
-                      className={`h-auto w-full ${
-                        isLoaded ? "cursor-pointer" : "cursor-wait"
-                      }`}
-                      src={src}
-                      alt={project.title || `Project Image ${index + 1}`}
-                      width={dimensions?.width || 850}
-                      height={dimensions?.height || 450}
-                      sizes="(max-width: 768px) 80vw, 520px"
-                      priority={index < 3}
-                      onLoad={() => {
-                        setLoadedImages((prev) => ({
-                          ...prev,
-                          [index]: true,
-                        }));
-                      }}
-                      onClick={() => openImage(index)}
-                    />
+                    onClick={() => openImage(index)}
+                  />
 
-                    <div className="pointer-events-none absolute left-4 top-4 opacity-0 transition duration-500 group-hover:opacity-100">
-                      <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-white mix-blend-difference">
-                        {imageNumber}
-                      </span>
-                    </div>
-                  </motion.div>
-                </MotionImage>
+                  <div className="pointer-events-none absolute left-4 top-4 opacity-0 transition duration-500 group-hover:opacity-100">
+                    <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-white mix-blend-difference">
+                      {imageNumber}
+                    </span>
+                  </div>
+                </motion.div>
               </div>
             );
           })}
 
           {project.srcVideo && (
-            <div className="flex w-full justify-center">
-              <MotionImage>
-                <video
-                  className="h-auto w-full max-w-[520px]"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  src={project.srcVideo}
-                />
-              </MotionImage>
+            <div className="flex w-full justify-center lg:justify-start">
+              <video
+                className="h-auto w-full max-w-[520px] lg:max-w-[680px] lg:translate-x-20"
+                autoPlay
+                muted
+                loop
+                playsInline
+                src={project.srcVideo}
+              />
             </div>
           )}
         </div>

@@ -26,15 +26,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const description = `View details about the project "${project.title}" by Rustam Kerimov.`;
+
   return {
     title: `${project.title} | Rustam Kerimov`,
-    description: `View details about the project "${project.title}" by Rustam Kerimov.`,
+    description,
     icons: {
       icon: "/favicon.ico",
     },
     openGraph: {
       title: `${project.title} | Rustam Kerimov`,
-      description: `View details about the project "${project.title}" by Rustam Kerimov.`,
+      description,
       images: project.src
         ? [
             {
@@ -57,9 +59,9 @@ const Page = async ({ params }: Props) => {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen bg-dark text-color">
+      <main className="min-h-screen bg-dark text-color">
         <ProjectModalWrapper project={project} />
-      </div>
+      </main>
     </SmoothScroll>
   );
 };

@@ -6,9 +6,21 @@ import { motion } from "framer-motion";
 import TransitionLink from "./TransitionLink";
 
 const menuLinks = [
-  { label: "Home", href: "/" },
-  { label: "My Work", href: "/projects" },
-  { label: "Contact", href: "/contact" },
+  {
+    label: "Home",
+    href: "/",
+    transitionLabel: "Welcome Back",
+  },
+  {
+    label: "My Work",
+    href: "/projects",
+    transitionLabel: "Selected Work",
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+    transitionLabel: "Let's Collaborate",
+  },
 ];
 
 const BurgerMenu = () => {
@@ -147,7 +159,7 @@ const BurgerMenu = () => {
               >
                 <TransitionLink
                   href={link.href}
-                  transitionLabel={link.label}
+                  transitionLabel={link.transitionLabel}
                   direction="right"
                   className="flex items-center justify-between border-b border-white/10 py-6"
                 >

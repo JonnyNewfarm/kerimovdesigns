@@ -1,16 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import WaveLinkText from "./WaveLink";
 import TextReveal from "@/components/TextReveal";
 import TransitionLink from "./TransitionLink";
 
 const Footer = () => {
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
-    const update = () =>
+    const update = () => {
       setTime(
         new Date().toLocaleTimeString("en-GB", {
           hour: "2-digit",
@@ -18,6 +17,7 @@ const Footer = () => {
           second: "2-digit",
         }),
       );
+    };
 
     update();
 
@@ -65,7 +65,7 @@ ideas into visuals.`}
               <div className="flex flex-col gap-1 text-xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-color/80 md:text-3xl">
                 <TransitionLink
                   href="/"
-                  transitionLabel="Home"
+                  transitionLabel="Welcome back"
                   className="transition hover:text-color"
                 >
                   <WaveLinkText text="Home" />
@@ -73,7 +73,7 @@ ideas into visuals.`}
 
                 <TransitionLink
                   href="/projects"
-                  transitionLabel="My work"
+                  transitionLabel="Selected Work"
                   className="transition hover:text-color"
                 >
                   <WaveLinkText text="My work" />
@@ -81,7 +81,7 @@ ideas into visuals.`}
 
                 <TransitionLink
                   href="/contact"
-                  transitionLabel="Contact"
+                  transitionLabel="Let's Collaborate"
                   className="transition hover:text-color"
                 >
                   <WaveLinkText text="Contact" />
@@ -171,7 +171,7 @@ ideas into visuals.`}
               Local time
             </TextReveal>
 
-            <p>{time}</p>
+            <p suppressHydrationWarning>{time ?? "--:--:--"}</p>
           </div>
 
           <div className="md:text-right">

@@ -10,6 +10,7 @@ import {
 import WaveLinkText from "../WaveLink";
 import TransitionLink from "@/components/TransitionLink";
 import TextReveal from "../TextReveal";
+import Image from "next/image";
 
 type ProjectListItem = {
   id: string;
@@ -290,10 +291,13 @@ const ProjectsTable = ({
               className="group relative isolate z-10 block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer overflow-hidden"
               aria-label={`Open project ${activeProject.title}`}
             >
-              <img
+              <Image
                 src={activeProject.src}
                 alt={activeProject.title}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                fill
+                priority
+                sizes="(min-width: 1280px) 66vw, (min-width: 768px) 58vw, 100vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
               />
 
               <motion.div

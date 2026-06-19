@@ -1,7 +1,5 @@
-"use client";
-
 import Image from "next/image";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import TransitionLink from "../TransitionLink";
 
 type ProjectListItem = {
@@ -51,6 +49,7 @@ const ProjectsTableMobile = ({
             key={project.id}
             project={project}
             number={startIndex + index + 1}
+            priority={index === 0}
           />
         ))}
       </div>
@@ -63,12 +62,14 @@ const ProjectsTableMobile = ({
 interface ProjectCardProps {
   project: ProjectListItem;
   number: number;
+  priority?: boolean;
 }
 
-const ProjectCard = ({ project, number }: ProjectCardProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
-
+const ProjectCard = ({
+  project,
+  number,
+  priority = false,
+}: ProjectCardProps) => {
   return (
     <article className="flex flex-col">
       <TransitionLink
@@ -77,28 +78,16 @@ const ProjectCard = ({ project, number }: ProjectCardProps) => {
         transitionLabel={project.title}
         className="block"
       >
-        <div className="relative h-[240px] w-full overflow-hidden border border-white/15">
-          {!isLoaded && !hasError && (
-            <div className="absolute inset-0 animate-pulse bg-white/5" />
-          )}
-
+        <div className="relative aspect-[4/3] w-full overflow-hidden border border-white/15 bg-white/5">
           <Image
             src={project.src}
             alt={project.title}
             fill
-            sizes="100vw"
-            className={`object-cover transition-opacity duration-700 ${
-              isLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            onLoadingComplete={() => setIsLoaded(true)}
-            onError={() => setHasError(true)}
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
+            sizes="(max-width: 767px) 100vw, 0px"
+            className="object-cover"
           />
-
-          {hasError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm uppercase tracking-[0.2em]">
-              Image error
-            </div>
-          )}
         </div>
       </TransitionLink>
 

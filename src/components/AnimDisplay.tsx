@@ -11,12 +11,13 @@ import {
   useTransform,
 } from "framer-motion";
 import TextReveal from "./TextReveal";
+import TransitionLink from "./TransitionLink";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const animations = [
   {
-    title: "Echo",
+    title: "Echo festival",
     heading: "Moving graphics",
     type: "Animated graphics",
     description:
@@ -199,8 +200,9 @@ export default function AnimDisplay() {
                 </div>
 
                 {item.video ? (
-                  <Link
+                  <TransitionLink
                     href={item.href}
+                    transitionLabel={item.title}
                     aria-label={`View ${item.title}`}
                     onMouseMove={handleMouseMove}
                     onMouseEnter={(event) =>
@@ -219,10 +221,11 @@ export default function AnimDisplay() {
                     />
 
                     <div className="pointer-events-none absolute inset-0 bg-dark/0 transition-colors duration-500 group-hover:bg-dark/10" />
-                  </Link>
+                  </TransitionLink>
                 ) : (
-                  <Link
+                  <TransitionLink
                     href={item.href}
+                    transitionLabel={item.title}
                     aria-label={`View ${item.title}`}
                     onMouseMove={handleMouseMove}
                     onMouseEnter={(event) =>
@@ -247,7 +250,7 @@ export default function AnimDisplay() {
                     ))}
 
                     <div className="pointer-events-none absolute inset-0 bg-dark/0 transition-colors duration-500 group-hover:bg-dark/10" />
-                  </Link>
+                  </TransitionLink>
                 )}
 
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-[0.45fr_1fr] md:items-start">

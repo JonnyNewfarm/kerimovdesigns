@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "../../lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 type ProjectData = {
   title: string;
@@ -37,6 +37,43 @@ type UpdateProjectData = {
   tools?: string;
 };
 
+const projectListSelect = {
+  id: true,
+  title: true,
+  src: true,
+  role: true,
+  type: true,
+  tools: true,
+  createdAt: true,
+};
+
+const projectDetailSelect = {
+  id: true,
+  title: true,
+  src: true,
+  src2: true,
+  src3: true,
+  src4: true,
+  src5: true,
+  src6: true,
+  src7: true,
+  src8: true,
+  src9: true,
+  srcVideo: true,
+  role: true,
+  type: true,
+  tools: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
+function revalidateProjects() {
+  revalidateTag("projects");
+  revalidatePath("/");
+  revalidatePath("/projects");
+  revalidatePath("/admin");
+}
+
 export async function createProject(data: ProjectData) {
   try {
     if (!data.title || typeof data.title !== "string") {
@@ -66,9 +103,7 @@ export async function createProject(data: ProjectData) {
       },
     });
 
-    revalidatePath("/");
-    revalidatePath("/projects");
-    revalidatePath("/admin");
+    revalidateProjects();
 
     return {
       success: true,
@@ -112,9 +147,7 @@ export async function updateProject(id: string, data: UpdateProjectData) {
       },
     });
 
-    revalidatePath("/");
-    revalidatePath("/projects");
-    revalidatePath("/admin");
+    revalidateProjects();
     revalidatePath(`/project/${id}`);
 
     return {
@@ -131,54 +164,72 @@ export async function updateProject(id: string, data: UpdateProjectData) {
   }
 }
 
-export async function getProjects() {
-  try {
-    const projects = await prisma.project.findMany({
+const getCachedProjects = unstable_cache(
+  async () => {
+    return prisma.project.findMany({
       orderBy: {
         createdAt: "desc",
       },
-      select: {
-        id: true,
-        title: true,
-        src: true,
-        role: true,
-        type: true,
-        tools: true,
-        createdAt: true,
-      },
+      select: projectListSelect,
     });
+  },
+  ["projects-all"],
+  {
+    revalidate: 60,
+    tags: ["projects"],
+  },
+);
 
-    return projects;
+export async function getProjects() {
+  try {
+    return await getCachedProjects();
   } catch (error) {
     console.error("Error fetching projects:", error);
     throw new Error("Failed to fetch projects");
   }
 }
 
-export async function getProjectsMobile() {
-  try {
-    const projects = await prisma.project.findMany({
+const getCachedProjectsMobile = unstable_cache(
+  async () => {
+    return prisma.project.findMany({
       take: 3,
       orderBy: {
         createdAt: "desc",
       },
-      select: {
-        id: true,
-        title: true,
-        src: true,
-        role: true,
-        type: true,
-        tools: true,
-        createdAt: true,
-      },
+      select: projectListSelect,
     });
+  },
+  ["projects-mobile"],
+  {
+    revalidate: 60,
+    tags: ["projects"],
+  },
+);
 
-    return projects;
+export async function getProjectsMobile() {
+  try {
+    return await getCachedProjectsMobile();
   } catch (error) {
     console.error("Error fetching mobile projects:", error);
     throw new Error("Failed to fetch projects");
   }
 }
+
+const getCachedProjectById = unstable_cache(
+  async (id: string) => {
+    return prisma.project.findUnique({
+      where: {
+        id,
+      },
+      select: projectDetailSelect,
+    });
+  },
+  ["project-by-id"],
+  {
+    revalidate: 60,
+    tags: ["projects"],
+  },
+);
 
 export async function getProjectById(id: string) {
   try {
@@ -186,13 +237,7 @@ export async function getProjectById(id: string) {
       throw new Error("Project ID is required");
     }
 
-    const project = await prisma.project.findUnique({
-      where: {
-        id,
-      },
-    });
-
-    return project;
+    return await getCachedProjectById(id);
   } catch (error) {
     console.error("Error fetching project by ID:", error);
     throw new Error("Failed to fetch project");
@@ -211,9 +256,8 @@ export async function deleteProjectById(id: string) {
       },
     });
 
-    revalidatePath("/");
-    revalidatePath("/projects");
-    revalidatePath("/admin");
+    revalidateProjects();
+    revalidatePath(`/project/${id}`);
 
     return {
       success: true,
@@ -229,32 +273,33 @@ export async function deleteProjectById(id: string) {
   }
 }
 
-export async function getLatestProject() {
-  try {
-    const latestProject = await prisma.project.findFirst({
+const getCachedLatestProject = unstable_cache(
+  async () => {
+    return prisma.project.findFirst({
       orderBy: {
         createdAt: "desc",
       },
-      select: {
-        id: true,
-        title: true,
-        src: true,
-        role: true,
-        type: true,
-        tools: true,
-        createdAt: true,
-      },
+      select: projectListSelect,
     });
+  },
+  ["latest-project"],
+  {
+    revalidate: 60,
+    tags: ["projects"],
+  },
+);
 
-    return latestProject;
+export async function getLatestProject() {
+  try {
+    return await getCachedLatestProject();
   } catch (error) {
     console.error("Error fetching latest project:", error);
     throw new Error("Failed to fetch latest project");
   }
 }
 
-export async function getProjectsPagination(page = 1, limit = 5) {
-  try {
+const getCachedProjectsPagination = unstable_cache(
+  async (page: number, limit: number) => {
     const safePage = Math.max(page, 1);
     const safeLimit = Math.max(limit, 1);
     const skip = (safePage - 1) * safeLimit;
@@ -266,15 +311,7 @@ export async function getProjectsPagination(page = 1, limit = 5) {
         orderBy: {
           createdAt: "desc",
         },
-        select: {
-          id: true,
-          title: true,
-          src: true,
-          role: true,
-          type: true,
-          tools: true,
-          createdAt: true,
-        },
+        select: projectListSelect,
       }),
       prisma.project.count(),
     ]);
@@ -283,6 +320,17 @@ export async function getProjectsPagination(page = 1, limit = 5) {
       projects,
       total,
     };
+  },
+  ["projects-pagination"],
+  {
+    revalidate: 60,
+    tags: ["projects"],
+  },
+);
+
+export async function getProjectsPagination(page = 1, limit = 5) {
+  try {
+    return await getCachedProjectsPagination(page, limit);
   } catch (error) {
     console.error("Error fetching paginated projects:", error);
     throw new Error("Failed to fetch projects");

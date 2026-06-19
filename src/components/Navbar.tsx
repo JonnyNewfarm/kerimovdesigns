@@ -31,7 +31,7 @@ const Navbar = () => {
               <div className="flex gap-x-1 m-0 leading-tight">
                 <TransitionLink
                   href="/"
-                  transitionLabel="Home"
+                  transitionLabel="Welcome Back"
                   direction="right"
                   className="inline-block"
                 >
@@ -40,7 +40,7 @@ const Navbar = () => {
 
                 <TransitionLink
                   href="/projects"
-                  transitionLabel="My work"
+                  transitionLabel="Selected Work"
                   direction="left"
                   className="inline-block"
                 >
@@ -49,7 +49,7 @@ const Navbar = () => {
 
                 <TransitionLink
                   href="/contact"
-                  transitionLabel="Contact"
+                  transitionLabel="Let's Collaborate"
                   direction="right"
                   className="inline-block"
                 >

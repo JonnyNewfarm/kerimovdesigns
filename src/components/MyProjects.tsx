@@ -53,7 +53,6 @@ type MobileLayoutItem = {
   scaleSm?: number;
   drift: number;
   driftDirection: 1 | -1;
-  entrance: "blur" | "clean";
 };
 
 const BASE_WIDTH = 580;
@@ -169,7 +168,6 @@ const mobileLayout: MobileLayoutItem[] = [
     scaleSm: 1.4,
     drift: 60,
     driftDirection: -1,
-    entrance: "blur",
   },
   {
     left: "80%",
@@ -180,7 +178,6 @@ const mobileLayout: MobileLayoutItem[] = [
     scaleSm: 0.8,
     drift: 60,
     driftDirection: 1,
-    entrance: "clean",
   },
   {
     left: "10%",
@@ -191,7 +188,6 @@ const mobileLayout: MobileLayoutItem[] = [
     scaleSm: 0.96,
     drift: 60,
     driftDirection: -1,
-    entrance: "blur",
   },
   {
     left: "67%",
@@ -202,7 +198,6 @@ const mobileLayout: MobileLayoutItem[] = [
     scaleSm: 1.15,
     drift: 55,
     driftDirection: 1,
-    entrance: "clean",
   },
   {
     left: "18%",
@@ -213,7 +208,6 @@ const mobileLayout: MobileLayoutItem[] = [
     scaleSm: 0.64,
     drift: 40,
     driftDirection: -1,
-    entrance: "blur",
   },
   {
     left: "70%",
@@ -224,7 +218,6 @@ const mobileLayout: MobileLayoutItem[] = [
     scaleSm: 0.9,
     drift: 40,
     driftDirection: 1,
-    entrance: "clean",
   },
 ];
 
@@ -374,16 +367,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
         className="relative hidden w-full lg:block"
         style={{ height: desktopSectionHeight }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 28, filter: "blur(6px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{
-            duration: 0.9,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="absolute left-[12%] top-[280px] z-30 max-w-[760px] xl:top-[210px]"
-        >
+        <div className="absolute left-[12%] top-[280px] z-30 max-w-[760px] xl:top-[210px]">
           <div className="mb-6 flex items-center gap-4">
             <span className="text-[18px] uppercase tracking-[0.18em] text-color/45">
               06
@@ -399,7 +383,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             <br />
             Work
           </h2>
-        </motion.div>
+        </div>
 
         {visibleProjects.map((project, index) => {
           const item = desktopLayout[index % desktopLayout.length];
@@ -488,8 +472,6 @@ export default function MyProjects({ projects }: MyProjectsProps) {
                 drift={item.drift}
                 driftDirection={item.driftDirection}
                 scrollYProgress={scrollYProgress}
-                entrance={item.entrance}
-                delay={index * 0.06}
               />
             );
           })}
@@ -611,7 +593,7 @@ function DesktopProjectItem({
                   opacity: isDimmed ? 0.7 : 1,
                 }}
                 transition={{
-                  duration: 0.55,
+                  duration: 0.35,
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="will-change-transform"
@@ -622,7 +604,7 @@ function DesktopProjectItem({
                     hover: { y: -8 },
                   }}
                   transition={{
-                    duration: 0.6,
+                    duration: 0.35,
                     ease: [0.22, 1, 0.36, 1],
                   }}
                 >
@@ -640,7 +622,7 @@ function DesktopProjectItem({
                         hover: { scale: 1.025 },
                       }}
                       transition={{
-                        duration: 0.9,
+                        duration: 0.45,
                         ease: [0.22, 1, 0.36, 1],
                       }}
                     >
@@ -669,26 +651,7 @@ function DesktopProjectItem({
 
             <AnimatePresence>
               {isActive && (
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    x: panelPosition === "leftOfCard" ? -18 : 18,
-                    filter: "blur(10px)",
-                  }}
-                  animate={{
-                    opacity: 1,
-                    x: 0,
-                    filter: "blur(0px)",
-                  }}
-                  exit={{
-                    opacity: 0,
-                    x: panelPosition === "leftOfCard" ? -12 : 12,
-                    filter: "blur(8px)",
-                  }}
-                  transition={{
-                    duration: 0.35,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
+                <div
                   className={`pointer-events-none absolute z-50 w-[280px] ${
                     panelPosition === "leftOfCard" ? "text-right" : ""
                   }`}
@@ -735,7 +698,7 @@ function DesktopProjectItem({
                       )}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
             </AnimatePresence>
           </motion.div>
@@ -754,8 +717,6 @@ function MobileProjectItem({
   drift,
   driftDirection,
   scrollYProgress,
-  entrance,
-  delay,
 }: {
   project: ProjectListItem;
   index: number;
@@ -765,10 +726,7 @@ function MobileProjectItem({
   drift: number;
   driftDirection: 1 | -1;
   scrollYProgress: MotionValue<number>;
-  entrance: "blur" | "clean";
-  delay: number;
 }) {
-  const useBlurEntrance = entrance === "blur";
   const projectNumber = formatProjectNumber(index);
 
   const driftY = useTransform(
@@ -781,19 +739,11 @@ function MobileProjectItem({
   const cardHeight = getMobileCardHeight(baseScale);
 
   return (
-    <motion.div
+    <div
       className="absolute"
       style={{
         top,
         left: getSafeMobileLeft(left, baseScale),
-      }}
-      initial={useBlurEntrance ? { y: 40, filter: "blur(14px)" } : { y: 26 }}
-      whileInView={useBlurEntrance ? { y: 0, filter: "blur(0px)" } : { y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{
-        duration: useBlurEntrance ? 0.95 : 0.75,
-        delay,
-        ease: [0.22, 1, 0.36, 1],
       }}
     >
       <motion.div style={{ y: driftY, willChange: "transform" }}>
@@ -821,6 +771,6 @@ function MobileProjectItem({
           </div>
         </Link>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

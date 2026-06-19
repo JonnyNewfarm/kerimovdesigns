@@ -36,6 +36,7 @@ function useIsMdUp() {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
+
     setIsMdUp(mediaQuery.matches);
 
     function handleChange(e: MediaQueryListEvent) {
@@ -43,6 +44,7 @@ function useIsMdUp() {
     }
 
     mediaQuery.addEventListener("change", handleChange);
+
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
@@ -206,8 +208,8 @@ function createCollageTexture(
   tiles: CollageTile[],
   shouldRotateLargeImage = false,
 ) {
-  const size = 1024;
-  const gap = 34;
+  const size = 512;
+  const gap = 18;
 
   const canvas = document.createElement("canvas");
   canvas.width = size;
@@ -218,7 +220,6 @@ function createCollageTexture(
   if (!ctx) return null;
 
   ctx.clearRect(0, 0, size, size);
-
   ctx.fillStyle = HERO_BG_COLOR;
   ctx.fillRect(0, 0, size, size);
 
@@ -269,30 +270,31 @@ function createBlurredTexture(texture: Texture) {
 
   if (!image) return null;
 
-  const width =
+  const sourceWidth =
     image instanceof HTMLImageElement
       ? image.naturalWidth || image.width
       : image.width;
 
-  const height =
+  const sourceHeight =
     image instanceof HTMLImageElement
       ? image.naturalHeight || image.height
       : image.height;
 
-  if (!width || !height) return null;
+  if (!sourceWidth || !sourceHeight) return null;
+
+  const size = 512;
 
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = size;
+  canvas.height = size;
 
   const ctx = canvas.getContext("2d");
 
   if (!ctx) return null;
 
-  ctx.clearRect(0, 0, width, height);
-
+  ctx.clearRect(0, 0, size, size);
   ctx.filter = "blur(6px) brightness(0.80)";
-  ctx.drawImage(image, 0, 0, width, height);
+  ctx.drawImage(image, 0, 0, size, size);
 
   const blurredTexture = new CanvasTexture(canvas);
 
@@ -381,6 +383,9 @@ export default function Index() {
   const container = useRef<HTMLDivElement | null>(null);
   const isMdUp = useIsMdUp();
 
+  const [hasMounted, setHasMounted] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
+
   const [activeCubeProject, setActiveCubeProject] =
     useState<CubeProject | null>(null);
 
@@ -390,12 +395,7 @@ export default function Index() {
     null,
   );
 
-  const [introDone, setIntroDone] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return sessionStorage.getItem("hero-intro-seen") === "true";
-  });
-
-  useScrollLock(!introDone);
+  useScrollLock(hasMounted && !introDone);
 
   const { scrollYProgress } = useScroll({
     target: container,
@@ -403,7 +403,11 @@ export default function Index() {
   });
 
   const progress = useTransform(scrollYProgress, [0, 1], [0, 4.3]);
-  const smoothProgress = useSpring(progress, { damping: 20 });
+
+  const smoothProgress = useSpring(progress, {
+    damping: 20,
+  });
+
   const lineWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   function clearOverlayTimeout() {
@@ -449,15 +453,11 @@ export default function Index() {
   }
 
   useEffect(() => {
-    return () => {
-      clearOverlayTimeout();
-    };
-  }, []);
+    setHasMounted(true);
 
-  useEffect(() => {
     const hasSeenIntro = sessionStorage.getItem("hero-intro-seen");
 
-    if (hasSeenIntro) {
+    if (hasSeenIntro === "true") {
       setIntroDone(true);
       return;
     }
@@ -468,6 +468,12 @@ export default function Index() {
     }, 3000);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      clearOverlayTimeout();
+    };
   }, []);
 
   return (
@@ -490,18 +496,29 @@ export default function Index() {
             }}
             className="relative h-full w-full"
           >
-            <Canvas className="h-3/4 w-full">
-              {isMdUp && <OrbitControls enableZoom={false} enablePan={false} />}
+            {hasMounted && (
+              <Canvas
+                className="h-3/4 w-full"
+                dpr={[1, 1.5]}
+                gl={{
+                  antialias: false,
+                  powerPreference: "high-performance",
+                }}
+              >
+                {isMdUp && (
+                  <OrbitControls enableZoom={false} enablePan={false} />
+                )}
 
-              <ambientLight intensity={2} />
-              <directionalLight position={[2, 1, 1]} />
+                <ambientLight intensity={2} />
+                <directionalLight position={[2, 1, 1]} />
 
-              <Cube
-                scrollProgress={smoothProgress}
-                introDone={introDone}
-                onActiveProjectChange={handleActiveProjectChange}
-              />
-            </Canvas>
+                <Cube
+                  scrollProgress={smoothProgress}
+                  introDone={introDone}
+                  onActiveProjectChange={handleActiveProjectChange}
+                />
+              </Canvas>
+            )}
 
             {activeCubeProject && introDone && (
               <div className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center uppercase">
@@ -703,7 +720,6 @@ const Cube = ({
       generatedCollageTextures = BOX_FACE_PROJECT_INDEXES.map(
         (projectIndex) => {
           const projectTextures = textureGroups[projectIndex];
-
           const shouldRotateLargeImage = projectIndex !== 0;
 
           return createCollageTexture(
@@ -753,6 +769,7 @@ const Cube = ({
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
 
     checkMobile();
+
     window.addEventListener("resize", checkMobile);
 
     return () => window.removeEventListener("resize", checkMobile);
