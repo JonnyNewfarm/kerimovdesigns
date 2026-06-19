@@ -51,8 +51,9 @@ const DESKTOP_LEAVE_DURATION = 650;
 const MOBILE_ENTER_DURATION = 760;
 const MOBILE_LEAVE_DURATION = 460;
 
+const MOBILE_VIEWPORT_EXTRA_COVER = 120;
+
 const transitionEase = [0.76, 0, 0.24, 1] as const;
-const letterEase = [0.22, 1, 0.36, 1] as const;
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -74,6 +75,62 @@ function useIsMobile() {
   return isMobile;
 }
 
+function useViewportSize(isMobile: boolean) {
+  const [size, setSize] = useState({
+    width: 0,
+    visibleHeight: 0,
+    coverHeight: 0,
+  });
+
+  useEffect(() => {
+    let frameId: number | null = null;
+
+    const update = () => {
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+
+      frameId = requestAnimationFrame(() => {
+        const width = window.innerWidth;
+
+        const visibleHeight = Math.ceil(
+          window.visualViewport?.height ?? window.innerHeight,
+        );
+
+        const coverHeight = Math.ceil(
+          visibleHeight + (isMobile ? MOBILE_VIEWPORT_EXTRA_COVER : 0),
+        );
+
+        setSize({
+          width,
+          visibleHeight,
+          coverHeight,
+        });
+      });
+    };
+
+    update();
+
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    window.visualViewport?.addEventListener("resize", update);
+    window.visualViewport?.addEventListener("scroll", update);
+
+    return () => {
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+      window.visualViewport?.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("scroll", update);
+    };
+  }, [isMobile]);
+
+  return size;
+}
+
 function getInitialPosition(direction: TransitionDirection) {
   return {
     x: direction === "right" ? "100%" : "-100%",
@@ -85,40 +142,15 @@ function CurvedOverlay({
   status,
   direction,
   isMobile,
+  width,
+  height,
 }: {
   status: TransitionStatus;
   direction: TransitionDirection;
   isMobile: boolean;
+  width: number;
+  height: number;
 }) {
-  const [dimensions, setDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
-
-  useEffect(() => {
-    const resize = () => {
-      const viewportHeight =
-        window.visualViewport?.height ?? window.innerHeight;
-
-      setDimensions({
-        width: window.innerWidth,
-        height: viewportHeight,
-      });
-    };
-
-    resize();
-
-    window.addEventListener("resize", resize);
-    window.visualViewport?.addEventListener("resize", resize);
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      window.visualViewport?.removeEventListener("resize", resize);
-    };
-  }, []);
-
-  const { width, height } = dimensions;
-
   if (!width || !height) {
     return <div className="fixed inset-0 bg-dark" />;
   }
@@ -190,8 +222,8 @@ function CurvedOverlay({
 
   return (
     <motion.svg
-      key={`${status}-${direction}-${isMobile ? "mobile" : "desktop"}`}
-      className="absolute inset-0 h-[100svh] w-screen overflow-visible"
+      key={`${status}-${direction}-${isMobile ? "mobile" : "desktop"}-${width}-${height}`}
+      className="absolute left-0 top-0 h-full w-screen overflow-visible"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
     >
@@ -311,6 +343,7 @@ export default function ClientPageTransitionWrapper({
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
+  const viewportSize = useViewportSize(isMobile);
 
   const [status, setStatus] = useState<TransitionStatus>("idle");
   const [pendingHref, setPendingHref] = useState<string | null>(null);
@@ -387,6 +420,30 @@ export default function ClientPageTransitionWrapper({
   const isTransitioning = status !== "idle";
   const initialPosition = getInitialPosition(transitionDirection);
 
+  const coverHeight = viewportSize.coverHeight
+    ? `${viewportSize.coverHeight}px`
+    : isMobile
+      ? `calc(100dvh + ${MOBILE_VIEWPORT_EXTRA_COVER}px)`
+      : "100dvh";
+
+  const visibleHeight = viewportSize.visibleHeight
+    ? `${viewportSize.visibleHeight}px`
+    : "100dvh";
+
+  const overlayStyle = useMemo(
+    () => ({
+      height: coverHeight,
+    }),
+    [coverHeight],
+  );
+
+  const contentStyle = useMemo(
+    () => ({
+      height: visibleHeight,
+    }),
+    [visibleHeight],
+  );
+
   return (
     <PageTransitionContext.Provider
       value={{
@@ -399,7 +456,8 @@ export default function ClientPageTransitionWrapper({
       <AnimatePresence>
         {isTransitioning && !shouldReduceMotion && (
           <motion.div
-            className="fixed inset-0 z-[99999] h-[100svh] pointer-events-none overflow-visible text-dark will-change-transform"
+            className="fixed left-0 top-0 z-[99999] w-screen pointer-events-none overflow-visible text-dark will-change-transform"
+            style={overlayStyle}
             initial={initialPosition}
             animate={{
               x: "0%",
@@ -424,9 +482,14 @@ export default function ClientPageTransitionWrapper({
               status={status}
               direction={transitionDirection}
               isMobile={isMobile}
+              width={viewportSize.width || 1}
+              height={viewportSize.coverHeight || 1}
             />
 
-            <div className="relative z-10 h-full w-full overflow-hidden">
+            <div
+              className="relative z-10 w-full overflow-hidden"
+              style={contentStyle}
+            >
               <DestinationText status={status} label={transitionLabel} />
 
               <TransitionText
