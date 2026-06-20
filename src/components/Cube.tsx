@@ -610,7 +610,7 @@ export default function Index() {
                   mode="words"
                   viewport={false}
                   delay={0.05}
-                  className="text-4xl font-extrabold text-color sm:text-4xl"
+                  className="text-4xl satoshi-black  text-color sm:text-4xl"
                 >
                   Archives
                 </TextReveal>
@@ -637,7 +637,7 @@ export default function Index() {
                   mode="words"
                   viewport={false}
                   delay={0.05}
-                  className="text-4xl font-extrabold text-color sm:text-4xl"
+                  className="text-4xl satoshi-black text-color sm:text-4xl"
                 >
                   Collaborate
                 </TextReveal>

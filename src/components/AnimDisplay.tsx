@@ -193,7 +193,7 @@ export default function AnimDisplay() {
                     as="h2"
                     mode="words"
                     delay={0.12}
-                    className="max-w-[1100px] text-[14vw] font-black uppercase leading-[0.88] tracking-[-0.05em] md:text-[8vw] lg:text-[5.8vw]"
+                    className="max-w-[1100px] text-[14vw] font-black uppercase leading-[0.88] tracking-[-0.025em] md:text-[8vw] lg:text-[5.8vw]"
                   >
                     {item.heading}
                   </TextReveal>

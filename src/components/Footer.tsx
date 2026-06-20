@@ -44,7 +44,7 @@ const Footer = () => {
               as="h2"
               mode="lines"
               delay={0.1}
-              className="max-w-[1200px] text-[12vw] font-black uppercase leading-[0.78] tracking-[-0.03em] text-color md:text-[6vw] lg:text-[6.5vw]"
+              className="max-w-[1200px] text-[12vw] font-black uppercase leading-[0.86] tracking-[-0.03em] text-color md:text-[6vw] lg:text-[6.5vw]"
             >
               {`Let’s turn
 ideas into visuals.`}

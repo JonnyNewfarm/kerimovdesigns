@@ -1,23 +1,18 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
 import "./globals.css";
+
 import Navbar from "@/components/Navbar";
 import NavbarMobile from "@/components/NavbarMobile";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
-import SafePageTransition from "@/components/ClientPageTransitionWrapper";
 import PageTransitionProvider from "@/components/ClientPageTransitionWrapper";
-
-const lusitana = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-lusitana",
-  weight: ["400", "700"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Rustam Kerimov | Portfolio",
   description: "Graphic designer, Rustam Kerimov's portfolio",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -25,10 +20,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-      </head>
-      <body className={lusitana.variable}>
+      <body>
         <PageTransitionProvider>
           <Navbar />
           <NavbarMobile />
@@ -43,6 +35,7 @@ export default function RootLayout({
               background: "#ecebeb",
               color: "#1c1a17",
               border: "1px solid #ecebeb",
+              fontFamily: "Satoshi, sans-serif",
             },
             success: {
               iconTheme: { primary: "#4ade80", secondary: "#1c1a17" },
