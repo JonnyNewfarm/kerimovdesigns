@@ -1,15 +1,22 @@
 "use client";
 
-import React, { ReactNode, useMemo, useState } from "react";
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   AnimatePresence,
   motion,
   useMotionValue,
   useSpring,
 } from "framer-motion";
-import WaveLinkText from "../WaveLink";
+import WaveLinkText from "@/components/WaveLink";
 import TransitionLink from "@/components/TransitionLink";
-import TextReveal from "../TextReveal";
+import TextReveal from "@/components/TextReveal";
 import Image from "next/image";
 
 type ProjectListItem = {
@@ -30,6 +37,8 @@ interface ProjectsTableProps {
 
 const PROJECTS_PER_VIEW = 5;
 
+const ease = [0.22, 1, 0.36, 1] as const;
+
 const ProjectsTable = ({
   projects,
   children,
@@ -39,6 +48,9 @@ const ProjectsTable = ({
   const [pageIndex, setPageIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
   const [isHoveringImage, setIsHoveringImage] = useState(false);
+
+  const queuedProjectIndex = useRef<number | null>(null);
+  const animationFrame = useRef<number | null>(null);
 
   const imageMouseX = useMotionValue(0);
   const imageMouseY = useMotionValue(0);
@@ -72,12 +84,62 @@ const ProjectsTable = ({
   const canGoPrevPage = pageIndex > 0;
   const canGoNextPage = pageIndex < totalPages - 1;
 
-  const setProjectIndex = (index: number) => {
+  const setProjectIndex = useCallback(
+    (index: number) => {
+      if (!projects.length) return;
+
+      const safeIndex = Math.min(Math.max(index, 0), projects.length - 1);
+
+      queuedProjectIndex.current = safeIndex;
+
+      if (animationFrame.current) return;
+
+      animationFrame.current = window.requestAnimationFrame(() => {
+        const nextIndex = queuedProjectIndex.current;
+
+        if (nextIndex !== null) {
+          setActiveIndex((currentIndex) => {
+            if (currentIndex === nextIndex) return currentIndex;
+            return nextIndex;
+          });
+        }
+
+        queuedProjectIndex.current = null;
+        animationFrame.current = null;
+      });
+    },
+    [projects.length],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (animationFrame.current) {
+        window.cancelAnimationFrame(animationFrame.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!projects.length) return;
 
-    const safeIndex = Math.min(Math.max(index, 0), projects.length - 1);
-    setActiveIndex(safeIndex);
-  };
+    setActiveIndex((currentIndex) => {
+      if (currentIndex > projects.length - 1) {
+        return projects.length - 1;
+      }
+
+      return currentIndex;
+    });
+  }, [projects.length]);
+
+  useEffect(() => {
+    if (pageIndex > totalPages - 1) {
+      const safePage = Math.max(totalPages - 1, 0);
+      const nextActiveIndex = safePage * PROJECTS_PER_VIEW;
+
+      setPageIndex(safePage);
+      setActiveIndex(nextActiveIndex);
+    }
+  }, [pageIndex, totalPages]);
 
   const goToPrevPage = () => {
     if (!canGoPrevPage) return;
@@ -173,7 +235,7 @@ const ProjectsTable = ({
                 }}
                 transition={{
                   duration: 0.42,
-                  ease: [0.22, 1, 0.36, 1],
+                  ease,
                 }}
                 className="absolute inset-0"
               >
@@ -312,7 +374,7 @@ const ProjectsTable = ({
                 }}
                 transition={{
                   opacity: { duration: 0.2, ease: "easeOut" },
-                  scale: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+                  scale: { duration: 0.35, ease },
                 }}
                 className="pointer-events-none absolute left-0 top-0 z-20 hidden -translate-x-1/2 -translate-y-1/2 mix-blend-difference lg:flex"
               >
@@ -323,13 +385,13 @@ const ProjectsTable = ({
             </TransitionLink>
 
             <div className="mt-7 min-h-0 pt-7">
-              <AnimatePresence mode="wait">
+              <AnimatePresence initial={false} mode="sync">
                 <motion.div
                   key={activeProject.id}
                   initial={{
                     opacity: 0,
-                    y: 18,
-                    filter: "blur(8px)",
+                    y: 14,
+                    filter: "blur(6px)",
                   }}
                   animate={{
                     opacity: 1,
@@ -338,18 +400,22 @@ const ProjectsTable = ({
                   }}
                   exit={{
                     opacity: 0,
-                    y: -14,
-                    filter: "blur(8px)",
+                    y: -10,
+                    filter: "blur(6px)",
+                    position: "absolute",
+                    width: "100%",
                   }}
                   transition={{
-                    duration: 0.34,
-                    ease: [0.22, 1, 0.36, 1],
+                    duration: 0.22,
+                    ease,
                   }}
+                  className="relative"
                 >
                   <TextReveal
                     as="p"
                     mode="words"
-                    delay={0.02}
+                    delay={0}
+                    viewport={false}
                     className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/40 sm:text-xs"
                   >
                     Featured Project
@@ -364,7 +430,10 @@ const ProjectsTable = ({
                     <TextReveal
                       as="h2"
                       mode="words"
-                      delay={0.01}
+                      delay={0}
+                      stagger={0.012}
+                      duration={0.42}
+                      viewport={false}
                       className="max-w-[980px] text-[clamp(2.8rem,4.6vw,5.8rem)] font-black uppercase leading-[0.88] tracking-[-0.035em] transition-opacity duration-300 hover:opacity-70"
                     >
                       {activeProject.title}
@@ -376,7 +445,8 @@ const ProjectsTable = ({
                       <TextReveal
                         as="p"
                         mode="words"
-                        delay={0.12}
+                        delay={0.04}
+                        viewport={false}
                         className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
                       >
                         Role
@@ -385,7 +455,8 @@ const ProjectsTable = ({
                       <TextReveal
                         as="p"
                         mode="words"
-                        delay={0.18}
+                        delay={0.06}
+                        viewport={false}
                         className="text-sm text-white/90 sm:text-base"
                       >
                         {activeProject.role ?? ""}
@@ -396,7 +467,8 @@ const ProjectsTable = ({
                       <TextReveal
                         as="p"
                         mode="words"
-                        delay={0.16}
+                        delay={0.05}
+                        viewport={false}
                         className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
                       >
                         Type
@@ -405,7 +477,8 @@ const ProjectsTable = ({
                       <TextReveal
                         as="p"
                         mode="words"
-                        delay={0.22}
+                        delay={0.07}
+                        viewport={false}
                         className="text-sm text-white/90 sm:text-base"
                       >
                         {activeProject.type ?? ""}
@@ -416,7 +489,8 @@ const ProjectsTable = ({
                       <TextReveal
                         as="p"
                         mode="words"
-                        delay={0.2}
+                        delay={0.06}
+                        viewport={false}
                         className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
                       >
                         Tools
@@ -425,7 +499,8 @@ const ProjectsTable = ({
                       <TextReveal
                         as="p"
                         mode="words"
-                        delay={0.26}
+                        delay={0.08}
+                        viewport={false}
                         className="text-sm text-white/90 sm:text-base"
                       >
                         {activeProject.tools ?? ""}

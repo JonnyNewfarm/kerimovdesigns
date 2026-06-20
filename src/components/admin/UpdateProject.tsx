@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getProjects, updateProject } from "@/app/actions";
+import { getProjectById, getProjects, updateProject } from "@/app/actions";
 import UploadImage from "@/components/UploadImage";
 
 type Project = {
@@ -56,10 +56,30 @@ const emptyFormData: ProjectFormData = {
   srcVideo: "",
 };
 
+function normalizeProjectData(project: Project): ProjectFormData {
+  return {
+    title: project.title || "",
+    role: project.role || "",
+    type: project.type || "",
+    tools: project.tools || "",
+    src: project.src || "",
+    src2: project.src2 || "",
+    src3: project.src3 || "",
+    src4: project.src4 || "",
+    src5: project.src5 || "",
+    src6: project.src6 || "",
+    src7: project.src7 || "",
+    src8: project.src8 || "",
+    src9: project.src9 || "",
+    srcVideo: project.srcVideo || "",
+  };
+}
+
 export default function UpdateProject() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [formData, setFormData] = useState<ProjectFormData>(emptyFormData);
+  const [isFetchingProject, setIsFetchingProject] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
@@ -82,29 +102,40 @@ export default function UpdateProject() {
       return;
     }
 
-    const selectedProject = projects.find(
-      (project) => project.id === selectedProjectId,
-    );
+    let cancelled = false;
 
-    if (!selectedProject) return;
+    const fetchFullProject = async () => {
+      try {
+        setIsFetchingProject(true);
 
-    setFormData({
-      title: selectedProject.title || "",
-      role: selectedProject.role || "",
-      type: selectedProject.type || "",
-      tools: selectedProject.tools || "",
-      src: selectedProject.src || "",
-      src2: selectedProject.src2 || "",
-      src3: selectedProject.src3 || "",
-      src4: selectedProject.src4 || "",
-      src5: selectedProject.src5 || "",
-      src6: selectedProject.src6 || "",
-      src7: selectedProject.src7 || "",
-      src8: selectedProject.src8 || "",
-      src9: selectedProject.src9 || "",
-      srcVideo: selectedProject.srcVideo || "",
-    });
-  }, [selectedProjectId, projects]);
+        const project = await getProjectById(selectedProjectId);
+
+        if (cancelled) return;
+
+        if (!project) {
+          alert("Could not find selected project");
+          setFormData(emptyFormData);
+          return;
+        }
+
+        setFormData(normalizeProjectData(project));
+      } catch (error) {
+        console.error("Failed to fetch full project:", error);
+        alert("Could not fetch full project data");
+        setFormData(emptyFormData);
+      } finally {
+        if (!cancelled) {
+          setIsFetchingProject(false);
+        }
+      }
+    };
+
+    fetchFullProject();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedProjectId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -133,14 +164,23 @@ export default function UpdateProject() {
     try {
       setIsUpdating(true);
 
-      await updateProject(selectedProjectId, formData);
+      const result = await updateProject(selectedProjectId, formData);
+
+      if (!result.success) {
+        alert(result.error || "Could not update project");
+        return;
+      }
 
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
           project.id === selectedProjectId
             ? {
                 ...project,
-                ...formData,
+                title: formData.title,
+                role: formData.role,
+                type: formData.type,
+                tools: formData.tools,
+                src: formData.src,
               }
             : project,
         ),
@@ -179,6 +219,7 @@ export default function UpdateProject() {
         onChange={(e) => setSelectedProjectId(e.target.value)}
         className="mb-6 p-2 border w-full max-w-lg border-white text-white bg-[#181c14]"
         value={selectedProjectId}
+        disabled={isUpdating}
       >
         <option value="">Select a project to update</option>
 
@@ -189,7 +230,11 @@ export default function UpdateProject() {
         ))}
       </select>
 
-      {selectedProjectId && (
+      {selectedProjectId && isFetchingProject && (
+        <p className="text-sm text-white/70">Loading project data...</p>
+      )}
+
+      {selectedProjectId && !isFetchingProject && (
         <form
           onSubmit={handleUpdate}
           className="flex flex-col items-center gap-y-4 w-full max-w-5xl"
@@ -238,14 +283,13 @@ export default function UpdateProject() {
                   onUploadComplete={(url) => handleUploadComplete(name, url)}
                 />
 
-                {formData[name] && (
-                  <input
-                    className="mt-2 border px-2 py-1 w-36 text-xs text-black"
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                  />
-                )}
+                <input
+                  className="mt-2 border px-2 py-1 w-36 text-xs text-black"
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  placeholder={`${label} URL`}
+                />
               </div>
             ))}
           </div>

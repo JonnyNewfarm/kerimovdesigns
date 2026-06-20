@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { getProjectsPagination } from "../actions";
+import { redirect } from "next/navigation";
+import { getProjects, getProjectsPagination } from "../actions";
 import ProjectsTable from "@/components/projects/ProjectsTable";
 import ProjectsTableMobile from "@/components/projects/ProjectsTableMobile";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -28,15 +29,23 @@ const Page = async ({ searchParams }: PageProps) => {
   const resolvedSearchParams = await searchParams;
 
   const parsedPage = Number(resolvedSearchParams.page);
+
   const currentPage =
     Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1;
 
-  const { projects, total } = await getProjectsPagination(
-    currentPage,
-    ITEMS_PER_PAGE,
-  );
+  const [desktopProjects, mobilePagination] = await Promise.all([
+    getProjects(),
+    getProjectsPagination(currentPage, ITEMS_PER_PAGE),
+  ]);
+
+  const { projects: mobileProjects, total } = mobilePagination;
 
   const totalPages = Math.max(Math.ceil(total / ITEMS_PER_PAGE), 1);
+
+  if (total > 0 && currentPage > totalPages) {
+    redirect(`/projects?page=${totalPages}`);
+  }
+
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
   const prevPage = currentPage > 1 ? currentPage - 1 : null;
@@ -46,15 +55,19 @@ const Page = async ({ searchParams }: PageProps) => {
     <SmoothScroll>
       <main className="w-full bg-dark text-color">
         <div className="hidden w-full md:block">
-          <ProjectsTable projects={projects} startIndex={startIndex} />
+          <ProjectsTable projects={desktopProjects} startIndex={0} />
         </div>
 
         <div className="min-h-screen w-full md:hidden">
-          <ProjectsTableMobile projects={projects} startIndex={startIndex}>
+          <ProjectsTableMobile
+            projects={mobileProjects}
+            startIndex={startIndex}
+          >
             <div className="mt-10 flex w-full items-center justify-between pt-6">
               <Link
                 href={prevPage ? `/projects?page=${prevPage}` : "#"}
                 aria-disabled={!prevPage}
+                tabIndex={prevPage ? 0 : -1}
                 prefetch={!!prevPage}
                 className={`group flex min-h-12 min-w-12 items-center justify-center border border-color/25 px-4 text-sm uppercase tracking-[0.18em] transition-all duration-300 ${
                   prevPage
@@ -70,13 +83,15 @@ const Page = async ({ searchParams }: PageProps) => {
 
               <div className="flex flex-col items-center leading-none">
                 <span className="mt-2 text-sm tracking-[0.18em] text-color">
-                  {currentPage} / {totalPages}
+                  {String(currentPage).padStart(2, "0")} /{" "}
+                  {String(totalPages).padStart(2, "0")}
                 </span>
               </div>
 
               <Link
                 href={nextPage ? `/projects?page=${nextPage}` : "#"}
                 aria-disabled={!nextPage}
+                tabIndex={nextPage ? 0 : -1}
                 prefetch={!!nextPage}
                 className={`group flex min-h-12 min-w-12 items-center justify-center border border-color/25 px-4 text-sm uppercase tracking-[0.18em] transition-all duration-300 ${
                   nextPage
