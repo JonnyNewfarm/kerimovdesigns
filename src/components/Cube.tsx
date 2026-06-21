@@ -10,10 +10,12 @@ import React, {
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import {
   Mesh,
+  Group,
   Texture,
   TextureLoader,
   SRGBColorSpace,
   CanvasTexture,
+  MathUtils,
 } from "three";
 import {
   useScroll,
@@ -23,7 +25,7 @@ import {
   MotionValue,
 } from "framer-motion";
 import Link from "next/link";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Text } from "@react-three/drei";
 import MagneticComp from "./MagneticComp";
 import HeroIntro from "./HeroIntro";
 import TextReveal from "@/components/TextReveal";
@@ -381,6 +383,9 @@ function useScrollLock(locked: boolean) {
 
 export default function Index() {
   const container = useRef<HTMLDivElement | null>(null);
+  const projectOverlayRef = useRef<HTMLDivElement | null>(null);
+  const lastPointerPositionRef = useRef({ x: -9999, y: -9999 });
+
   const isMdUp = useIsMdUp();
 
   const [hasMounted, setHasMounted] = useState(false);
@@ -390,7 +395,6 @@ export default function Index() {
     useState<CubeProject | null>(null);
 
   const activeCubeProjectRef = useRef<CubeProject | null>(null);
-  const isProjectOverlayHoveredRef = useRef(false);
   const overlayLeaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -417,6 +421,24 @@ export default function Index() {
     }
   }
 
+  function isPointerInsideProjectOverlay() {
+    const overlay = projectOverlayRef.current;
+
+    if (!overlay) return false;
+
+    const rect = overlay.getBoundingClientRect();
+    const { x, y } = lastPointerPositionRef.current;
+
+    const padding = 18;
+
+    return (
+      x >= rect.left - padding &&
+      x <= rect.right + padding &&
+      y >= rect.top - padding &&
+      y <= rect.bottom + padding
+    );
+  }
+
   function handleActiveProjectChange(project: CubeProject | null) {
     clearOverlayTimeout();
 
@@ -427,29 +449,11 @@ export default function Index() {
     }
 
     overlayLeaveTimeoutRef.current = setTimeout(() => {
-      if (isProjectOverlayHoveredRef.current) return;
+      if (isPointerInsideProjectOverlay()) return;
 
       activeCubeProjectRef.current = null;
       setActiveCubeProject(null);
-    }, 140);
-  }
-
-  function handleProjectOverlayEnter() {
-    isProjectOverlayHoveredRef.current = true;
-    clearOverlayTimeout();
-
-    if (activeCubeProjectRef.current) {
-      setActiveCubeProject(activeCubeProjectRef.current);
-    }
-  }
-
-  function handleProjectOverlayLeave() {
-    isProjectOverlayHoveredRef.current = false;
-
-    overlayLeaveTimeoutRef.current = setTimeout(() => {
-      activeCubeProjectRef.current = null;
-      setActiveCubeProject(null);
-    }, 140);
+    }, 180);
   }
 
   useEffect(() => {
@@ -479,6 +483,12 @@ export default function Index() {
   return (
     <motion.div
       ref={container}
+      onPointerMove={(event) => {
+        lastPointerPositionRef.current = {
+          x: event.clientX,
+          y: event.clientY,
+        };
+      }}
       className="min-h-[150dvh]"
       initial={false}
       animate={{ opacity: 1 }}
@@ -515,13 +525,17 @@ export default function Index() {
                 <Cube
                   scrollProgress={smoothProgress}
                   introDone={introDone}
+                  shouldKeepActiveProject={isPointerInsideProjectOverlay}
                   onActiveProjectChange={handleActiveProjectChange}
                 />
               </Canvas>
             )}
 
             {activeCubeProject && introDone && (
-              <div className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center uppercase">
+              <div
+                ref={projectOverlayRef}
+                className="pointer-events-none absolute left-1/2 top-[38%] z-20 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center uppercase"
+              >
                 <div className="pointer-events-none">
                   <p className="mb-2 text-[10px] font-bold tracking-[0.55em] text-white">
                     {activeCubeProject.subtitle}
@@ -535,8 +549,6 @@ export default function Index() {
                     <TransitionLink
                       href={activeCubeProject.href}
                       transitionLabel={activeCubeProject.title}
-                      onPointerEnter={handleProjectOverlayEnter}
-                      onPointerLeave={handleProjectOverlayLeave}
                       className="pointer-events-auto mt-5 inline-block border border-white px-5 py-3 text-xs font-bold tracking-[0.35em] text-white transition hover:bg-white hover:text-black"
                     >
                       View case
@@ -610,7 +622,7 @@ export default function Index() {
                   mode="words"
                   viewport={false}
                   delay={0.05}
-                  className="text-4xl satoshi-black  text-color sm:text-4xl"
+                  className="text-4xl satoshi-black text-color sm:text-4xl"
                 >
                   Archives
                 </TextReveal>
@@ -653,13 +665,18 @@ export default function Index() {
 const Cube = ({
   scrollProgress,
   introDone,
+  shouldKeepActiveProject,
   onActiveProjectChange,
 }: {
   scrollProgress: MotionValue<number>;
   introDone: boolean;
+  shouldKeepActiveProject: () => boolean;
   onActiveProjectChange: (project: CubeProject | null) => void;
 }) => {
+  const group = useRef<Group>(null);
   const mesh = useRef<Mesh>(null);
+  const helperTextGroup = useRef<Group>(null);
+  const helperText = useRef<any>(null);
 
   const { camera, raycaster, pointer } = useThree();
 
@@ -679,6 +696,28 @@ const Cube = ({
   const hasPointerEnteredRef = useRef(false);
   const activeMaterialIndexRef = useRef<number | null>(null);
   const targetScaleRef = useRef(1);
+
+  /**
+   * JUSTER TEKSTEN HER
+   *
+   * X:
+   * negativ = venstre
+   * positiv = høyre
+   *
+   * Y:
+   * høyere tall = høyere opp
+   * lavere tall = lavere ned
+   *
+   * Z:
+   * positiv = nærmere skjermen / kameraet
+   */
+  const TEXT_START_X = -0.45;
+  const TEXT_END_X = 0.15;
+
+  const TEXT_START_Y = 1.48;
+  const TEXT_END_Y = -5.5;
+
+  const TEXT_Z = 0.8;
 
   const allImagePaths = useMemo(
     () => cubeProjects.flatMap((project) => project.images),
@@ -774,21 +813,76 @@ const Cube = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (!mesh.current) return;
+    if (!group.current || !mesh.current || !helperTextGroup.current) return;
+
+    group.current.position.set(0, 0, 0);
+    group.current.rotation.set(0, 0, 0);
+    group.current.scale.set(1, 1, 1);
 
     mesh.current.position.set(0, 0, 0);
     mesh.current.rotation.set(0, 0, 0);
     mesh.current.scale.set(1, 1, 1);
+
+    helperTextGroup.current.position.set(TEXT_START_X, TEXT_START_Y, TEXT_Z);
+    helperTextGroup.current.rotation.set(0, 0, 0);
+    helperTextGroup.current.scale.set(1, 1, 1);
+
     targetScaleRef.current = 1;
   }, []);
 
+  function clearCubeHover() {
+    hoveredRef.current = false;
+    activeMaterialIndexRef.current = null;
+
+    setHovered(false);
+    setActiveMaterialIndex(null);
+    onActiveProjectChange(null);
+  }
+
   useFrame(() => {
-    if (!mesh.current) return;
+    if (!group.current || !mesh.current || !helperTextGroup.current) return;
 
     const value = scrollProgress.get();
 
-    mesh.current.rotation.x = value;
-    mesh.current.rotation.y = value * 1.2;
+    group.current.rotation.x = value;
+    group.current.rotation.y = value * 1.2;
+
+    const fallProgress = MathUtils.clamp((value - 0.35) / 1.15, 0, 1);
+    const easedFall = fallProgress * fallProgress * (3 - 2 * fallProgress);
+
+    helperTextGroup.current.position.x = MathUtils.lerp(
+      TEXT_START_X,
+      TEXT_END_X,
+      easedFall,
+    );
+
+    helperTextGroup.current.position.y = MathUtils.lerp(
+      TEXT_START_Y,
+      TEXT_END_Y,
+      easedFall,
+    );
+
+    helperTextGroup.current.position.z = TEXT_Z;
+
+    helperTextGroup.current.rotation.x = MathUtils.lerp(0, -0.9, easedFall);
+    helperTextGroup.current.rotation.z = MathUtils.lerp(0, 0.45, easedFall);
+
+    helperTextGroup.current.scale.setScalar(MathUtils.lerp(1, 0.92, easedFall));
+
+    if (helperText.current?.material) {
+      const fadeProgress = MathUtils.clamp((fallProgress - 0.1) / 0.3, 0, 1);
+      const easedFade = fadeProgress * fadeProgress * (3 - 2 * fadeProgress);
+
+      helperText.current.material.transparent = true;
+      helperText.current.material.depthTest = false;
+      helperText.current.material.opacity = MathUtils.lerp(
+        introDone ? 1 : 0,
+        0,
+        easedFade,
+      );
+    }
+
+    helperTextGroup.current.visible = fallProgress < 0.98;
 
     if (hasPointerEnteredRef.current) {
       raycaster.setFromCamera(pointer, camera);
@@ -811,28 +905,25 @@ const Cube = ({
           onActiveProjectChange(cubeProjects[projectIndex]);
         }
       } else {
-        if (hoveredRef.current) {
-          hoveredRef.current = false;
-          setHovered(false);
+        if (shouldKeepActiveProject()) {
+          return;
         }
 
-        if (activeMaterialIndexRef.current !== null) {
-          activeMaterialIndexRef.current = null;
-          setActiveMaterialIndex(null);
-          onActiveProjectChange(null);
+        if (hoveredRef.current || activeMaterialIndexRef.current !== null) {
+          clearCubeHover();
         }
       }
     }
 
     if (isMobile) {
-      mesh.current.scale.set(1, 1, 1);
+      group.current.scale.set(1, 1, 1);
       return;
     }
 
     const targetScale = hoveredRef.current && introDone ? 1.1 : 1;
     targetScaleRef.current += (targetScale - targetScaleRef.current) * 0.1;
 
-    mesh.current.scale.set(
+    group.current.scale.set(
       targetScaleRef.current,
       targetScaleRef.current,
       targetScaleRef.current,
@@ -846,13 +937,12 @@ const Cube = ({
   }
 
   function handlePointerLeave() {
-    hasPointerEnteredRef.current = false;
-    hoveredRef.current = false;
-    activeMaterialIndexRef.current = null;
+    if (shouldKeepActiveProject()) {
+      return;
+    }
 
-    setHovered(false);
-    setActiveMaterialIndex(null);
-    onActiveProjectChange(null);
+    hasPointerEnteredRef.current = false;
+    clearCubeHover();
   }
 
   const texturesReady =
@@ -866,45 +956,64 @@ const Cube = ({
   }
 
   return (
-    <mesh
-      ref={mesh}
-      position={[0, 0, 0]}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-    >
-      <boxGeometry args={[2.3, 2.3, 2.3]} />
+    <group ref={group}>
+      <group ref={helperTextGroup}>
+        <Text
+          ref={helperText}
+          position={isMobile ? [-0.14, 0, 0] : [0, 0, 0]}
+          fontSize={0.095}
+          letterSpacing={0.22}
+          anchorX="center"
+          anchorY="middle"
+          textAlign="center"
+          color="#ffffff"
+          material-toneMapped={false}
+          renderOrder={10}
+        >
+          {isMobile ? "SCROLL TO EXPLORE" : "SCROLL / DRAG / HOVER"}
+        </Text>
+      </group>
 
-      {BOX_FACE_PROJECT_INDEXES.map((projectIndex, materialIndex) => {
-        const isRustam = projectIndex === 0;
-        const isActiveFace =
-          hovered && introDone && activeMaterialIndex === materialIndex;
+      <mesh
+        ref={mesh}
+        position={[0, 0, 0]}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+      >
+        <boxGeometry args={[2.3, 2.3, 2.3]} />
 
-        const normalTexture = collageTextures[materialIndex];
+        {BOX_FACE_PROJECT_INDEXES.map((projectIndex, materialIndex) => {
+          const isRustam = projectIndex === 0;
+          const isActiveFace =
+            hovered && introDone && activeMaterialIndex === materialIndex;
 
-        const textureMap =
-          isActiveFace && blurredTextures[materialIndex]
-            ? blurredTextures[materialIndex]
-            : normalTexture;
+          const normalTexture = collageTextures[materialIndex];
 
-        if (isRustam) {
+          const textureMap =
+            isActiveFace && blurredTextures[materialIndex]
+              ? blurredTextures[materialIndex]
+              : normalTexture;
+
+          if (isRustam) {
+            return (
+              <meshBasicMaterial
+                key={materialIndex}
+                attach={`material-${materialIndex}`}
+                map={textureMap}
+                toneMapped={false}
+              />
+            );
+          }
+
           return (
-            <meshBasicMaterial
+            <meshStandardMaterial
               key={materialIndex}
               attach={`material-${materialIndex}`}
               map={textureMap}
-              toneMapped={false}
             />
           );
-        }
-
-        return (
-          <meshStandardMaterial
-            key={materialIndex}
-            attach={`material-${materialIndex}`}
-            map={textureMap}
-          />
-        );
-      })}
-    </mesh>
+        })}
+      </mesh>
+    </group>
   );
 };
