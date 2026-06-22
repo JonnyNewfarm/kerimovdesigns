@@ -273,7 +273,7 @@ function TransitionText({
   return (
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4 md:px-8">
       <motion.h2
-        className="m-0 max-w-[92vw] whitespace-nowrap text-center text-color font-extrabold uppercase tracking-[-0.035em] leading-[0.86] md:max-w-[96vw]"
+        className="m-0 max-w-[92vw] whitespace-nowrap text-center text-color font-extrabold uppercase tracking-[-0.025em] leading-[0.86] md:max-w-[96vw]"
         style={{
           fontSize: isMobile
             ? `clamp(32px, ${fontVw}vw, 86px)`

@@ -141,5 +141,89 @@ body {
 .page-title-overlay.hidden {
   opacity: 0;
 }
+
+
+.color-combo-bg {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(220, 232, 232, 0.9) 0%, transparent 28%),
+    radial-gradient(circle at 80% 30%, rgba(172, 203, 214, 0.9) 0%, transparent 30%),
+    radial-gradient(circle at 55% 55%, rgba(181, 137, 83, 0.38) 0%, transparent 22%),
+    linear-gradient(
+      135deg,
+      #a9cdda 0%,
+      #d7e4e1 38%,
+      #b8c9c7 58%,
+      #c3945f 82%,
+      #7c4d2d 100%
+    );
+}
+
+.color-combo-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 14%,
+      rgba(104, 58, 31, 0.45) 15%,
+      rgba(196, 126, 65, 0.32) 17%,
+      transparent 22%,
+      transparent 47%,
+      rgba(126, 72, 38, 0.35) 49%,
+      rgba(210, 145, 80, 0.25) 51%,
+      transparent 56%,
+      transparent 78%,
+      rgba(87, 54, 38, 0.35) 80%,
+      rgba(219, 159, 91, 0.25) 83%,
+      transparent 88%
+    );
+}
+
+.color-combo-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.45;
+  background:
+    linear-gradient(
+      165deg,
+      rgba(255, 255, 255, 0.42) 0%,
+      transparent 22%,
+      rgba(42, 75, 89, 0.18) 45%,
+      transparent 65%,
+      rgba(255, 255, 255, 0.25) 100%
+    );
+}
+
+.color-combo-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  color: white;
+}
+
+.color-combo-content h1 {
+  max-width: 800px;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 1;
+  font-weight: 800;
+}
+
+.color-combo-content p {
+  max-width: 600px;
+  margin-top: 1.5rem;
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+}
  
  
