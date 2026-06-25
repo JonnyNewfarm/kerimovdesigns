@@ -74,7 +74,7 @@ const SHADER_DISPLACEMENT = 0.018;
 const CUBE_SIZE = 2.3;
 const CUBE_HALF = CUBE_SIZE / 2;
 
-const FACE_OVERLAY_OFFSET = 0.012;
+const FACE_OVERLAY_OFFSET = 0.016;
 const FACE_OVERLAY_POSITION = CUBE_HALF + FACE_OVERLAY_OFFSET;
 const VIDEO_OVERLAY_POSITION = CUBE_HALF + FACE_OVERLAY_OFFSET + 0.002;
 
@@ -1169,14 +1169,19 @@ export default function Index() {
             }}
             className="relative h-full w-full"
           >
-            {hasMounted && (
+            {hasMounted && introDone && (
               <Canvas
+                key="hero-canvas-ready"
                 className="h-3/4 w-full"
                 dpr={[1, 1.5]}
                 frameloop="always"
                 gl={{
                   antialias: false,
                   powerPreference: "high-performance",
+                }}
+                onCreated={({ gl, invalidate }) => {
+                  gl.setAnimationLoop(null);
+                  invalidate();
                 }}
               >
                 {isMdUp && (
@@ -1200,6 +1205,7 @@ export default function Index() {
                 <directionalLight position={[2, 1, 1]} />
 
                 <Cube
+                  key="cube-ready"
                   scrollProgress={smoothProgress}
                   introDone={introDone}
                   isDraggingCubeRef={isDraggingCubeRef}
@@ -1698,10 +1704,35 @@ const Cube = ({
     document.body.style.cursor = "";
   }
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     if (!group.current) return;
 
+    const time = clock.getElapsedTime();
     const value = scrollProgress.get();
+
+    shaderMaterials.current.forEach((material, materialIndex) => {
+      if (!material) return;
+
+      const isActiveFace =
+        !isMobile &&
+        hoveredRef.current &&
+        introDoneRef.current &&
+        activeMaterialIndexRef.current === materialIndex;
+
+      material.uniforms.uTime.value = time;
+
+      material.uniforms.uHover.value = MathUtils.lerp(
+        material.uniforms.uHover.value,
+        isActiveFace ? 1 : 0,
+        0.08,
+      );
+
+      if (!isMobile) {
+        material.uniforms.uMouse.value.lerp(targetMouseUvRef.current, 0.12);
+      } else {
+        material.uniforms.uMouse.value.set(0.5, 0.5);
+      }
+    });
 
     if (!isDraggingCubeRef.current) {
       group.current.rotation.x = MathUtils.lerp(

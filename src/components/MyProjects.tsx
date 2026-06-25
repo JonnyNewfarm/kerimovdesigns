@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import MagneticComp from "@/components/MagneticComp";
 import { usePathname } from "next/navigation";
 import TransitionLink from "./TransitionLink";
+import TextReveal from "./TextReveal";
 
 type ProjectListItem = {
   id: string;
@@ -374,15 +375,25 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             </span>
 
             <span className="text-[13px] font-black uppercase tracking-[0.28em] text-color/45">
-              Selected projects
+              Latest projects
             </span>
           </div>
-
-          <h2 className="text-[clamp(72px,7.4vw,150px)] font-black uppercase leading-[0.82] tracking-[-0.045em] text-color">
+          <TextReveal
+            as="h2"
+            mode="lines"
+            delay={0.1}
+            className="text-[clamp(72px,7.4vw,150px)] font-black uppercase leading-[0.82] tracking-[-0.045em] text-color"
+          >
             Recent
-            <br />
+          </TextReveal>
+          <TextReveal
+            as="h2"
+            mode="lines"
+            delay={0.1}
+            className="text-[clamp(72px,7.4vw,150px)] font-black uppercase leading-[0.82] tracking-[-0.045em] text-color"
+          >
             Work
-          </h2>
+          </TextReveal>
         </div>
 
         {visibleProjects.map((project, index) => {
@@ -444,7 +455,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
               </span>
 
               <span className="text-[10px] font-black uppercase tracking-[0.22em] text-color/45">
-                Selected projects
+                Latest projects
               </span>
             </div>
 

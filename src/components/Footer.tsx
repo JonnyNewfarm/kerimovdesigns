@@ -5,27 +5,46 @@ import WaveLinkText from "./WaveLink";
 import TextReveal from "@/components/TextReveal";
 import TransitionLink from "./TransitionLink";
 
-const Footer = () => {
+function getNorwayTimeLabel() {
+  const now = new Date();
+
+  const time = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Oslo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(now);
+
+  const offsetParts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Oslo",
+    timeZoneName: "shortOffset",
+  }).formatToParts(now);
+
+  const offset =
+    offsetParts.find((part) => part.type === "timeZoneName")?.value ?? "GMT+1";
+
+  return `${offset} (${time}, NO)`;
+}
+
+function LocalTime() {
   const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
     const update = () => {
-      setTime(
-        new Date().toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        }),
-      );
+      setTime(getNorwayTimeLabel());
     };
 
     update();
 
-    const interval = setInterval(update, 1000);
+    const interval = window.setInterval(update, 60_000);
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, []);
 
+  return <p suppressHydrationWarning>{time ?? "GMT+1 (--:--, NO)"}</p>;
+}
+
+const Footer = () => {
   return (
     <footer className="relative overflow-hidden bg-dark px-4 py-10 text-color md:px-10 lg:px-16">
       <div className="mx-auto flex min-h-[520px] w-full max-w-[1800px] flex-col justify-between pt-8">
@@ -171,7 +190,7 @@ ideas into visuals.`}
               Local time
             </TextReveal>
 
-            <p suppressHydrationWarning>{time ?? "--:--:--"}</p>
+            <LocalTime />
           </div>
 
           <div className="md:text-right">

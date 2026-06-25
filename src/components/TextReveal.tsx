@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion, type Variants } from "framer-motion";
 
 const defaultEase = [0.22, 1, 0.36, 1] as const;
@@ -34,28 +34,35 @@ export default function TextReveal({
   mode = "words",
   y = "115%",
   rotate,
-  blur = 10,
+  blur = 0,
   viewport = true,
   htmlFor,
 }: TextRevealProps) {
   const MotionTag = motion[as] as any;
 
-  const text = React.Children.toArray(children)
-    .map((child) => {
-      if (typeof child === "string" || typeof child === "number") {
-        return String(child);
-      }
+  const text = useMemo(() => {
+    return React.Children.toArray(children)
+      .map((child) => {
+        if (typeof child === "string" || typeof child === "number") {
+          return String(child);
+        }
 
-      return "";
-    })
-    .join("");
+        return "";
+      })
+      .join("");
+  }, [children]);
 
-  const items =
-    mode === "lines"
-      ? text.split("\n").filter((line) => line.trim().length > 0)
-      : mode === "chars"
-        ? Array.from(text)
-        : text.split(" ");
+  const items = useMemo(() => {
+    if (mode === "lines") {
+      return text.split("\n").filter((line) => line.trim().length > 0);
+    }
+
+    if (mode === "chars") {
+      return Array.from(text);
+    }
+
+    return text.split(" ");
+  }, [mode, text]);
 
   const resolvedStagger =
     stagger ?? (mode === "lines" ? 0.11 : mode === "chars" ? 0.014 : 0.028);
@@ -81,13 +88,13 @@ export default function TextReveal({
       y,
       opacity: 0,
       rotate: resolvedRotate,
-      filter: `blur(${blur}px)`,
+      ...(blur > 0 ? { filter: `blur(${blur}px)` } : {}),
     },
     visible: {
       y: 0,
       opacity: 1,
       rotate: 0,
-      filter: "blur(0px)",
+      ...(blur > 0 ? { filter: "blur(0px)" } : {}),
       transition: {
         duration: resolvedDuration,
         ease: defaultEase,
@@ -117,12 +124,8 @@ export default function TextReveal({
                 : "inline-block overflow-hidden align-top"
             }
           >
-            <motion.span
-              variants={itemVariants}
-              className="inline-block will-change-transform"
-            >
+            <motion.span variants={itemVariants} className="inline-block">
               {isSpaceChar ? "\u00A0" : item}
-
               {mode === "words" && index !== items.length - 1 ? "\u00A0" : null}
             </motion.span>
           </span>
