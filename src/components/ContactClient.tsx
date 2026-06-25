@@ -57,7 +57,7 @@ type SentenceInputProps = {
   type?: "text" | "email";
   required?: boolean;
   className?: string;
-  inputRef?: React.RefObject<HTMLInputElement | null>;
+  inputRef?: React.Ref<HTMLInputElement>;
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
