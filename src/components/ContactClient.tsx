@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SmoothScroll from "@/components/SmoothScroll";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -49,43 +49,85 @@ function FadeIn({
   );
 }
 
-type AnimatedFieldProps = {
-  children: React.ReactNode;
-  delay?: number;
+type SentenceInputProps = {
+  id: string;
+  name: string;
+  value: string;
+  placeholder: string;
+  type?: "text" | "email";
+  required?: boolean;
   className?: string;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
 };
 
-function AnimatedField({
-  children,
-  delay = 0,
+function SentenceInput({
+  id,
+  name,
+  value,
+  placeholder,
+  type = "text",
+  required = false,
   className = "",
-}: AnimatedFieldProps) {
+  inputRef,
+  onChange,
+}: SentenceInputProps) {
   return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        y: 26,
-        filter: "blur(8px)",
+    <input
+      ref={inputRef}
+      id={id}
+      name={name}
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      required={required}
+      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-color/65 outline-none transition placeholder:text-color/25 focus:text-color md:min-w-[320px] ${className}`}
+    />
+  );
+}
+
+type SentenceTextareaProps = {
+  id: string;
+  name: string;
+  value: string;
+  placeholder: string;
+  required?: boolean;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
+};
+
+function SentenceTextarea({
+  id,
+  name,
+  value,
+  placeholder,
+  required = false,
+  onChange,
+}: SentenceTextareaProps) {
+  return (
+    <textarea
+      id={id}
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      required={required}
+      style={{
+        scrollbarColor: "rgba(245, 236, 220, 0.35) transparent",
+        scrollbarWidth: "thin",
       }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-        filter: "blur(0px)",
-      }}
-      viewport={{ once: true, amount: 0.35 }}
-      transition={{
-        duration: 0.85,
-        delay,
-        ease,
-      }}
-      className={className}
-    >
-      {children}
-    </motion.div>
+      className="max-h-[360px] min-h-[100px] w-full resize-none overflow-y-auto border-0 bg-transparent px-0 pb-4 pr-5 text-[clamp(2rem,4.4vw,5rem)] font-black normal-case leading-[1.08] tracking-[-0.035em] text-color/65 outline-none transition placeholder:text-color/25 focus:text-color [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-color/25 [&::-webkit-scrollbar-thumb]:transition [&::-webkit-scrollbar-thumb:hover]:bg-color/45"
+    />
   );
 }
 
 const ContactClient = () => {
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -101,6 +143,10 @@ const ContactClient = () => {
 
   const [submitted, setSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
+
+  useEffect(() => {
+    nameInputRef.current?.focus({ preventScroll: true });
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -163,6 +209,10 @@ const ContactClient = () => {
         setForm({ name: "", email: "", organization: "", message: "" });
         setValidationErrors({});
         setSubmitted(false);
+
+        requestAnimationFrame(() => {
+          nameInputRef.current?.focus({ preventScroll: true });
+        });
       } else {
         toast.error("Something went wrong.");
       }
@@ -195,8 +245,8 @@ const ContactClient = () => {
                 delay={0.12}
                 className="max-w-[1250px] text-[12vw] font-black uppercase leading-[0.86] tracking-[-0.02em] text-color md:text-[10vw] lg:text-[8vw]"
               >
-                {`Let's create
-a project
+                {`Let's 
+work on a project
 together`}
               </TextReveal>
             </div>
@@ -213,7 +263,7 @@ together`}
             </TextReveal>
           </div>
 
-          <div className="grid grid-cols-1 gap-14 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
+          <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
             {/* DETAILS */}
             <aside className="order-2 lg:order-1">
               <motion.div
@@ -355,137 +405,132 @@ together`}
               </motion.div>
             </aside>
 
-            {/* FORM */}
+            {/* EDITORIAL FORM */}
             <form
               onSubmit={handleSubmit}
               noValidate
               className="order-1 lg:order-2"
             >
-              <div className="grid grid-cols-1 gap-x-10 gap-y-9 md:grid-cols-2">
-                <AnimatedField delay={0.02}>
-                  <TextReveal
-                    as="label"
-                    htmlFor="name"
-                    mode="words"
-                    className="mb-3 block text-xs font-black uppercase tracking-[0.24em] text-color/45"
-                  >
-                    Name
-                  </TextReveal>
-
-                  <input
-                    id="name"
-                    className="w-full border-b border-stone-400/30 bg-transparent py-5 text-lg font-bold text-color outline-none transition duration-500 placeholder:text-color/25 focus:border-color md:text-xl"
-                    placeholder="Your name"
-                    name="name"
-                    type="text"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                  />
-
-                  {submitted && validationErrors.name && (
-                    <p className="mt-3 text-sm font-bold text-red-500">
-                      {validationErrors.name}
-                    </p>
-                  )}
-                </AnimatedField>
-
-                <AnimatedField delay={0.08}>
-                  <TextReveal
-                    as="label"
-                    htmlFor="email"
-                    mode="words"
-                    className="mb-3 block text-xs font-black uppercase tracking-[0.24em] text-color/45"
-                  >
-                    Email
-                  </TextReveal>
-
-                  <input
-                    id="email"
-                    className="w-full border-b border-stone-400/30 bg-transparent py-5 text-lg font-bold text-color outline-none transition duration-500 placeholder:text-color/25 focus:border-color md:text-xl"
-                    placeholder="Your email"
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                  />
-
-                  {submitted && validationErrors.email && (
-                    <p className="mt-3 text-sm font-bold text-red-500">
-                      {validationErrors.email}
-                    </p>
-                  )}
-                </AnimatedField>
-
-                <AnimatedField delay={0.14} className="md:col-span-2">
-                  <TextReveal
-                    as="label"
-                    htmlFor="organization"
-                    mode="words"
-                    className="mb-3 block text-xs font-black uppercase tracking-[0.24em] text-color/45"
-                  >
-                    Organization
-                  </TextReveal>
-
-                  <input
-                    id="organization"
-                    className="w-full border-b border-stone-400/30 bg-transparent py-5 text-lg font-bold text-color outline-none transition duration-500 placeholder:text-color/25 focus:border-color md:text-xl"
-                    placeholder="Studio, company or brand — optional"
-                    name="organization"
-                    type="text"
-                    value={form.organization}
-                    onChange={handleChange}
-                  />
-                </AnimatedField>
-
-                <AnimatedField delay={0.2} className="md:col-span-2">
-                  <TextReveal
-                    as="label"
-                    htmlFor="message"
-                    mode="words"
-                    className="mb-3 block text-xs font-black uppercase tracking-[0.24em] text-color/45"
-                  >
-                    Message
-                  </TextReveal>
-
-                  <textarea
-                    id="message"
-                    className="min-h-[220px] w-full resize-none border-b border-stone-400/30 bg-transparent py-5 text-lg font-bold leading-[1.35] text-color outline-none transition duration-500 placeholder:text-color/25 focus:border-color md:text-xl"
-                    placeholder="Tell me what you want to make..."
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
-                    required
-                  />
-
-                  {submitted && validationErrors.message && (
-                    <p className="mt-3 text-sm font-bold text-red-500">
-                      {validationErrors.message}
-                    </p>
-                  )}
-                </AnimatedField>
-              </div>
-
-              <FadeIn
-                delay={0.18}
-                y={24}
-                className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-center"
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: 30,
+                  filter: "blur(8px)",
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{
+                  duration: 0.9,
+                  ease,
+                }}
               >
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  className="group relative w-fit cursor-pointer overflow-hidden border border-color bg-color px-8 py-4 text-sm font-black uppercase tracking-[0.2em] text-dark transition disabled:cursor-not-allowed disabled:opacity-40"
+                <TextReveal
+                  as="p"
+                  mode="words"
+                  className="mb-10 text-xs font-black uppercase tracking-[0.24em] text-color/35"
                 >
-                  <WaveLinkText
-                    text={isSending ? "Sending..." : "Send message"}
-                  />
-                </button>
+                  Fill the brief
+                </TextReveal>
 
-                <p className="max-w-[360px] text-sm font-bold leading-[1.35] text-color/40">
-                  Usually replies within a short time.
-                </p>
-              </FadeIn>
+                <div className="max-w-[1250px]">
+                  <div className="text-[clamp(2.25rem,5.4vw,5.9rem)] font-black normal-case leading-[1.12] tracking-[-0.035em] text-color">
+                    <p>
+                      Hey Rustam, my name is{" "}
+                      <SentenceInput
+                        inputRef={nameInputRef}
+                        id="name"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        placeholder="your name"
+                        required
+                      />
+                    </p>
+
+                    <p className="mt-2 md:mt-3">
+                      and I’m from{" "}
+                      <SentenceInput
+                        id="organization"
+                        name="organization"
+                        value={form.organization}
+                        onChange={handleChange}
+                        placeholder="studio / company"
+                      />
+                    </p>
+
+                    <p className="mt-2 md:mt-3">
+                      You can reach me at{" "}
+                      <SentenceInput
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        placeholder="your email"
+                        required
+                        className="md:min-w-[440px]"
+                      />
+                    </p>
+                  </div>
+
+                  <div className="mt-10 md:mt-12">
+                    <label
+                      htmlFor="message"
+                      className="mb-4 block text-[clamp(2.25rem,5.4vw,5.9rem)] font-black normal-case leading-[1.12] tracking-[-0.035em] text-color"
+                    >
+                      Message
+                    </label>
+
+                    <SentenceTextarea
+                      id="message"
+                      name="message"
+                      value={form.message}
+                      onChange={handleChange}
+                      placeholder="Tell me what you want to make..."
+                      required
+                    />
+                  </div>
+                </div>
+
+                {submitted &&
+                  (validationErrors.name ||
+                    validationErrors.email ||
+                    validationErrors.message) && (
+                    <div className="mt-10 flex flex-col gap-2 text-sm font-black uppercase tracking-[0.16em] text-red-500">
+                      {validationErrors.name && <p>{validationErrors.name}</p>}
+                      {validationErrors.email && (
+                        <p>{validationErrors.email}</p>
+                      )}
+                      {validationErrors.message && (
+                        <p>{validationErrors.message}</p>
+                      )}
+                    </div>
+                  )}
+
+                <FadeIn
+                  delay={0.18}
+                  y={24}
+                  className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-center"
+                >
+                  <button
+                    type="submit"
+                    disabled={isSending}
+                    className="group relative w-fit cursor-pointer overflow-hidden border border-color bg-color px-8 py-4 text-sm md:text-lg font-black uppercase tracking-[0.2em] text-dark transition disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <WaveLinkText
+                      text={isSending ? "Sending..." : "Send message"}
+                    />
+                  </button>
+
+                  <p className="max-w-[420px] text-sm font-bold leading-[1.35] text-color/40">
+                    Start with your name and send your project message.
+                  </p>
+                </FadeIn>
+              </motion.div>
             </form>
           </div>
         </div>

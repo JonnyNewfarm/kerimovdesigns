@@ -1114,6 +1114,8 @@ export default function Index() {
   const isDraggingCubeRef = useRef(false);
 
   const [hasMounted, setHasMounted] = useState(false);
+  const [introChecked, setIntroChecked] = useState(false);
+  const [shouldUseIntro, setShouldUseIntro] = useState(false);
   const [introDone, setIntroDone] = useState(false);
 
   useScrollLock(hasMounted && !introDone);
@@ -1134,21 +1136,25 @@ export default function Index() {
   useEffect(() => {
     setHasMounted(true);
 
-    const hasSeenIntro = sessionStorage.getItem("hero-intro-seen");
+    const hasSeenIntro = sessionStorage.getItem("hero-intro-seen") === "true";
 
-    if (hasSeenIntro === "true") {
+    if (hasSeenIntro) {
+      setShouldUseIntro(false);
       setIntroDone(true);
+      setIntroChecked(true);
       return;
     }
 
-    const timer = setTimeout(() => {
+    setShouldUseIntro(true);
+    setIntroChecked(true);
+
+    const timer = window.setTimeout(() => {
       sessionStorage.setItem("hero-intro-seen", "true");
       setIntroDone(true);
-    }, 3000);
+    }, 3200);
 
-    return () => clearTimeout(timer);
+    return () => window.clearTimeout(timer);
   }, []);
-
   return (
     <motion.div
       ref={container}
@@ -1157,16 +1163,11 @@ export default function Index() {
       animate={{ opacity: 1 }}
     >
       <div className="sticky top-0 relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden uppercase">
-        <HeroIntro isDone={introDone} />
-
+        {introChecked && shouldUseIntro && <HeroIntro isDone={introDone} />}
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
             initial={false}
-            animate={introDone ? { opacity: 1 } : { opacity: 0 }}
-            transition={{
-              duration: 0.45,
-              ease: [0.76, 0, 0.24, 1],
-            }}
+            animate={{ opacity: 1 }}
             className="relative h-full w-full"
           >
             {hasMounted && introDone && (
@@ -1178,10 +1179,6 @@ export default function Index() {
                 gl={{
                   antialias: false,
                   powerPreference: "high-performance",
-                }}
-                onCreated={({ gl, invalidate }) => {
-                  gl.setAnimationLoop(null);
-                  invalidate();
                 }}
               >
                 {isMdUp && (
@@ -1214,7 +1211,6 @@ export default function Index() {
             )}
           </motion.div>
         </div>
-
         <motion.div
           initial={false}
           animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -1258,7 +1254,6 @@ export default function Index() {
             </>
           )}
         </motion.div>
-
         <motion.div
           initial={false}
           animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -1285,7 +1280,6 @@ export default function Index() {
             </MagneticComp>
           )}
         </motion.div>
-
         <motion.div
           initial={false}
           animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
