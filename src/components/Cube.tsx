@@ -151,11 +151,7 @@ const logoImagePaths = [
   "/logo-4.png",
 ];
 
-const visualImagePaths = [
-  "/visual-01.jpeg",
-  "/visual-02.jpeg",
-  "/visual-003.jpeg",
-];
+const visualImagePaths = ["/dm-01.jpeg", "/visual-02.jpeg", "/dm-06.jpeg"];
 
 type CollageTile = {
   imageSlot: 0 | 1 | 2;
