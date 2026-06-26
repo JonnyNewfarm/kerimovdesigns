@@ -53,9 +53,6 @@ const ProjectsTable = ({
   const queuedProjectIndex = useRef<number | null>(null);
   const animationFrame = useRef<number | null>(null);
 
-  const imageLinkRef = useRef<HTMLAnchorElement | null>(null);
-  const latestMouseRef = useRef({ x: -9999, y: -9999 });
-
   const imageMouseX = useMotionValue(0);
   const imageMouseY = useMotionValue(0);
 
@@ -115,16 +112,6 @@ const ProjectsTable = ({
     [projects.length],
   );
 
-  const updateImageCursor = useCallback(
-    (clientX: number, clientY: number, element: HTMLAnchorElement) => {
-      const rect = element.getBoundingClientRect();
-
-      imageMouseX.set(clientX - rect.left);
-      imageMouseY.set(clientY - rect.top);
-    },
-    [imageMouseX, imageMouseY],
-  );
-
   useEffect(() => {
     return () => {
       if (animationFrame.current) {
@@ -155,42 +142,6 @@ const ProjectsTable = ({
     }
   }, [pageIndex, totalPages]);
 
-  useEffect(() => {
-    const handleGlobalMouseMove = (event: MouseEvent) => {
-      latestMouseRef.current = {
-        x: event.clientX,
-        y: event.clientY,
-      };
-    };
-
-    const handleScroll = () => {
-      const imageLink = imageLinkRef.current;
-      if (!imageLink) return;
-
-      const { x, y } = latestMouseRef.current;
-
-      const element = document.elementFromPoint(x, y);
-
-      const isOverImage = element ? imageLink.contains(element) : false;
-
-      if (!isOverImage) {
-        setIsHoveringImage(false);
-        return;
-      }
-
-      updateImageCursor(x, y, imageLink);
-      setIsHoveringImage(true);
-    };
-
-    window.addEventListener("mousemove", handleGlobalMouseMove);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("mousemove", handleGlobalMouseMove);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [updateImageCursor]);
-
   const goToPrevPage = () => {
     if (!canGoPrevPage) return;
 
@@ -214,24 +165,19 @@ const ProjectsTable = ({
   };
 
   const handleImageMouseMove = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    latestMouseRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-    };
+    const rect = event.currentTarget.getBoundingClientRect();
 
-    updateImageCursor(event.clientX, event.clientY, event.currentTarget);
-    setIsHoveringImage(true);
+    imageMouseX.set(event.clientX - rect.left);
+    imageMouseY.set(event.clientY - rect.top);
   };
 
   const handleImageMouseEnter = (
     event: React.MouseEvent<HTMLAnchorElement>,
   ) => {
-    latestMouseRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-    };
+    const rect = event.currentTarget.getBoundingClientRect();
 
-    updateImageCursor(event.clientX, event.clientY, event.currentTarget);
+    imageMouseX.set(event.clientX - rect.left);
+    imageMouseY.set(event.clientY - rect.top);
     setIsHoveringImage(true);
   };
 
@@ -399,7 +345,6 @@ const ProjectsTable = ({
         <main className="flex min-h-0 flex-col md:col-span-7 xl:col-span-8">
           <div className="ml-auto flex w-full max-w-[1080px] flex-col">
             <TransitionLink
-              ref={imageLinkRef}
               href={`/project/${activeProject.id}`}
               transitionLabel={activeProject.title}
               direction="right"
