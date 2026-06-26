@@ -23,19 +23,22 @@ export default function UploadProject() {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
+
     const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
     const role = formData.get("role") as string;
     const type = formData.get("type") as string;
     const tools = formData.get("tools") as string;
 
     if (!imageUrl) {
-      alert("Please upload an image first.");
+      alert("Please upload a wide image first.");
       return;
     }
 
     startTransition(() => {
       createProject({
         title,
+        description,
         src: imageUrl,
         src2: imageUrl2,
         src3: imageUrl3,
@@ -45,7 +48,7 @@ export default function UploadProject() {
         src7: imageUrl7,
         src8: imageUrl8,
         src9: imageUrl9,
-        srcVideo: srcVideo,
+        srcVideo,
         role,
         type,
         tools,
@@ -54,35 +57,43 @@ export default function UploadProject() {
   };
 
   return (
-    <div className="w-full flex-col gap-y-6 text-white min-h-screen flex items-center justify-center">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center gap-y-6 text-white">
       <h1 className="text-2xl text-white">Upload project</h1>
+
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-center gap-y-6"
+        className="flex w-full max-w-xl flex-col items-center justify-center gap-y-6 px-6"
       >
         <input
-          className="outline-1 outline-stone-600 py-2 px-3 w-full lg:min-w-[350px]"
+          className="w-full border border-stone-600 bg-transparent px-3 py-2 text-white outline-none"
           name="title"
           placeholder="Title"
           required
         />
 
+        <textarea
+          className="min-h-[220px] w-full resize-y border border-stone-600 bg-transparent px-3 py-2 text-white outline-none"
+          name="description"
+          placeholder="Project description"
+          required
+        />
+
         <input
-          className="outline-1 outline-stone-600 py-2 w-full px-3 lg:min-w-[350px]"
+          className="w-full border border-stone-600 bg-transparent px-3 py-2 text-white outline-none"
           name="role"
           placeholder="Role"
           required
         />
 
         <input
-          className="outline-1 outline-stone-600 py-2 w-full px-3 lg:min-w-[350px]"
+          className="w-full border border-stone-600 bg-transparent px-3 py-2 text-white outline-none"
           name="type"
           placeholder="Type"
           required
         />
 
         <input
-          className="outline-1 outline-stone-600 py-2 px-3 w-full lg:min-w-[350px]"
+          className="w-full border border-stone-600 bg-transparent px-3 py-2 text-white outline-none"
           name="tools"
           placeholder="Tools"
           required
@@ -96,19 +107,19 @@ export default function UploadProject() {
         <input type="hidden" name="src6" value={imageUrl6} />
         <input type="hidden" name="src7" value={imageUrl7} />
         <input type="hidden" name="src8" value={imageUrl8} />
-        <input type="hidden" name="src" value={imageUrl9} />
+        <input type="hidden" name="src9" value={imageUrl9} />
         <input type="hidden" name="srcVideo" value={srcVideo} />
 
         <button
           type="button"
           onClick={() => setShowModal(true)}
-          className="cursor-pointer hover:scale-105 transition-transform ease-in-out border-2 w-full text-lg font-semibold border-stone-400 py-2 px-4"
+          className="w-full cursor-pointer border-2 border-stone-400 px-4 py-2 text-lg font-semibold transition-opacity hover:opacity-70"
         >
           Upload Images & Video
         </button>
 
         <button
-          className="cursor-pointer hover:scale-105 transition-transform ease-in-out border-2 w-full text-lg font-semibold border-stone-400 py-2 px-4"
+          className="w-full cursor-pointer border-2 border-stone-400 px-4 py-2 text-lg font-semibold transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
           type="submit"
           disabled={isPending}
         >
@@ -119,90 +130,101 @@ export default function UploadProject() {
       <AnimatePresence>
         {showModal && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
               style={{ scrollbarWidth: "thin" }}
-              className="bg-stone-900 overflow-y-scroll max-h-[80vh] flex flex-col  p-6 rounded-md max-w-xl w-full"
+              className="flex max-h-[80vh] w-full max-w-xl flex-col overflow-y-scroll bg-stone-900 p-6"
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Upload Images & Video</h2>
+
                 <button
+                  type="button"
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 text-lg cursor-pointer hover:text-white"
+                  className="cursor-pointer text-lg text-gray-400 hover:text-white"
+                  aria-label="Close upload modal"
                 >
                   ✕
                 </button>
               </div>
-              <div className="grid grid-cols-2 w-full gap-4">
+
+              <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col items-start">
                   <span className="mb-1 text-sm font-medium">Wide Image</span>
-                  <div className="w-full flex justify-start">
-                    {" "}
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl} />
                   </div>
                 </div>
+
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Image</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">
+                    Optional Image 2
+                  </span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl2} />
                   </div>
                 </div>
+
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Image</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">Image 3</span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl3} />
                   </div>
                 </div>
+
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Image</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">Image 4</span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl4} />
                   </div>
                 </div>
 
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Image</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">Image 5</span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl5} />
                   </div>
                 </div>
 
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Image</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">Image 6</span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl6} />
                   </div>
                 </div>
+
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Image</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">Image 7</span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl7} />
                   </div>
                 </div>
+
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Image</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">Image 8</span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl8} />
                   </div>
                 </div>
+
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Image</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">Image 9</span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setImageUrl9} />
                   </div>
                 </div>
 
                 <div className="flex flex-col items-start">
-                  <span className="mb-1 text-sm font-medium">Video?</span>
-                  <div className="w-full flex justify-start">
+                  <span className="mb-1 text-sm font-medium">Video</span>
+                  <div className="flex w-full justify-start">
                     <UploadImage onUploadComplete={setSrcVideo} />
                   </div>
                 </div>

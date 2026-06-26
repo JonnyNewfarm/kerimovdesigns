@@ -8,8 +8,9 @@ datasource db {
 }
 
 model Project {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  title String
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String @default("")
 
   src       String   @db.String
   src2      String?  @db.String

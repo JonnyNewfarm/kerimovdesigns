@@ -40,6 +40,7 @@ import { OrbitControls } from "@react-three/drei";
 import MagneticComp from "./MagneticComp";
 import HeroIntro from "./HeroIntro";
 import TextReveal from "@/components/TextReveal";
+import TransitionLink from "./TransitionLink";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -1121,7 +1122,7 @@ export default function Index() {
     offset: ["start start", "end end"],
   });
 
-  const progress = useTransform(scrollYProgress, [0, 1], [0, 4.5]);
+  const progress = useTransform(scrollYProgress, [0, 1], [0, 4.4]);
 
   const smoothProgress = useSpring(progress, {
     damping: 20,
@@ -1262,7 +1263,12 @@ export default function Index() {
         >
           {introDone && (
             <MagneticComp>
-              <Link href="/projects" className="inline-block">
+              <TransitionLink
+                href="/projects"
+                transitionLabel="Selected Work"
+                direction="left"
+                className="inline-block"
+              >
                 <TextReveal
                   as="span"
                   mode="words"
@@ -1272,7 +1278,7 @@ export default function Index() {
                 >
                   Archives
                 </TextReveal>
-              </Link>
+              </TransitionLink>
             </MagneticComp>
           )}
         </motion.div>
@@ -1288,7 +1294,12 @@ export default function Index() {
         >
           {introDone && (
             <MagneticComp>
-              <Link href="/contact" className="inline-block">
+              <TransitionLink
+                href="/contact"
+                transitionLabel="Let's Collaborate"
+                direction="right"
+                className="inline-block"
+              >
                 <TextReveal
                   as="span"
                   mode="words"
@@ -1298,7 +1309,7 @@ export default function Index() {
                 >
                   Collaborate
                 </TextReveal>
-              </Link>
+              </TransitionLink>
             </MagneticComp>
           )}
         </motion.div>

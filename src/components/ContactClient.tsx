@@ -84,7 +84,7 @@ function SentenceInput({
       onChange={onChange}
       placeholder={placeholder}
       required={required}
-      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-color/65 outline-none transition placeholder:text-color/25 focus:text-color md:min-w-[320px] ${className}`}
+      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-[#a3b18a] outline-none transition placeholder:text-[#a3b18a]/65 focus:text-color md:min-w-[320px] ${className}`}
     />
   );
 }
@@ -120,7 +120,7 @@ function SentenceTextarea({
         scrollbarColor: "rgba(245, 236, 220, 0.35) transparent",
         scrollbarWidth: "thin",
       }}
-      className="max-h-[360px] min-h-[100px] w-full resize-none overflow-y-auto border-0 bg-transparent px-0 pb-4 pr-5 text-[clamp(2rem,4.4vw,5rem)] font-black normal-case leading-[1.08] tracking-[-0.035em] text-color/65 outline-none transition placeholder:text-color/25 focus:text-color [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-color/25 [&::-webkit-scrollbar-thumb]:transition [&::-webkit-scrollbar-thumb:hover]:bg-color/45"
+      className="max-h-[360px] min-h-[100px] w-full resize-none overflow-y-auto border-0 bg-transparent px-0 pb-4 pr-5 text-[clamp(2rem,4.4vw,5rem)] font-black normal-case leading-[1.08] tracking-[-0.035em] text-[#a3b18a] outline-none transition placeholder:text-[#a3b18a]/65 focus:text-color [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-color/25 [&::-webkit-scrollbar-thumb]:transition [&::-webkit-scrollbar-thumb:hover]:bg-color/45"
     />
   );
 }
@@ -225,7 +225,7 @@ const ContactClient = () => {
 
   return (
     <SmoothScroll>
-      <section className="min-h-screen overflow-hidden bg-dark px-4 pb-12 pt-28 text-color md:px-10 md:pb-16 md:pt-36 lg:px-16">
+      <section className="min-h-screen overflow-clip bg-dark px-4 pb-12 pt-28 text-color md:px-10 md:pb-16 md:pt-36 lg:px-16">
         <div className="mx-auto w-full max-w-[1800px]">
           {/* HERO */}
           <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-[1fr_0.7fr] md:items-end lg:mb-24">
@@ -263,9 +263,10 @@ together`}
             </TextReveal>
           </div>
 
-          <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
-            {/* DETAILS */}
-            <aside className="order-2 lg:order-1">
+          {/* BRIEF */}
+          <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.72fr_1.28fr] lg:items-start lg:gap-20">
+            {/* LEFT SIDE */}
+            <aside className="order-2 lg:sticky lg:top-28 lg:order-1">
               <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -278,8 +279,9 @@ together`}
                     },
                   },
                 }}
-                className="grid grid-cols-1 gap-10 text-sm font-black uppercase tracking-[0.18em] text-color/70 sm:grid-cols-2 lg:sticky lg:top-28 lg:grid-cols-1"
+                className="grid grid-cols-1 gap-10 text-sm font-black uppercase tracking-[0.18em] text-color/70 sm:grid-cols-2 lg:grid-cols-1"
               >
+                {/* DETAILS */}
                 <motion.div
                   variants={{
                     hidden: {
@@ -324,6 +326,7 @@ together`}
                   </div>
                 </motion.div>
 
+                {/* SOCIALS */}
                 <motion.div
                   variants={{
                     hidden: {
@@ -371,6 +374,7 @@ together`}
                   </div>
                 </motion.div>
 
+                {/* AVAILABILITY */}
                 <motion.div
                   variants={{
                     hidden: {
@@ -405,7 +409,7 @@ together`}
               </motion.div>
             </aside>
 
-            {/* EDITORIAL FORM */}
+            {/* RIGHT SIDE / FORM */}
             <form
               onSubmit={handleSubmit}
               noValidate
@@ -428,15 +432,15 @@ together`}
                   ease,
                 }}
               >
-                <TextReveal
-                  as="p"
-                  mode="words"
-                  className="mb-10 text-xs font-black uppercase tracking-[0.24em] text-color/35"
-                >
-                  Fill the brief
-                </TextReveal>
-
                 <div className="max-w-[1250px]">
+                  <TextReveal
+                    as="p"
+                    mode="words"
+                    className="mb-10 text-xs font-black uppercase tracking-[0.24em] text-color/35"
+                  >
+                    Fill the brief
+                  </TextReveal>
+
                   <div className="text-[clamp(2.25rem,5.4vw,5.9rem)] font-black normal-case leading-[1.12] tracking-[-0.035em] text-color">
                     <p>
                       Hey Rustam, my name is{" "}
@@ -494,42 +498,46 @@ together`}
                       required
                     />
                   </div>
-                </div>
 
-                {submitted &&
-                  (validationErrors.name ||
-                    validationErrors.email ||
-                    validationErrors.message) && (
-                    <div className="mt-10 flex flex-col gap-2 text-sm font-black uppercase tracking-[0.16em] text-red-500">
-                      {validationErrors.name && <p>{validationErrors.name}</p>}
-                      {validationErrors.email && (
-                        <p>{validationErrors.email}</p>
-                      )}
-                      {validationErrors.message && (
-                        <p>{validationErrors.message}</p>
-                      )}
-                    </div>
-                  )}
+                  {submitted &&
+                    (validationErrors.name ||
+                      validationErrors.email ||
+                      validationErrors.message) && (
+                      <div className="mt-10 flex flex-col gap-2 text-sm font-black uppercase tracking-[0.16em] text-red-500">
+                        {validationErrors.name && (
+                          <p>{validationErrors.name}</p>
+                        )}
 
-                <FadeIn
-                  delay={0.18}
-                  y={24}
-                  className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-center"
-                >
-                  <button
-                    type="submit"
-                    disabled={isSending}
-                    className="group relative w-fit cursor-pointer overflow-hidden border border-color bg-color px-8 py-4 text-sm md:text-lg font-black uppercase tracking-[0.2em] text-dark transition disabled:cursor-not-allowed disabled:opacity-40"
+                        {validationErrors.email && (
+                          <p>{validationErrors.email}</p>
+                        )}
+
+                        {validationErrors.message && (
+                          <p>{validationErrors.message}</p>
+                        )}
+                      </div>
+                    )}
+
+                  <FadeIn
+                    delay={0.18}
+                    y={24}
+                    className="mt-8 flex flex-col gap-5 pb-24 sm:flex-row sm:items-center lg:pb-40"
                   >
-                    <WaveLinkText
-                      text={isSending ? "Sending..." : "Send message"}
-                    />
-                  </button>
+                    <button
+                      type="submit"
+                      disabled={isSending}
+                      className="group relative w-fit cursor-pointer overflow-hidden border border-color bg-color px-8 py-4 text-sm font-black uppercase tracking-[0.2em] text-dark transition disabled:cursor-not-allowed disabled:opacity-40 md:text-lg"
+                    >
+                      <WaveLinkText
+                        text={isSending ? "Sending..." : "Send message"}
+                      />
+                    </button>
 
-                  <p className="max-w-[420px] text-sm font-bold leading-[1.35] text-color/40">
-                    Start with your name and send your project message.
-                  </p>
-                </FadeIn>
+                    <p className="max-w-[420px] text-sm font-bold leading-[1.35] text-color/40">
+                      Start with your name and send your project message.
+                    </p>
+                  </FadeIn>
+                </div>
               </motion.div>
             </form>
           </div>

@@ -8,6 +8,7 @@ import TextReveal from "./TextReveal";
 export interface Project {
   id: string;
   title: string;
+  description?: string | null;
   src: string;
   src2?: string | null;
   src3?: string | null;
@@ -40,7 +41,7 @@ const imageLayout = [
   {
     row: "justify-start",
     offset: "translate-x-0 sm:translate-x-10 lg:translate-x-20",
-    size: "max-w-[280px] sm:max-w-[360px] lg:max-w-[430px]",
+    size: "max-w-[280px] sm:max-w-[360px] lg:max-w-[560px] xl:max-w-[640px]",
   },
   {
     row: "justify-end",
@@ -121,6 +122,184 @@ const fieldVariants = {
   },
 };
 
+const formatCount = (count: number) => String(count).padStart(2, "0");
+
+const RollingDigit = ({
+  digit,
+  delay = 0,
+}: {
+  digit: number;
+  delay?: number;
+}) => {
+  const duration = digit === 0 ? 0.6 : 0.45 + digit * 0.22;
+
+  return (
+    <span className="relative inline-block h-[1em] overflow-hidden leading-none">
+      <motion.span
+        className="block"
+        initial={{ y: "0%" }}
+        animate={{ y: `-${digit * 10}%` }}
+        transition={{
+          duration,
+          ease: [0.22, 1, 0.36, 1],
+          delay,
+        }}
+      >
+        {Array.from({ length: 10 }, (_, index) => (
+          <span
+            key={index}
+            className="block h-[1em] leading-none"
+            aria-hidden="true"
+          >
+            {index}
+          </span>
+        ))}
+      </motion.span>
+    </span>
+  );
+};
+
+const RollingCount = ({
+  value,
+  digits = 2,
+}: {
+  value: number;
+  digits?: number;
+}) => {
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setHasStarted(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [value]);
+
+  const currentValue = hasStarted ? value : 0;
+  const formattedValue = String(currentValue).padStart(digits, "0");
+
+  return (
+    <span
+      className="inline-flex overflow-hidden text-lg font-black uppercase leading-none tracking-[0.06em] text-white/85 sm:text-xl"
+      aria-label={formatCount(value)}
+    >
+      {formattedValue.split("").map((character, index) => (
+        <RollingDigit
+          key={`${index}-${character}`}
+          digit={Number(character)}
+          delay={index * 0.08}
+        />
+      ))}
+    </span>
+  );
+};
+
+const ProjectDescription = ({
+  title,
+  description,
+}: {
+  title: string;
+  description?: string | null;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  if (!description) return null;
+
+  const paragraphs = description
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  const previewText = paragraphs[0] || description;
+  const textToShow = isExpanded ? description : previewText;
+  const hasMoreText =
+    paragraphs.length > 1 || description.length > previewText.length;
+
+  return (
+    <motion.section
+      initial={{
+        opacity: 0,
+        y: 40,
+        filter: "blur(8px)",
+      }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+      }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{
+        duration: 0.85,
+        ease,
+      }}
+      className="mt-14 w-full px-4 py-10 sm:mt-20 sm:px-8 sm:py-16 lg:mt-28 lg:px-0"
+      aria-labelledby="project-description-title"
+    >
+      <div className="ml-auto w-full max-w-[920px] pr-4 sm:pr-8 lg:pr-16 xl:pr-20">
+        <h2 id="project-description-title" className="sr-only">
+          {title} project description
+        </h2>
+
+        <motion.div
+          layout
+          id="project-description-content"
+          transition={{
+            layout: {
+              duration: 0.75,
+              ease: [0.16, 1, 0.3, 1],
+            },
+          }}
+          className="overflow-hidden whitespace-pre-line text-base font-black italic leading-8 tracking-[0.06em] text-white/85 sm:text-lg sm:leading-9 md:text-2xl md:leading-10"
+        >
+          {textToShow}
+        </motion.div>
+
+        {hasMoreText && (
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            aria-expanded={isExpanded}
+            aria-controls="project-description-content"
+            className="mt-8 inline-flex items-center cursor-pointer gap-3 text-[10px] font-black uppercase tracking-[0.32em] text-white/55 transition-opacity duration-300 hover:opacity-100 sm:text-xs"
+          >
+            <span>{isExpanded ? "Show less" : "Read more"}</span>
+
+            <span
+              className={`inline-flex origin-center transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                isExpanded ? "rotate-90" : "-rotate-90"
+              }`}
+              aria-hidden="true"
+            >
+              <svg
+                width="30"
+                height="18"
+                viewBox="0 0 30 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-[14px] w-[24px] sm:h-[16px] sm:w-[28px]"
+              >
+                <path
+                  d="M4 14H26"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="square"
+                />
+                <path
+                  d="M4 14L11 7"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="square"
+                />
+              </svg>
+            </span>
+          </button>
+        )}
+      </div>
+    </motion.section>
+  );
+};
+
 const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -153,6 +332,9 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
     project.src8,
     project.src9,
   ]);
+
+  const imageCount = images.length;
+  const videoCount = project.srcVideo ? 1 : 0;
 
   const activeImage = activeIndex !== null ? images[activeIndex] : null;
   const activeDimensions =
@@ -229,23 +411,63 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
     <LayoutGroup>
       <section className="mx-auto w-full max-w-[1600px] px-7 pt-32 sm:px-14">
         <div className="max-w-[1200px]">
-          <TextReveal
-            as="p"
-            mode="words"
-            delay={0.05}
-            className="mb-8 text-xs font-black uppercase tracking-[0.25em] text-white/50"
-          >
-            Selected Project
-          </TextReveal>
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <div className="max-w-[1200px]">
+              <TextReveal
+                as="p"
+                mode="words"
+                delay={0.05}
+                className="mb-8 text-xs font-black uppercase tracking-[0.25em] text-white/50"
+              >
+                Selected Project
+              </TextReveal>
 
-          <TextReveal
-            as="h1"
-            mode="lines"
-            delay={0.12}
-            className="text-left text-5xl font-black uppercase leading-[0.9] tracking-[-0.04em] text-color sm:text-7xl md:text-7xl xl:text-[9rem]"
-          >
-            {getTitleLines(project.title)}
-          </TextReveal>
+              <TextReveal
+                as="h1"
+                mode="lines"
+                delay={0.12}
+                className="text-left text-5xl font-black uppercase leading-[0.9] tracking-[-0.04em] text-color sm:text-7xl md:text-7xl xl:text-[9rem]"
+              >
+                {getTitleLines(project.title)}
+              </TextReveal>
+            </div>
+
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 20,
+                filter: "blur(8px)",
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+                filter: "blur(0px)",
+              }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{
+                duration: 0.85,
+                ease,
+                delay: 0.15,
+              }}
+              className="flex items-center gap-8 xl:justify-end xl:pb-4"
+            >
+              <div className="flex flex-col">
+                <span className="mb-2 text-[10px]  uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                  Images
+                </span>
+
+                <RollingCount value={imageCount} />
+              </div>
+
+              <div className="flex flex-col">
+                <span className="mb-2 text-[10px]  uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                  Videos
+                </span>
+
+                <RollingCount value={videoCount} />
+              </div>
+            </motion.div>
+          </div>
 
           <motion.div
             initial="hidden"
@@ -260,7 +482,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                 },
               },
             }}
-            className="mt-12 grid grid-cols-1 gap-8 border-t border-[#ecebeb]/20 pt-6 sm:grid-cols-3 sm:gap-10"
+            className="mt-4 grid grid-cols-1 gap-6 border-t border-[#ecebeb]/20 pt-6 sm:grid-cols-3 sm:gap-10"
           >
             <motion.div variants={fieldVariants}>
               <TextReveal
@@ -322,71 +544,77 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
             const dimensions = imageDimensions[index];
 
             return (
-              <div
-                key={`${src}-${index}`}
-                className={`flex w-full ${layout.row}`}
-              >
-                <motion.div
-                  layoutId={`project-image-${index}`}
-                  className={`group relative w-full ${layout.size} ${layout.offset}`}
-                  onMouseEnter={() => {
-                    if (activeIndex === null) {
-                      setHoveredIndex(index);
-                    }
-                  }}
-                  onMouseLeave={() => {
-                    if (activeIndex === null) {
-                      setHoveredIndex(null);
-                    }
-                  }}
-                  animate={{
-                    opacity: isActive ? 0 : shouldBlur ? 0.45 : 1,
-                    filter: shouldBlur ? "blur(5px)" : "blur(0px)",
-                  }}
-                  style={{
-                    pointerEvents: isActive ? "none" : "auto",
-                  }}
-                  transition={{
-                    opacity: {
-                      duration: 0.45,
-                      ease: [0.22, 1, 0.36, 1],
-                    },
-                    filter: {
-                      duration: 0.45,
-                      ease: [0.22, 1, 0.36, 1],
-                    },
-                    layout: {
-                      duration: 0.85,
-                      ease: [0.16, 1, 0.3, 1],
-                    },
-                  }}
-                >
-                  <Image
-                    unoptimized
-                    className={`h-auto w-full ${
-                      isLoaded ? "cursor-pointer" : "cursor-wait"
-                    }`}
-                    src={src}
-                    alt={project.title || `Project Image ${index + 1}`}
-                    width={dimensions?.width || 850}
-                    height={dimensions?.height || 450}
-                    sizes="(max-width: 768px) 80vw, 520px"
-                    priority={index < 3}
-                    onLoad={() => {
-                      setLoadedImages((prev) => ({
-                        ...prev,
-                        [index]: true,
-                      }));
+              <div key={`${src}-${index}`}>
+                <div className={`flex w-full ${layout.row}`}>
+                  <motion.div
+                    layoutId={`project-image-${index}`}
+                    className={`group relative w-full ${layout.size} ${layout.offset}`}
+                    onMouseEnter={() => {
+                      if (activeIndex === null) {
+                        setHoveredIndex(index);
+                      }
                     }}
-                    onClick={() => openImage(index)}
-                  />
+                    onMouseLeave={() => {
+                      if (activeIndex === null) {
+                        setHoveredIndex(null);
+                      }
+                    }}
+                    animate={{
+                      opacity: isActive ? 0 : shouldBlur ? 0.45 : 1,
+                      filter: shouldBlur ? "blur(5px)" : "blur(0px)",
+                    }}
+                    style={{
+                      pointerEvents: isActive ? "none" : "auto",
+                    }}
+                    transition={{
+                      opacity: {
+                        duration: 0.45,
+                        ease: [0.22, 1, 0.36, 1],
+                      },
+                      filter: {
+                        duration: 0.45,
+                        ease: [0.22, 1, 0.36, 1],
+                      },
+                      layout: {
+                        duration: 0.85,
+                        ease: [0.16, 1, 0.3, 1],
+                      },
+                    }}
+                  >
+                    <Image
+                      unoptimized
+                      className={`h-auto w-full ${
+                        isLoaded ? "cursor-pointer" : "cursor-wait"
+                      }`}
+                      src={src}
+                      alt={project.title || `Project Image ${index + 1}`}
+                      width={dimensions?.width || 850}
+                      height={dimensions?.height || 450}
+                      sizes="(max-width: 768px) 80vw, 520px"
+                      priority={index < 3}
+                      onLoad={() => {
+                        setLoadedImages((prev) => ({
+                          ...prev,
+                          [index]: true,
+                        }));
+                      }}
+                      onClick={() => openImage(index)}
+                    />
 
-                  <div className="pointer-events-none absolute left-4 top-4 opacity-0 transition duration-500 group-hover:opacity-100">
-                    <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-white mix-blend-difference">
-                      {imageNumber}
-                    </span>
-                  </div>
-                </motion.div>
+                    <div className="pointer-events-none absolute left-4 top-4 opacity-0 transition duration-500 group-hover:opacity-100">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-white mix-blend-difference">
+                        {imageNumber}
+                      </span>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {index === 0 && (
+                  <ProjectDescription
+                    title={project.title}
+                    description={project.description}
+                  />
+                )}
               </div>
             );
           })}

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   motion,
   useMotionValue,
@@ -12,8 +11,6 @@ import {
 } from "framer-motion";
 import TextReveal from "./TextReveal";
 import TransitionLink from "./TransitionLink";
-
-const ease = [0.22, 1, 0.36, 1] as const;
 
 const animations = [
   {
@@ -43,7 +40,7 @@ const animations = [
 export default function AnimDisplay() {
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const activeProjectRef = useRef<HTMLAnchorElement | null>(null);
-  const latestMouseRef = useRef({ x: 0, y: 0 });
+  const latestMouseRef = useRef({ x: -9999, y: -9999 });
 
   const [isLg, setIsLg] = useState(false);
   const [hoverText, setHoverText] = useState("");
@@ -75,25 +72,58 @@ export default function AnimDisplay() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!activeProjectRef.current) return;
+    const handleGlobalMouseMove = (event: MouseEvent) => {
+      latestMouseRef.current = {
+        x: event.clientX,
+        y: event.clientY,
+      };
 
-      const rect = activeProjectRef.current.getBoundingClientRect();
+      mouseX.set(event.clientX);
+      mouseY.set(event.clientY);
+    };
+
+    window.addEventListener("mousemove", handleGlobalMouseMove);
+
+    return () => window.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, [mouseX, mouseY]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!isLg) return;
+
       const { x, y } = latestMouseRef.current;
 
-      const isStillInside =
-        x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+      const element = document.elementFromPoint(x, y);
 
-      if (!isStillInside) {
+      const projectElement = element?.closest(
+        "[data-project-index]",
+      ) as HTMLAnchorElement | null;
+
+      if (!projectElement) {
         setIsHoveringProject(false);
         activeProjectRef.current = null;
+        return;
       }
+
+      const index = Number(projectElement.dataset.projectIndex);
+      const item = animations[index];
+
+      if (!item) {
+        setIsHoveringProject(false);
+        activeProjectRef.current = null;
+        return;
+      }
+
+      activeProjectRef.current = projectElement;
+      setHoverText(item.hoverText);
+      setCursorClass(item.cursorClass);
+      setIsHoveringProject(true);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isLg]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -204,6 +234,7 @@ export default function AnimDisplay() {
                     href={item.href}
                     transitionLabel={item.title}
                     aria-label={`View ${item.title}`}
+                    data-project-index={index}
                     onMouseMove={handleMouseMove}
                     onMouseEnter={(event) =>
                       handleMouseEnter(event, item.hoverText, item.cursorClass)
@@ -227,6 +258,7 @@ export default function AnimDisplay() {
                     href={item.href}
                     transitionLabel={item.title}
                     aria-label={`View ${item.title}`}
+                    data-project-index={index}
                     onMouseMove={handleMouseMove}
                     onMouseEnter={(event) =>
                       handleMouseEnter(event, item.hoverText, item.cursorClass)
