@@ -152,7 +152,7 @@ const logoImagePaths = [
   "/logo-4.png",
 ];
 
-const visualImagePaths = ["/cc-1.jpeg", "/cc-03.jpeg", "/cc-04.jpeg"];
+const visualImagePaths = ["/cc-8.jpg", "/cc-07.webp", "/cc-05.jpeg"];
 
 type CollageTile = {
   imageSlot: 0 | 1 | 2;
@@ -185,9 +185,8 @@ const faceCollageLayout: CollageTile[] = [
 ];
 
 const visualCollageLayout: CollageTile[] = [
-  { imageSlot: 0, x: 0, y: -0.12, width: 1, height: 0.68 },
-  { imageSlot: 1, x: 0, y: 0.58, width: 0.5, height: 0.62 },
-  { imageSlot: 2, x: 0.5, y: 0.58, width: 0.5, height: 0.62 },
+  { imageSlot: 0, x: 0, y: -0.1, width: 0.5, height: 1.29 },
+  { imageSlot: 2, x: 0.5, y: -0.1, width: 0.5, height: 1.29 },
 ];
 
 const gradientVertexShader = `
