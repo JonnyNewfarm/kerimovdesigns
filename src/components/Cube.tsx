@@ -726,7 +726,7 @@ function createVisualIdentityTexture(
 
   ctx.fillStyle = "#f2eee8";
   ctx.font = `900 57px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("I DESIGN", padding, padding);
+  ctx.fillText("I DESIGN", padding, 74);
 
   ctx.fillStyle = "#ffffff";
   ctx.font = `900 63px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
