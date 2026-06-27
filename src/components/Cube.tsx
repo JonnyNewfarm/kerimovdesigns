@@ -152,7 +152,7 @@ const logoImagePaths = [
   "/logo-4.png",
 ];
 
-const visualImagePaths = ["/cc-8.jpg", "/cc-07.webp", "/cc-05.jpeg"];
+const visualImagePaths = ["/cc-11.jpg", "/cc-07.webp", "/cc-05.jpeg"];
 
 type CollageTile = {
   imageSlot: 0 | 1 | 2;
@@ -185,8 +185,8 @@ const faceCollageLayout: CollageTile[] = [
 ];
 
 const visualCollageLayout: CollageTile[] = [
-  { imageSlot: 0, x: 0, y: -0.1, width: 0.5, height: 1.29 },
-  { imageSlot: 2, x: 0.5, y: -0.1, width: 0.5, height: 1.29 },
+  { imageSlot: 0, x: 0, y: -0.57, width: 0.5, height: 1.36 },
+  { imageSlot: 2, x: 0.5, y: -0.3, width: 0.5, height: 1.29 },
 ];
 
 const gradientVertexShader = `
@@ -725,43 +725,13 @@ function createVisualIdentityTexture(
   ctx.textBaseline = "top";
 
   ctx.fillStyle = "#f2eee8";
-  ctx.font = `900 42px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("VISUAL IDENTITY", padding, padding);
+  ctx.font = `900 57px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.fillText("I DESIGN", padding, padding);
 
   ctx.fillStyle = "#ffffff";
-  ctx.font = `900 92px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("I DESIGN", padding, 150);
-  ctx.fillText("VISUAL CONCEPTS", padding, 242);
-
-  const logoImage = logoTexture?.image as
-    | HTMLImageElement
-    | HTMLCanvasElement
-    | undefined;
-
-  if (logoImage) {
-    const logoBoxSize = 150;
-    const logoPadding = 18;
-    const cornerOffset = 10;
-
-    const logoBoxX = size - logoBoxSize - cornerOffset;
-    const logoBoxY = cornerOffset;
-
-    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
-    ctx.fillRect(logoBoxX, logoBoxY, logoBoxSize, logoBoxSize);
-
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.68)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(logoBoxX, logoBoxY, logoBoxSize, logoBoxSize);
-
-    drawImageContain(
-      ctx,
-      logoImage,
-      logoBoxX + logoPadding,
-      logoBoxY + logoPadding,
-      logoBoxSize - logoPadding * 2,
-      logoBoxSize - logoPadding * 2,
-    );
-  }
+  ctx.font = `900 63px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.fillText("", padding, 850);
+  ctx.fillText("VISUAL IDENTITIES", 357, 895);
 
   const collageX = padding;
   const collageY = 410;
@@ -791,10 +761,6 @@ function createVisualIdentityTexture(
     const drawHeight = height - insetTop - insetBottom;
 
     drawImageCover(ctx, image, drawX, drawY, drawWidth, drawHeight, false);
-
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(drawX, drawY, drawWidth, drawHeight);
   });
 
   const visualIdentityTexture = new CanvasTexture(canvas);
@@ -818,27 +784,23 @@ function createMovingGraphicsTextTexture(logoTexture?: Texture) {
 
   ctx.clearRect(0, 0, size, size);
 
-  const padding = 78;
+  const padding = 48;
 
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
 
-  ctx.fillStyle = "#f2eee8";
-  ctx.font = `900 42px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("MOTION", padding, padding);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `900 85px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+
+  ctx.fillText("DESIGN THAT MOVES", padding, 430);
+  ctx.fillText("WITH IMPACT", padding, 525);
+  ctx.fillText("", padding, 610);
 
   ctx.fillStyle = "#ffffff";
-  ctx.font = `900 90px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("DESIGN", padding, 145);
-  ctx.fillText("CREATED", padding, 230);
-  ctx.fillText("WITH MOTION", padding, 315);
-  ctx.fillText("FOR VISUAL IMPACT", padding, 400);
-
-  ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
-  ctx.font = `700 40px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.font = `700 45px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "bottom";
-  ctx.fillText("VIDEO / LOOP / TYPE", padding, size - padding);
+  ctx.fillText("VIDEO / LOOP / TYPE", padding, 418);
   ctx.textBaseline = "top";
 
   const logoImage = logoTexture?.image as
@@ -847,19 +809,12 @@ function createMovingGraphicsTextTexture(logoTexture?: Texture) {
     | undefined;
 
   if (logoImage) {
-    const logoBoxSize = 150;
+    const logoBoxSize = 230;
     const logoPadding = 18;
     const cornerOffset = 10;
 
-    const logoBoxX = size - logoBoxSize - cornerOffset;
+    const logoBoxX = cornerOffset;
     const logoBoxY = cornerOffset;
-
-    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
-    ctx.fillRect(logoBoxX, logoBoxY, logoBoxSize, logoBoxSize);
-
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.68)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(logoBoxX, logoBoxY, logoBoxSize, logoBoxSize);
 
     drawImageContain(
       ctx,
@@ -870,15 +825,6 @@ function createMovingGraphicsTextTexture(logoTexture?: Texture) {
       logoBoxSize - logoPadding * 2,
     );
   }
-
-  const videoBoxX = padding;
-  const videoBoxY = 540;
-  const videoBoxWidth = size - padding * 2;
-  const videoBoxHeight = 300;
-
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(videoBoxX, videoBoxY, videoBoxWidth, videoBoxHeight);
 
   const texture = new CanvasTexture(canvas);
 
@@ -925,16 +871,16 @@ function createCollaborateTexture() {
 
   const buttonX = padding;
   const buttonY = 585;
-  const buttonWidth = 500;
+  const buttonWidth = 610;
   const buttonHeight = 150;
 
   ctx.strokeStyle = "rgba(255, 255, 255, 0.72)";
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 6;
   ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
 
   ctx.fillStyle = "#ffffff";
   ctx.font = `900 52px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("GO TO CONTACT", buttonX + 38, buttonY + 50);
+  ctx.fillText("LET'S COLLABORATE", buttonX + 38, buttonY + 50);
 
   const texture = new CanvasTexture(canvas);
 
@@ -1819,12 +1765,12 @@ const Cube = ({
       </mesh>
 
       <mesh
-        position={[0, -VIDEO_OVERLAY_POSITION, -0.36]}
+        position={[0.19, -VIDEO_OVERLAY_POSITION, -0.66]}
         rotation={[Math.PI / 2, 0, Math.PI * 2]}
         renderOrder={28}
         raycast={() => null}
       >
-        <planeGeometry args={[1.72, 0.66]} />
+        <planeGeometry args={[1.72, 0.77]} />
         <meshBasicMaterial
           map={movingGraphicsVideoTexture}
           depthWrite={false}
