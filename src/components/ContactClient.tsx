@@ -228,13 +228,14 @@ const ContactClient = () => {
       <section className="min-h-screen overflow-clip bg-dark px-4 pb-12 pt-28 text-color md:px-10 md:pb-16 md:pt-36 lg:px-16">
         <div className="mx-auto w-full max-w-[1800px]">
           {/* HERO */}
-          <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-[1fr_0.7fr] md:items-end lg:mb-24">
+          {/* HERO */}
+          <div className="grid min-h-[calc(100svh-7rem)] grid-cols-1 items-end gap-8 pb-16 md:grid-cols-[1fr_0.7fr] md:pb-20 lg:pb-24">
             <div>
               <TextReveal
                 as="p"
                 mode="words"
                 delay={0.05}
-                className="mb-6 text-xs font-black uppercase tracking-[0.28em] text-color/45 md:text-sm"
+                className="mb-6 text-xs font-black uppercase tracking-[0.28em] text-color/45 "
               >
                 Contact / Start a project
               </TextReveal>
@@ -243,7 +244,7 @@ const ContactClient = () => {
                 as="h1"
                 mode="lines"
                 delay={0.12}
-                className="max-w-[1250px] text-[12vw] font-black uppercase leading-[0.86] tracking-[-0.02em] text-color md:text-[10vw] lg:text-[8vw]"
+                className="max-w-[1050px] text-[clamp(3.6rem,6.2vw,7.2rem)] font-black uppercase leading-[0.9] tracking-[-0.02em] text-color"
               >
                 {`Let's 
 work on a project
@@ -264,7 +265,9 @@ together`}
           </div>
 
           {/* BRIEF */}
+          {/* BRIEF */}
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.72fr_1.28fr] lg:items-start lg:gap-20">
+            {" "}
             {/* LEFT SIDE */}
             <aside className="order-2 lg:sticky lg:top-28 lg:order-1">
               <motion.div
@@ -408,7 +411,6 @@ together`}
                 </motion.div>
               </motion.div>
             </aside>
-
             {/* RIGHT SIDE / FORM */}
             <form
               onSubmit={handleSubmit}
