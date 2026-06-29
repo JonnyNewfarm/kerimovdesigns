@@ -40,26 +40,32 @@ const PROJECTS_PER_VIEW = 5;
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const PaginationArrowIcon = ({ direction }: { direction: "prev" | "next" }) => {
+const PaginationTextArrow = ({ direction }: { direction: "prev" | "next" }) => {
   const isPrev = direction === "prev";
 
   return (
     <span
-      className={`pagination-arrow-icon ${isPrev ? "is-prev" : "is-next"}`}
+      className={`pagination-text-arrow ${isPrev ? "is-prev" : "is-next"}`}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 24 24">
-        <path className="arrow-line" d="M5 12H18" />
+      <svg viewBox="0 0 48 24">
+        {isPrev ? (
+          <>
+            {/* strek */}
+            <path d="M44 12H14" />
 
-        <path
-          className="arrow-wing arrow-wing-in"
-          d={isPrev ? "M13 17L18 12" : "M13 7L18 12"}
-        />
+            {/* utstikker som vokser ut mot venstre */}
+            <path className="pagination-text-arrow-wing" d="M14 12L24 4" />
+          </>
+        ) : (
+          <>
+            {/* strek */}
+            <path d="M4 12H34" />
 
-        <path
-          className="arrow-wing arrow-wing-out"
-          d={isPrev ? "M13 7L18 12" : "M13 17L18 12"}
-        />
+            {/* utstikker som vokser ut mot høyre */}
+            <path className="pagination-text-arrow-wing" d="M34 12L24 4" />
+          </>
+        )}
       </svg>
     </span>
   );
@@ -350,25 +356,26 @@ const ProjectsTable = ({
           </div>
 
           <div className="mt-6 flex shrink-0 items-center justify-between  pt-5">
-            <div className="flex pr-5 items-center justify-between w-full">
+            <div className="flex flex-col 2xl:flex-row pr-5 items-center justify-between w-full">
               <p className="text-[10px] uppercase tracking-[0.25em] text-white/50 sm:text-xs">
                 {String(pageIndex + 1).padStart(2, "0")} /{" "}
                 {String(totalPages).padStart(2, "0")}
               </p>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-6">
                 <button
                   type="button"
                   onClick={goToPrevPage}
                   disabled={!canGoPrevPage}
                   aria-label="Previous projects"
-                  className={`group relative flex h-16 w-16 cursor-pointer items-center justify-center text-lg leading-none ${
+                  className={`group inline-flex items-center gap-3 text-[12px] font-black uppercase tracking-[0.25em] transition-opacity duration-300 sm:text-md xl:text-lg 2xl:text-xl ${
                     canGoPrevPage
-                      ? "text-white"
-                      : "cursor-not-allowed text-white/20 opacity-40"
+                      ? "cursor-pointer text-white hover:opacity-70"
+                      : "cursor-not-allowed text-white/20 opacity-90"
                   }`}
                 >
-                  <PaginationArrowIcon direction="prev" />
+                  <PaginationTextArrow direction="prev" />
+                  <span>Prev</span>
                 </button>
 
                 <button
@@ -376,13 +383,14 @@ const ProjectsTable = ({
                   onClick={goToNextPage}
                   disabled={!canGoNextPage}
                   aria-label="Next projects"
-                  className={`group relative flex h-16 w-16 cursor-pointer items-center justify-center text-lg leading-none ${
+                  className={`group inline-flex items-center gap-3 text-[12px] font-black uppercase tracking-[0.25em] transition-opacity sm:text-md xl:text-xl duration-300 2l:text-xl ${
                     canGoNextPage
-                      ? "text-white"
-                      : "cursor-not-allowed text-white/20 opacity-40"
+                      ? "cursor-pointer text-white hover:opacity-70"
+                      : "cursor-not-allowed text-white/20 opacity-90"
                   }`}
                 >
-                  <PaginationArrowIcon direction="next" />
+                  <span>Next</span>
+                  <PaginationTextArrow direction="next" />
                 </button>
               </div>
             </div>
