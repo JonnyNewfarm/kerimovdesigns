@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { AnchorHTMLAttributes, MouseEvent, ReactNode } from "react";
+import { forwardRef } from "react";
 import {
   usePageTransition,
   type TransitionDirection,
@@ -16,55 +17,63 @@ interface TransitionLinkProps
   direction?: TransitionDirection;
 }
 
-export default function TransitionLink({
-  href,
-  children,
-  className,
-  target,
-  onClick,
-  transitionLabel,
-  direction = "left",
-  ...props
-}: TransitionLinkProps) {
-  const { startTransition, isTransitioning } = usePageTransition();
+const TransitionLink = forwardRef<HTMLAnchorElement, TransitionLinkProps>(
+  function TransitionLink(
+    {
+      href,
+      children,
+      className,
+      target,
+      onClick,
+      transitionLabel,
+      direction = "left",
+      ...props
+    },
+    ref,
+  ) {
+    const { startTransition, isTransitioning } = usePageTransition();
 
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    onClick?.(event);
+    const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+      onClick?.(event);
 
-    if (event.defaultPrevented) return;
+      if (event.defaultPrevented) return;
 
-    const isExternal =
-      href.startsWith("http") ||
-      href.startsWith("mailto:") ||
-      href.startsWith("tel:");
+      const isExternal =
+        href.startsWith("http") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:");
 
-    const isNewTab =
-      target === "_blank" ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.shiftKey ||
-      event.altKey;
+      const isNewTab =
+        target === "_blank" ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey;
 
-    const isAnchorOnly = href.startsWith("#");
+      const isAnchorOnly = href.startsWith("#");
 
-    if (isExternal || isNewTab || isAnchorOnly) return;
+      if (isExternal || isNewTab || isAnchorOnly) return;
 
-    event.preventDefault();
+      event.preventDefault();
 
-    if (!isTransitioning) {
-      startTransition(href, transitionLabel, direction);
-    }
-  };
+      if (!isTransitioning) {
+        startTransition(href, transitionLabel, direction);
+      }
+    };
 
-  return (
-    <Link
-      href={href}
-      target={target}
-      onClick={handleClick}
-      className={className}
-      {...props}
-    >
-      {children}
-    </Link>
-  );
-}
+    return (
+      <Link
+        ref={ref}
+        href={href}
+        target={target}
+        onClick={handleClick}
+        className={className}
+        {...props}
+      >
+        {children}
+      </Link>
+    );
+  },
+);
+
+export default TransitionLink;

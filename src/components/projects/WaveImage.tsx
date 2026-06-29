@@ -1,264 +1,259 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { fragment, vertex } from "@/components/projects/WaveShader";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 
-interface WaveImageProps {
+type WaveImageProps = {
   src: string;
-  allSrcs?: string[];
-  amplitude?: number;
-  waveLength?: number;
-  speed?: number;
-  segments?: number;
-  debugDelay?: number;
+  alt?: string;
+  className?: string;
+};
 
-  /**
-   * Hvor lenge wave-effekten varer når bildet byttes.
-   */
-  transitionDuration?: number;
+const vertexShader = `
+  uniform vec2 uMouse;
+  uniform float uHover;
+  uniform float uTime;
+  uniform float uStrength;
 
-  /**
-   * Hvis true får bildet wave også første gang det loader.
-   * Jeg anbefaler false for en roligere projects-side.
-   */
-  waveOnInitialLoad?: boolean;
-}
+  varying vec2 vUv;
+  varying float vDepth;
+  varying float vHover;
 
-const textureCache = new Map<string, THREE.Texture>();
-const loadingCache = new Map<string, Promise<THREE.Texture>>();
+  void main() {
+    vUv = uv;
 
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+    vec3 pos = position;
 
-function drawSpacedText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  startX: number,
-  y: number,
-  letterSpacing: number,
-) {
-  let currentX = startX;
+    vec2 centered = uv - 0.5;
 
-  for (const char of text) {
-    ctx.fillText(char, currentX, y);
-    currentX += ctx.measureText(char).width + letterSpacing;
-  }
-}
+    float dist = distance(uv, uMouse);
 
-function createLoadingTexture() {
-  const width = 1600;
-  const height = 1000;
+    // Stor, myk hover-zone.
+    float hoverInfluence = exp(-dist * dist * 9.0) * uHover;
 
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+    // Grid/paper displacement over hele planet.
+    // Dette er "rutene på et plane" som bøyer seg litt frem/bak.
+    float waveA = sin((uv.x * 8.0) + (uTime * 0.9));
+    float waveB = cos((uv.y * 7.0) - (uTime * 0.75));
+    float waveC = sin(((uv.x + uv.y) * 7.5) + (uTime * 0.55));
+    float waveD = cos(((uv.x - uv.y) * 6.0) - (uTime * 0.65));
 
-  const ctx = canvas.getContext("2d");
-
-  if (ctx) {
-    ctx.fillStyle = "#080808";
-    ctx.fillRect(0, 0, width, height);
-
-    const text = "LOADING IMAGE";
-    const x = 110;
-    const y = height - 150;
-
-    ctx.save();
-    ctx.fillStyle = "rgba(255,255,255,0.95)";
-    ctx.font = "900 40px Montserrat, Arial, Helvetica, sans-serif";
-    ctx.textBaseline = "bottom";
-
-    drawSpacedText(ctx, text, x, y, 8);
-
-    ctx.restore();
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = false;
-  texture.anisotropy = 1;
-  texture.wrapS = THREE.ClampToEdgeWrapping;
-  texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.needsUpdate = true;
-
-  return texture;
-}
-
-function prepareTexture(texture: THREE.Texture) {
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = false;
-  texture.anisotropy = 1;
-  texture.needsUpdate = true;
-
-  return texture;
-}
-
-function loadTexture(src: string) {
-  const cachedTexture = textureCache.get(src);
-
-  if (cachedTexture) {
-    return Promise.resolve(cachedTexture);
-  }
-
-  const existingLoad = loadingCache.get(src);
-
-  if (existingLoad) {
-    return existingLoad;
-  }
-
-  const loader = new THREE.TextureLoader();
-
-  const promise = new Promise<THREE.Texture>((resolve, reject) => {
-    loader.load(
-      src,
-      (texture) => {
-        const preparedTexture = prepareTexture(texture);
-
-        textureCache.set(src, preparedTexture);
-        loadingCache.delete(src);
-
-        resolve(preparedTexture);
-      },
-      undefined,
-      (error) => {
-        loadingCache.delete(src);
-        reject(error);
-      },
+    float globalDepth = (
+      waveA * 0.035 +
+      waveB * 0.032 +
+      waveC * 0.024 +
+      waveD * 0.018
     );
-  });
 
-  loadingCache.set(src, promise);
+    // Noen punkter går frem, noen går bak.
+    pos.z += globalDepth * uStrength;
 
-  return promise;
-}
+    // Hover lager ekstra fold rundt cursor.
+    float hoverWave = sin((dist * 22.0) - (uTime * 4.5)) * hoverInfluence;
+    pos.z += hoverInfluence * 0.22;
+    pos.z += hoverWave * 0.055;
 
-function easeOutCubic(value: number) {
-  return 1 - Math.pow(1 - value, 3);
-}
+    // Subtil drag ut fra cursor, så det føles som image-mesh.
+    vec2 dir = normalize(uv - uMouse + 0.0001);
+    pos.x += dir.x * hoverInfluence * 0.035;
+    pos.y += dir.y * hoverInfluence * 0.025;
 
-function WaveModel({
-  texture,
-  amplitude = 0.035,
-  waveLength = 5,
-  speed = 0.032,
-  segments = 16,
-  waveTrigger = 0,
-  transitionDuration = 0.7,
-}: {
-  texture: THREE.Texture;
-  amplitude?: number;
-  waveLength?: number;
-  speed?: number;
-  segments?: number;
-  waveTrigger?: number;
-  transitionDuration?: number;
-}) {
-  const image =
-    useRef<THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>>(null);
+    // Litt større dybde mot midten, men IKKE deformerte kanter.
+    float centerFalloff = 1.0 - smoothstep(0.0, 0.72, length(centered));
+    pos.z += centerFalloff * sin(uTime * 0.7 + uv.x * 4.0) * 0.018;
 
-  const { viewport } = useThree();
+    vDepth = globalDepth + hoverInfluence;
+    vHover = hoverInfluence;
 
-  const waveElapsedRef = useRef(transitionDuration);
-  const waveStrengthRef = useRef(0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  }
+`;
 
-  const uniforms = useRef({
-    uTime: {
-      value: 0,
-    },
-    uAmplitude: {
-      value: 0,
-    },
-    uWaveLength: {
-      value: waveLength,
-    },
-    uTexture: {
-      value: texture,
-    },
-    vUvScale: {
-      value: new THREE.Vector2(1, 1),
-    },
-  });
+const fragmentShader = `
+  uniform sampler2D uTexture;
+  uniform vec2 uMouse;
+  uniform float uHover;
+  uniform float uTime;
+  uniform vec2 uResolution;
+  uniform vec2 uImageResolution;
+
+  varying vec2 vUv;
+  varying float vDepth;
+  varying float vHover;
+
+  vec2 coverUv(vec2 uv, vec2 containerSize, vec2 imageSize) {
+    float containerRatio = containerSize.x / containerSize.y;
+    float imageRatio = imageSize.x / imageSize.y;
+
+    vec2 scale = vec2(1.0);
+    vec2 offset = vec2(0.0);
+
+    if (containerRatio > imageRatio) {
+      scale.y = imageRatio / containerRatio;
+      offset.y = (1.0 - scale.y) * 0.5;
+    } else {
+      scale.x = containerRatio / imageRatio;
+      offset.x = (1.0 - scale.x) * 0.5;
+    }
+
+    return uv * scale + offset;
+  }
+
+  void main() {
+    vec2 uv = vUv;
+
+    float dist = distance(uv, uMouse);
+    float hoverInfluence = exp(-dist * dist * 9.0) * uHover;
+
+    vec2 dir = normalize(uv - uMouse + 0.0001);
+
+    // UV distortion som følger mesh-bøyingen.
+    vec2 meshFlow = vec2(
+      sin((uv.y * 7.0) + (uTime * 0.7)),
+      cos((uv.x * 7.0) - (uTime * 0.6))
+    ) * 0.006;
+
+    vec2 hoverDistort = dir * hoverInfluence * 0.025;
+
+    vec2 distortedUv = uv + meshFlow + hoverDistort;
+
+    vec2 textureUv = coverUv(distortedUv, uResolution, uImageResolution);
+
+    vec4 color = texture2D(uTexture, textureUv);
+
+    // Lys/skygge fra Z-depth, så rutene føles som de går frem/bak.
+    color.rgb += vDepth * 0.18;
+    color.rgb += vHover * 0.10;
+
+    // Litt mørkere rundt selve trykket.
+    color.rgb -= smoothstep(0.22, 0.0, dist) * uHover * 0.055;
+
+    gl_FragColor = color;
+  }
+`;
+
+function WaveMesh({ src }: { src: string }) {
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+
+  const texture = useLoader(THREE.TextureLoader, src);
+  const viewport = useThree((state) => state.viewport);
+  const size = useThree((state) => state.size);
+
+  const mouse = useRef(new THREE.Vector2(0.5, 0.5));
+  const targetMouse = useRef(new THREE.Vector2(0.5, 0.5));
+
+  const hover = useRef(0);
+  const targetHover = useRef(0);
+
+  const strength = useRef(1);
+
+  const imageResolution = useMemo(() => {
+    const image = texture.image as HTMLImageElement | undefined;
+
+    return new THREE.Vector2(
+      image?.naturalWidth || image?.width || 1,
+      image?.naturalHeight || image?.height || 1,
+    );
+  }, [texture]);
+
+  const uniforms = useMemo(
+    () => ({
+      uTexture: {
+        value: texture,
+      },
+      uMouse: {
+        value: new THREE.Vector2(0.5, 0.5),
+      },
+      uHover: {
+        value: 0,
+      },
+      uTime: {
+        value: 0,
+      },
+      uStrength: {
+        value: 1,
+      },
+      uResolution: {
+        value: new THREE.Vector2(size.width, size.height),
+      },
+      uImageResolution: {
+        value: imageResolution,
+      },
+    }),
+    [texture, size.width, size.height, imageResolution],
+  );
 
   useEffect(() => {
-    if (!image.current) return;
-
-    image.current.material.uniforms.uTexture.value = texture;
-    image.current.material.needsUpdate = true;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.needsUpdate = true;
   }, [texture]);
 
   useEffect(() => {
-    if (waveTrigger <= 0) return;
+    if (!materialRef.current) return;
 
-    waveElapsedRef.current = 0;
-    waveStrengthRef.current = 1;
-  }, [waveTrigger]);
+    materialRef.current.uniforms.uResolution.value.set(size.width, size.height);
+    materialRef.current.uniforms.uImageResolution.value.copy(imageResolution);
+  }, [size.width, size.height, imageResolution]);
 
-  useFrame((_, delta) => {
-    if (!image.current) return;
+  useFrame((state, delta) => {
+    if (!materialRef.current) return;
 
-    const material = image.current.material;
-    const currentTexture = material.uniforms.uTexture.value as THREE.Texture;
+    hover.current = THREE.MathUtils.lerp(
+      hover.current,
+      targetHover.current,
+      1 - Math.pow(0.001, delta),
+    );
 
-    if (!currentTexture?.image) return;
+    mouse.current.lerp(targetMouse.current, 1 - Math.pow(0.001, delta));
 
-    const planeWidth = viewport.width;
-    const planeHeight = viewport.height;
+    // Litt roligere når man ikke hover, sterkere på hover.
+    const targetStrength = targetHover.current ? 1.25 : 0.7;
 
-    image.current.scale.x = planeWidth;
-    image.current.scale.y = planeHeight;
+    strength.current = THREE.MathUtils.lerp(
+      strength.current,
+      targetStrength,
+      1 - Math.pow(0.001, delta),
+    );
 
-    const planeAspect = planeWidth / planeHeight;
-
-    const imageWidth = currentTexture.image.width || 1;
-    const imageHeight = currentTexture.image.height || 1;
-
-    const imageAspect = imageWidth / imageHeight;
-
-    const uvScale = material.uniforms.vUvScale.value as THREE.Vector2;
-
-    if (planeAspect > imageAspect) {
-      uvScale.set(1, imageAspect / planeAspect);
-    } else {
-      uvScale.set(planeAspect / imageAspect, 1);
-    }
-
-    if (waveStrengthRef.current > 0) {
-      waveElapsedRef.current += delta;
-
-      const rawProgress = Math.min(
-        waveElapsedRef.current / transitionDuration,
-        1,
-      );
-
-      const easedProgress = easeOutCubic(rawProgress);
-      waveStrengthRef.current = 1 - easedProgress;
-
-      material.uniforms.uTime.value += speed;
-    }
-
-    material.uniforms.uAmplitude.value = amplitude * waveStrengthRef.current;
-    material.uniforms.uWaveLength.value = waveLength;
+    materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+    materialRef.current.uniforms.uHover.value = hover.current;
+    materialRef.current.uniforms.uMouse.value.copy(mouse.current);
+    materialRef.current.uniforms.uStrength.value = strength.current;
   });
 
   return (
-    <mesh ref={image}>
-      <planeGeometry args={[0.99, 1, segments, segments]} />
+    <mesh
+      scale={[viewport.width, viewport.height, 1]}
+      onPointerMove={(event) => {
+        if (!event.uv) return;
+        targetMouse.current.set(event.uv.x, event.uv.y);
+      }}
+      onPointerEnter={(event) => {
+        targetHover.current = 1;
+
+        if (event.uv) {
+          targetMouse.current.set(event.uv.x, event.uv.y);
+        }
+      }}
+      onPointerLeave={() => {
+        targetHover.current = 0;
+      }}
+    >
+      {/* Dette er rutene. Flere segments = mykere bøying. */}
+      <planeGeometry args={[1, 1, 160, 160]} />
 
       <shaderMaterial
-        fragmentShader={fragment}
-        vertexShader={vertex}
-        uniforms={uniforms.current}
-        side={THREE.DoubleSide}
-        transparent={false}
-        toneMapped={false}
+        ref={materialRef}
+        uniforms={uniforms}
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        side={THREE.FrontSide}
       />
     </mesh>
   );
@@ -266,123 +261,33 @@ function WaveModel({
 
 export default function WaveImage({
   src,
-  allSrcs = [],
-  amplitude = 0.035,
-  waveLength = 5,
-  speed = 0.032,
-  segments = 16,
-  debugDelay = 0,
-  transitionDuration = 0.7,
-  waveOnInitialLoad = false,
+  alt = "",
+  className = "",
 }: WaveImageProps) {
-  const loadingTexture = useMemo(() => createLoadingTexture(), []);
-
-  const previousSrcRef = useRef<string | null>(null);
-  const hasLoadedFirstImageRef = useRef(false);
-
-  const [waveTrigger, setWaveTrigger] = useState(0);
-
-  const [currentTexture, setCurrentTexture] = useState<THREE.Texture>(() => {
-    return textureCache.get(src) || loadingTexture;
-  });
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const previousSrc = previousSrcRef.current;
-    const isNewSrc = previousSrc !== null && previousSrc !== src;
-
-    previousSrcRef.current = src;
-
-    const shouldTriggerWave = () => {
-      if (waveOnInitialLoad && !hasLoadedFirstImageRef.current) {
-        return true;
-      }
-
-      return isNewSrc;
-    };
-
-    const cachedTexture = textureCache.get(src);
-
-    if (cachedTexture && debugDelay === 0) {
-      setCurrentTexture(cachedTexture);
-
-      if (shouldTriggerWave()) {
-        setWaveTrigger((current) => current + 1);
-      }
-
-      hasLoadedFirstImageRef.current = true;
-
-      return () => {
-        isMounted = false;
-      };
-    }
-
-    setCurrentTexture(loadingTexture);
-
-    Promise.all([loadTexture(src), wait(debugDelay)])
-      .then(([texture]) => {
-        if (!isMounted) return;
-
-        setCurrentTexture(texture);
-
-        if (shouldTriggerWave()) {
-          setWaveTrigger((current) => current + 1);
-        }
-
-        hasLoadedFirstImageRef.current = true;
-      })
-      .catch(() => {
-        if (!isMounted) return;
-
-        setCurrentTexture(loadingTexture);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [src, loadingTexture, debugDelay, waveOnInitialLoad]);
-
-  useEffect(() => {
-    const preloadSources = allSrcs.filter((imageSrc) => imageSrc !== src);
-
-    preloadSources.forEach((imageSrc) => {
-      loadTexture(imageSrc).catch(() => {
-        // Ignore preload errors.
-      });
-    });
-  }, [allSrcs, src]);
-
   return (
-    <div className="absolute inset-0 z-10 h-full w-full bg-dark">
+    <div
+      aria-label={alt}
+      role={alt ? "img" : undefined}
+      className={`relative h-full w-full overflow-hidden ${className}`}
+    >
       <Canvas
-        className="absolute inset-0 z-50 h-full w-full"
+        orthographic
         camera={{
           position: [0, 0, 2],
-          fov: 70,
+          zoom: 100,
+          near: 0.01,
+          far: 100,
         }}
-        dpr={[1, 1.5]}
         gl={{
-          antialias: false,
           alpha: true,
+          antialias: true,
           powerPreference: "high-performance",
-          outputColorSpace: THREE.SRGBColorSpace,
-          toneMapping: THREE.NoToneMapping,
         }}
-        onCreated={({ gl }) => {
-          gl.outputColorSpace = THREE.SRGBColorSpace;
-          gl.toneMapping = THREE.NoToneMapping;
-        }}
+        className="absolute inset-0 h-full w-full"
       >
-        <WaveModel
-          texture={currentTexture}
-          amplitude={amplitude}
-          waveLength={waveLength}
-          speed={speed}
-          segments={segments}
-          waveTrigger={waveTrigger}
-          transitionDuration={transitionDuration}
-        />
+        <Suspense fallback={null}>
+          <WaveMesh src={src} />
+        </Suspense>
       </Canvas>
     </div>
   );

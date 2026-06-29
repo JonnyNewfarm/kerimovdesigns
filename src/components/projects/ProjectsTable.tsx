@@ -14,10 +14,10 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
-import WaveLinkText from "@/components/WaveLink";
 import TransitionLink from "@/components/TransitionLink";
 import TextReveal from "@/components/TextReveal";
 import Image from "next/image";
+import MagneticComp from "../MagneticComp";
 
 type ProjectListItem = {
   id: string;
@@ -40,6 +40,30 @@ const PROJECTS_PER_VIEW = 5;
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
+const PaginationArrowIcon = ({ direction }: { direction: "prev" | "next" }) => {
+  const isPrev = direction === "prev";
+
+  return (
+    <span
+      className={`pagination-arrow-icon ${isPrev ? "is-prev" : "is-next"}`}
+      aria-hidden="true"
+    >
+      <svg viewBox="0 0 24 24">
+        <path className="arrow-line" d="M5 12H18" />
+
+        <path
+          className="arrow-wing arrow-wing-in"
+          d={isPrev ? "M13 17L18 12" : "M13 7L18 12"}
+        />
+
+        <path
+          className="arrow-wing arrow-wing-out"
+          d={isPrev ? "M13 7L18 12" : "M13 17L18 12"}
+        />
+      </svg>
+    </span>
+  );
+};
 const ProjectsTable = ({
   projects,
   children,
@@ -52,6 +76,8 @@ const ProjectsTable = ({
 
   const queuedProjectIndex = useRef<number | null>(null);
   const animationFrame = useRef<number | null>(null);
+  const imageLinkRef = useRef<HTMLAnchorElement | null>(null);
+  const lastPointerPosition = useRef<{ x: number; y: number } | null>(null);
 
   const imageMouseX = useMotionValue(0);
   const imageMouseY = useMotionValue(0);
@@ -165,12 +191,52 @@ const ProjectsTable = ({
   };
 
   const handleImageMouseMove = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    lastPointerPosition.current = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+
     const rect = event.currentTarget.getBoundingClientRect();
 
     imageMouseX.set(event.clientX - rect.left);
     imageMouseY.set(event.clientY - rect.top);
+
+    if (!isHoveringImage) {
+      setIsHoveringImage(true);
+    }
   };
 
+  useEffect(() => {
+    const checkInitialHover = (event: MouseEvent) => {
+      lastPointerPosition.current = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+
+      const element = imageLinkRef.current;
+      if (!element) return;
+
+      const rect = element.getBoundingClientRect();
+
+      const isInside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (!isInside) return;
+
+      imageMouseX.set(event.clientX - rect.left);
+      imageMouseY.set(event.clientY - rect.top);
+      setIsHoveringImage(true);
+    };
+
+    window.addEventListener("mousemove", checkInitialHover, { once: true });
+
+    return () => {
+      window.removeEventListener("mousemove", checkInitialHover);
+    };
+  }, [imageMouseX, imageMouseY]);
   const handleImageMouseEnter = (
     event: React.MouseEvent<HTMLAnchorElement>,
   ) => {
@@ -203,18 +269,18 @@ const ProjectsTable = ({
     <section className="w-full bg-dark text-color">
       <div className="mx-auto grid min-h-screen w-full max-w-[1800px] grid-cols-1 gap-10 px-7 pb-12 pt-28 sm:px-14 md:grid-cols-12 md:px-16 md:pt-32 lg:px-20 xl:px-24">
         <aside className="flex min-h-0 flex-col md:col-span-5 md:h-[calc(100vh-9rem)] md:pr-6 xl:col-span-4">
-          <div className="mb-8 flex min-h-[calc(clamp(3rem,5vw,5.4rem)*1.76+1.5rem)] shrink-0 items-end">
+          <div className="mb-6 flex min-h-[calc(clamp(3rem,5vw,5.4rem)*1.76+1.5rem)] shrink-0 items-end">
             <TextReveal
               as="p"
               mode="words"
               delay={0.05}
-              className="mb-4 text-[10px] font-black uppercase tracking-[0.35em] text-white/80 sm:text-xs"
+              className=" text-[10px] font-black uppercase tracking-[0.35em] text-white/80 sm:text-xs"
             >
               Selected Work
             </TextReveal>
           </div>
 
-          <div className="relative min-h-[390px] flex-1 overflow-hidden border-t border-[#ecebeb]/20">
+          <div className="relative min-h-[390px] flex-1 overflow-hidden">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={pageIndex}
@@ -246,13 +312,14 @@ const ProjectsTable = ({
 
                   return (
                     <TransitionLink
+                      ref={imageLinkRef}
                       key={project.id}
                       href={`/project/${project.id}`}
                       transitionLabel={project.title}
                       direction="right"
                       onMouseEnter={() => setProjectIndex(realIndex)}
                       onFocus={() => setProjectIndex(realIndex)}
-                      className="group flex min-h-[78px] w-full items-center justify-between gap-6 border-b border-[#ecebeb]/20 py-5 text-left transition-opacity duration-300"
+                      className="group flex min-h-[78px] w-full items-center justify-between gap-6  py-5 text-left transition-opacity duration-300"
                     >
                       <div className="flex min-w-0 items-start gap-4">
                         <span
@@ -265,7 +332,7 @@ const ProjectsTable = ({
 
                         <div className="min-w-0">
                           <h2
-                            className={`truncate uppercase leading-none tracking-[-0.045em] transition-all duration-500 ${
+                            className={`truncate uppercase font-black leading-none tracking-[-0.045em] transition-all duration-500 ${
                               isActive
                                 ? "translate-x-3 text-[clamp(1.75rem,2.1vw,2.65rem)] text-white opacity-100"
                                 : "translate-x-0 text-[clamp(1.45rem,1.75vw,2.15rem)] text-white/45 opacity-80"
@@ -282,12 +349,8 @@ const ProjectsTable = ({
             </AnimatePresence>
           </div>
 
-          <div className="mt-6 flex shrink-0 items-center justify-between border-t border-[#ecebeb]/20 pt-5">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-white/35 sm:text-xs">
-              Browse projects
-            </p>
-
-            <div className="flex items-center gap-5">
+          <div className="mt-6 flex shrink-0 items-center justify-between  pt-5">
+            <div className="flex pr-5 items-center justify-between w-full">
               <p className="text-[10px] uppercase tracking-[0.25em] text-white/50 sm:text-xs">
                 {String(pageIndex + 1).padStart(2, "0")} /{" "}
                 {String(totalPages).padStart(2, "0")}
@@ -299,20 +362,13 @@ const ProjectsTable = ({
                   onClick={goToPrevPage}
                   disabled={!canGoPrevPage}
                   aria-label="Previous projects"
-                  className={`group relative flex h-9 w-9 cursor-pointer items-center justify-center text-lg leading-none ${
+                  className={`group relative flex h-16 w-16 cursor-pointer items-center justify-center text-lg leading-none ${
                     canGoPrevPage
                       ? "text-white"
                       : "cursor-not-allowed text-white/20 opacity-40"
                   }`}
                 >
-                  <span className="absolute left-0 top-0 h-px w-full origin-right scale-x-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-0" />
-                  <span className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-0" />
-                  <span className="absolute left-0 top-0 h-full w-px origin-bottom scale-y-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-0" />
-                  <span className="absolute right-0 top-0 h-full w-px origin-top scale-y-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-0" />
-
-                  <span className="relative transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-x-1">
-                    ←
-                  </span>
+                  <PaginationArrowIcon direction="prev" />
                 </button>
 
                 <button
@@ -320,20 +376,13 @@ const ProjectsTable = ({
                   onClick={goToNextPage}
                   disabled={!canGoNextPage}
                   aria-label="Next projects"
-                  className={`group relative flex h-9 w-9 cursor-pointer items-center justify-center text-lg leading-none ${
+                  className={`group relative flex h-16 w-16 cursor-pointer items-center justify-center text-lg leading-none ${
                     canGoNextPage
                       ? "text-white"
                       : "cursor-not-allowed text-white/20 opacity-40"
                   }`}
                 >
-                  <span className="absolute left-0 top-0 h-px w-full origin-left scale-x-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-0" />
-                  <span className="absolute bottom-0 left-0 h-px w-full origin-right scale-x-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-0" />
-                  <span className="absolute left-0 top-0 h-full w-px origin-top scale-y-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-0" />
-                  <span className="absolute right-0 top-0 h-full w-px origin-bottom scale-y-100 bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-0" />
-
-                  <span className="relative transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1">
-                    →
-                  </span>
+                  <PaginationArrowIcon direction="next" />
                 </button>
               </div>
             </div>
@@ -344,46 +393,48 @@ const ProjectsTable = ({
 
         <main className="flex min-h-0 flex-col md:col-span-7 xl:col-span-8">
           <div className="ml-auto flex w-full max-w-[1080px] flex-col">
-            <TransitionLink
-              href={`/project/${activeProject.id}`}
-              transitionLabel={activeProject.title}
-              direction="right"
-              onMouseMove={handleImageMouseMove}
-              onMouseEnter={handleImageMouseEnter}
-              onMouseLeave={handleImageMouseLeave}
-              className="group relative isolate z-10 block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer overflow-hidden"
-              aria-label={`Open project ${activeProject.title}`}
-            >
-              <Image
-                src={activeProject.src}
-                alt={activeProject.title}
-                fill
-                priority
-                sizes="(min-width: 1280px) 66vw, (min-width: 768px) 58vw, 100vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-              />
-
-              <motion.div
-                aria-hidden="true"
-                style={{
-                  x: cursorX,
-                  y: cursorY,
-                }}
-                animate={{
-                  opacity: isHoveringImage ? 1 : 0,
-                  scale: isHoveringImage ? 1 : 0.35,
-                }}
-                transition={{
-                  opacity: { duration: 0.2, ease: "easeOut" },
-                  scale: { duration: 0.35, ease },
-                }}
-                className="pointer-events-none absolute left-0 top-0 z-20 hidden -translate-x-1/2 -translate-y-1/2 mix-blend-difference lg:flex"
+            <MagneticComp>
+              <TransitionLink
+                href={`/project/${activeProject.id}`}
+                transitionLabel={activeProject.title}
+                direction="right"
+                onMouseMove={handleImageMouseMove}
+                onMouseEnter={handleImageMouseEnter}
+                onMouseLeave={handleImageMouseLeave}
+                className="group relative isolate z-10 block h-[clamp(360px,56vh,640px)] w-full shrink-0 cursor-pointer overflow-hidden"
+                aria-label={`Open project ${activeProject.title}`}
               >
-                <div className="text-center text-[7vw] font-black uppercase leading-[0.78] tracking-[-0.035em] text-white md:text-[5.8vw] lg:text-[4.8vw]">
-                  View case
-                </div>
-              </motion.div>
-            </TransitionLink>
+                <Image
+                  src={activeProject.src}
+                  alt={activeProject.title}
+                  fill
+                  priority
+                  sizes="(min-width: 1280px) 66vw, (min-width: 768px) 58vw, 100vw"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                />
+
+                <motion.div
+                  aria-hidden="true"
+                  style={{
+                    x: cursorX,
+                    y: cursorY,
+                  }}
+                  animate={{
+                    opacity: isHoveringImage ? 1 : 0,
+                    scale: isHoveringImage ? 1 : 0.35,
+                  }}
+                  transition={{
+                    opacity: { duration: 0.2, ease: "easeOut" },
+                    scale: { duration: 0.35, ease },
+                  }}
+                  className="pointer-events-none absolute left-0 top-0 z-20 hidden -translate-x-1/2 -translate-y-1/2 mix-blend-difference lg:flex"
+                >
+                  <div className="text-center text-[7vw] font-black uppercase leading-[0.78] tracking-[-0.035em] text-white md:text-[5.8vw] lg:text-[4.8vw]">
+                    View case
+                  </div>
+                </motion.div>
+              </TransitionLink>
+            </MagneticComp>
 
             <div className="mt-7 min-h-0 pt-7">
               <AnimatePresence initial={false} mode="sync">
@@ -421,7 +472,6 @@ const ProjectsTable = ({
                   >
                     Featured Project
                   </TextReveal>
-
                   <TransitionLink
                     href={`/project/${activeProject.id}`}
                     transitionLabel={activeProject.title}
@@ -440,83 +490,40 @@ const ProjectsTable = ({
                       {activeProject.title}
                     </TextReveal>
                   </TransitionLink>
+                  <div className="mt-6 grid grid-cols-1 gap-6 pt-6 sm:grid-cols-3">
+                    {activeProject.role ? (
+                      <div>
+                        <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/35 sm:text-xs">
+                          Role
+                        </p>
+                        <p className="text-sm uppercase tracking-[0.12em] text-white/75">
+                          {activeProject.role}
+                        </p>
+                      </div>
+                    ) : null}
 
-                  <div className="mt-6 grid grid-cols-1 gap-6 border-t border-[#ecebeb]/20 pt-6 sm:grid-cols-3">
-                    <div>
-                      <TextReveal
-                        as="p"
-                        mode="words"
-                        delay={0.04}
-                        viewport={false}
-                        className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
-                      >
-                        Role
-                      </TextReveal>
+                    {activeProject.type ? (
+                      <div>
+                        <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/35 sm:text-xs">
+                          Type
+                        </p>
+                        <p className="text-sm uppercase tracking-[0.12em] text-white/75">
+                          {activeProject.type}
+                        </p>
+                      </div>
+                    ) : null}
 
-                      <TextReveal
-                        as="p"
-                        mode="words"
-                        delay={0.06}
-                        viewport={false}
-                        className="text-sm text-white/90 sm:text-base"
-                      >
-                        {activeProject.role ?? ""}
-                      </TextReveal>
-                    </div>
-
-                    <div>
-                      <TextReveal
-                        as="p"
-                        mode="words"
-                        delay={0.05}
-                        viewport={false}
-                        className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
-                      >
-                        Type
-                      </TextReveal>
-
-                      <TextReveal
-                        as="p"
-                        mode="words"
-                        delay={0.07}
-                        viewport={false}
-                        className="text-sm text-white/90 sm:text-base"
-                      >
-                        {activeProject.type ?? ""}
-                      </TextReveal>
-                    </div>
-
-                    <div>
-                      <TextReveal
-                        as="p"
-                        mode="words"
-                        delay={0.06}
-                        viewport={false}
-                        className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
-                      >
-                        Tools
-                      </TextReveal>
-
-                      <TextReveal
-                        as="p"
-                        mode="words"
-                        delay={0.08}
-                        viewport={false}
-                        className="text-sm text-white/90 sm:text-base"
-                      >
-                        {activeProject.tools ?? ""}
-                      </TextReveal>
-                    </div>
-                  </div>
-
-                  <TransitionLink
-                    href={`/project/${activeProject.id}`}
-                    transitionLabel="Open Project"
-                    direction="right"
-                    className="mt-6 inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.28em] text-white/80 transition-opacity duration-300 hover:opacity-60 sm:text-xs"
-                  >
-                    <WaveLinkText text="Open Project" />
-                  </TransitionLink>
+                    {activeProject.tools ? (
+                      <div>
+                        <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/35 sm:text-xs">
+                          Tools
+                        </p>
+                        <p className="text-sm uppercase tracking-[0.12em] text-white/75">
+                          {activeProject.tools}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>{" "}
                 </motion.div>
               </AnimatePresence>
             </div>
