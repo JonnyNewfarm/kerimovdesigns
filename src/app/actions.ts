@@ -5,6 +5,7 @@ import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 type ProjectData = {
   title: string;
+  description?: string;
   src: string;
   src2?: string;
   src3?: string;
@@ -22,6 +23,7 @@ type ProjectData = {
 
 type UpdateProjectData = {
   title?: string;
+  description?: string;
   src?: string;
   src2?: string;
   src3?: string;
@@ -40,6 +42,7 @@ type UpdateProjectData = {
 const projectListSelect = {
   id: true,
   title: true,
+  description: true,
   src: true,
   role: true,
   type: true,
@@ -50,6 +53,7 @@ const projectListSelect = {
 const projectDetailSelect = {
   id: true,
   title: true,
+  description: true,
   src: true,
   src2: true,
   src3: true,
@@ -87,6 +91,7 @@ export async function createProject(data: ProjectData) {
     const project = await prisma.project.create({
       data: {
         title: data.title,
+        description: data.description || "",
         src: data.src,
         src2: data.src2 || "",
         src3: data.src3 || "",
@@ -131,6 +136,9 @@ export async function updateProject(id: string, data: UpdateProjectData) {
       },
       data: {
         ...(data.title !== undefined && { title: data.title }),
+        ...(data.description !== undefined && {
+          description: data.description,
+        }),
         ...(data.src !== undefined && { src: data.src }),
         ...(data.src2 !== undefined && { src2: data.src2 }),
         ...(data.src3 !== undefined && { src3: data.src3 }),
