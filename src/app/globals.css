@@ -87,7 +87,52 @@ body {
   .text-color {
     color: #ecdfcc;
   }
+.pagination-arrow-icon {
+  display: block;
+  width: 60px;
+  height: 60px;
+  overflow: visible;
+}
 
+.pagination-arrow-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.35;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  overflow: visible;
+}
+
+/* venstre pil peker venstre */
+.pagination-arrow-icon.is-prev {
+  transform: scaleX(-1);
+}
+
+.arrow-wing {
+  transform-box: fill-box;
+  transform-origin: right center;
+}
+
+.arrow-wing-in {
+  transform: scaleX(1);
+  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.arrow-wing-out {
+  transform: scaleX(0);
+  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* hover på knappen */
+.group:hover .arrow-wing-in {
+  transform: scaleX(0);
+}
+
+.group:hover .arrow-wing-out {
+  transform: scaleX(1);
+}
 .hero-intro-logo path {
   fill: transparent;
   stroke: #ecdfcc;
