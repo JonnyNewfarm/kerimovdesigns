@@ -63,47 +63,49 @@ const Page = async ({ searchParams }: PageProps) => {
             projects={mobileProjects}
             startIndex={startIndex}
           >
-            <div className="mt-10 flex w-full items-center justify-between pt-6">
-              <Link
-                href={prevPage ? `/projects?page=${prevPage}` : "#"}
-                aria-disabled={!prevPage}
-                tabIndex={prevPage ? 0 : -1}
-                prefetch={!!prevPage}
-                className={`group flex min-h-12 min-w-12 items-center justify-center border border-color/25 px-4 text-sm uppercase tracking-[0.18em] transition-all duration-300 ${
-                  prevPage
-                    ? "font-black text-color"
-                    : "pointer-events-none border-color/10 text-color/20"
-                }`}
-              >
-                <span className="mr-2 text-xl leading-none transition-transform duration-300 group-hover:-translate-x-1">
-                  ←
-                </span>
-                Prev
-              </Link>
+            <div className=" flex flex-row-reverse w-full items-center justify-between pt-6">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+                {String(currentPage).padStart(2, "0")} /{" "}
+                {String(totalPages).padStart(2, "0")}
+              </p>
 
-              <div className="flex flex-col items-center leading-none">
-                <span className="mt-2 text-sm tracking-[0.18em] text-color">
-                  {String(currentPage).padStart(2, "0")} /{" "}
-                  {String(totalPages).padStart(2, "0")}
-                </span>
+              <div className="flex items-center gap-6">
+                {prevPage ? (
+                  <Link
+                    href={`/projects?page=${prevPage}`}
+                    prefetch
+                    aria-label="Previous projects"
+                    className="flex min-h-12 min-w-12 items-center justify-center text-white"
+                  >
+                    <PaginationArrow direction="prev" />
+                  </Link>
+                ) : (
+                  <span
+                    aria-disabled="true"
+                    className="flex min-h-12 min-w-12 items-center justify-center text-white/20"
+                  >
+                    <PaginationArrow direction="prev" />
+                  </span>
+                )}
+
+                {nextPage ? (
+                  <Link
+                    href={`/projects?page=${nextPage}`}
+                    prefetch
+                    aria-label="Next projects"
+                    className="flex min-h-12 min-w-12 items-center justify-center text-white"
+                  >
+                    <PaginationArrow direction="next" />
+                  </Link>
+                ) : (
+                  <span
+                    aria-disabled="true"
+                    className="flex min-h-12 min-w-12 items-center justify-center text-white/20"
+                  >
+                    <PaginationArrow direction="next" />
+                  </span>
+                )}
               </div>
-
-              <Link
-                href={nextPage ? `/projects?page=${nextPage}` : "#"}
-                aria-disabled={!nextPage}
-                tabIndex={nextPage ? 0 : -1}
-                prefetch={!!nextPage}
-                className={`group flex min-h-12 min-w-12 items-center justify-center border border-color/25 px-4 text-sm uppercase tracking-[0.18em] transition-all duration-300 ${
-                  nextPage
-                    ? "font-black text-color"
-                    : "pointer-events-none border-color/10 text-color/20"
-                }`}
-              >
-                Next
-                <span className="ml-2 text-xl leading-none transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
             </div>
           </ProjectsTableMobile>
         </div>
@@ -113,3 +115,36 @@ const Page = async ({ searchParams }: PageProps) => {
 };
 
 export default Page;
+
+const PaginationArrow = ({ direction }: { direction: "prev" | "next" }) => {
+  const isPrev = direction === "prev";
+
+  return (
+    <svg
+      viewBox="0 0 48 24"
+      className="h-8 w-16 fill-none stroke-current"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {isPrev ? (
+        <>
+          {/* Linje mot venstre */}
+          <path d="M44 12H14" />
+
+          {/* Utstikker ned */}
+          <path d="M14 12L24 20" />
+        </>
+      ) : (
+        <>
+          {/* Linje mot høyre */}
+          <path d="M4 12H34" />
+
+          {/* Utstikker opp */}
+          <path d="M34 12L24 4" />
+        </>
+      )}
+    </svg>
+  );
+};
