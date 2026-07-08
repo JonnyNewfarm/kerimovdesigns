@@ -1,39 +1,51 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 import WaveLinkText from "./WaveLink";
 import TransitionLink from "./TransitionLink";
 
 const Navbar = () => {
+  const pathname = usePathname();
+
+  const getLinkClassName = (href: string) => {
+    const isActive = pathname === href;
+
+    return [
+      "inline-block transition-opacity duration-300",
+      isActive ? "opacity-100" : "opacity-80 hover:opacity-100",
+    ].join(" ");
+  };
+
   return (
-    <div className="w-full hidden md:block fixed top-0 z-[9999]">
-      <div className="bg-dark font-extrabold text-[16px] text-color md:px-20 md:py-3 flex items-center z-50 w-full justify-between">
-        <div className="w-full h-full">
+    <div className="fixed top-0 z-[9999] hidden w-full md:block">
+      <div className="bg-dark text-color z-50 flex w-full items-center justify-between px-20 py-3 text-[16px] font-extrabold">
+        <div className="h-full w-full">
           <div className="flex items-center justify-between">
             <div className="tracking-tighter">
-              <h1 className="opacity-70 m-0 leading-none">Name:</h1>
+              <h1 className="m-0 leading-none opacity-70">Name:</h1>
               <p className="m-0 leading-tight">Rustam Kerimov</p>
             </div>
 
             <div className="tracking-tighter">
-              <h1 className="opacity-70 m-0 leading-none">Occupation:</h1>
+              <h1 className="m-0 leading-none opacity-70">Occupation:</h1>
               <p className="m-0 leading-tight">Graphic designer</p>
             </div>
 
             <div className="tracking-tighter">
-              <h1 className="opacity-70 m-0 leading-none">Location:</h1>
+              <h1 className="m-0 leading-none opacity-70">Location:</h1>
               <p className="m-0 leading-tight">Oslo, Norway</p>
             </div>
 
             <div className="tracking-tighter">
-              <h1 className="opacity-70 m-0 leading-none">Navigation:</h1>
+              <h1 className="m-0 leading-none opacity-70">Navigation:</h1>
 
-              <div className="flex gap-x-1 m-0 leading-tight">
+              <div className="m-0 flex gap-x-1 leading-tight">
                 <TransitionLink
                   href="/"
                   transitionLabel="Welcome Back"
                   direction="right"
-                  className="inline-block"
+                  className={getLinkClassName("/")}
                 >
                   <WaveLinkText text="Home," />
                 </TransitionLink>
@@ -42,7 +54,7 @@ const Navbar = () => {
                   href="/projects"
                   transitionLabel="Selected Work"
                   direction="left"
-                  className="inline-block"
+                  className={getLinkClassName("/projects")}
                 >
                   <WaveLinkText text="My work," />
                 </TransitionLink>
@@ -51,7 +63,7 @@ const Navbar = () => {
                   href="/contact"
                   transitionLabel="Let's Collaborate"
                   direction="right"
-                  className="inline-block"
+                  className={getLinkClassName("/contact")}
                 >
                   <WaveLinkText text="Contact" />
                 </TransitionLink>
