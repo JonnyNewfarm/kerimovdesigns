@@ -6,6 +6,7 @@ import NavbarMobile from "@/components/NavbarMobile";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 import PageTransitionProvider from "@/components/ClientPageTransitionWrapper";
+import { ProjectNavProvider } from "@/components/ProjectNavContext";
 
 export const metadata: Metadata = {
   title: "Rustam Kerimov | Portfolio",
@@ -22,9 +23,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <PageTransitionProvider>
-          <Navbar />
-          <NavbarMobile />
-          {children}
+          <ProjectNavProvider>
+            <Navbar />
+            <NavbarMobile />
+            {children}
+          </ProjectNavProvider>
           <Footer />
         </PageTransitionProvider>
 

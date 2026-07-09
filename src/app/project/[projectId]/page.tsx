@@ -2,6 +2,7 @@ import { getProjectById } from "@/app/actions";
 import { notFound } from "next/navigation";
 import SmoothScroll from "@/components/SmoothScroll";
 import ProjectModalWrapper from "@/components/ProjectModalWrapper";
+import { ProjectNavTitleSetter } from "@/components/ProjectNavContext";
 import type { Metadata } from "next";
 
 type ParamsType = Promise<{
@@ -59,6 +60,8 @@ const Page = async ({ params }: Props) => {
 
   return (
     <SmoothScroll>
+      <ProjectNavTitleSetter title={project.title} />
+
       <main className="min-h-screen bg-dark text-color">
         <ProjectModalWrapper project={project} />
       </main>

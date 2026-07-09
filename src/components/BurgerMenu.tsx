@@ -130,7 +130,7 @@ const BurgerMenu = () => {
             delay: isOpen ? 0.2 : 0,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className="mb-10 border-b border-white/10 pb-6"
+          className="mb-4  pb-6"
         >
           <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/40">
             Navigation
