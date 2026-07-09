@@ -56,14 +56,14 @@ type MobileLayoutItem = {
   driftDirection: 1 | -1;
 };
 
-const BASE_WIDTH = 580;
+const BASE_WIDTH = 720;
 const BASE_HEIGHT = 430;
 
 const DESKTOP_SAFE_PADDING = 24;
 const MOBILE_SAFE_PADDING = 16;
 
 const MOBILE_CONTAINER_MAX_WIDTH = 430;
-const MOBILE_CARD_BASE_WIDTH = 320;
+const MOBILE_CARD_BASE_WIDTH = 360;
 const MOBILE_CARD_BASE_HEIGHT = 214;
 
 const desktopLayout: LayoutItem[] = [
@@ -106,8 +106,8 @@ const desktopLayout: LayoutItem[] = [
     top: 1100,
     topMd: 1100,
     topLg: 1100,
-    topXl: 950,
-    top2xl: 950,
+    topXl: 1100,
+    top2xl: 1100,
     scale: 0.9,
     drift: 90,
     driftDirection: -1,
