@@ -12,19 +12,22 @@ model Project {
   title       String
   description String @default("")
 
-  src       String   @db.String
-  src2      String?  @db.String
-  src3      String?  @db.String
-  src4      String?  @db.String
-  src5      String?  @db.String
-  src6      String?  @db.String
-  src7      String?  @db.String
-  src8      String?  @db.String
-  src9      String?  @db.String
-  srcVideo  String?  @db.String
-  role      String?
-  type      String?
-  tools     String?
+  src      String  @db.String
+  src2     String? @db.String
+  src3     String? @db.String
+  src4     String? @db.String
+  src5     String? @db.String
+  src6     String? @db.String
+  src7     String? @db.String
+  src8     String? @db.String
+  src9     String? @db.String
+  srcVideo String? @db.String
+
+  type  String?
+  tools String?
+
+  tags String[] @default([])
+
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }

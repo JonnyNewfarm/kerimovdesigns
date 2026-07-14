@@ -16,9 +16,9 @@ type ProjectData = {
   src8?: string;
   src9?: string;
   srcVideo?: string;
-  role?: string;
   type?: string;
   tools?: string;
+  tags: string[];
 };
 
 type UpdateProjectData = {
@@ -34,9 +34,9 @@ type UpdateProjectData = {
   src8?: string;
   src9?: string;
   srcVideo?: string;
-  role?: string;
   type?: string;
   tools?: string;
+  tags?: string[];
 };
 
 const projectListSelect = {
@@ -44,9 +44,9 @@ const projectListSelect = {
   title: true,
   description: true,
   src: true,
-  role: true,
   type: true,
   tools: true,
+  tags: true,
   createdAt: true,
 };
 
@@ -64,11 +64,52 @@ const projectDetailSelect = {
   src8: true,
   src9: true,
   srcVideo: true,
-  role: true,
   type: true,
   tools: true,
+  tags: true,
   createdAt: true,
   updatedAt: true,
+};
+
+const normalizeTag = (tag?: string) => {
+  if (!tag) {
+    return undefined;
+  }
+
+  const normalizedTag = tag
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-");
+
+  return normalizedTag || undefined;
+};
+
+const normalizeTags = (tags?: string[]) => {
+  if (!tags) {
+    return [];
+  }
+
+  return [
+    ...new Set(
+      tags
+        .map((tag) => normalizeTag(tag))
+        .filter((tag): tag is string => Boolean(tag)),
+    ),
+  ];
+};
+
+const createTagFilter = (tag?: string) => {
+  const normalizedTag = normalizeTag(tag);
+
+  if (!normalizedTag) {
+    return undefined;
+  }
+
+  return {
+    tags: {
+      has: normalizedTag,
+    },
+  };
 };
 
 function revalidateProjects() {
@@ -88,10 +129,16 @@ export async function createProject(data: ProjectData) {
       throw new Error("Invalid image src passed to DB.");
     }
 
+    const tags = normalizeTags(data.tags);
+
+    if (!tags.length) {
+      throw new Error("At least one project tag is required.");
+    }
+
     const project = await prisma.project.create({
       data: {
-        title: data.title,
-        description: data.description || "",
+        title: data.title.trim(),
+        description: data.description?.trim() || "",
         src: data.src,
         src2: data.src2 || "",
         src3: data.src3 || "",
@@ -102,9 +149,9 @@ export async function createProject(data: ProjectData) {
         src8: data.src8 || "",
         src9: data.src9 || "",
         srcVideo: data.srcVideo || "",
-        role: data.role || "",
-        type: data.type || "",
-        tools: data.tools || "",
+        type: data.type?.trim() || "",
+        tools: data.tools?.trim() || "",
+        tags,
       },
     });
 
@@ -119,15 +166,34 @@ export async function createProject(data: ProjectData) {
 
     return {
       success: false,
-      error: "Could not create project",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Could not create project",
     };
   }
 }
 
-export async function updateProject(id: string, data: UpdateProjectData) {
+export async function updateProject(
+  id: string,
+  data: UpdateProjectData,
+) {
   try {
     if (!id) {
       throw new Error("Project ID is required");
+    }
+
+    const normalizedTags =
+      data.tags !== undefined
+        ? normalizeTags(data.tags)
+        : undefined;
+
+    if (
+      data.tags !== undefined &&
+      normalizedTags !== undefined &&
+      !normalizedTags.length
+    ) {
+      throw new Error("At least one project tag is required.");
     }
 
     const updatedProject = await prisma.project.update({
@@ -135,23 +201,65 @@ export async function updateProject(id: string, data: UpdateProjectData) {
         id,
       },
       data: {
-        ...(data.title !== undefined && { title: data.title }),
-        ...(data.description !== undefined && {
-          description: data.description,
+        ...(data.title !== undefined && {
+          title: data.title.trim(),
         }),
-        ...(data.src !== undefined && { src: data.src }),
-        ...(data.src2 !== undefined && { src2: data.src2 }),
-        ...(data.src3 !== undefined && { src3: data.src3 }),
-        ...(data.src4 !== undefined && { src4: data.src4 }),
-        ...(data.src5 !== undefined && { src5: data.src5 }),
-        ...(data.src6 !== undefined && { src6: data.src6 }),
-        ...(data.src7 !== undefined && { src7: data.src7 }),
-        ...(data.src8 !== undefined && { src8: data.src8 }),
-        ...(data.src9 !== undefined && { src9: data.src9 }),
-        ...(data.srcVideo !== undefined && { srcVideo: data.srcVideo }),
-        ...(data.role !== undefined && { role: data.role }),
-        ...(data.type !== undefined && { type: data.type }),
-        ...(data.tools !== undefined && { tools: data.tools }),
+
+        ...(data.description !== undefined && {
+          description: data.description.trim(),
+        }),
+
+        ...(data.src !== undefined && {
+          src: data.src,
+        }),
+
+        ...(data.src2 !== undefined && {
+          src2: data.src2,
+        }),
+
+        ...(data.src3 !== undefined && {
+          src3: data.src3,
+        }),
+
+        ...(data.src4 !== undefined && {
+          src4: data.src4,
+        }),
+
+        ...(data.src5 !== undefined && {
+          src5: data.src5,
+        }),
+
+        ...(data.src6 !== undefined && {
+          src6: data.src6,
+        }),
+
+        ...(data.src7 !== undefined && {
+          src7: data.src7,
+        }),
+
+        ...(data.src8 !== undefined && {
+          src8: data.src8,
+        }),
+
+        ...(data.src9 !== undefined && {
+          src9: data.src9,
+        }),
+
+        ...(data.srcVideo !== undefined && {
+          srcVideo: data.srcVideo,
+        }),
+
+        ...(data.type !== undefined && {
+          type: data.type.trim(),
+        }),
+
+        ...(data.tools !== undefined && {
+          tools: data.tools.trim(),
+        }),
+
+        ...(normalizedTags !== undefined && {
+          tags: normalizedTags,
+        }),
       },
     });
 
@@ -167,14 +275,20 @@ export async function updateProject(id: string, data: UpdateProjectData) {
 
     return {
       success: false,
-      error: "Could not update project",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Could not update project",
     };
   }
 }
 
 const getCachedProjects = unstable_cache(
-  async () => {
+  async (tag?: string) => {
+    const where = createTagFilter(tag);
+
     return prisma.project.findMany({
+      where,
       orderBy: {
         createdAt: "desc",
       },
@@ -188,18 +302,22 @@ const getCachedProjects = unstable_cache(
   },
 );
 
-export async function getProjects() {
+export async function getProjects(tag?: string) {
   try {
-    return await getCachedProjects();
+    return await getCachedProjects(tag);
   } catch (error) {
     console.error("Error fetching projects:", error);
+
     throw new Error("Failed to fetch projects");
   }
 }
 
 const getCachedProjectsMobile = unstable_cache(
-  async () => {
+  async (tag?: string) => {
+    const where = createTagFilter(tag);
+
     return prisma.project.findMany({
+      where,
       take: 3,
       orderBy: {
         createdAt: "desc",
@@ -214,11 +332,12 @@ const getCachedProjectsMobile = unstable_cache(
   },
 );
 
-export async function getProjectsMobile() {
+export async function getProjectsMobile(tag?: string) {
   try {
-    return await getCachedProjectsMobile();
+    return await getCachedProjectsMobile(tag);
   } catch (error) {
     console.error("Error fetching mobile projects:", error);
+
     throw new Error("Failed to fetch projects");
   }
 }
@@ -248,6 +367,7 @@ export async function getProjectById(id: string) {
     return await getCachedProjectById(id);
   } catch (error) {
     console.error("Error fetching project by ID:", error);
+
     throw new Error("Failed to fetch project");
   }
 }
@@ -282,8 +402,11 @@ export async function deleteProjectById(id: string) {
 }
 
 const getCachedLatestProject = unstable_cache(
-  async () => {
+  async (tag?: string) => {
+    const where = createTagFilter(tag);
+
     return prisma.project.findFirst({
+      where,
       orderBy: {
         createdAt: "desc",
       },
@@ -297,23 +420,31 @@ const getCachedLatestProject = unstable_cache(
   },
 );
 
-export async function getLatestProject() {
+export async function getLatestProject(tag?: string) {
   try {
-    return await getCachedLatestProject();
+    return await getCachedLatestProject(tag);
   } catch (error) {
     console.error("Error fetching latest project:", error);
+
     throw new Error("Failed to fetch latest project");
   }
 }
 
 const getCachedProjectsPagination = unstable_cache(
-  async (page: number, limit: number) => {
+  async (
+    page: number,
+    limit: number,
+    tag?: string,
+  ) => {
     const safePage = Math.max(page, 1);
     const safeLimit = Math.max(limit, 1);
     const skip = (safePage - 1) * safeLimit;
 
+    const where = createTagFilter(tag);
+
     const [projects, total] = await Promise.all([
       prisma.project.findMany({
+        where,
         skip,
         take: safeLimit,
         orderBy: {
@@ -321,7 +452,10 @@ const getCachedProjectsPagination = unstable_cache(
         },
         select: projectListSelect,
       }),
-      prisma.project.count(),
+
+      prisma.project.count({
+        where,
+      }),
     ]);
 
     return {
@@ -336,11 +470,23 @@ const getCachedProjectsPagination = unstable_cache(
   },
 );
 
-export async function getProjectsPagination(page = 1, limit = 5) {
+export async function getProjectsPagination(
+  page = 1,
+  limit = 5,
+  tag?: string,
+) {
   try {
-    return await getCachedProjectsPagination(page, limit);
+    return await getCachedProjectsPagination(
+      page,
+      limit,
+      tag,
+    );
   } catch (error) {
-    console.error("Error fetching paginated projects:", error);
+    console.error(
+      "Error fetching paginated projects:",
+      error,
+    );
+
     throw new Error("Failed to fetch projects");
   }
 }

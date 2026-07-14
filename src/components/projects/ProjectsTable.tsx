@@ -18,14 +18,15 @@ import TransitionLink from "@/components/TransitionLink";
 import TextReveal from "@/components/TextReveal";
 import Image from "next/image";
 import MagneticComp from "../MagneticComp";
+import ProjectsTagFilter from "./ProjectsTagFilter";
 
 type ProjectListItem = {
   id: string;
   title: string;
   src: string;
-  role: string | null;
   type: string | null;
   tools: string | null;
+  tags: string[];
   createdAt?: Date;
   description?: string | null;
 };
@@ -34,11 +35,17 @@ interface ProjectsTableProps {
   projects: ProjectListItem[];
   children?: ReactNode;
   startIndex: number;
+  availableTags?: string[];
+  activeTags?: string[];
 }
 
 const PROJECTS_PER_VIEW = 5;
 
 const ease = [0.22, 1, 0.36, 1] as const;
+
+const formatTag = (tag: string) => {
+  return tag.replaceAll("-", " ");
+};
 
 const PaginationTextArrow = ({ direction }: { direction: "prev" | "next" }) => {
   const isPrev = direction === "prev";
@@ -51,18 +58,12 @@ const PaginationTextArrow = ({ direction }: { direction: "prev" | "next" }) => {
       <svg viewBox="0 0 48 24">
         {isPrev ? (
           <>
-            {/* strek */}
             <path d="M44 12H14" />
-
-            {/* utstikker som vokser ut mot venstre */}
             <path className="pagination-text-arrow-wing" d="M14 12L24 4" />
           </>
         ) : (
           <>
-            {/* strek */}
             <path d="M4 12H34" />
-
-            {/* utstikker som vokser ut mot høyre */}
             <path className="pagination-text-arrow-wing" d="M34 12L24 4" />
           </>
         )}
@@ -70,10 +71,13 @@ const PaginationTextArrow = ({ direction }: { direction: "prev" | "next" }) => {
     </span>
   );
 };
+
 const ProjectsTable = ({
   projects,
   children,
   startIndex,
+  availableTags = [],
+  activeTags = [],
 }: ProjectsTableProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [pageIndex, setPageIndex] = useState(0);
@@ -83,7 +87,6 @@ const ProjectsTable = ({
   const queuedProjectIndex = useRef<number | null>(null);
   const animationFrame = useRef<number | null>(null);
   const imageLinkRef = useRef<HTMLAnchorElement | null>(null);
-  const lastPointerPosition = useRef<{ x: number; y: number } | null>(null);
 
   const imageMouseX = useMotionValue(0);
   const imageMouseY = useMotionValue(0);
@@ -99,6 +102,8 @@ const ProjectsTable = ({
     damping: 22,
     mass: 0.4,
   });
+
+  const activeTagsKey = activeTags.join("|");
 
   const totalPages = Math.max(
     Math.ceil(projects.length / PROJECTS_PER_VIEW),
@@ -119,20 +124,27 @@ const ProjectsTable = ({
 
   const setProjectIndex = useCallback(
     (index: number) => {
-      if (!projects.length) return;
+      if (!projects.length) {
+        return;
+      }
 
       const safeIndex = Math.min(Math.max(index, 0), projects.length - 1);
 
       queuedProjectIndex.current = safeIndex;
 
-      if (animationFrame.current) return;
+      if (animationFrame.current) {
+        return;
+      }
 
       animationFrame.current = window.requestAnimationFrame(() => {
         const nextIndex = queuedProjectIndex.current;
 
         if (nextIndex !== null) {
           setActiveIndex((currentIndex) => {
-            if (currentIndex === nextIndex) return currentIndex;
+            if (currentIndex === nextIndex) {
+              return currentIndex;
+            }
+
             return nextIndex;
           });
         }
@@ -153,7 +165,16 @@ const ProjectsTable = ({
   }, []);
 
   useEffect(() => {
-    if (!projects.length) return;
+    setPageIndex(0);
+    setActiveIndex(0);
+    setDirection(1);
+    setIsHoveringImage(false);
+  }, [activeTagsKey]);
+
+  useEffect(() => {
+    if (!projects.length) {
+      return;
+    }
 
     setActiveIndex((currentIndex) => {
       if (currentIndex > projects.length - 1) {
@@ -175,7 +196,9 @@ const ProjectsTable = ({
   }, [pageIndex, totalPages]);
 
   const goToPrevPage = () => {
-    if (!canGoPrevPage) return;
+    if (!canGoPrevPage) {
+      return;
+    }
 
     const nextPage = pageIndex - 1;
     const nextActiveIndex = nextPage * PROJECTS_PER_VIEW;
@@ -183,10 +206,13 @@ const ProjectsTable = ({
     setDirection(-1);
     setPageIndex(nextPage);
     setActiveIndex(nextActiveIndex);
+    setIsHoveringImage(false);
   };
 
   const goToNextPage = () => {
-    if (!canGoNextPage) return;
+    if (!canGoNextPage) {
+      return;
+    }
 
     const nextPage = pageIndex + 1;
     const nextActiveIndex = nextPage * PROJECTS_PER_VIEW;
@@ -194,14 +220,10 @@ const ProjectsTable = ({
     setDirection(1);
     setPageIndex(nextPage);
     setActiveIndex(nextActiveIndex);
+    setIsHoveringImage(false);
   };
 
   const handleImageMouseMove = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    lastPointerPosition.current = {
-      x: event.clientX,
-      y: event.clientY,
-    };
-
     const rect = event.currentTarget.getBoundingClientRect();
 
     imageMouseX.set(event.clientX - rect.left);
@@ -212,37 +234,6 @@ const ProjectsTable = ({
     }
   };
 
-  useEffect(() => {
-    const checkInitialHover = (event: MouseEvent) => {
-      lastPointerPosition.current = {
-        x: event.clientX,
-        y: event.clientY,
-      };
-
-      const element = imageLinkRef.current;
-      if (!element) return;
-
-      const rect = element.getBoundingClientRect();
-
-      const isInside =
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
-
-      if (!isInside) return;
-
-      imageMouseX.set(event.clientX - rect.left);
-      imageMouseY.set(event.clientY - rect.top);
-      setIsHoveringImage(true);
-    };
-
-    window.addEventListener("mousemove", checkInitialHover, { once: true });
-
-    return () => {
-      window.removeEventListener("mousemove", checkInitialHover);
-    };
-  }, [imageMouseX, imageMouseY]);
   const handleImageMouseEnter = (
     event: React.MouseEvent<HTMLAnchorElement>,
   ) => {
@@ -250,6 +241,7 @@ const ProjectsTable = ({
 
     imageMouseX.set(event.clientX - rect.left);
     imageMouseY.set(event.clientY - rect.top);
+
     setIsHoveringImage(true);
   };
 
@@ -259,37 +251,59 @@ const ProjectsTable = ({
 
   if (!projects.length || !activeProject) {
     return (
-      <section className="flex min-h-screen w-full items-center justify-center bg-dark px-7 text-color sm:px-14">
-        <TextReveal
-          as="p"
-          mode="words"
-          className="text-sm uppercase tracking-[0.2em] text-white/50"
-        >
-          No projects found
-        </TextReveal>
+      <section className="min-h-screen w-full bg-dark px-7 pb-12 pt-28 text-color sm:px-14 md:px-16 md:pt-32 lg:px-20 xl:px-24">
+        <div className="mx-auto w-full max-w-[1800px]">
+          <div className="flex max-w-2xl flex-col gap-6">
+            <TextReveal
+              as="p"
+              mode="words"
+              className="text-[10px] font-black uppercase tracking-[0.35em] text-white/80 sm:text-xs"
+            >
+              Selected Work
+            </TextReveal>
+
+            <ProjectsTagFilter
+              availableTags={availableTags}
+              activeTags={activeTags}
+            />
+
+            <TextReveal
+              as="p"
+              mode="words"
+              className="pt-16 text-sm uppercase tracking-[0.2em] text-white/50"
+            >
+              No projects found
+            </TextReveal>
+          </div>
+        </div>
       </section>
     );
   }
 
   return (
     <section className="w-full bg-dark text-color">
-      <div className="mx-auto grid min-h-screen w-full max-w-[1800px] grid-cols-1 gap-10 px-7 pb-12 pt-28 sm:px-14 md:grid-cols-12 md:px-16 md:pt-32 lg:px-20 xl:px-24">
+      <div className="mx-auto grid min-h-screen w-full max-w-[1800px] grid-cols-1 gap-10 px-7 pb-12 pt-28 sm:px-8 md:grid-cols-12 md:pt-32 lg:px-8 xl:px-18">
         <aside className="flex min-h-0 flex-col md:col-span-5 md:h-[calc(100vh-9rem)] md:pr-6 xl:col-span-4">
-          <div className="mb-6 flex min-h-[calc(clamp(3rem,5vw,5.4rem)*1.76+1.5rem)] shrink-0 items-end">
-            <TextReveal
-              as="p"
-              mode="words"
-              delay={0.05}
-              className=" text-[10px] font-black uppercase tracking-[0.35em] text-white/80 sm:text-xs"
-            >
-              Selected Work
-            </TextReveal>
+          <div className="relative z-[200] mb-6 flex min-h-[calc(clamp(3rem,5vw,5.4rem)*1.76+1.5rem)] shrink-0 flex-col justify-end gap-5">
+            <ProjectsTagFilter
+              availableTags={availableTags}
+              activeTags={activeTags}
+            />
           </div>
+
+          <TextReveal
+            as="p"
+            mode="words"
+            delay={0.05}
+            className="text-[10px] font-black mb-2 mt-5 uppercase tracking-[0.35em] text-white/80 sm:text-xs"
+          >
+            Selected Work
+          </TextReveal>
 
           <div className="relative min-h-[390px] flex-1 overflow-hidden">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
-                key={pageIndex}
+                key={`${activeTagsKey || "all"}-${pageIndex}`}
                 custom={direction}
                 initial={{
                   opacity: 0,
@@ -314,18 +328,17 @@ const ProjectsTable = ({
               >
                 {visibleProjects.map((project, index) => {
                   const realIndex = pageIndex * PROJECTS_PER_VIEW + index;
+
                   const isActive = activeIndex === realIndex;
 
                   return (
                     <TransitionLink
-                      ref={imageLinkRef}
                       key={project.id}
                       href={`/project/${project.id}`}
                       transitionLabel={project.title}
                       direction="right"
-                      onMouseEnter={() => setProjectIndex(realIndex)}
                       onFocus={() => setProjectIndex(realIndex)}
-                      className="group flex min-h-[78px] w-full items-center justify-between gap-6  py-5 text-left transition-opacity duration-300"
+                      className="group inline-flex min-h-[78px] w-fit items-center py-5 text-left transition-opacity duration-300"
                     >
                       <div className="flex min-w-0 items-start gap-4">
                         <span
@@ -338,7 +351,8 @@ const ProjectsTable = ({
 
                         <div className="min-w-0">
                           <h2
-                            className={`truncate uppercase font-black leading-none tracking-[-0.045em] transition-all duration-500 ${
+                            onMouseEnter={() => setProjectIndex(realIndex)}
+                            className={`w-fit max-w-full truncate font-black uppercase leading-none tracking-[-0.045em] transition-all duration-500 ${
                               isActive
                                 ? "translate-x-3 text-[clamp(1.75rem,2.1vw,2.65rem)] text-white opacity-100"
                                 : "translate-x-0 text-[clamp(1.45rem,1.75vw,2.15rem)] text-white/45 opacity-80"
@@ -355,8 +369,8 @@ const ProjectsTable = ({
             </AnimatePresence>
           </div>
 
-          <div className="mt-6 flex shrink-0 items-center justify-between  pt-5">
-            <div className="flex flex-col 2xl:flex-row pr-5 items-center justify-between w-full">
+          <div className="mt-6 flex shrink-0 items-center justify-between pt-5">
+            <div className="flex w-full flex-col items-center justify-between pr-5 2xl:flex-row">
               <p className="text-[10px] uppercase tracking-[0.25em] text-white/50 sm:text-xs">
                 {String(pageIndex + 1).padStart(2, "0")} /{" "}
                 {String(totalPages).padStart(2, "0")}
@@ -383,7 +397,7 @@ const ProjectsTable = ({
                   onClick={goToNextPage}
                   disabled={!canGoNextPage}
                   aria-label="Next projects"
-                  className={`group inline-flex items-center gap-3 text-[12px] font-black uppercase tracking-[0.25em] transition-opacity sm:text-md xl:text-xl duration-300 2l:text-xl ${
+                  className={`group inline-flex items-center gap-3 text-[12px] font-black uppercase tracking-[0.25em] transition-opacity duration-300 sm:text-md xl:text-xl 2xl:text-xl ${
                     canGoNextPage
                       ? "cursor-pointer text-white hover:opacity-70"
                       : "cursor-not-allowed text-white/20 opacity-90"
@@ -403,6 +417,7 @@ const ProjectsTable = ({
           <div className="ml-auto flex w-full max-w-[1080px] flex-col">
             <MagneticComp>
               <TransitionLink
+                ref={imageLinkRef}
                 href={`/project/${activeProject.id}`}
                 transitionLabel={activeProject.title}
                 direction="right"
@@ -432,8 +447,14 @@ const ProjectsTable = ({
                     scale: isHoveringImage ? 1 : 0.35,
                   }}
                   transition={{
-                    opacity: { duration: 0.2, ease: "easeOut" },
-                    scale: { duration: 0.35, ease },
+                    opacity: {
+                      duration: 0.2,
+                      ease: "easeOut",
+                    },
+                    scale: {
+                      duration: 0.35,
+                      ease,
+                    },
                   }}
                   className="pointer-events-none absolute left-0 top-0 z-20 hidden -translate-x-1/2 -translate-y-1/2 mix-blend-difference lg:flex"
                 >
@@ -480,6 +501,7 @@ const ProjectsTable = ({
                   >
                     Featured Project
                   </TextReveal>
+
                   <TransitionLink
                     href={`/project/${activeProject.id}`}
                     transitionLabel={activeProject.title}
@@ -498,23 +520,33 @@ const ProjectsTable = ({
                       {activeProject.title}
                     </TextReveal>
                   </TransitionLink>
+
                   <div className="mt-6 grid grid-cols-1 gap-6 pt-6 sm:grid-cols-3">
-                    {activeProject.role ? (
+                    {activeProject.tags?.length ? (
                       <div>
                         <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/35 sm:text-xs">
-                          Role
+                          Tags
                         </p>
-                        <p className="text-sm uppercase tracking-[0.12em] text-white/75">
-                          {activeProject.role}
-                        </p>
+
+                        <div className="flex flex-wrap gap-x-3 gap-y-2">
+                          {activeProject.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="text-sm uppercase tracking-[0.12em] text-white/75"
+                            >
+                              {formatTag(tag)}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     ) : null}
 
                     {activeProject.type ? (
                       <div>
                         <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/35 sm:text-xs">
-                          Type
+                          Year
                         </p>
+
                         <p className="text-sm uppercase tracking-[0.12em] text-white/75">
                           {activeProject.type}
                         </p>
@@ -526,12 +558,13 @@ const ProjectsTable = ({
                         <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/35 sm:text-xs">
                           Tools
                         </p>
+
                         <p className="text-sm uppercase tracking-[0.12em] text-white/75">
                           {activeProject.tools}
                         </p>
                       </div>
                     ) : null}
-                  </div>{" "}
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>

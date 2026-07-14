@@ -20,7 +20,7 @@ export interface Project {
   src8?: string | null;
   src9?: string | null;
   srcVideo?: string | null;
-  role?: string | null;
+  tags?: string | string[] | null;
   type?: string | null;
   tools?: string | null;
   createdAt: Date;
@@ -301,6 +301,21 @@ const ProjectDescription = ({
   );
 };
 
+const getProjectTags = (tags?: string | string[] | null) => {
+  if (!tags) return [];
+
+  const parsedTags = Array.isArray(tags) ? tags : tags.split(",");
+
+  return parsedTags
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+    .filter((tag, index, allTags) => allTags.indexOf(tag) === index);
+};
+
+const formatTag = (tag: string) => {
+  return tag.replaceAll("-", " ");
+};
+
 const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -336,6 +351,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
 
   const imageCount = images.length;
   const videoCount = project.srcVideo ? 1 : 0;
+  const projectTags = getProjectTags(project.tags);
 
   const activeImage = activeIndex !== null ? images[activeIndex] : null;
   const activeDimensions =
@@ -489,13 +505,15 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
               <TextReveal
                 as="p"
                 mode="words"
-                className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
+                className="mb-3 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
               >
-                Role
+                Tags
               </TextReveal>
 
-              <p className="text-sm leading-relaxed text-white/85 sm:text-base">
-                {project.role}
+              <p className="text-sm max-w-60 uppercase leading-relaxed text-white/85 sm:text-base">
+                {projectTags.length > 0
+                  ? projectTags.map(formatTag).join(", ")
+                  : "—"}
               </p>
             </motion.div>
 
@@ -505,7 +523,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                 mode="words"
                 className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs"
               >
-                Type
+                Year
               </TextReveal>
 
               <p className="text-sm leading-relaxed text-white/85 sm:text-base">
