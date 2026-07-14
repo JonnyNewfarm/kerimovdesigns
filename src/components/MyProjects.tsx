@@ -19,9 +19,9 @@ type ProjectListItem = {
   id: string;
   title: string;
   src: string;
-  role: string | null;
   type: string | null;
   tools: string[] | string | null;
+  tags?: string | string[] | null;
   createdAt?: Date;
 };
 
@@ -221,6 +221,16 @@ const mobileLayout: MobileLayoutItem[] = [
     driftDirection: 1,
   },
 ];
+
+function formatTags(tags: ProjectListItem["tags"]) {
+  if (!tags) return "";
+
+  if (Array.isArray(tags)) {
+    return tags.map((tag) => tag.replaceAll("-", " ")).join(", ");
+  }
+
+  return tags.replaceAll("-", " ");
+}
 
 function formatTools(tools: ProjectListItem["tools"]) {
   if (!tools) return "";
@@ -540,6 +550,7 @@ function DesktopProjectItem({
   onHoverEnd: () => void;
 }) {
   const tools = formatTools(project.tools);
+  const tags = formatTags(project.tags);
   const projectNumber = formatProjectNumber(index);
 
   const panelPositions = [
@@ -690,9 +701,9 @@ function DesktopProjectItem({
                     <div className="h-px w-full bg-color/20" />
 
                     <div className="space-y-2">
-                      {project.role && (
+                      {tags && (
                         <p className="text-[13px] uppercase tracking-[0.18em] text-color/55">
-                          {project.role}
+                          {tags}
                         </p>
                       )}
 
