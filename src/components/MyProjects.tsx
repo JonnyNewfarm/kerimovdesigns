@@ -222,16 +222,13 @@ const mobileLayout: MobileLayoutItem[] = [
   },
 ];
 
-function formatTags(tags: ProjectListItem["tags"]) {
-  if (!tags) return "";
+function formatTags(tags: ProjectListItem["tags"]): string[] {
+  if (!tags) return [];
 
-  if (Array.isArray(tags)) {
-    return tags.map((tag) => tag.replaceAll("-", " ")).join(", ");
-  }
+  const tagList = Array.isArray(tags) ? tags : [tags];
 
-  return tags.replaceAll("-", " ");
+  return tagList.map((tag) => tag.replaceAll("-", " "));
 }
-
 function formatTools(tools: ProjectListItem["tools"]) {
   if (!tools) return "";
   if (Array.isArray(tools)) return tools.join(", ");
@@ -372,14 +369,14 @@ export default function MyProjects({ projects }: MyProjectsProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative mb-20 mt-14 w-full overflow-hidden bg-dark text-color"
+      className="relative mb-20 mt-14 pt-60 min-h-screen w-full overflow-hidden bg-dark text-color"
     >
       <div
         className="relative hidden w-full lg:block"
         style={{ height: desktopSectionHeight }}
       >
-        <div className="absolute left-[12%] top-[280px] z-30 max-w-[760px] xl:top-[210px]">
-          <div className="mb-6 flex items-center gap-4">
+        <div className="absolute left-[12%]  xl:left-[8%] lg:top-[-80px] z-30 max-w-[760px] xl:top-[210px]">
+          <div className=" flex items-center gap-4">
             <span className="text-[18px] uppercase tracking-[0.18em] text-color/45">
               06
             </span>
@@ -392,7 +389,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             as="h2"
             mode="lines"
             delay={0.1}
-            className="text-[clamp(72px,7.4vw,150px)] font-black uppercase leading-[0.82] tracking-[-0.045em] text-color"
+            className="text-[clamp(40px,5.4vw,100px)] mb-2 font-black uppercase leading-[0.82] tracking-[-0.045em] text-color"
           >
             Recent
           </TextReveal>
@@ -400,7 +397,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             as="h2"
             mode="lines"
             delay={0.1}
-            className="text-[clamp(72px,7.4vw,150px)] font-black uppercase leading-[0.82] tracking-[-0.045em] text-color"
+            className="text-[clamp(40px,5.4vw,100px)] font-black uppercase leading-[0.82] tracking-[-0.045em] text-color"
           >
             Work
           </TextReveal>
@@ -693,7 +690,7 @@ function DesktopProjectItem({
                         Selected project
                       </p>
 
-                      <p className="mt-2 text-2xl uppercase leading-none tracking-[-0.04em] text-color">
+                      <p className="mt-2 text-2xl font-black uppercase leading-none tracking-[-0.04em] text-color">
                         {project.title}
                       </p>
                     </div>
@@ -701,18 +698,27 @@ function DesktopProjectItem({
                     <div className="h-px w-full bg-color/20" />
 
                     <div className="space-y-2">
-                      {tags && (
-                        <p className="text-[13px] uppercase tracking-[0.18em] text-color/55">
-                          {tags}
-                        </p>
+                      <p className="font-semibold">TAGS:</p>
+                      {tags.length > 0 && (
+                        <div className="space-y-1">
+                          {tags.map((tag) => (
+                            <p
+                              key={tag}
+                              className="text-[13px] uppercase tracking-[0.18em] text-color/55"
+                            >
+                              {tag}
+                            </p>
+                          ))}
+                        </div>
                       )}
-
+                      <p className="font-semibold">YEAR:</p>
                       {project.type && (
                         <p className="text-[13px] uppercase tracking-[0.18em] text-color/55">
                           {project.type}
                         </p>
                       )}
 
+                      <p className="font-semibold">TOOLS:</p>
                       {tools && (
                         <p className="text-[13px] uppercase leading-6 tracking-[0.18em] text-color/55">
                           {tools}
