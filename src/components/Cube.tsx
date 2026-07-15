@@ -235,13 +235,17 @@ const cubeProjects: {
 ];
 
 const logoImagePaths = [
-  "/logo-1.png",
-  "/logo-2.png",
-  "/logo-3.png",
-  "/logo-4.png",
+  "/cube-img/logos/logo-1.png",
+  "/cube-img//logos/logo-2.png",
+  "/cube-img//logos/logo-3.png",
+  "/cube-img/logos/logo-4.png",
 ];
 
-const visualImagePaths = ["/cc-11.jpg", "/cc-07.webp", "/cc-05.jpeg"];
+const visualImagePaths = [
+  "/cube-img/cc-11.jpg",
+  "/cube-img/cc-07.webp",
+  "/cube-img/cc-05.jpeg",
+];
 const clientWorkImagePaths = [
   "/cube-img/client-work5.jpg",
   "/cube-img/client-work3.jpg",
@@ -256,15 +260,6 @@ type CollageTile = {
   rotate?: boolean;
 };
 
-/**
- * three.js BoxGeometry material index order:
- * 0 = right
- * 1 = left
- * 2 = top
- * 3 = bottom
- * 4 = front
- * 5 = back
- */
 const BOX_FACE_PROJECT_INDEXES = [1, 2, 3, 4, 0, 5];
 
 const faceCollageLayout: CollageTile[] = [
@@ -1404,7 +1399,7 @@ function createLogoInspirationTexture(textures: Texture[]) {
 
     ctx.strokeStyle = "rgba(255, 255, 255, 0.68)";
 
-    ctx.lineWidth = 10;
+    ctx.lineWidth = 4;
 
     ctx.strokeRect(box.x, box.y, logoBoxWidth, logoBoxHeight);
 
