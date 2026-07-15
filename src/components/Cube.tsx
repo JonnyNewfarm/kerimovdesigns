@@ -290,19 +290,18 @@ const visualCollageLayout: CollageTile[] = [
   {
     imageSlot: 0,
     x: 0,
-    y: -0.57,
+    y: -0.54, // var -0.57
     width: 0.5,
     height: 1.36,
   },
   {
     imageSlot: 2,
     x: 0.5,
-    y: -0.3,
+    y: -0.35, // var -0.3
     width: 0.5,
     height: 1.29,
   },
 ];
-
 const gradientVertexShader = `
   varying vec2 vUv;
   varying vec3 vPosition;

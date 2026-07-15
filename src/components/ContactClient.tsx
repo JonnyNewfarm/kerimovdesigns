@@ -84,7 +84,7 @@ function SentenceInput({
       onChange={onChange}
       placeholder={placeholder}
       required={required}
-      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-white outline-none transition placeholder:text-[#abb896] focus:text-color md:min-w-[320px] ${className}`}
+      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-white outline-none transition placeholder:text-[#bcc4ae] focus:text-color md:min-w-[320px] ${className}`}
     />
   );
 }
