@@ -369,7 +369,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative mb-20 mt-14 pt-60 min-h-screen w-full overflow-hidden bg-dark text-color"
+      className="relative mb-20  lg:pt-40 xl:pt-10 min-h-screen w-full overflow-hidden bg-dark text-color"
     >
       <div
         className="relative hidden w-full lg:block"
@@ -389,7 +389,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
             as="h2"
             mode="lines"
             delay={0.1}
-            className="text-[clamp(40px,5.4vw,100px)] mb-2 font-black uppercase leading-[0.82] tracking-[-0.045em] text-color"
+            className="text-[clamp(40px,5.4vw,100px)] mb- font-black uppercase leading-[0.82] tracking-[-0.045em] text-color"
           >
             Recent
           </TextReveal>
@@ -432,15 +432,15 @@ export default function MyProjects({ projects }: MyProjectsProps) {
         <TransitionLink
           href="/projects"
           transitionLabel="My Work"
-          className="group absolute left-[8%] top-[2580px] z-40"
+          className="group absolute left-[8%] top-[2580px]  lg:top-[2950px] xl:top-[2580px] z-40"
         >
           <MagneticComp>
             <div className="uppercase leading-[0.8] tracking-[-0.04em]">
-              <p className="flex items-center gap-x-2 text-6xl text-color/70 transition group-hover:text-color">
+              <p className="flex items-center gap-x-2 text-4xl text-color/70 transition group-hover:text-color">
                 view —
               </p>
-              <p className="text-6xl text-color/70 transition group-hover:text-color">
-                Archives
+              <p className="text-4xl text-color/70 transition group-hover:text-color">
+                projects
               </p>
             </div>
           </MagneticComp>

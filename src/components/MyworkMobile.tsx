@@ -40,8 +40,7 @@ const ProjectsTableMobile = ({ projects }: ProjectsTableMobileProps) => {
                   <h1>{project.title}</h1>
                 </div>
                 <div className=" p-5 flex justify-between text-sm">
-                  <h1>{project.role}</h1>
-                  <h1>{project.tools}</h1>
+                  <h1>{project.tags}</h1>
                 </div>
               </div>
             </div>

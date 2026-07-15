@@ -1,11 +1,11 @@
 "use client";
 
 import React, {
-  useRef,
   useEffect,
-  useState,
   useLayoutEffect,
   useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
   Canvas,
@@ -14,28 +14,26 @@ import {
   type ThreeEvent,
 } from "@react-three/fiber";
 import {
-  Mesh,
+  CanvasTexture,
+  Color,
   Group,
+  MathUtils,
+  Mesh,
+  MeshBasicMaterial,
+  ShaderMaterial,
+  SRGBColorSpace,
   Texture,
   TextureLoader,
-  VideoTexture,
-  SRGBColorSpace,
-  CanvasTexture,
-  MathUtils,
-  ShaderMaterial,
-  MeshBasicMaterial,
-  Color,
   Vector2,
+  VideoTexture,
 } from "three";
 import {
+  motion,
+  MotionValue,
   useScroll,
   useSpring,
   useTransform,
-  motion,
-  MotionValue,
 } from "framer-motion";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { OrbitControls } from "@react-three/drei";
 import MagneticComp from "./MagneticComp";
 import HeroIntro from "./HeroIntro";
@@ -52,13 +50,15 @@ function useIsMdUp() {
 
     setIsMdUp(mediaQuery.matches);
 
-    function handleChange(e: MediaQueryListEvent) {
-      setIsMdUp(e.matches);
+    function handleChange(event: MediaQueryListEvent) {
+      setIsMdUp(event.matches);
     }
 
     mediaQuery.addEventListener("change", handleChange);
 
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
   }, []);
 
   return isMdUp;
@@ -81,27 +81,116 @@ const VIDEO_OVERLAY_POSITION = CUBE_HALF + FACE_OVERLAY_OFFSET + 0.002;
 
 const FACE_OVERLAY_SIZE = 2.08;
 
-const CONTACT_BUTTON_CANVAS_SIZE = 1024;
-const CONTACT_BUTTON_X = 78;
-const CONTACT_BUTTON_Y = 585;
-const CONTACT_BUTTON_WIDTH = 500;
-const CONTACT_BUTTON_HEIGHT = 150;
+/*
+ * Klikkbart ABOUT-område på top face.
+ * Verdiene følger plasseringen i createTopTextTexture.
+ */
+const ABOUT_LINK_CANVAS_SIZE = 1024;
 
-const CONTACT_BUTTON_PLANE_WIDTH =
-  (CONTACT_BUTTON_WIDTH / CONTACT_BUTTON_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+const ABOUT_LINK_X = 105;
+const ABOUT_LINK_Y = 45;
+const ABOUT_LINK_WIDTH = 95;
+const ABOUT_LINK_HEIGHT = 390;
+const ABOUT_LINK_PLANE_WIDTH =
+  (ABOUT_LINK_WIDTH / ABOUT_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
 
-const CONTACT_BUTTON_PLANE_HEIGHT =
-  (CONTACT_BUTTON_HEIGHT / CONTACT_BUTTON_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+const ABOUT_LINK_PLANE_HEIGHT =
+  (ABOUT_LINK_HEIGHT / ABOUT_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
 
-const CONTACT_BUTTON_CENTER_X =
-  ((CONTACT_BUTTON_X + CONTACT_BUTTON_WIDTH / 2) / CONTACT_BUTTON_CANVAS_SIZE -
+const ABOUT_LINK_CENTER_X =
+  ((ABOUT_LINK_X + ABOUT_LINK_WIDTH / 2) / ABOUT_LINK_CANVAS_SIZE - 0.5) *
+  FACE_OVERLAY_SIZE;
+
+const ABOUT_LINK_CENTER_Y =
+  (0.5 - (ABOUT_LINK_Y + ABOUT_LINK_HEIGHT / 2) / ABOUT_LINK_CANVAS_SIZE) *
+  FACE_OVERLAY_SIZE;
+
+const CLIENT_WORK_LINK_CANVAS_SIZE = 1024;
+
+const CLIENT_WORK_LINK_X = 65;
+const CLIENT_WORK_LINK_Y = 775;
+const CLIENT_WORK_LINK_WIDTH = 670;
+const CLIENT_WORK_LINK_HEIGHT = 150;
+
+const CLIENT_WORK_LINK_PLANE_WIDTH =
+  (CLIENT_WORK_LINK_WIDTH / CLIENT_WORK_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+
+const CLIENT_WORK_LINK_PLANE_HEIGHT =
+  (CLIENT_WORK_LINK_HEIGHT / CLIENT_WORK_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+
+const CLIENT_WORK_LINK_CENTER_X =
+  ((CLIENT_WORK_LINK_X + CLIENT_WORK_LINK_WIDTH / 2) /
+    CLIENT_WORK_LINK_CANVAS_SIZE -
     0.5) *
   FACE_OVERLAY_SIZE;
 
-const CONTACT_BUTTON_CENTER_Y =
+const CLIENT_WORK_LINK_CENTER_Y =
   (0.5 -
-    (CONTACT_BUTTON_Y + CONTACT_BUTTON_HEIGHT / 2) /
-      CONTACT_BUTTON_CANVAS_SIZE) *
+    (CLIENT_WORK_LINK_Y + CLIENT_WORK_LINK_HEIGHT / 2) /
+      CLIENT_WORK_LINK_CANVAS_SIZE) *
+  FACE_OVERLAY_SIZE;
+
+const VISUAL_LINK_CANVAS_SIZE = 1024;
+const VISUAL_LINK_X = 357;
+const VISUAL_LINK_Y = 835;
+const VISUAL_LINK_WIDTH = 555;
+const VISUAL_LINK_HEIGHT = 125;
+
+const VISUAL_LINK_PLANE_WIDTH =
+  (VISUAL_LINK_WIDTH / VISUAL_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+
+const VISUAL_LINK_PLANE_HEIGHT =
+  (VISUAL_LINK_HEIGHT / VISUAL_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+
+const VISUAL_LINK_CENTER_X =
+  ((VISUAL_LINK_X + VISUAL_LINK_WIDTH / 2) / VISUAL_LINK_CANVAS_SIZE - 0.5) *
+  FACE_OVERLAY_SIZE;
+
+const VISUAL_LINK_CENTER_Y =
+  (0.5 - (VISUAL_LINK_Y + VISUAL_LINK_HEIGHT / 2) / VISUAL_LINK_CANVAS_SIZE) *
+  FACE_OVERLAY_SIZE;
+
+const ANIMATION_LINK_CANVAS_SIZE = 1024;
+const ANIMATION_LINK_X = 45;
+const ANIMATION_LINK_Y = 50;
+const ANIMATION_LINK_WIDTH = 600;
+const ANIMATION_LINK_HEIGHT = 165;
+
+const ANIMATION_LINK_PLANE_WIDTH =
+  (ANIMATION_LINK_WIDTH / ANIMATION_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+
+const ANIMATION_LINK_PLANE_HEIGHT =
+  (ANIMATION_LINK_HEIGHT / ANIMATION_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+
+const ANIMATION_LINK_CENTER_X =
+  ((ANIMATION_LINK_X + ANIMATION_LINK_WIDTH / 2) / ANIMATION_LINK_CANVAS_SIZE -
+    0.5) *
+  FACE_OVERLAY_SIZE;
+
+const ANIMATION_LINK_CENTER_Y =
+  (0.5 -
+    (ANIMATION_LINK_Y + ANIMATION_LINK_HEIGHT / 2) /
+      ANIMATION_LINK_CANVAS_SIZE) *
+  FACE_OVERLAY_SIZE;
+
+const LOGO_LINK_CANVAS_SIZE = 1024;
+const LOGO_LINK_X = 65;
+const LOGO_LINK_Y = 360;
+const LOGO_LINK_WIDTH = 500;
+const LOGO_LINK_HEIGHT = 125;
+
+const LOGO_LINK_PLANE_WIDTH =
+  (LOGO_LINK_WIDTH / LOGO_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+
+const LOGO_LINK_PLANE_HEIGHT =
+  (LOGO_LINK_HEIGHT / LOGO_LINK_CANVAS_SIZE) * FACE_OVERLAY_SIZE;
+
+const LOGO_LINK_CENTER_X =
+  ((LOGO_LINK_X + LOGO_LINK_WIDTH / 2) / LOGO_LINK_CANVAS_SIZE - 0.5) *
+  FACE_OVERLAY_SIZE;
+
+const LOGO_LINK_CENTER_Y =
+  (0.5 - (LOGO_LINK_Y + LOGO_LINK_HEIGHT / 2) / LOGO_LINK_CANVAS_SIZE) *
   FACE_OVERLAY_SIZE;
 
 const cubeProjects: {
@@ -153,6 +242,10 @@ const logoImagePaths = [
 ];
 
 const visualImagePaths = ["/cc-11.jpg", "/cc-07.webp", "/cc-05.jpeg"];
+const clientWorkImagePaths = [
+  "/cube-img/client-work5.jpg",
+  "/cube-img/client-work3.jpg",
+];
 
 type CollageTile = {
   imageSlot: 0 | 1 | 2;
@@ -165,8 +258,8 @@ type CollageTile = {
 
 /**
  * three.js BoxGeometry material index order:
- * 0 = right side
- * 1 = left side
+ * 0 = right
+ * 1 = left
  * 2 = top
  * 3 = bottom
  * 4 = front
@@ -174,19 +267,45 @@ type CollageTile = {
  */
 const BOX_FACE_PROJECT_INDEXES = [1, 2, 3, 4, 0, 5];
 
-const RUSTAM_FACE_MATERIAL_INDEX = BOX_FACE_PROJECT_INDEXES.findIndex(
-  (projectIndex) => projectIndex === 0,
-);
-
 const faceCollageLayout: CollageTile[] = [
-  { imageSlot: 0, x: 0, y: 0, width: 0.62, height: 1 },
-  { imageSlot: 1, x: 0.62, y: 0, width: 0.38, height: 0.46 },
-  { imageSlot: 2, x: 0.62, y: 0.46, width: 0.38, height: 0.54 },
+  {
+    imageSlot: 0,
+    x: 0,
+    y: 0,
+    width: 0.62,
+    height: 1,
+  },
+  {
+    imageSlot: 1,
+    x: 0.62,
+    y: 0,
+    width: 0.38,
+    height: 0.46,
+  },
+  {
+    imageSlot: 2,
+    x: 0.62,
+    y: 0.46,
+    width: 0.38,
+    height: 0.54,
+  },
 ];
 
 const visualCollageLayout: CollageTile[] = [
-  { imageSlot: 0, x: 0, y: -0.57, width: 0.5, height: 1.36 },
-  { imageSlot: 2, x: 0.5, y: -0.3, width: 0.5, height: 1.29 },
+  {
+    imageSlot: 0,
+    x: 0,
+    y: -0.57,
+    width: 0.5,
+    height: 1.36,
+  },
+  {
+    imageSlot: 2,
+    x: 0.5,
+    y: -0.3,
+    width: 0.5,
+    height: 1.29,
+  },
 ];
 
 const gradientVertexShader = `
@@ -208,10 +327,16 @@ const gradientVertexShader = `
       cos(position.y * 2.8 + uTime * 0.82);
 
     float fabricWave =
-      sin((position.x * 1.4 - position.y * 1.8) * 5.0 + uTime * 1.15);
+      sin(
+        (position.x * 1.4 - position.y * 1.8) * 5.0 +
+        uTime * 1.15
+      );
 
     float detailWave =
-      sin((position.x + position.y) * 6.5 + uTime * 1.35);
+      sin(
+        (position.x + position.y) * 6.5 +
+        uTime * 1.35
+      );
 
     float displacement =
       (
@@ -222,7 +347,10 @@ const gradientVertexShader = `
 
     transformed += normal * displacement;
 
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+    gl_Position =
+      projectionMatrix *
+      modelViewMatrix *
+      vec4(transformed, 1.0);
   }
 `;
 
@@ -243,7 +371,10 @@ const gradientFragmentShader = `
   uniform vec2 uMouse;
 
   float random(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+    return fract(
+      sin(dot(st.xy, vec2(12.9898, 78.233))) *
+      43758.5453123
+    );
   }
 
   float noise(vec2 st) {
@@ -280,48 +411,45 @@ const gradientFragmentShader = `
 
     float time = uTime * uSpeed;
 
-    /*
-      Ekte gradient-follow:
-      uMouse flytter selve UV/gradient-flowen.
-      Dette tegner IKKE en sirkel eller spotlight oppå gradienten.
-    */
-    vec2 mouseOffset = (uMouse - vec2(0.5)) * uHover;
+    vec2 mouseOffset =
+      (uMouse - vec2(0.5)) * uHover;
 
     vec2 animatedUv = uv;
 
-    /*
-      Flytter hele gradientfeltet etter musa.
-      Øk 0.42 hvis du vil at gradienten skal følge mer.
-      Senk 0.42 hvis det blir for mye.
-    */
     animatedUv -= mouseOffset * 0.42;
 
     animatedUv.x += sin(
-      (uv.y + mouseOffset.y * 1.8) * 4.8 + time * 0.95
+      (uv.y + mouseOffset.y * 1.8) * 4.8 +
+      time * 0.95
     ) * uWarp;
 
     animatedUv.y += cos(
-      (uv.x + mouseOffset.x * 1.8) * 4.4 + time * 0.82
+      (uv.x + mouseOffset.x * 1.8) * 4.4 +
+      time * 0.82
     ) * uWarp;
 
     vec2 silkUv = animatedUv;
 
     silkUv.x += sin(
-      (animatedUv.y + animatedUv.x * 0.35 + mouseOffset.x * 0.85) * 7.0 +
+      (
+        animatedUv.y +
+        animatedUv.x * 0.35 +
+        mouseOffset.x * 0.85
+      ) * 7.0 +
       time * 0.75
     ) * 0.045;
 
     silkUv.y += cos(
-      (animatedUv.x - animatedUv.y * 0.25 + mouseOffset.y * 0.85) * 6.5 -
+      (
+        animatedUv.x -
+        animatedUv.y * 0.25 +
+        mouseOffset.y * 0.85
+      ) * 6.5 -
       time * 0.62
     ) * 0.038;
 
     vec2 flowUv = silkUv * 1.75;
 
-    /*
-      Flytter noise/flowen etter musa også.
-      Dette gjør at selve gradientbevegelsen føles dratt av cursoren.
-    */
     flowUv += mouseOffset * 1.35;
 
     flowUv += vec2(
@@ -329,46 +457,109 @@ const gradientFragmentShader = `
       cos(time * 0.36)
     ) * uMovement;
 
-    float n1 = fbm(flowUv + vec2(time * 0.08, -time * 0.04));
-    float n2 = fbm(flowUv * 1.65 - vec2(time * 0.12, time * 0.08));
-    float n3 = fbm(flowUv * 2.45 + vec2(n1, n2) + time * 0.12);
+    float n1 = fbm(
+      flowUv +
+      vec2(time * 0.08, -time * 0.04)
+    );
 
-    float sweepOne =
-      smoothstep(0.02, 0.95, silkUv.x + n1 * 0.42);
+    float n2 = fbm(
+      flowUv * 1.65 -
+      vec2(time * 0.12, time * 0.08)
+    );
 
-    float sweepTwo =
-      smoothstep(0.04, 0.98, silkUv.y + n2 * 0.38);
+    float n3 = fbm(
+      flowUv * 2.45 +
+      vec2(n1, n2) +
+      time * 0.12
+    );
 
-    float diagonalSweep =
-      smoothstep(
-        0.0,
-        1.0,
-        silkUv.x * 0.58 + silkUv.y * 0.42 + n3 * 0.28
-      );
+    float sweepOne = smoothstep(
+      0.02,
+      0.95,
+      silkUv.x + n1 * 0.42
+    );
+
+    float sweepTwo = smoothstep(
+      0.04,
+      0.98,
+      silkUv.y + n2 * 0.38
+    );
+
+    float diagonalSweep = smoothstep(
+      0.0,
+      1.0,
+      silkUv.x * 0.58 +
+      silkUv.y * 0.42 +
+      n3 * 0.28
+    );
 
     float movingLight =
-      sin((silkUv.x * 3.2 + silkUv.y * 2.4) + time * 1.15 + n3 * 2.2) * 0.5 + 0.5;
+      sin(
+        silkUv.x * 3.2 +
+        silkUv.y * 2.4 +
+        time * 1.15 +
+        n3 * 2.2
+      ) * 0.5 + 0.5;
 
-    movingLight = smoothstep(0.25, 0.95, movingLight);
+    movingLight = smoothstep(
+      0.25,
+      0.95,
+      movingLight
+    );
 
-    vec3 color = mix(uColorA, uColorB, sweepOne);
-    color = mix(color, uColorC, sweepTwo * 0.5);
-    color = mix(color, uColorD, diagonalSweep * 0.42);
+    vec3 color = mix(
+      uColorA,
+      uColorB,
+      sweepOne
+    );
 
-    vec3 liftedColor = color + uColorC * 0.16;
-    color = mix(color, liftedColor, movingLight * 0.22);
+    color = mix(
+      color,
+      uColorC,
+      sweepTwo * 0.5
+    );
 
-    float shadowVeil = fbm(silkUv * 3.4 - time * 0.08);
-    color = mix(color * 0.88, color * 1.08, shadowVeil * 0.55);
+    color = mix(
+      color,
+      uColorD,
+      diagonalSweep * 0.42
+    );
 
-    /*
-      Vanlig statisk center glow.
-      Denne følger ikke musa, så den lager ikke fake cursor-sirkel.
-    */
-    float centerGlow = 1.0 - distance(uv, vec2(0.5));
-    centerGlow = smoothstep(0.12, 0.86, centerGlow);
+    vec3 liftedColor =
+      color + uColorC * 0.16;
 
-    color = mix(color * 0.82, color * 1.08, centerGlow);
+    color = mix(
+      color,
+      liftedColor,
+      movingLight * 0.22
+    );
+
+    float shadowVeil = fbm(
+      silkUv * 3.4 -
+      time * 0.08
+    );
+
+    color = mix(
+      color * 0.88,
+      color * 1.08,
+      shadowVeil * 0.55
+    );
+
+    float centerGlow =
+      1.0 -
+      distance(uv, vec2(0.5));
+
+    centerGlow = smoothstep(
+      0.12,
+      0.86,
+      centerGlow
+    );
+
+    color = mix(
+      color * 0.82,
+      color * 1.08,
+      centerGlow
+    );
 
     float vignette =
       smoothstep(0.0, 0.22, uv.x) *
@@ -376,16 +567,33 @@ const gradientFragmentShader = `
       smoothstep(0.0, 0.22, 1.0 - uv.x) *
       smoothstep(0.0, 0.22, 1.0 - uv.y);
 
-    color *= mix(0.72, 1.08, vignette);
+    color *= mix(
+      0.72,
+      1.08,
+      vignette
+    );
 
-    float grain = random(uv * 2.2 + time * 0.025);
-    color += (grain - 0.5) * 0.012;
+    float grain = random(
+      uv * 2.2 +
+      time * 0.025
+    );
 
-    color = mix(color, color * 1.12, uHover * 0.18);
+    color +=
+      (grain - 0.5) * 0.012;
 
-    color = pow(color, vec3(0.94));
+    color = mix(
+      color,
+      color * 1.12,
+      uHover * 0.18
+    );
 
-    gl_FragColor = vec4(color, 1.0);
+    color = pow(
+      color,
+      vec3(0.94)
+    );
+
+    gl_FragColor =
+      vec4(color, 1.0);
   }
 `;
 
@@ -449,21 +657,26 @@ function drawImageCover(
       ? image.naturalHeight || image.height
       : image.height;
 
-  if (!imageWidth || !imageHeight) return;
+  if (!imageWidth || !imageHeight) {
+    return;
+  }
 
   ctx.save();
 
   if (rotate) {
     ctx.translate(x + width / 2, y + height / 2);
+
     ctx.rotate(Math.PI / 2);
 
     drawImageCover(ctx, image, -height / 2, -width / 2, height, width, false);
 
     ctx.restore();
+
     return;
   }
 
   const imageRatio = imageWidth / imageHeight;
+
   const tileRatio = width / height;
 
   let sourceWidth = imageWidth;
@@ -473,9 +686,11 @@ function drawImageCover(
 
   if (imageRatio > tileRatio) {
     sourceWidth = imageHeight * tileRatio;
+
     sourceX = (imageWidth - sourceWidth) / 2;
   } else {
     sourceHeight = imageWidth / tileRatio;
+
     sourceY = (imageHeight - sourceHeight) / 2;
   }
 
@@ -512,9 +727,12 @@ function drawImageContain(
       ? image.naturalHeight || image.height
       : image.height;
 
-  if (!imageWidth || !imageHeight) return;
+  if (!imageWidth || !imageHeight) {
+    return;
+  }
 
   const imageRatio = imageWidth / imageHeight;
+
   const boxRatio = width / height;
 
   let drawWidth = width;
@@ -527,6 +745,7 @@ function drawImageContain(
   }
 
   const drawX = x + (width - drawWidth) / 2;
+
   const drawY = y + (height - drawHeight) / 2;
 
   ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
@@ -541,36 +760,53 @@ function createCollageTexture(
   const gap = 18;
 
   const canvas = document.createElement("canvas");
+
   canvas.width = size;
   canvas.height = size;
 
   const ctx = canvas.getContext("2d");
 
-  if (!ctx) return null;
+  if (!ctx) {
+    return null;
+  }
 
   ctx.clearRect(0, 0, size, size);
+
   ctx.fillStyle = HERO_BG_COLOR;
+
   ctx.fillRect(0, 0, size, size);
 
   tiles.forEach((tile) => {
     const texture = textures[tile.imageSlot];
+
     const image = texture?.image as HTMLImageElement | HTMLCanvasElement;
 
-    if (!image) return;
+    if (!image) {
+      return;
+    }
 
     const x = tile.x * size;
+
     const y = tile.y * size;
+
     const width = tile.width * size;
+
     const height = tile.height * size;
 
     const insetLeft = x === 0 ? 0 : gap / 2;
+
     const insetTop = y === 0 ? 0 : gap / 2;
+
     const insetRight = x + width >= size ? 0 : gap / 2;
+
     const insetBottom = y + height >= size ? 0 : gap / 2;
 
     const drawX = x + insetLeft;
+
     const drawY = y + insetTop;
+
     const drawWidth = width - insetLeft - insetRight;
+
     const drawHeight = height - insetTop - insetBottom;
 
     const isLargeImage = tile.imageSlot === 0;
@@ -589,23 +825,27 @@ function createCollageTexture(
   const collageTexture = new CanvasTexture(canvas);
 
   collageTexture.colorSpace = SRGBColorSpace;
+
   collageTexture.needsUpdate = true;
 
   return collageTexture;
 }
 
 async function loadSatoshiFont() {
-  if (typeof document === "undefined") return;
+  if (typeof document === "undefined") {
+    return;
+  }
 
   try {
     await document.fonts.load(`900 100px ${SATOSHI_FONT_FAMILY}`);
+
     await document.fonts.ready;
 
     if (document.fonts.check(`900 100px ${SATOSHI_FONT_FAMILY}`)) {
       return;
     }
   } catch {
-    // fallback below
+    // Fallback below.
   }
 
   const possibleFontFiles = [
@@ -628,14 +868,16 @@ async function loadSatoshiFont() {
       );
 
       const loadedFont = await fontFace.load();
+
       document.fonts.add(loadedFont);
+
       await document.fonts.ready;
 
       if (document.fonts.check(`900 100px ${SATOSHI_FONT_FAMILY}`)) {
         return;
       }
     } catch {
-      // try next font
+      // Try next font file.
     }
   }
 }
@@ -644,47 +886,82 @@ function createTopTextTexture() {
   const size = 1024;
 
   const canvas = document.createElement("canvas");
+
   canvas.width = size;
   canvas.height = size;
 
   const ctx = canvas.getContext("2d");
 
-  if (!ctx) return null;
+  if (!ctx) {
+    return null;
+  }
 
   ctx.clearRect(0, 0, size, size);
 
   ctx.save();
 
   ctx.translate(size / 2, size / 2);
+
   ctx.rotate(Math.PI / 2);
 
   const lines = ["RUSTAM KERIMOV", "GRAPHIC DESIGNER", "OSLO / NORWAY"];
+
   const bottomLine = "VISUAL IDENTITY / LOGOS / ANIMATION";
 
   const x = -size / 2 + 56;
+
   const startY = -110;
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
 
   ctx.fillStyle = "#ffffff";
+
   ctx.font = `900 86px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
   lines.forEach((line, index) => {
     ctx.fillText(line, x, startY + index * 105);
   });
 
-  ctx.textBaseline = "bottom";
-  ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
-  ctx.font = `900 40px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  const aboutY = size / 2 - 145;
 
-  ctx.fillText(bottomLine, x, size / 2 - 42);
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#ffffff";
+
+  ctx.font = `900 60px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+
+  ctx.fillText("CONTACT", x, aboutY);
+
+  const contactTextWidth = ctx.measureText("CONTACT").width;
+  const arrowStartX = x + contactTextWidth + 42;
+  const arrowEndX = arrowStartX + 105;
+
+  ctx.beginPath();
+
+  ctx.moveTo(arrowStartX, aboutY);
+
+  ctx.lineTo(arrowEndX, aboutY);
+
+  ctx.lineTo(arrowEndX - 28, aboutY - 23);
+
+  ctx.strokeStyle = "#ffffff";
+
+  ctx.lineWidth = 5;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+
+  ctx.stroke();
+
+  ctx.textBaseline = "bottom";
 
   const cornerOffset = 42;
 
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
+
   ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
+
   ctx.font = `900 35px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
   ctx.fillText(
@@ -698,6 +975,7 @@ function createTopTextTexture() {
   const texture = new CanvasTexture(canvas);
 
   texture.colorSpace = SRGBColorSpace;
+
   texture.needsUpdate = true;
 
   return texture;
@@ -710,12 +988,15 @@ function createVisualIdentityTexture(
   const size = 1024;
 
   const canvas = document.createElement("canvas");
+
   canvas.width = size;
   canvas.height = size;
 
   const ctx = canvas.getContext("2d");
 
-  if (!ctx) return null;
+  if (!ctx) {
+    return null;
+  }
 
   ctx.clearRect(0, 0, size, size);
 
@@ -725,39 +1006,76 @@ function createVisualIdentityTexture(
   ctx.textBaseline = "top";
 
   ctx.fillStyle = "#f2eee8";
+
   ctx.font = `900 57px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+
   ctx.fillText("I DESIGN", padding, 74);
 
   ctx.fillStyle = "#ffffff";
+
   ctx.font = `900 63px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("", padding, 850);
-  ctx.fillText("VISUAL IDENTITIES", 357, 895);
+
+  const visualLinkX = 250;
+  const visualLinkY = 898;
+  const visualLinkText = "VISUAL IDENTITIES";
+
+  ctx.fillText(visualLinkText, visualLinkX, visualLinkY);
+
+  const visualTextWidth = ctx.measureText(visualLinkText).width;
+  const visualArrowStartX = visualLinkX + visualTextWidth + 24;
+  const visualArrowY = visualLinkY + 32;
+  const visualArrowEndX = visualArrowStartX + 82;
+
+  ctx.beginPath();
+  ctx.moveTo(visualArrowStartX, visualArrowY);
+  ctx.lineTo(visualArrowEndX, visualArrowY);
+  ctx.lineTo(visualArrowEndX - 24, visualArrowY - 20);
+
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+  ctx.stroke();
 
   const collageX = padding;
   const collageY = 410;
+
   const collageWidth = size - padding * 2;
+
   const collageHeight = 480;
   const gap = 22;
 
   visualCollageLayout.forEach((tile) => {
     const texture = textures[tile.imageSlot];
+
     const image = texture?.image as HTMLImageElement | HTMLCanvasElement;
 
-    if (!image) return;
+    if (!image) {
+      return;
+    }
 
     const x = collageX + tile.x * collageWidth;
+
     const y = collageY + tile.y * collageHeight;
+
     const width = tile.width * collageWidth;
+
     const height = tile.height * collageHeight;
 
     const insetLeft = tile.x === 0 ? 0 : gap / 2;
+
     const insetTop = tile.y === 0 ? 0 : gap / 2;
+
     const insetRight = tile.x + tile.width >= 1 ? 0 : gap / 2;
+
     const insetBottom = tile.y + tile.height >= 1 ? 0 : gap / 2;
 
     const drawX = x + insetLeft;
+
     const drawY = y + insetTop;
+
     const drawWidth = width - insetLeft - insetRight;
+
     const drawHeight = height - insetTop - insetBottom;
 
     drawImageCover(ctx, image, drawX, drawY, drawWidth, drawHeight, false);
@@ -766,21 +1084,25 @@ function createVisualIdentityTexture(
   const visualIdentityTexture = new CanvasTexture(canvas);
 
   visualIdentityTexture.colorSpace = SRGBColorSpace;
+
   visualIdentityTexture.needsUpdate = true;
 
   return visualIdentityTexture;
 }
 
-function createMovingGraphicsTextTexture(logoTexture?: Texture) {
+function createMovingGraphicsTextTexture() {
   const size = 1024;
 
   const canvas = document.createElement("canvas");
+
   canvas.width = size;
   canvas.height = size;
 
   const ctx = canvas.getContext("2d");
 
-  if (!ctx) return null;
+  if (!ctx) {
+    return null;
+  }
 
   ctx.clearRect(0, 0, size, size);
 
@@ -790,97 +1112,194 @@ function createMovingGraphicsTextTexture(logoTexture?: Texture) {
   ctx.textBaseline = "top";
 
   ctx.fillStyle = "#ffffff";
+
   ctx.font = `900 85px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
   ctx.fillText("DESIGN THAT MOVES", padding, 430);
+
   ctx.fillText("WITH IMPACT", padding, 525);
-  ctx.fillText("", padding, 610);
 
   ctx.fillStyle = "#ffffff";
+
   ctx.font = `700 45px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.textAlign = "left";
+
   ctx.textBaseline = "bottom";
+
   ctx.fillText("VIDEO / LOOP / TYPE", padding, 418);
-  ctx.textBaseline = "top";
+  const animationTextX = 60;
+  const animationArrowY = 130;
 
-  const logoImage = logoTexture?.image as
-    | HTMLImageElement
-    | HTMLCanvasElement
-    | undefined;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `900 60px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
-  if (logoImage) {
-    const logoBoxSize = 230;
-    const logoPadding = 18;
-    const cornerOffset = 10;
+  ctx.fillText("ANIMATIONS", animationTextX, animationArrowY);
 
-    const logoBoxX = cornerOffset;
-    const logoBoxY = cornerOffset;
+  const animationTextWidth = ctx.measureText("ANIMATIONS").width;
 
-    drawImageContain(
-      ctx,
-      logoImage,
-      logoBoxX + logoPadding,
-      logoBoxY + logoPadding,
-      logoBoxSize - logoPadding * 2,
-      logoBoxSize - logoPadding * 2,
-    );
-  }
+  const animationArrowStartX = animationTextX + animationTextWidth + 28;
+
+  const animationArrowEndX = animationArrowStartX + 105;
+
+  ctx.beginPath();
+  ctx.moveTo(animationArrowStartX, animationArrowY);
+  ctx.lineTo(animationArrowEndX, animationArrowY);
+  ctx.lineTo(animationArrowEndX - 28, animationArrowY - 23);
+
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+  ctx.stroke();
+
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `900 60px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+
+  ctx.beginPath();
+  ctx.moveTo(animationArrowStartX, animationArrowY);
+  ctx.lineTo(animationArrowEndX, animationArrowY);
+  ctx.lineTo(animationArrowEndX - 28, animationArrowY - 23);
+
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(animationArrowStartX, animationArrowY);
+  ctx.lineTo(animationArrowEndX, animationArrowY);
+  ctx.lineTo(animationArrowEndX - 28, animationArrowY - 23);
+
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+  ctx.stroke();
 
   const texture = new CanvasTexture(canvas);
 
   texture.colorSpace = SRGBColorSpace;
+
   texture.needsUpdate = true;
 
   return texture;
 }
 
-function createCollaborateTexture() {
+function createClientWorkTexture(textures: Texture[]) {
   const size = 1024;
 
   const canvas = document.createElement("canvas");
+
   canvas.width = size;
   canvas.height = size;
 
   const ctx = canvas.getContext("2d");
 
-  if (!ctx) return null;
+  if (!ctx) {
+    return null;
+  }
 
   ctx.clearRect(0, 0, size, size);
 
-  const padding = 78;
+  const padding = 68;
+  const gap = 24;
+
+  const firstTexture = textures[0];
+  const secondTexture = textures[1];
+
+  const firstImage = firstTexture?.image as
+    | HTMLImageElement
+    | HTMLCanvasElement
+    | undefined;
+
+  const secondImage = secondTexture?.image as
+    | HTMLImageElement
+    | HTMLCanvasElement
+    | undefined;
+
+  /*
+   * Første bilde er nesten kvadratisk og får derfor
+   * den største flaten til venstre.
+   */
+  const firstImageX = padding;
+  const firstImageY = padding;
+  const firstImageWidth = 575;
+  const firstImageHeight = 575;
+
+  /*
+   * Andre bilde er portrettformat.
+   * Boksen følger omtrent bildets originale ratio.
+   */
+  const secondImageX = firstImageX + firstImageWidth + gap;
+  const secondImageY = padding;
+  const secondImageWidth = size - secondImageX - padding;
+  const secondImageHeight = 405;
+
+  if (firstImage) {
+    drawImageCover(
+      ctx,
+      firstImage,
+      firstImageX,
+      firstImageY,
+      firstImageWidth,
+      firstImageHeight,
+    );
+  }
+
+  if (secondImage) {
+    drawImageCover(
+      ctx,
+      secondImage,
+      secondImageX,
+      secondImageY,
+      secondImageWidth,
+      secondImageHeight,
+    );
+  }
 
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
 
-  ctx.fillStyle = "#f2eee8";
-  ctx.font = `900 42px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("LET'S COLLABORATE", padding, padding);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
+
+  ctx.font = `900 30px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+
+  ctx.fillText("SELECTED COMMERCIAL PROJECTS", padding, 700);
+
+  const linkX = padding;
+  const linkY = 835;
+  const linkText = "CLIENT WORK";
 
   ctx.fillStyle = "#ffffff";
-  ctx.font = `900 88px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
-  const headlineLines = ["AVAILABLE FOR", "FREELANCE", "WORK"];
+  ctx.font = `900 64px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
-  headlineLines.forEach((line, index) => {
-    ctx.fillText(line, padding, 150 + index * 92);
-  });
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
 
-  ctx.fillStyle = "rgba(255, 255, 255, 0.76)";
-  ctx.font = `900 34px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("CONTACT FOR PROJECTS", padding, 500);
+  ctx.fillText(linkText, linkX, linkY);
 
-  const buttonX = padding;
-  const buttonY = 585;
-  const buttonWidth = 610;
-  const buttonHeight = 150;
+  const textWidth = ctx.measureText(linkText).width;
 
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.72)";
-  ctx.lineWidth = 6;
-  ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+  const arrowStartX = linkX + textWidth + 28;
+  const arrowEndX = arrowStartX + 105;
 
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `900 52px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("LET'S COLLABORATE", buttonX + 38, buttonY + 50);
+  ctx.beginPath();
+
+  ctx.moveTo(arrowStartX, linkY);
+  ctx.lineTo(arrowEndX, linkY);
+  ctx.lineTo(arrowEndX - 28, linkY - 23);
+
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+
+  ctx.stroke();
 
   const texture = new CanvasTexture(canvas);
 
@@ -894,12 +1313,15 @@ function createLogoInspirationTexture(textures: Texture[]) {
   const size = 1024;
 
   const canvas = document.createElement("canvas");
+
   canvas.width = size;
   canvas.height = size;
 
   const ctx = canvas.getContext("2d");
 
-  if (!ctx) return null;
+  if (!ctx) {
+    return null;
+  }
 
   ctx.clearRect(0, 0, size, size);
 
@@ -909,25 +1331,47 @@ function createLogoInspirationTexture(textures: Texture[]) {
   ctx.textBaseline = "top";
 
   ctx.fillStyle = "#f2eee8";
-  ctx.font = `900 42px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("LOGOS", padding, padding);
+
+  ctx.font = `900 96px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+
+  ctx.fillText("VISUAL MARKS", padding, 260);
+
+  const logoLinkX = padding;
+  const logoLinkY = 420;
+  const logoLinkText = "LOGO DESIGN";
 
   ctx.fillStyle = "#ffffff";
-  ctx.font = `900 96px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("VISUAL", padding, 150);
-  ctx.fillText("MARKS", padding, 246);
+  ctx.font = `900 58px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
 
-  ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
-  ctx.font = `700 45px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.fillText("SELECTED LOGO DESIGN", padding, 390);
+  ctx.fillText(logoLinkText, logoLinkX, logoLinkY);
+
+  const logoLinkTextWidth = ctx.measureText(logoLinkText).width;
+  const logoArrowStartX = logoLinkX + logoLinkTextWidth + 28;
+  const logoArrowEndX = logoArrowStartX + 100;
+
+  ctx.beginPath();
+  ctx.moveTo(logoArrowStartX, logoLinkY);
+  ctx.lineTo(logoArrowEndX, logoLinkY);
+  ctx.lineTo(logoArrowEndX - 28, logoLinkY - 23);
+
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+  ctx.stroke();
 
   const logoAreaX = padding;
   const logoAreaY = 500;
+
   const logoAreaWidth = size - padding * 2;
+
   const logoAreaHeight = 380;
   const gap = 28;
 
   const logoBoxWidth = (logoAreaWidth - gap) / 2;
+
   const logoBoxHeight = (logoAreaHeight - gap) / 2;
 
   const logoBoxes = [
@@ -951,16 +1395,22 @@ function createLogoInspirationTexture(textures: Texture[]) {
 
   logoBoxes.forEach((box, index) => {
     const texture = textures[index];
+
     const image = texture?.image as HTMLImageElement | HTMLCanvasElement;
 
     ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+
     ctx.fillRect(box.x, box.y, logoBoxWidth, logoBoxHeight);
 
     ctx.strokeStyle = "rgba(255, 255, 255, 0.68)";
+
     ctx.lineWidth = 2;
+
     ctx.strokeRect(box.x, box.y, logoBoxWidth, logoBoxHeight);
 
-    if (!image) return;
+    if (!image) {
+      return;
+    }
 
     const logoPadding = 28;
 
@@ -977,6 +1427,7 @@ function createLogoInspirationTexture(textures: Texture[]) {
   const texture = new CanvasTexture(canvas);
 
   texture.colorSpace = SRGBColorSpace;
+
   texture.needsUpdate = true;
 
   return texture;
@@ -985,7 +1436,9 @@ function createLogoInspirationTexture(textures: Texture[]) {
 function waitForTextureImage(texture: Texture) {
   const image = texture.image as HTMLImageElement | undefined;
 
-  if (!image) return Promise.resolve();
+  if (!image) {
+    return Promise.resolve();
+  }
 
   if (image.complete && image.naturalWidth > 0) {
     return Promise.resolve();
@@ -997,34 +1450,48 @@ function waitForTextureImage(texture: Texture) {
 
   return new Promise<void>((resolve) => {
     image.onload = () => resolve();
+
     image.onerror = () => resolve();
   });
 }
 
 function useScrollLock(locked: boolean) {
   useEffect(() => {
-    if (!locked) return;
+    if (!locked) {
+      return;
+    }
 
     const scrollY = window.scrollY;
 
     const originalBodyOverflow = document.body.style.overflow;
+
     const originalBodyPosition = document.body.style.position;
+
     const originalBodyTop = document.body.style.top;
+
     const originalBodyLeft = document.body.style.left;
+
     const originalBodyRight = document.body.style.right;
+
     const originalBodyWidth = document.body.style.width;
+
     const originalBodyTouchAction = document.body.style.touchAction;
 
     const originalHtmlOverflow = document.documentElement.style.overflow;
+
     const originalHtmlOverscrollBehavior =
       document.documentElement.style.overscrollBehavior;
 
     document.documentElement.style.overflow = "hidden";
+
     document.documentElement.style.overscrollBehavior = "none";
 
     document.body.style.overflow = "hidden";
+
     document.body.style.position = "fixed";
+
     document.body.style.top = `-${scrollY}px`;
+
     document.body.style.left = "0";
     document.body.style.right = "0";
     document.body.style.width = "100%";
@@ -1032,15 +1499,22 @@ function useScrollLock(locked: boolean) {
 
     return () => {
       document.documentElement.style.overflow = originalHtmlOverflow;
+
       document.documentElement.style.overscrollBehavior =
         originalHtmlOverscrollBehavior;
 
       document.body.style.overflow = originalBodyOverflow;
+
       document.body.style.position = originalBodyPosition;
+
       document.body.style.top = originalBodyTop;
+
       document.body.style.left = originalBodyLeft;
+
       document.body.style.right = originalBodyRight;
+
       document.body.style.width = originalBodyWidth;
+
       document.body.style.touchAction = originalBodyTouchAction;
 
       window.scrollTo(0, scrollY);
@@ -1051,13 +1525,21 @@ function useScrollLock(locked: boolean) {
 export default function Index() {
   const container = useRef<HTMLDivElement | null>(null);
 
-  const isMdUp = useIsMdUp();
-
   const isDraggingCubeRef = useRef(false);
 
+  const clientWorkTransitionRef = useRef<HTMLAnchorElement | null>(null);
+  const contactTransitionRef = useRef<HTMLAnchorElement | null>(null);
+  const visualIdentityTransitionRef = useRef<HTMLAnchorElement | null>(null);
+  const animationTransitionRef = useRef<HTMLAnchorElement | null>(null);
+  const logoTransitionRef = useRef<HTMLAnchorElement | null>(null);
+
+  const isMdUp = useIsMdUp();
   const [hasMounted, setHasMounted] = useState(false);
+
   const [introChecked, setIntroChecked] = useState(false);
+
   const [shouldUseIntro, setShouldUseIntro] = useState(false);
+
   const [introDone, setIntroDone] = useState(false);
 
   useScrollLock(hasMounted && !introDone);
@@ -1084,6 +1566,7 @@ export default function Index() {
       setShouldUseIntro(false);
       setIntroDone(true);
       setIntroChecked(true);
+
       return;
     }
 
@@ -1092,24 +1575,97 @@ export default function Index() {
 
     const timer = window.setTimeout(() => {
       sessionStorage.setItem("hero-intro-seen", "true");
+
       setIntroDone(true);
     }, 3200);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, []);
+
   return (
     <motion.div
       ref={container}
       className="min-h-[150dvh]"
       initial={false}
-      animate={{ opacity: 1 }}
+      animate={{
+        opacity: 1,
+      }}
     >
+      <div
+        className="pointer-events-none fixed -left-[9999px] top-0 opacity-0"
+        aria-hidden="true"
+      >
+        <TransitionLink
+          ref={contactTransitionRef}
+          href="/contact"
+          transitionLabel="Contact"
+          direction="right"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed -left-[9999px] top-0 opacity-0"
+        >
+          Contact
+        </TransitionLink>
+        <TransitionLink
+          ref={clientWorkTransitionRef}
+          href="/projects?tags=client-work"
+          transitionLabel="Client Work"
+          direction="right"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed -left-[9999px] top-0 opacity-0"
+        >
+          Client Work
+        </TransitionLink>
+
+        <TransitionLink
+          ref={visualIdentityTransitionRef}
+          href="/projects?tags=visual-identity"
+          transitionLabel="Visual Identity"
+          direction="left"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed -left-[9999px] top-0 opacity-0"
+        >
+          Visual Identities
+        </TransitionLink>
+
+        <TransitionLink
+          ref={animationTransitionRef}
+          href="/projects?tags=animations"
+          transitionLabel="Animations"
+          direction="right"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed -left-[9999px] top-0 opacity-0"
+        >
+          Animations
+        </TransitionLink>
+
+        <TransitionLink
+          ref={logoTransitionRef}
+          href="/projects?tags=logo-design"
+          transitionLabel="Logo Design"
+          direction="left"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed -left-[9999px] top-0 opacity-0"
+        >
+          Logo Design
+        </TransitionLink>
+      </div>
+
       <div className="sticky top-0 relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden uppercase">
         {introChecked && shouldUseIntro && <HeroIntro isDone={introDone} />}
+
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
             initial={false}
-            animate={{ opacity: 1 }}
+            animate={{
+              opacity: 1,
+            }}
             className="relative h-full w-full"
           >
             {hasMounted && introDone && (
@@ -1127,8 +1683,8 @@ export default function Index() {
                   <OrbitControls
                     enableZoom={false}
                     enablePan={false}
-                    enableRotate={true}
-                    enableDamping={true}
+                    enableRotate
+                    enableDamping
                     dampingFactor={0.06}
                     rotateSpeed={0.65}
                     onStart={() => {
@@ -1141,6 +1697,7 @@ export default function Index() {
                 )}
 
                 <ambientLight intensity={2} />
+
                 <directionalLight position={[2, 1, 1]} />
 
                 <Cube
@@ -1148,14 +1705,30 @@ export default function Index() {
                   scrollProgress={smoothProgress}
                   introDone={introDone}
                   isDraggingCubeRef={isDraggingCubeRef}
+                  contactTransitionRef={contactTransitionRef}
+                  clientWorkTransitionRef={clientWorkTransitionRef}
+                  visualIdentityTransitionRef={visualIdentityTransitionRef}
+                  animationTransitionRef={animationTransitionRef}
+                  logoTransitionRef={logoTransitionRef}
                 />
               </Canvas>
             )}
           </motion.div>
         </div>
+
         <motion.div
           initial={false}
-          animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          animate={
+            introDone
+              ? {
+                  opacity: 1,
+                  y: 0,
+                }
+              : {
+                  opacity: 0,
+                  y: 30,
+                }
+          }
           transition={{
             duration: 0.9,
             delay: introDone ? 0.15 : 0,
@@ -1196,9 +1769,20 @@ export default function Index() {
             </>
           )}
         </motion.div>
+
         <motion.div
           initial={false}
-          animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          animate={
+            introDone
+              ? {
+                  opacity: 1,
+                  y: 0,
+                }
+              : {
+                  opacity: 0,
+                  y: 20,
+                }
+          }
           transition={{
             duration: 0.9,
             delay: introDone ? 0.25 : 0,
@@ -1227,9 +1811,20 @@ export default function Index() {
             </MagneticComp>
           )}
         </motion.div>
+
         <motion.div
           initial={false}
-          animate={introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          animate={
+            introDone
+              ? {
+                  opacity: 1,
+                  y: 0,
+                }
+              : {
+                  opacity: 0,
+                  y: 20,
+                }
+          }
           transition={{
             duration: 0.9,
             delay: introDone ? 0.3 : 0,
@@ -1262,47 +1857,68 @@ export default function Index() {
     </motion.div>
   );
 }
-
+type CubeProps = {
+  scrollProgress: MotionValue<number>;
+  introDone: boolean;
+  isDraggingCubeRef: React.MutableRefObject<boolean>;
+  contactTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
+  clientWorkTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
+  visualIdentityTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
+  animationTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
+  logoTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
+};
 const Cube = ({
   scrollProgress,
   introDone,
   isDraggingCubeRef,
-}: {
-  scrollProgress: MotionValue<number>;
-  introDone: boolean;
-  isDraggingCubeRef: React.MutableRefObject<boolean>;
-}) => {
-  const router = useRouter();
-
+  contactTransitionRef,
+  clientWorkTransitionRef,
+  visualIdentityTransitionRef,
+  animationTransitionRef,
+  logoTransitionRef,
+}: CubeProps) => {
   const group = useRef<Group>(null);
+
   const mesh = useRef<Mesh>(null);
 
   const shaderMaterials = useRef<(ShaderMaterial | null)[]>([]);
+
   const rustamMaterialRef = useRef<MeshBasicMaterial | null>(null);
 
   const hoveredRef = useRef(false);
+
   const activeMaterialIndexRef = useRef<number | null>(null);
+
   const targetMouseUvRef = useRef(new Vector2(0.5, 0.5));
+
   const targetScaleRef = useRef(1);
+
   const introDoneRef = useRef(introDone);
 
   const movingVideoTextureRef = useRef<VideoTexture | null>(null);
+
   const movingVideoElementRef = useRef<HTMLVideoElement | null>(null);
 
   const [isMobile, setIsMobile] = useState(false);
+
   const [rustamTexture, setRustamTexture] = useState<CanvasTexture | null>(
     null,
   );
+
   const [topTextTexture, setTopTextTexture] = useState<CanvasTexture | null>(
     null,
   );
+
   const [visualIdentityTexture, setVisualIdentityTexture] =
     useState<CanvasTexture | null>(null);
+
   const [movingGraphicsTextTexture, setMovingGraphicsTextTexture] =
     useState<CanvasTexture | null>(null);
+
   const [movingGraphicsVideoTexture, setMovingGraphicsVideoTexture] =
     useState<VideoTexture | null>(null);
-  const [collaborateTexture, setCollaborateTexture] =
+
+  const [clientWorkTexture, setClientWorkTexture] =
     useState<CanvasTexture | null>(null);
   const [logoInspirationTexture, setLogoInspirationTexture] =
     useState<CanvasTexture | null>(null);
@@ -1320,6 +1936,10 @@ const Cube = ({
   ) as Texture[];
 
   const logoTextures = useLoader(TextureLoader, logoImagePaths) as Texture[];
+  const clientWorkTextures = useLoader(
+    TextureLoader,
+    clientWorkImagePaths,
+  ) as Texture[];
 
   useEffect(() => {
     introDoneRef.current = introDone;
@@ -1333,6 +1953,7 @@ const Cube = ({
     async function buildRustamTexture() {
       rustamTextures.forEach((texture) => {
         texture.colorSpace = SRGBColorSpace;
+
         texture.needsUpdate = true;
       });
 
@@ -1340,7 +1961,9 @@ const Cube = ({
         rustamTextures.map((texture) => waitForTextureImage(texture)),
       );
 
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
 
       generatedRustamTexture = createCollageTexture(
         rustamTextures,
@@ -1350,6 +1973,7 @@ const Cube = ({
 
       if (cancelled) {
         generatedRustamTexture?.dispose();
+
         return;
       }
 
@@ -1360,23 +1984,28 @@ const Cube = ({
 
     return () => {
       cancelled = true;
+
       generatedRustamTexture?.dispose();
     };
   }, [rustamTextures]);
 
   useEffect(() => {
     let cancelled = false;
+
     let texture: CanvasTexture | null = null;
 
     async function buildTopTextTexture() {
       await loadSatoshiFont();
 
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
 
       texture = createTopTextTexture();
 
       if (cancelled) {
         texture?.dispose();
+
         return;
       }
 
@@ -1393,16 +2022,19 @@ const Cube = ({
 
   useEffect(() => {
     let cancelled = false;
+
     let generatedVisualIdentityTexture: CanvasTexture | null = null;
 
     async function buildVisualIdentityTexture() {
       visualTextures.forEach((texture) => {
         texture.colorSpace = SRGBColorSpace;
+
         texture.needsUpdate = true;
       });
 
       logoTextures.forEach((texture) => {
         texture.colorSpace = SRGBColorSpace;
+
         texture.needsUpdate = true;
       });
 
@@ -1413,7 +2045,9 @@ const Cube = ({
         ...logoTextures.map((texture) => waitForTextureImage(texture)),
       ]);
 
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
 
       generatedVisualIdentityTexture = createVisualIdentityTexture(
         visualTextures,
@@ -1422,6 +2056,7 @@ const Cube = ({
 
       if (cancelled) {
         generatedVisualIdentityTexture?.dispose();
+
         return;
       }
 
@@ -1432,6 +2067,7 @@ const Cube = ({
 
     return () => {
       cancelled = true;
+
       generatedVisualIdentityTexture?.dispose();
     };
   }, [visualTextures, logoTextures]);
@@ -1440,10 +2076,10 @@ const Cube = ({
     let cancelled = false;
 
     let generatedMovingTexture: CanvasTexture | null = null;
-    let generatedCollaborateTexture: CanvasTexture | null = null;
+    let generatedClientWorkTexture: CanvasTexture | null = null;
 
     async function buildCanvasTextures() {
-      logoTextures.forEach((texture) => {
+      clientWorkTextures.forEach((texture) => {
         texture.colorSpace = SRGBColorSpace;
         texture.needsUpdate = true;
       });
@@ -1451,40 +2087,47 @@ const Cube = ({
       await loadSatoshiFont();
 
       await Promise.all(
-        logoTextures.map((texture) => waitForTextureImage(texture)),
+        clientWorkTextures.map((texture) => waitForTextureImage(texture)),
       );
 
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
 
-      generatedMovingTexture = createMovingGraphicsTextTexture(logoTextures[2]);
-      generatedCollaborateTexture = createCollaborateTexture();
+      generatedMovingTexture = createMovingGraphicsTextTexture();
+
+      generatedClientWorkTexture = createClientWorkTexture(clientWorkTextures);
 
       if (cancelled) {
         generatedMovingTexture?.dispose();
-        generatedCollaborateTexture?.dispose();
+        generatedClientWorkTexture?.dispose();
+
         return;
       }
 
       setMovingGraphicsTextTexture(generatedMovingTexture);
-      setCollaborateTexture(generatedCollaborateTexture);
+      setClientWorkTexture(generatedClientWorkTexture);
     }
 
     buildCanvasTextures();
 
     return () => {
       cancelled = true;
+
       generatedMovingTexture?.dispose();
-      generatedCollaborateTexture?.dispose();
+      generatedClientWorkTexture?.dispose();
     };
-  }, [logoTextures]);
+  }, [clientWorkTextures]);
 
   useEffect(() => {
     let cancelled = false;
+
     let generatedLogoTexture: CanvasTexture | null = null;
 
     async function buildLogoInspirationTexture() {
       logoTextures.forEach((texture) => {
         texture.colorSpace = SRGBColorSpace;
+
         texture.needsUpdate = true;
       });
 
@@ -1494,12 +2137,15 @@ const Cube = ({
         logoTextures.map((texture) => waitForTextureImage(texture)),
       );
 
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
 
       generatedLogoTexture = createLogoInspirationTexture(logoTextures);
 
       if (cancelled) {
         generatedLogoTexture?.dispose();
+
         return;
       }
 
@@ -1510,6 +2156,7 @@ const Cube = ({
 
     return () => {
       cancelled = true;
+
       generatedLogoTexture?.dispose();
     };
   }, [logoTextures]);
@@ -1518,6 +2165,7 @@ const Cube = ({
     const video = document.createElement("video");
 
     video.src = "/bylarm-new.mp4";
+
     video.loop = true;
     video.muted = true;
     video.playsInline = true;
@@ -1528,87 +2176,126 @@ const Cube = ({
     movingVideoElementRef.current = video;
 
     const texture = new VideoTexture(video);
+
     texture.colorSpace = SRGBColorSpace;
 
     movingVideoTextureRef.current = texture;
+
     setMovingGraphicsVideoTexture(texture);
 
-    const playVideo = async () => {
+    async function playVideo() {
       try {
         await video.play();
       } catch {
-        // Browser may delay autoplay until interaction.
+        // Browser may delay autoplay.
       }
-    };
+    }
 
     playVideo();
 
     return () => {
       video.pause();
+
       video.removeAttribute("src");
+
       video.load();
 
       texture.dispose();
 
       movingVideoElementRef.current = null;
+
       movingVideoTextureRef.current = null;
     };
   }, []);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    function checkMobile() {
+      setIsMobile(window.innerWidth < 768);
+    }
 
     checkMobile();
 
     window.addEventListener("resize", checkMobile);
 
-    return () => window.removeEventListener("resize", checkMobile);
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   useLayoutEffect(() => {
-    if (!group.current || !mesh.current) return;
+    if (!group.current || !mesh.current) {
+      return;
+    }
 
     group.current.position.set(0, 0, 0);
+
     group.current.rotation.set(0, 0, 0);
+
     group.current.scale.set(1, 1, 1);
 
     mesh.current.position.set(0, 0, 0);
+
     mesh.current.rotation.set(0, 0, 0);
+
     mesh.current.scale.set(1, 1, 1);
 
     targetScaleRef.current = 1;
   }, []);
+
+  function triggerContactTransition() {
+    contactTransitionRef.current?.click();
+  }
+
+  function triggerClientWorkTransition() {
+    clientWorkTransitionRef.current?.click();
+  }
+
+  function triggerVisualIdentityTransition() {
+    visualIdentityTransitionRef.current?.click();
+  }
+
+  function triggerAnimationTransition() {
+    animationTransitionRef.current?.click();
+  }
+  function triggerLogoTransition() {
+    logoTransitionRef.current?.click();
+  }
 
   function updateRustamMaterial() {
     if (!rustamMaterialRef.current || !rustamTexture) {
       return;
     }
 
-    const nextMap = rustamTexture;
-
-    if (rustamMaterialRef.current.map === nextMap) {
+    if (rustamMaterialRef.current.map === rustamTexture) {
       return;
     }
 
-    rustamMaterialRef.current.map = nextMap;
+    rustamMaterialRef.current.map = rustamTexture;
+
     rustamMaterialRef.current.needsUpdate = true;
   }
 
   function clearCubeHover() {
     hoveredRef.current = false;
+
     activeMaterialIndexRef.current = null;
+
+    document.body.style.cursor = "";
 
     updateRustamMaterial();
   }
 
   function handlePointerMove(event: ThreeEvent<PointerEvent>) {
-    if (!introDoneRef.current) return;
+    if (!introDoneRef.current) {
+      return;
+    }
 
     event.stopPropagation();
 
     const materialIndex = event.face?.materialIndex ?? null;
 
     hoveredRef.current = materialIndex !== null;
+
     activeMaterialIndexRef.current = materialIndex;
 
     if (!isMobile && event.uv) {
@@ -1622,42 +2309,91 @@ const Cube = ({
     clearCubeHover();
   }
 
-  function handleCollaborateClick(event: ThreeEvent<MouseEvent>) {
+  function handleContactClick(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
 
     document.body.style.cursor = "";
 
-    router.push("/contact");
+    triggerContactTransition();
   }
 
-  function handleCollaboratePointerOver(event: ThreeEvent<PointerEvent>) {
+  function handleClientWorkClick(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
+
+    document.body.style.cursor = "";
+
+    triggerClientWorkTransition();
+  }
+
+  function handleVisualIdentityClick(event: ThreeEvent<MouseEvent>) {
+    event.stopPropagation();
+
+    document.body.style.cursor = "";
+
+    triggerVisualIdentityTransition();
+  }
+
+  function handleAnimationClick(event: ThreeEvent<MouseEvent>) {
+    event.stopPropagation();
+
+    document.body.style.cursor = "";
+
+    triggerAnimationTransition();
+  }
+  function handleLogoClick(event: ThreeEvent<MouseEvent>) {
+    event.stopPropagation();
+
+    document.body.style.cursor = "";
+
+    triggerLogoTransition();
+  }
+  function handleContactPointerOver(event: ThreeEvent<PointerEvent>) {
+    event.stopPropagation();
+
+    hoveredRef.current = true;
+
     document.body.style.cursor = "pointer";
   }
 
-  function handleCollaboratePointerOut(event: ThreeEvent<PointerEvent>) {
+  function handleContactPointerOut(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
+
+    hoveredRef.current = false;
+
+    activeMaterialIndexRef.current = null;
+
     document.body.style.cursor = "";
   }
 
-  function handleCollaboratePointerDown(event: ThreeEvent<PointerEvent>) {
+  function handleContactPointerDown(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
+
+    hoveredRef.current = true;
+
     document.body.style.cursor = "pointer";
   }
 
-  function handleCollaboratePointerUp(event: ThreeEvent<PointerEvent>) {
+  function handleContactPointerUp(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
-    document.body.style.cursor = "";
+
+    hoveredRef.current = true;
+
+    document.body.style.cursor = "pointer";
   }
 
   useFrame(({ clock }) => {
-    if (!group.current) return;
+    if (!group.current) {
+      return;
+    }
 
     const time = clock.getElapsedTime();
+
     const value = scrollProgress.get();
 
     shaderMaterials.current.forEach((material, materialIndex) => {
-      if (!material) return;
+      if (!material) {
+        return;
+      }
 
       const isActiveFace =
         !isMobile &&
@@ -1696,6 +2432,7 @@ const Cube = ({
 
     if (isMobile) {
       group.current.scale.set(1, 1, 1);
+
       return;
     }
 
@@ -1716,7 +2453,7 @@ const Cube = ({
     !visualIdentityTexture ||
     !movingGraphicsTextTexture ||
     !movingGraphicsVideoTexture ||
-    !collaborateTexture ||
+    !clientWorkTexture ||
     !logoInspirationTexture
   ) {
     return null;
@@ -1724,96 +2461,19 @@ const Cube = ({
 
   return (
     <group ref={group}>
-      {/* TOP FACE */}
-      <mesh
+      {/* TOP FACE: RUSTAM / ABOUT */}
+      <group
         position={[0, FACE_OVERLAY_POSITION, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
-        renderOrder={30}
-        raycast={() => null}
-      >
-        <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
-        <meshBasicMaterial
-          map={topTextTexture}
-          transparent
-          depthWrite={false}
-          depthTest={true}
-          toneMapped={false}
-          polygonOffset
-          polygonOffsetFactor={-2}
-          polygonOffsetUnits={-2}
-        />
-      </mesh>
-
-      {/* BOTTOM FACE: MOTION + VIDEO */}
-      <mesh
-        position={[0, -FACE_OVERLAY_POSITION, 0]}
-        rotation={[Math.PI / 2, 0, Math.PI * 2]}
-        renderOrder={30}
-        raycast={() => null}
-      >
-        <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
-        <meshBasicMaterial
-          map={movingGraphicsTextTexture}
-          transparent
-          depthWrite={false}
-          depthTest={true}
-          toneMapped={false}
-          polygonOffset
-          polygonOffsetFactor={-2}
-          polygonOffsetUnits={-2}
-        />
-      </mesh>
-
-      <mesh
-        position={[0.19, -VIDEO_OVERLAY_POSITION, -0.66]}
-        rotation={[Math.PI / 2, 0, Math.PI * 2]}
-        renderOrder={28}
-        raycast={() => null}
-      >
-        <planeGeometry args={[1.72, 0.77]} />
-        <meshBasicMaterial
-          map={movingGraphicsVideoTexture}
-          depthWrite={false}
-          depthTest={true}
-          toneMapped={false}
-          polygonOffset
-          polygonOffsetFactor={-1}
-          polygonOffsetUnits={-1}
-        />
-      </mesh>
-
-      {/* LEFT FACE: VISUAL IDENTITY */}
-      <mesh
-        position={[-FACE_OVERLAY_POSITION, 0, 0]}
-        rotation={[0, -Math.PI / 2, -Math.PI]}
-        renderOrder={30}
-        raycast={() => null}
-      >
-        <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
-        <meshBasicMaterial
-          map={visualIdentityTexture}
-          transparent
-          depthWrite={false}
-          depthTest={true}
-          toneMapped={false}
-          polygonOffset
-          polygonOffsetFactor={-2}
-          polygonOffsetUnits={-2}
-        />
-      </mesh>
-
-      {/* RIGHT FACE: COLLABORATE */}
-      <group
-        position={[FACE_OVERLAY_POSITION, 0, 0]}
-        rotation={[0, Math.PI / 2, Math.PI / 2]}
       >
         <mesh renderOrder={30} raycast={() => null}>
           <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
+
           <meshBasicMaterial
-            map={collaborateTexture}
+            map={topTextTexture}
             transparent
             depthWrite={false}
-            depthTest={true}
+            depthTest
             toneMapped={false}
             polygonOffset
             polygonOffsetFactor={-2}
@@ -1822,17 +2482,18 @@ const Cube = ({
         </mesh>
 
         <mesh
-          position={[CONTACT_BUTTON_CENTER_X, CONTACT_BUTTON_CENTER_Y, 0.01]}
+          position={[ABOUT_LINK_CENTER_X, ABOUT_LINK_CENTER_Y, 0.012]}
           renderOrder={40}
-          onClick={handleCollaborateClick}
-          onPointerOver={handleCollaboratePointerOver}
-          onPointerOut={handleCollaboratePointerOut}
-          onPointerDown={handleCollaboratePointerDown}
-          onPointerUp={handleCollaboratePointerUp}
+          onClick={handleContactClick}
+          onPointerOver={handleContactPointerOver}
+          onPointerOut={handleContactPointerOut}
+          onPointerDown={handleContactPointerDown}
+          onPointerUp={handleContactPointerUp}
         >
           <planeGeometry
-            args={[CONTACT_BUTTON_PLANE_WIDTH, CONTACT_BUTTON_PLANE_HEIGHT]}
+            args={[ABOUT_LINK_PLANE_WIDTH, ABOUT_LINK_PLANE_HEIGHT]}
           />
+
           <meshBasicMaterial
             transparent
             opacity={0}
@@ -1843,25 +2504,203 @@ const Cube = ({
         </mesh>
       </group>
 
-      {/* BACK FACE: LOGOS */}
+      {/* BOTTOM FACE: ANIMATIONS */}
+      <group
+        position={[0, -FACE_OVERLAY_POSITION, 0]}
+        rotation={[Math.PI / 2, 0, Math.PI * 2]}
+      >
+        {/* Tekstlaget */}
+        <mesh renderOrder={30} raycast={() => null}>
+          <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
+
+          <meshBasicMaterial
+            map={movingGraphicsTextTexture}
+            transparent
+            depthWrite={false}
+            depthTest
+            toneMapped={false}
+            polygonOffset
+            polygonOffsetFactor={-2}
+            polygonOffsetUnits={-2}
+          />
+        </mesh>
+
+        <mesh
+          position={[ANIMATION_LINK_CENTER_X, ANIMATION_LINK_CENTER_Y, 0.012]}
+          renderOrder={40}
+          onClick={handleAnimationClick}
+          onPointerOver={handleContactPointerOver}
+          onPointerOut={handleContactPointerOut}
+          onPointerDown={handleContactPointerDown}
+          onPointerUp={handleContactPointerUp}
+        >
+          <planeGeometry
+            args={[ANIMATION_LINK_PLANE_WIDTH, ANIMATION_LINK_PLANE_HEIGHT]}
+          />
+
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            depthTest={false}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
+
+      {/* Videoen på animasjonssiden */}
       <mesh
-        position={[0, 0, -FACE_OVERLAY_POSITION]}
-        rotation={[0, Math.PI, 0]}
-        renderOrder={30}
+        position={[0.19, -VIDEO_OVERLAY_POSITION, -0.66]}
+        rotation={[Math.PI / 2, 0, Math.PI * 2]}
+        renderOrder={28}
         raycast={() => null}
       >
-        <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
+        <planeGeometry args={[1.72, 0.77]} />
+
         <meshBasicMaterial
-          map={logoInspirationTexture}
-          transparent
+          map={movingGraphicsVideoTexture}
           depthWrite={false}
-          depthTest={true}
+          depthTest
           toneMapped={false}
           polygonOffset
-          polygonOffsetFactor={-2}
-          polygonOffsetUnits={-2}
+          polygonOffsetFactor={-1}
+          polygonOffsetUnits={-1}
         />
       </mesh>
+
+      {/* LEFT FACE */}
+      {/* LEFT FACE: VISUAL IDENTITIES */}
+      <group
+        position={[-FACE_OVERLAY_POSITION, 0, 0]}
+        rotation={[0, -Math.PI / 2, -Math.PI]}
+      >
+        <mesh renderOrder={30} raycast={() => null}>
+          <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
+
+          <meshBasicMaterial
+            map={visualIdentityTexture}
+            transparent
+            depthWrite={false}
+            depthTest
+            toneMapped={false}
+            polygonOffset
+            polygonOffsetFactor={-2}
+            polygonOffsetUnits={-2}
+          />
+        </mesh>
+
+        <mesh
+          position={[VISUAL_LINK_CENTER_X, VISUAL_LINK_CENTER_Y, 0.012]}
+          renderOrder={40}
+          onClick={handleVisualIdentityClick}
+          onPointerOver={handleContactPointerOver}
+          onPointerOut={handleContactPointerOut}
+          onPointerDown={handleContactPointerDown}
+          onPointerUp={handleContactPointerUp}
+        >
+          <planeGeometry
+            args={[VISUAL_LINK_PLANE_WIDTH, VISUAL_LINK_PLANE_HEIGHT]}
+          />
+
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            depthTest={false}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
+
+      {/* RIGHT FACE: CLIENT WORK */}
+      <group
+        position={[FACE_OVERLAY_POSITION, 0, 0]}
+        rotation={[0, Math.PI / 2, Math.PI / 2]}
+      >
+        <mesh renderOrder={30} raycast={() => null}>
+          <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
+
+          <meshBasicMaterial
+            map={clientWorkTexture}
+            transparent
+            depthWrite={false}
+            depthTest
+            toneMapped={false}
+            polygonOffset
+            polygonOffsetFactor={-2}
+            polygonOffsetUnits={-2}
+          />
+        </mesh>
+
+        <mesh
+          position={[
+            CLIENT_WORK_LINK_CENTER_X,
+            CLIENT_WORK_LINK_CENTER_Y,
+            0.012,
+          ]}
+          renderOrder={40}
+          onClick={handleClientWorkClick}
+          onPointerOver={handleContactPointerOver}
+          onPointerOut={handleContactPointerOut}
+          onPointerDown={handleContactPointerDown}
+          onPointerUp={handleContactPointerUp}
+        >
+          <planeGeometry
+            args={[CLIENT_WORK_LINK_PLANE_WIDTH, CLIENT_WORK_LINK_PLANE_HEIGHT]}
+          />
+
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            depthTest={false}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
+
+      {/* BACK FACE: VISUAL MARKS / LOGO DESIGN */}
+      <group
+        position={[0, 0, -FACE_OVERLAY_POSITION]}
+        rotation={[0, Math.PI, 0]}
+      >
+        <mesh renderOrder={30} raycast={() => null}>
+          <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
+
+          <meshBasicMaterial
+            map={logoInspirationTexture}
+            transparent
+            depthWrite={false}
+            depthTest
+            toneMapped={false}
+            polygonOffset
+            polygonOffsetFactor={-2}
+            polygonOffsetUnits={-2}
+          />
+        </mesh>
+
+        <mesh
+          position={[LOGO_LINK_CENTER_X, LOGO_LINK_CENTER_Y, 0.012]}
+          renderOrder={40}
+          onClick={handleLogoClick}
+          onPointerOver={handleContactPointerOver}
+          onPointerOut={handleContactPointerOut}
+          onPointerDown={handleContactPointerDown}
+          onPointerUp={handleContactPointerUp}
+        >
+          <planeGeometry
+            args={[LOGO_LINK_PLANE_WIDTH, LOGO_LINK_PLANE_HEIGHT]}
+          />
+
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            depthTest={false}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
 
       <mesh
         ref={mesh}
@@ -1898,25 +2737,47 @@ const Cube = ({
               vertexShader={gradientVertexShader}
               fragmentShader={gradientFragmentShader}
               uniforms={{
-                uTime: { value: 0 },
-                uHover: { value: 0 },
-                uMouse: { value: new Vector2(0.5, 0.5) },
-
-                uSpeed: { value: SHADER_SPEED },
-                uMovement: { value: SHADER_MOVEMENT },
-                uWarp: { value: SHADER_WARP },
-                uDisplacement: { value: SHADER_DISPLACEMENT },
-
-                uColorA: { value: new Color(palette.colorA) },
-                uColorB: { value: new Color(palette.colorB) },
-                uColorC: { value: new Color(palette.colorC) },
-                uColorD: { value: new Color(palette.colorD) },
+                uTime: {
+                  value: 0,
+                },
+                uHover: {
+                  value: 0,
+                },
+                uMouse: {
+                  value: new Vector2(0.5, 0.5),
+                },
+                uSpeed: {
+                  value: SHADER_SPEED,
+                },
+                uMovement: {
+                  value: SHADER_MOVEMENT,
+                },
+                uWarp: {
+                  value: SHADER_WARP,
+                },
+                uDisplacement: {
+                  value: SHADER_DISPLACEMENT,
+                },
+                uColorA: {
+                  value: new Color(palette.colorA),
+                },
+                uColorB: {
+                  value: new Color(palette.colorB),
+                },
+                uColorC: {
+                  value: new Color(palette.colorC),
+                },
+                uColorD: {
+                  value: new Color(palette.colorD),
+                },
               }}
               toneMapped={false}
               onBeforeRender={() => {
                 const material = shaderMaterials.current[materialIndex];
 
-                if (!material) return;
+                if (!material) {
+                  return;
+                }
 
                 const time = performance.now() * 0.001;
 
