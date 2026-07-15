@@ -947,7 +947,7 @@ function createTopTextTexture() {
 
   ctx.strokeStyle = "#ffffff";
 
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 10;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
 
@@ -1032,7 +1032,7 @@ function createVisualIdentityTexture(
   ctx.lineTo(visualArrowEndX - 24, visualArrowY - 20);
 
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 10;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
   ctx.stroke();
@@ -1148,7 +1148,7 @@ function createMovingGraphicsTextTexture() {
   ctx.lineTo(animationArrowEndX - 28, animationArrowY - 23);
 
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 10;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
   ctx.stroke();
@@ -1164,7 +1164,7 @@ function createMovingGraphicsTextTexture() {
   ctx.lineTo(animationArrowEndX - 28, animationArrowY - 23);
 
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 10;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
   ctx.stroke();
@@ -1175,7 +1175,7 @@ function createMovingGraphicsTextTexture() {
   ctx.lineTo(animationArrowEndX - 28, animationArrowY - 23);
 
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 12;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
   ctx.stroke();
@@ -1295,7 +1295,7 @@ function createClientWorkTexture(textures: Texture[]) {
   ctx.lineTo(arrowEndX - 28, linkY - 23);
 
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 10;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
 
@@ -1357,7 +1357,7 @@ function createLogoInspirationTexture(textures: Texture[]) {
   ctx.lineTo(logoArrowEndX - 28, logoLinkY - 23);
 
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 10;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
   ctx.stroke();
@@ -1404,7 +1404,7 @@ function createLogoInspirationTexture(textures: Texture[]) {
 
     ctx.strokeStyle = "rgba(255, 255, 255, 0.68)";
 
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 10;
 
     ctx.strokeRect(box.x, box.y, logoBoxWidth, logoBoxHeight);
 
