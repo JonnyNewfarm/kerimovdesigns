@@ -25,7 +25,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="fixed top-0 z-[9999] hidden w-full md:block">
+    <div className="fixed top-0 z-[99] hidden w-full md:block">
       <div className="bg-dark text-color z-50 flex w-full items-start justify-between px-20 py-3 text-[16px] font-extrabold">
         <div className="h-full w-full">
           <div className="flex items-start justify-between">

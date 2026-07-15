@@ -84,7 +84,7 @@ function SentenceInput({
       onChange={onChange}
       placeholder={placeholder}
       required={required}
-      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-[#a3b18a] outline-none transition placeholder:text-[#a3b18a]/65 focus:text-color md:min-w-[320px] ${className}`}
+      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-white outline-none transition placeholder:text-[#abb896] focus:text-color md:min-w-[320px] ${className}`}
     />
   );
 }
@@ -231,15 +231,6 @@ const ContactClient = () => {
           {/* HERO */}
           <div className="grid min-h-[calc(100svh-7rem)] grid-cols-1 items-end gap-8 pb-16 md:grid-cols-[1fr_0.7fr] md:pb-20 lg:pb-24">
             <div>
-              <TextReveal
-                as="p"
-                mode="words"
-                delay={0.05}
-                className="mb-6 text-xs font-black uppercase tracking-[0.28em] text-color/45 "
-              >
-                Contact / Start a project
-              </TextReveal>
-
               <TextReveal
                 as="h1"
                 mode="lines"

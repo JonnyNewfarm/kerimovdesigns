@@ -382,7 +382,7 @@ export default function UpdateProject() {
             <input
               className="w-full border bg-transparent px-3 py-2 text-white outline-none"
               name="type"
-              placeholder="Type"
+              placeholder="Year"
               value={formData.type}
               onChange={handleChange}
               required

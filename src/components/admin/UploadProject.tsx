@@ -150,7 +150,7 @@ export default function UploadProject() {
         <input
           className="w-full border border-stone-600 bg-transparent px-3 py-2 text-white outline-none transition-colors placeholder:text-white/40 focus:border-white"
           name="type"
-          placeholder="Type"
+          placeholder="Year"
           required
         />
 
