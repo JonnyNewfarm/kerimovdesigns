@@ -84,7 +84,7 @@ function SentenceInput({
       onChange={onChange}
       placeholder={placeholder}
       required={required}
-      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-white outline-none transition placeholder:text-[#79895c]/70 focus:text-color md:min-w-[320px] ${className}`}
+      className={`mx-2 mb-2 inline-block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-black leading-none text-[#e4dfd3] outline-none transition placeholder:text-[#7e7869] focus:text-color md:min-w-[320px] ${className}`}
     />
   );
 }
@@ -120,7 +120,7 @@ function SentenceTextarea({
         scrollbarColor: "rgba(245, 236, 220, 0.35) transparent",
         scrollbarWidth: "thin",
       }}
-      className="max-h-[360px] min-h-[100px] w-full resize-none overflow-y-auto border-0 bg-transparent px-0 pb-4 pr-5 text-[clamp(2rem,4.4vw,5rem)] font-black normal-case leading-[1.08] tracking-[-0.035em] text-[#a3b18a] outline-none transition placeholder:text-[#79895c]/70 focus:text-color [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-color/25 [&::-webkit-scrollbar-thumb]:transition [&::-webkit-scrollbar-thumb:hover]:bg-color/45"
+      className="max-h-[360px] min-h-[100px] w-full resize-none overflow-y-auto border-0 bg-transparent px-0 pb-4 pr-5 text-[clamp(2rem,4.4vw,5rem)] font-black normal-case leading-[1.08] tracking-[-0.035em] text-[#e4dfd3] outline-none transition placeholder:text-[#7e7869] focus:text-color [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-color/25 [&::-webkit-scrollbar-thumb]:transition [&::-webkit-scrollbar-thumb:hover]:bg-color/45"
     />
   );
 }
@@ -436,7 +436,7 @@ together`}
 
                   <div className="text-[clamp(2.25rem,5.4vw,5.9rem)] font-black normal-case leading-[1.12] tracking-[-0.035em] text-color">
                     <p>
-                      Hey Rustam, my name is{" "}
+                      Hey Rustam, my name is:{" "}
                       <SentenceInput
                         inputRef={nameInputRef}
                         id="name"
@@ -449,7 +449,7 @@ together`}
                     </p>
 
                     <p className="mt-2 md:mt-3">
-                      and I’m from{" "}
+                      and I’m from:{" "}
                       <SentenceInput
                         id="organization"
                         name="organization"
@@ -460,7 +460,7 @@ together`}
                     </p>
 
                     <p className="mt-2 md:mt-3">
-                      You can reach me at{" "}
+                      You can reach me at:{" "}
                       <SentenceInput
                         id="email"
                         name="email"
@@ -479,7 +479,7 @@ together`}
                       htmlFor="message"
                       className="mb-4 block text-[clamp(2.25rem,5.4vw,5.9rem)] font-black normal-case leading-[1.12] tracking-[-0.035em] text-color"
                     >
-                      Message
+                      Message:
                     </label>
 
                     <SentenceTextarea
