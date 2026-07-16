@@ -135,16 +135,6 @@ function useViewportSize(isMobile: boolean) {
 function getTransitionVariant(href: string): TransitionVariant {
   const destinationPath = href.split("?")[0].split("#")[0];
 
-  /*
-   * Bare prosjekt-detaljsider får overgangen nedenfra.
-   *
-   * Eksempel:
-   * /project/abc123
-   *
-   * Disse bruker fortsatt vanlig overgang:
-   * /projects
-   * /projects?tags=animations
-   */
   if (destinationPath.startsWith("/project/")) {
     return "projectDetails";
   }
@@ -192,9 +182,6 @@ function CurvedOverlay({
   const topCurve = isMobile ? 75 : 190;
   const bottomCurve = isMobile ? 45 : 150;
 
-  /*
-   * Vanlig overgang fra venstre.
-   */
   const enteringFromLeftInitialPath = `
     M 0 0
     L ${width} 0
@@ -211,9 +198,6 @@ function CurvedOverlay({
     Z
   `;
 
-  /*
-   * Vanlig overgang fra høyre.
-   */
   const enteringFromRightInitialPath = `
     M ${width} 0
     L 0 0
@@ -230,11 +214,6 @@ function CurvedOverlay({
     Z
   `;
 
-  /*
-   * Prosjekt-detaljside:
-   * Overlayet starter under skjermen.
-   * Denne kurven ligger på toppen av overlayet.
-   */
   const projectEnteringInitialPath = `
     M 0 ${topCurve}
     Q ${width / 2} ${-topCurve} ${width} ${topCurve}
@@ -251,10 +230,6 @@ function CurvedOverlay({
     Z
   `;
 
-  /*
-   * Når overlayet forlater skjermen oppover,
-   * får bunnen en kurve.
-   */
   const leavingInitialPath = `
     M 0 0
     L ${width} 0
@@ -353,13 +328,8 @@ function TransitionText({
 
   return (
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4 md:px-8">
-      <motion.h2
-        className="m-0 max-w-[92vw] whitespace-nowrap text-center font-extrabold uppercase leading-[0.86] tracking-[-0.02em] text-white/85 md:max-w-[96vw]"
-        style={{
-          fontSize: isMobile
-            ? `clamp(32px, ${fontVw}vw, 86px)`
-            : `clamp(34px, ${fontVw}vw, 230px)`,
-        }}
+      <motion.div
+        className="w-fit max-w-[92vw] md:max-w-[96vw]"
         initial={{
           ...initialTextPosition,
           scaleX: variant === "projectDetails" ? 1 : 1.04,
@@ -375,44 +345,37 @@ function TransitionText({
           ease: transitionEase,
         }}
       >
-        {label}
-      </motion.h2>
+        <motion.p
+          className="mb-2 text-left text-[18px] font-extrabold  leading-none tracking-[-0.03em] text-white/85 md:mb-4 md:text-[30px]"
+          initial={{
+            opacity: 0,
+            y: 14,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.35,
+            delay: 0.2,
+            ease: transitionEase,
+          }}
+        >
+          {variant === "projectDetails" ? "Project:" : "Destination:"}
+        </motion.p>
+
+        <h2
+          className="m-0 whitespace-nowrap text-left font-extrabold uppercase leading-[0.86] tracking-[-0.02em] text-white/85"
+          style={{
+            fontSize: isMobile
+              ? `clamp(32px, ${fontVw}vw, 86px)`
+              : `clamp(34px, ${fontVw}vw, 230px)`,
+          }}
+        >
+          {label}
+        </h2>
+      </motion.div>
     </div>
-  );
-}
-
-function DestinationText({
-  status,
-  label,
-}: {
-  status: TransitionStatus;
-  label: string;
-}) {
-  return (
-    <motion.div
-      className="absolute bottom-6 right-6 hidden max-w-[70vw] text-right text-white md:block"
-      initial={{
-        y: 20,
-        opacity: 0,
-      }}
-      animate={{
-        y: status === "entering" ? 0 : -20,
-        opacity: status === "entering" ? 1 : 0,
-      }}
-      transition={{
-        duration: 0.35,
-        delay: status === "entering" ? 0.35 : 0,
-        ease: transitionEase,
-      }}
-    >
-      <p className="m-0 text-[12px] uppercase leading-none opacity-60">
-        Destination
-      </p>
-
-      <p className="m-0 mt-1 text-[15px] font-extrabold uppercase leading-none tracking-[-0.04em]">
-        {label}
-      </p>
-    </motion.div>
   );
 }
 
@@ -587,8 +550,6 @@ export default function ClientPageTransitionWrapper({
               className="relative z-10 w-full overflow-hidden"
               style={contentStyle}
             >
-              <DestinationText status={status} label={transitionLabel} />
-
               <TransitionText
                 status={status}
                 label={transitionLabel}
