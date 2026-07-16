@@ -15,6 +15,7 @@ import { usePathname, useRouter } from "next/navigation";
 export type TransitionDirection = "left" | "right";
 
 type TransitionStatus = "idle" | "entering" | "leaving";
+type TransitionVariant = "horizontal" | "projectDetails";
 
 type PageTransitionContextType = {
   startTransition: (
@@ -131,7 +132,37 @@ function useViewportSize(isMobile: boolean) {
   return size;
 }
 
-function getInitialPosition(direction: TransitionDirection) {
+function getTransitionVariant(href: string): TransitionVariant {
+  const destinationPath = href.split("?")[0].split("#")[0];
+
+  /*
+   * Bare prosjekt-detaljsider får overgangen nedenfra.
+   *
+   * Eksempel:
+   * /project/abc123
+   *
+   * Disse bruker fortsatt vanlig overgang:
+   * /projects
+   * /projects?tags=animations
+   */
+  if (destinationPath.startsWith("/project/")) {
+    return "projectDetails";
+  }
+
+  return "horizontal";
+}
+
+function getInitialPosition(
+  variant: TransitionVariant,
+  direction: TransitionDirection,
+) {
+  if (variant === "projectDetails") {
+    return {
+      x: "0%",
+      y: "100%",
+    };
+  }
+
   return {
     x: direction === "right" ? "100%" : "-100%",
     y: "0%",
@@ -141,12 +172,14 @@ function getInitialPosition(direction: TransitionDirection) {
 function CurvedOverlay({
   status,
   direction,
+  variant,
   isMobile,
   width,
   height,
 }: {
   status: TransitionStatus;
   direction: TransitionDirection;
+  variant: TransitionVariant;
   isMobile: boolean;
   width: number;
   height: number;
@@ -156,8 +189,12 @@ function CurvedOverlay({
   }
 
   const sideCurve = isMobile ? 90 : 220;
-  const leaveCurve = isMobile ? 45 : 150;
+  const topCurve = isMobile ? 75 : 190;
+  const bottomCurve = isMobile ? 45 : 150;
 
+  /*
+   * Vanlig overgang fra venstre.
+   */
   const enteringFromLeftInitialPath = `
     M 0 0
     L ${width} 0
@@ -174,6 +211,9 @@ function CurvedOverlay({
     Z
   `;
 
+  /*
+   * Vanlig overgang fra høyre.
+   */
   const enteringFromRightInitialPath = `
     M ${width} 0
     L 0 0
@@ -190,11 +230,36 @@ function CurvedOverlay({
     Z
   `;
 
+  /*
+   * Prosjekt-detaljside:
+   * Overlayet starter under skjermen.
+   * Denne kurven ligger på toppen av overlayet.
+   */
+  const projectEnteringInitialPath = `
+    M 0 ${topCurve}
+    Q ${width / 2} ${-topCurve} ${width} ${topCurve}
+    L ${width} ${height}
+    L 0 ${height}
+    Z
+  `;
+
+  const projectEnteringTargetPath = `
+    M 0 0
+    Q ${width / 2} 0 ${width} 0
+    L ${width} ${height}
+    L 0 ${height}
+    Z
+  `;
+
+  /*
+   * Når overlayet forlater skjermen oppover,
+   * får bunnen en kurve.
+   */
   const leavingInitialPath = `
     M 0 0
     L ${width} 0
     L ${width} ${height}
-    Q ${width / 2} ${height + leaveCurve} 0 ${height}
+    Q ${width / 2} ${height + bottomCurve} 0 ${height}
     Z
   `;
 
@@ -206,29 +271,34 @@ function CurvedOverlay({
     Z
   `;
 
-  const initialPath =
-    status === "leaving"
-      ? leavingInitialPath
-      : direction === "right"
-        ? enteringFromRightInitialPath
-        : enteringFromLeftInitialPath;
+  let initialPath: string;
+  let targetPath: string;
 
-  const targetPath =
-    status === "leaving"
-      ? leavingTargetPath
-      : direction === "right"
-        ? enteringFromRightTargetPath
-        : enteringFromLeftTargetPath;
+  if (status === "leaving") {
+    initialPath = leavingInitialPath;
+    targetPath = leavingTargetPath;
+  } else if (variant === "projectDetails") {
+    initialPath = projectEnteringInitialPath;
+    targetPath = projectEnteringTargetPath;
+  } else if (direction === "right") {
+    initialPath = enteringFromRightInitialPath;
+    targetPath = enteringFromRightTargetPath;
+  } else {
+    initialPath = enteringFromLeftInitialPath;
+    targetPath = enteringFromLeftTargetPath;
+  }
 
   return (
     <motion.svg
-      key={`${status}-${direction}-${isMobile ? "mobile" : "desktop"}-${width}-${height}`}
+      key={`${status}-${variant}-${direction}-${
+        isMobile ? "mobile" : "desktop"
+      }-${width}-${height}`}
       className="absolute left-0 top-0 h-full w-screen overflow-visible"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
     >
       <motion.path
-        fill="#667a6c"
+        fill={variant === "projectDetails" ? "#4b4f47" : "#667a6c"}
         initial={{
           d: initialPath,
         }}
@@ -255,11 +325,13 @@ function TransitionText({
   status,
   label,
   direction,
+  variant,
   isMobile,
 }: {
   status: TransitionStatus;
   label: string;
   direction: TransitionDirection;
+  variant: TransitionVariant;
   isMobile: boolean;
 }) {
   const labelLength = label.length;
@@ -268,21 +340,29 @@ function TransitionText({
     ? Math.min(14, Math.max(7, 120 / Math.max(labelLength * 0.95, 7)))
     : Math.min(13, Math.max(3.8, 96 / Math.max(labelLength * 0.95, 7)));
 
-  const textStartX = direction === "right" ? "10vw" : "-10vw";
+  const initialTextPosition =
+    variant === "projectDetails"
+      ? {
+          x: "0vw",
+          y: "12vh",
+        }
+      : {
+          x: direction === "right" ? "10vw" : "-10vw",
+          y: "0vh",
+        };
 
   return (
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4 md:px-8">
       <motion.h2
-        className="m-0 max-w-[92vw] whitespace-nowrap text-center text-color font-extrabold uppercase tracking-[-0.02em] leading-[0.86] md:max-w-[96vw]"
+        className="m-0 max-w-[92vw] whitespace-nowrap text-center font-extrabold uppercase leading-[0.86] tracking-[-0.02em] text-white/85 md:max-w-[96vw]"
         style={{
           fontSize: isMobile
             ? `clamp(32px, ${fontVw}vw, 86px)`
             : `clamp(34px, ${fontVw}vw, 230px)`,
         }}
         initial={{
-          x: textStartX,
-          y: "0vh",
-          scaleX: 1.04,
+          ...initialTextPosition,
+          scaleX: variant === "projectDetails" ? 1 : 1.04,
         }}
         animate={{
           x: "0vw",
@@ -310,7 +390,7 @@ function DestinationText({
 }) {
   return (
     <motion.div
-      className="absolute bottom-6 right-6 hidden max-w-[70vw] text-right text-color md:block"
+      className="absolute bottom-6 right-6 hidden max-w-[70vw] text-right text-white md:block"
       initial={{
         y: 20,
         opacity: 0,
@@ -350,6 +430,8 @@ export default function ClientPageTransitionWrapper({
   const [transitionLabel, setTransitionLabel] = useState("");
   const [transitionDirection, setTransitionDirection] =
     useState<TransitionDirection>("left");
+  const [transitionVariant, setTransitionVariant] =
+    useState<TransitionVariant>("horizontal");
 
   const previousPathname = useRef(pathname);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -374,7 +456,9 @@ export default function ClientPageTransitionWrapper({
     label?: string,
     direction: TransitionDirection = "left",
   ) => {
-    if (!href || href === pathname || status !== "idle") return;
+    if (!href || href === pathname || status !== "idle") {
+      return;
+    }
 
     if (shouldReduceMotion) {
       router.push(href);
@@ -383,9 +467,12 @@ export default function ClientPageTransitionWrapper({
 
     clearCurrentTimeout();
 
+    const variant = getTransitionVariant(href);
+
     setPendingHref(href);
     setTransitionLabel(label || "Loading");
     setTransitionDirection(direction);
+    setTransitionVariant(variant);
     setStatus("entering");
 
     timeoutRef.current = setTimeout(() => {
@@ -394,11 +481,15 @@ export default function ClientPageTransitionWrapper({
   };
 
   useEffect(() => {
-    if (pathname === previousPathname.current) return;
+    if (pathname === previousPathname.current) {
+      return;
+    }
 
     previousPathname.current = pathname;
 
-    if (!pendingHref) return;
+    if (!pendingHref) {
+      return;
+    }
 
     clearCurrentTimeout();
 
@@ -408,6 +499,7 @@ export default function ClientPageTransitionWrapper({
       setStatus("idle");
       setPendingHref(null);
       setTransitionLabel("");
+      setTransitionVariant("horizontal");
     }, leaveDuration);
   }, [pathname, pendingHref, leaveDuration]);
 
@@ -418,7 +510,11 @@ export default function ClientPageTransitionWrapper({
   }, []);
 
   const isTransitioning = status !== "idle";
-  const initialPosition = getInitialPosition(transitionDirection);
+
+  const initialPosition = getInitialPosition(
+    transitionVariant,
+    transitionDirection,
+  );
 
   const coverHeight = viewportSize.coverHeight
     ? `${viewportSize.coverHeight}px`
@@ -456,7 +552,7 @@ export default function ClientPageTransitionWrapper({
       <AnimatePresence>
         {isTransitioning && !shouldReduceMotion && (
           <motion.div
-            className="fixed left-0 top-0 z-[99999] w-screen pointer-events-none overflow-visible text-dark will-change-transform"
+            className="pointer-events-none fixed left-0 top-0 z-[99999] w-screen overflow-visible text-dark will-change-transform"
             style={overlayStyle}
             initial={initialPosition}
             animate={{
@@ -481,6 +577,7 @@ export default function ClientPageTransitionWrapper({
             <CurvedOverlay
               status={status}
               direction={transitionDirection}
+              variant={transitionVariant}
               isMobile={isMobile}
               width={viewportSize.width || 1}
               height={viewportSize.coverHeight || 1}
@@ -496,6 +593,7 @@ export default function ClientPageTransitionWrapper({
                 status={status}
                 label={transitionLabel}
                 direction={transitionDirection}
+                variant={transitionVariant}
                 isMobile={isMobile}
               />
             </div>
