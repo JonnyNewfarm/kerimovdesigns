@@ -1110,9 +1110,9 @@ function createMovingGraphicsTextTexture() {
 
   ctx.font = `900 85px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
-  ctx.fillText("DESIGN THAT MOVES", padding, 430);
+  ctx.fillText("MOTION AS A", padding, 430);
 
-  ctx.fillText("WITH IMPACT", padding, 525);
+  ctx.fillText("VISUAL LANGUAGE", padding, 525);
 
   ctx.fillStyle = "#ffffff";
 
