@@ -127,7 +127,6 @@ const Navbar = () => {
                 <TransitionLink
                   href="/"
                   transitionLabel="Welcome Back"
-                  direction="right"
                   className={getLinkClassName("/")}
                 >
                   <WaveLinkText text="Home," />
@@ -137,7 +136,6 @@ const Navbar = () => {
                   <TransitionLink
                     href="/projects"
                     transitionLabel="Selected Work"
-                    direction="left"
                     className={getLinkClassName("/projects")}
                   >
                     <WaveLinkText text="My work," />
@@ -300,7 +298,6 @@ const Navbar = () => {
                 <TransitionLink
                   href="/contact"
                   transitionLabel="Let's Collaborate"
-                  direction="right"
                   className={getLinkClassName("/contact")}
                 >
                   <WaveLinkText text="Contact" />

@@ -10,7 +10,6 @@ const NavbarMobile = () => {
       <TransitionLink
         href="/"
         transitionLabel="Home"
-        direction="right"
         className="flex items-center justify-center gap-x-2 text-sm uppercase tracking-[0.18em]"
       >
         {" "}

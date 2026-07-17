@@ -310,7 +310,6 @@ const ProjectsTable = ({
                         key={project.id}
                         href={`/project/${project.id}`}
                         transitionLabel={project.title}
-                        direction="right"
                         onFocus={() => setProjectIndex(realIndex)}
                         className="group inline-flex min-h-[78px] w-fit items-center py-5 text-left transition-opacity duration-300"
                       >
@@ -514,7 +513,6 @@ const ProjectsTable = ({
                     ref={imageLinkRef}
                     href={`/project/${activeProject.id}`}
                     transitionLabel={activeProject.title}
-                    direction="right"
                     onMouseMove={handleImageMouseMove}
                     onMouseEnter={handleImageMouseEnter}
                     onMouseLeave={handleImageMouseLeave}
@@ -599,7 +597,6 @@ const ProjectsTable = ({
                       <TransitionLink
                         href={`/project/${activeProject.id}`}
                         transitionLabel={activeProject.title}
-                        direction="right"
                         className="inline-block"
                       >
                         <TextReveal

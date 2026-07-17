@@ -100,7 +100,6 @@ const ProjectCard = ({
     <article className="flex flex-col">
       <TransitionLink
         href={`/project/${project.id}`}
-        direction="left"
         transitionLabel={project.title}
         className="block"
       >

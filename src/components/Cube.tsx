@@ -1596,7 +1596,6 @@ export default function Index() {
           ref={contactTransitionRef}
           href="/contact"
           transitionLabel="Contact"
-          direction="right"
           tabIndex={-1}
           aria-hidden="true"
           className="fixed -left-[9999px] top-0 opacity-0"
@@ -1607,7 +1606,6 @@ export default function Index() {
           ref={clientWorkTransitionRef}
           href="/projects?tags=client-work"
           transitionLabel="Client Work"
-          direction="right"
           tabIndex={-1}
           aria-hidden="true"
           className="fixed -left-[9999px] top-0 opacity-0"
@@ -1619,7 +1617,6 @@ export default function Index() {
           ref={visualIdentityTransitionRef}
           href="/projects?tags=visual-identity"
           transitionLabel="Visual Identity"
-          direction="left"
           tabIndex={-1}
           aria-hidden="true"
           className="fixed -left-[9999px] top-0 opacity-0"
@@ -1631,7 +1628,6 @@ export default function Index() {
           ref={animationTransitionRef}
           href="/projects?tags=animations"
           transitionLabel="Animations"
-          direction="right"
           tabIndex={-1}
           aria-hidden="true"
           className="fixed -left-[9999px] top-0 opacity-0"
@@ -1643,7 +1639,6 @@ export default function Index() {
           ref={logoTransitionRef}
           href="/projects?tags=logo-design"
           transitionLabel="Logo Design"
-          direction="left"
           tabIndex={-1}
           aria-hidden="true"
           className="fixed -left-[9999px] top-0 opacity-0"
@@ -1832,7 +1827,6 @@ export default function Index() {
               <TransitionLink
                 href="/contact"
                 transitionLabel="Let's Collaborate"
-                direction="right"
                 className="inline-block"
               >
                 <TextReveal
