@@ -167,7 +167,10 @@ function getEnterDurationSeconds(
   return getEnterDuration(variant, isMobile) / 1000;
 }
 
-function getInitialPosition(variant: TransitionVariant) {
+function getInitialPosition(
+  variant: TransitionVariant,
+  direction: TransitionDirection,
+) {
   if (variant === "projectDetails") {
     return {
       x: "0%",
@@ -175,22 +178,22 @@ function getInitialPosition(variant: TransitionVariant) {
     };
   }
 
-  // Vanlig overgang starter over skjermen
-  // og beveger seg ned.
   return {
-    x: "0%",
-    y: "-100%",
+    x: direction === "right" ? "100%" : "-100%",
+    y: "0%",
   };
 }
 
 function CurvedOverlay({
   status,
+  direction,
   variant,
   isMobile,
   width,
   height,
 }: {
   status: TransitionStatus;
+  direction: TransitionDirection;
   variant: TransitionVariant;
   isMobile: boolean;
   width: number;
@@ -200,34 +203,52 @@ function CurvedOverlay({
     return <div className="fixed inset-0 bg-dark" />;
   }
 
+  const sideCurve = isMobile ? 90 : 220;
   const topCurve = isMobile ? 75 : 190;
   const bottomCurve = isMobile ? 45 : 150;
 
   /*
-   * Vanlig overgang:
-   * Hele overlayet starter over skjermen.
-   * Den nederste kanten har en kurve mens den beveger seg ned.
+   * ORIGINAL REGULAR ENTERING
+   * Ikke endret.
    */
-  const regularEnteringInitialPath = `
+
+  const enteringFromLeftInitialPath = `
     M 0 0
     L ${width} 0
-    L ${width} ${height - bottomCurve}
-    Q ${width / 2} ${height + bottomCurve} 0 ${height - bottomCurve}
+    Q ${width + sideCurve} ${height / 2} ${width} ${height}
+    L 0 ${height}
     Z
   `;
 
-  const regularEnteringTargetPath = `
+  const enteringFromLeftTargetPath = `
     M 0 0
     L ${width} 0
+    Q ${width} ${height / 2} ${width} ${height}
+    L 0 ${height}
+    Z
+  `;
+
+  const enteringFromRightInitialPath = `
+    M ${width} 0
+    L 0 0
+    Q ${-sideCurve} ${height / 2} 0 ${height}
     L ${width} ${height}
-    Q ${width / 2} ${height} 0 ${height}
+    Z
+  `;
+
+  const enteringFromRightTargetPath = `
+    M ${width} 0
+    L 0 0
+    Q 0 ${height / 2} 0 ${height}
+    L ${width} ${height}
     Z
   `;
 
   /*
-   * Project detail:
-   * Kommer fortsatt opp nedenfra.
+   * ORIGINAL PROJECT DETAIL ENTERING
+   * Ikke endret.
    */
+
   const projectEnteringInitialPath = `
     M 0 ${topCurve}
     Q ${width / 2} ${-topCurve} ${width} ${topCurve}
@@ -245,9 +266,11 @@ function CurvedOverlay({
   `;
 
   /*
-   * Når siden er lastet, går overlayet opp igjen.
+   * ORIGINAL PROJECT DETAIL LEAVING
+   * Ikke endret.
    */
-  const leavingInitialPath = `
+
+  const projectLeavingInitialPath = `
     M 0 0
     L ${width} 0
     L ${width} ${height}
@@ -255,7 +278,7 @@ function CurvedOverlay({
     Z
   `;
 
-  const leavingTargetPath = `
+  const projectLeavingTargetPath = `
     M 0 0
     L ${width} 0
     L ${width} ${height}
@@ -263,18 +286,77 @@ function CurvedOverlay({
     Z
   `;
 
+  /*
+   * REGULAR LEAVING
+   *
+   * Samme prinsipp som project detail leaving:
+   * kanten henger igjen bak overlayet.
+   *
+   * Når overlayet går mot høyre, henger venstrekanten etter.
+   */
+
+  const leavingToRightInitialPath = `
+    M 0 0
+    Q ${-bottomCurve} ${height / 2} 0 ${height}
+    L ${width} ${height}
+    L ${width} 0
+    Z
+  `;
+
+  const leavingToRightTargetPath = `
+    M 0 0
+    Q 0 ${height / 2} 0 ${height}
+    L ${width} ${height}
+    L ${width} 0
+    Z
+  `;
+
+  /*
+   * Når overlayet går mot venstre,
+   * henger høyrekanten etter.
+   */
+
+  const leavingToLeftInitialPath = `
+    M 0 0
+    L ${width} 0
+    Q ${width + bottomCurve} ${height / 2} ${width} ${height}
+    L 0 ${height}
+    Z
+  `;
+
+  const leavingToLeftTargetPath = `
+    M 0 0
+    L ${width} 0
+    Q ${width} ${height / 2} ${width} ${height}
+    L 0 ${height}
+    Z
+  `;
+
   let initialPath: string;
   let targetPath: string;
 
   if (status === "leaving") {
-    initialPath = leavingInitialPath;
-    targetPath = leavingTargetPath;
+    if (variant === "projectDetails") {
+      initialPath = projectLeavingInitialPath;
+      targetPath = projectLeavingTargetPath;
+    } else if (direction === "right") {
+      // Kommer inn fra høyre og fortsetter ut mot venstre.
+      initialPath = leavingToLeftInitialPath;
+      targetPath = leavingToLeftTargetPath;
+    } else {
+      // Kommer inn fra venstre og fortsetter ut mot høyre.
+      initialPath = leavingToRightInitialPath;
+      targetPath = leavingToRightTargetPath;
+    }
   } else if (variant === "projectDetails") {
     initialPath = projectEnteringInitialPath;
     targetPath = projectEnteringTargetPath;
+  } else if (direction === "right") {
+    initialPath = enteringFromRightInitialPath;
+    targetPath = enteringFromRightTargetPath;
   } else {
-    initialPath = regularEnteringInitialPath;
-    targetPath = regularEnteringTargetPath;
+    initialPath = enteringFromLeftInitialPath;
+    targetPath = enteringFromLeftTargetPath;
   }
 
   const pathDuration =
@@ -286,7 +368,7 @@ function CurvedOverlay({
 
   return (
     <motion.svg
-      key={`${status}-${variant}-${
+      key={`${status}-${variant}-${direction}-${
         isMobile ? "mobile" : "desktop"
       }-${width}-${height}`}
       className="absolute left-0 top-0 h-full w-screen overflow-visible"
@@ -313,11 +395,13 @@ function CurvedOverlay({
 function TransitionText({
   status,
   label,
+  direction,
   variant,
   isMobile,
 }: {
   status: TransitionStatus;
   label: string;
+  direction: TransitionDirection;
   variant: TransitionVariant;
   isMobile: boolean;
 }) {
@@ -334,8 +418,8 @@ function TransitionText({
           y: "12vh",
         }
       : {
-          x: "0vw",
-          y: "-10vh",
+          x: direction === "right" ? "10vw" : "-10vw",
+          y: "0vh",
         };
 
   const textDuration =
@@ -347,7 +431,7 @@ function TransitionText({
         className="w-fit max-w-[92vw] md:max-w-[96vw]"
         initial={{
           ...initialTextPosition,
-          scaleX: 1,
+          scaleX: variant === "projectDetails" ? 1 : 1.04,
         }}
         animate={{
           x: "0vw",
@@ -486,7 +570,10 @@ export default function ClientPageTransitionWrapper({
 
   const isTransitioning = status !== "idle";
 
-  const initialPosition = getInitialPosition(transitionVariant);
+  const initialPosition = getInitialPosition(
+    transitionVariant,
+    transitionDirection,
+  );
 
   const overlayEnterDuration = getEnterDurationSeconds(
     transitionVariant,
@@ -517,6 +604,17 @@ export default function ClientPageTransitionWrapper({
     [visibleHeight],
   );
 
+  const leavingPosition =
+    transitionVariant === "projectDetails"
+      ? {
+          x: "0%",
+          y: "-100%",
+        }
+      : {
+          x: transitionDirection === "right" ? "-100%" : "100%",
+          y: "0%",
+        };
+
   return (
     <PageTransitionContext.Provider
       value={{
@@ -532,13 +630,15 @@ export default function ClientPageTransitionWrapper({
             className="pointer-events-none fixed left-0 top-0 z-[99999] w-screen overflow-visible text-dark will-change-transform"
             style={overlayStyle}
             initial={initialPosition}
-            animate={{
-              x: "0%",
-              y: status === "entering" ? "0%" : "-100%",
-            }}
-            exit={{
-              y: "-100%",
-            }}
+            animate={
+              status === "entering"
+                ? {
+                    x: "0%",
+                    y: "0%",
+                  }
+                : leavingPosition
+            }
+            exit={leavingPosition}
             transition={{
               duration:
                 status === "entering"
@@ -551,6 +651,7 @@ export default function ClientPageTransitionWrapper({
           >
             <CurvedOverlay
               status={status}
+              direction={transitionDirection}
               variant={transitionVariant}
               isMobile={isMobile}
               width={viewportSize.width || 1}
@@ -564,6 +665,7 @@ export default function ClientPageTransitionWrapper({
               <TransitionText
                 status={status}
                 label={transitionLabel}
+                direction={transitionDirection}
                 variant={transitionVariant}
                 isMobile={isMobile}
               />
