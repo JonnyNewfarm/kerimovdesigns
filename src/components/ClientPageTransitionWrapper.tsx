@@ -46,10 +46,13 @@ interface ClientPageTransitionWrapperProps {
   children: ReactNode;
 }
 
-const DESKTOP_ENTER_DURATION = 950;
-const DESKTOP_LEAVE_DURATION = 650;
+const DESKTOP_HORIZONTAL_ENTER_DURATION = 750;
+const MOBILE_HORIZONTAL_ENTER_DURATION = 600;
 
-const MOBILE_ENTER_DURATION = 760;
+const DESKTOP_PROJECT_ENTER_DURATION = 950;
+const MOBILE_PROJECT_ENTER_DURATION = 760;
+
+const DESKTOP_LEAVE_DURATION = 650;
 const MOBILE_LEAVE_DURATION = 460;
 
 const MOBILE_VIEWPORT_EXTRA_COVER = 120;
@@ -140,6 +143,28 @@ function getTransitionVariant(href: string): TransitionVariant {
   }
 
   return "horizontal";
+}
+
+function getEnterDuration(
+  variant: TransitionVariant,
+  isMobile: boolean,
+): number {
+  if (variant === "projectDetails") {
+    return isMobile
+      ? MOBILE_PROJECT_ENTER_DURATION
+      : DESKTOP_PROJECT_ENTER_DURATION;
+  }
+
+  return isMobile
+    ? MOBILE_HORIZONTAL_ENTER_DURATION
+    : DESKTOP_HORIZONTAL_ENTER_DURATION;
+}
+
+function getEnterDurationSeconds(
+  variant: TransitionVariant,
+  isMobile: boolean,
+): number {
+  return getEnterDuration(variant, isMobile) / 1000;
 }
 
 function getInitialPosition(
@@ -263,6 +288,13 @@ function CurvedOverlay({
     targetPath = enteringFromLeftTargetPath;
   }
 
+  const pathDuration =
+    status === "entering"
+      ? getEnterDurationSeconds(variant, isMobile)
+      : isMobile
+        ? 0.42
+        : 0.65;
+
   return (
     <motion.svg
       key={`${status}-${variant}-${direction}-${
@@ -281,14 +313,7 @@ function CurvedOverlay({
           d: targetPath,
         }}
         transition={{
-          duration:
-            status === "entering"
-              ? isMobile
-                ? 0.76
-                : 0.95
-              : isMobile
-                ? 0.42
-                : 0.65,
+          duration: pathDuration,
           ease: transitionEase,
         }}
       />
@@ -326,6 +351,9 @@ function TransitionText({
           y: "0vh",
         };
 
+  const textDuration =
+    variant === "projectDetails" ? 0.55 : isMobile ? 0.4 : 0.46;
+
   return (
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4 md:px-8">
       <motion.div
@@ -340,13 +368,13 @@ function TransitionText({
           scaleX: 1,
         }}
         transition={{
-          duration: status === "entering" ? 0.55 : 0,
-          delay: status === "entering" ? 0.08 : 0,
+          duration: status === "entering" ? textDuration : 0,
+          delay: status === "entering" ? 0.05 : 0,
           ease: transitionEase,
         }}
       >
         <motion.p
-          className="mb-2 text-left text-[18px] font-extrabold  leading-none tracking-[-0.03em] text-white/85 md:mb-4 md:text-[30px]"
+          className="mb-2 text-left text-[18px] font-extrabold leading-none tracking-[-0.03em] text-white/85 md:mb-4 md:text-[30px]"
           initial={{
             opacity: 0,
             y: 14,
@@ -356,8 +384,8 @@ function TransitionText({
             y: 0,
           }}
           transition={{
-            duration: 0.35,
-            delay: 0.2,
+            duration: variant === "projectDetails" ? 0.35 : 0.28,
+            delay: variant === "projectDetails" ? 0.2 : 0.12,
             ease: transitionEase,
           }}
         >
@@ -399,10 +427,6 @@ export default function ClientPageTransitionWrapper({
   const previousPathname = useRef(pathname);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const enterDuration = isMobile
-    ? MOBILE_ENTER_DURATION
-    : DESKTOP_ENTER_DURATION;
-
   const leaveDuration = isMobile
     ? MOBILE_LEAVE_DURATION
     : DESKTOP_LEAVE_DURATION;
@@ -431,6 +455,7 @@ export default function ClientPageTransitionWrapper({
     clearCurrentTimeout();
 
     const variant = getTransitionVariant(href);
+    const enterDuration = getEnterDuration(variant, isMobile);
 
     setPendingHref(href);
     setTransitionLabel(label || "Loading");
@@ -477,6 +502,11 @@ export default function ClientPageTransitionWrapper({
   const initialPosition = getInitialPosition(
     transitionVariant,
     transitionDirection,
+  );
+
+  const overlayEnterDuration = getEnterDurationSeconds(
+    transitionVariant,
+    isMobile,
   );
 
   const coverHeight = viewportSize.coverHeight
@@ -528,9 +558,7 @@ export default function ClientPageTransitionWrapper({
             transition={{
               duration:
                 status === "entering"
-                  ? isMobile
-                    ? 0.76
-                    : 0.95
+                  ? overlayEnterDuration
                   : isMobile
                     ? 0.46
                     : 0.65,
