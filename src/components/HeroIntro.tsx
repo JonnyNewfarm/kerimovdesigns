@@ -53,18 +53,6 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
       }}
     >
       <div className="relative h-full w-full overflow-hidden">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.65,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="absolute left-6 top-6 text-[10px] font-black uppercase tracking-[0.45em] text-[#ecdfcc]/55 md:left-10 md:top-10"
-        >
-          Portfolio Experience
-        </motion.p>
-
         <div className="absolute bottom-8 left-8 md:bottom-12 md:left-12">
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.92 }}

@@ -35,7 +35,6 @@ import {
   useTransform,
 } from "framer-motion";
 import { OrbitControls } from "@react-three/drei";
-import MagneticComp from "./MagneticComp";
 import HeroIntro from "./HeroIntro";
 import TextReveal from "@/components/TextReveal";
 import TransitionLink from "./TransitionLink";

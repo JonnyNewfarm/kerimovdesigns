@@ -286,15 +286,6 @@ function CurvedOverlay({
     Z
   `;
 
-  /*
-   * REGULAR LEAVING
-   *
-   * Samme prinsipp som project detail leaving:
-   * kanten henger igjen bak overlayet.
-   *
-   * Når overlayet går mot høyre, henger venstrekanten etter.
-   */
-
   const leavingToRightInitialPath = `
     M 0 0
     Q ${-bottomCurve} ${height / 2} 0 ${height}
@@ -310,11 +301,6 @@ function CurvedOverlay({
     L ${width} 0
     Z
   `;
-
-  /*
-   * Når overlayet går mot venstre,
-   * henger høyrekanten etter.
-   */
 
   const leavingToLeftInitialPath = `
     M 0 0
@@ -340,11 +326,9 @@ function CurvedOverlay({
       initialPath = projectLeavingInitialPath;
       targetPath = projectLeavingTargetPath;
     } else if (direction === "right") {
-      // Kommer inn fra høyre og fortsetter ut mot venstre.
       initialPath = leavingToLeftInitialPath;
       targetPath = leavingToLeftTargetPath;
     } else {
-      // Kommer inn fra venstre og fortsetter ut mot høyre.
       initialPath = leavingToRightInitialPath;
       targetPath = leavingToRightTargetPath;
     }
