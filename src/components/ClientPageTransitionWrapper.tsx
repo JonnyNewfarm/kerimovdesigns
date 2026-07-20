@@ -203,9 +203,9 @@ function CurvedOverlay({
     return <div className="fixed inset-0 bg-dark" />;
   }
 
-  const sideCurve = isMobile ? 90 : 220;
-  const topCurve = isMobile ? 75 : 190;
-  const bottomCurve = isMobile ? 45 : 150;
+  const sideCurve = isMobile ? 20 : 56;
+  const topCurve = isMobile ? 14 : 44;
+  const bottomCurve = isMobile ? 14 : 36;
 
   /*
    * ORIGINAL REGULAR ENTERING
