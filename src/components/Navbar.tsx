@@ -152,17 +152,15 @@ const Navbar = () => {
         filter: "blur(5px)",
       };
 
+  const secondaryInfoClassName = `tracking-tighter ${
+    showSecondaryInfo ? "pointer-events-auto" : "pointer-events-none"
+  }`;
+
   return (
     <div className="fixed top-0 z-[99] hidden w-full bg-transparent lg:block">
       <div className="z-50 flex w-full items-start justify-between px-20 py-3 text-[16px] font-extrabold text-color">
         <div className="h-full w-full">
           <div className="flex items-start justify-between">
-            <div className="tracking-tighter">
-              <h1 className="m-0 leading-none opacity-70">Name:</h1>
-
-              <p className="m-0 leading-tight">Rustam Kerimov</p>
-            </div>
-
             <motion.div
               initial={false}
               animate={secondaryInfoAnimation}
@@ -170,11 +168,22 @@ const Navbar = () => {
                 duration: showSecondaryInfo ? 0.6 : 0.4,
                 ease: PROJECT_EASE,
               }}
-              className={`tracking-tighter ${
-                showSecondaryInfo
-                  ? "pointer-events-auto"
-                  : "pointer-events-none"
-              }`}
+              className={secondaryInfoClassName}
+            >
+              <h1 className="m-0 leading-none opacity-70">Name:</h1>
+
+              <p className="m-0 leading-tight">Rustam Kerimov</p>
+            </motion.div>
+
+            <motion.div
+              initial={false}
+              animate={secondaryInfoAnimation}
+              transition={{
+                duration: showSecondaryInfo ? 0.6 : 0.4,
+                delay: showSecondaryInfo ? 0.05 : 0,
+                ease: PROJECT_EASE,
+              }}
+              className={secondaryInfoClassName}
             >
               <h1 className="m-0 leading-none opacity-70">Occupation:</h1>
 
@@ -186,14 +195,10 @@ const Navbar = () => {
               animate={secondaryInfoAnimation}
               transition={{
                 duration: showSecondaryInfo ? 0.6 : 0.4,
-                delay: showSecondaryInfo ? 0.05 : 0,
+                delay: showSecondaryInfo ? 0.1 : 0,
                 ease: PROJECT_EASE,
               }}
-              className={`tracking-tighter ${
-                showSecondaryInfo
-                  ? "pointer-events-auto"
-                  : "pointer-events-none"
-              }`}
+              className={secondaryInfoClassName}
             >
               <h1 className="m-0 leading-none opacity-70">Location:</h1>
 
@@ -239,7 +244,6 @@ const Navbar = () => {
                               delayChildren: 0.05,
                             },
                           },
-
                           hidden: {
                             opacity: 1,
                             transition: {
@@ -267,7 +271,6 @@ const Navbar = () => {
                                   ease: PROJECT_EASE,
                                 },
                               },
-
                               hidden: {
                                 opacity: 0,
                                 y: -8,
@@ -340,18 +343,15 @@ const Navbar = () => {
                                       duration: 0.7,
                                       ease: PROJECT_EASE,
                                     },
-
                                     pathOffset: {
                                       duration: 0.7,
                                       ease: PROJECT_EASE,
                                     },
-
                                     opacity: {
                                       duration: 0.12,
                                     },
                                   },
                                 },
-
                                 hidden: {
                                   pathLength: 0,
                                   pathOffset: 1,
@@ -361,12 +361,10 @@ const Navbar = () => {
                                       duration: 0.55,
                                       ease: PROJECT_EASE,
                                     },
-
                                     pathOffset: {
                                       duration: 0.55,
                                       ease: PROJECT_EASE,
                                     },
-
                                     opacity: {
                                       duration: 0.1,
                                       delay: 0.45,
