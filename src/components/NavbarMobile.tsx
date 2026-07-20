@@ -6,7 +6,7 @@ import TransitionLink from "./TransitionLink";
 
 const NavbarMobile = () => {
   return (
-    <div className="fixed left-0 top-0 z-50 flex w-full items-center justify-between  bg-dark px-6 py-4 text-color backdrop-blur-md md:hidden">
+    <div className="fixed left-0 top-0 z-50 flex w-full items-center justify-between  transparent px-6 py-4 text-color  lg:hidden">
       <TransitionLink
         href="/"
         transitionLabel="Home"

@@ -39,6 +39,7 @@ import MagneticComp from "./MagneticComp";
 import HeroIntro from "./HeroIntro";
 import TextReveal from "@/components/TextReveal";
 import TransitionLink from "./TransitionLink";
+import LocalTime from "./LocalTime";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -1712,11 +1713,13 @@ export default function Index() {
             introDone
               ? {
                   opacity: 1,
+                  x: 0,
                   y: 0,
                 }
               : {
                   opacity: 0,
-                  y: 30,
+                  x: -30,
+                  y: 20,
                 }
           }
           transition={{
@@ -1724,122 +1727,109 @@ export default function Index() {
             delay: introDone ? 0.15 : 0,
             ease,
           }}
-          className="pointer-events-none absolute bottom-4 z-10 px-4 text-center lg:bottom-11"
+          className="
+    pointer-events-none
+    absolute
+    bottom-6
+    left-6
+    z-10
+    
+    text-left
+    md:bottom-10
+    md:left-10
+    md:translate-x-0
+    
+    lg:left-14
+  "
         >
           {introDone && (
-            <>
+            <div className="flex flex-col">
               <TextReveal
                 as="h1"
                 mode="words"
                 viewport={false}
                 delay={0.05}
-                className="-mb-1 text-2xl font-bold text-color sm:text-2xl"
+                className="satoshi-black text-4xl leading-[0.95] tracking-[-0.02em] text-color sm:text-5xl lg:text-6xl"
               >
-                Rustam Kerimov
+                Kerimov
               </TextReveal>
-
-              <motion.div
-                className="mx-auto mt-1 rounded-3xl bg-stone-500"
-                style={{
-                  width: lineWidth,
-                  height: "2px",
-                  originX: 0,
-                }}
-              />
 
               <TextReveal
                 as="h2"
                 mode="words"
                 viewport={false}
                 delay={0.12}
-                className="whitespace-nowrap text-3xl font-extrabold text-color sm:text-4xl"
+                className="satoshi-black text-5xl leading-[0.82] tracking-[-0.02em] text-color sm:text-6xl lg:text-7xl"
               >
-                Graphic Designer
+                Designs
               </TextReveal>
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div
+          initial={false}
+          animate={
+            introDone
+              ? {
+                  opacity: 1,
+                  x: 0,
+                  y: 0,
+                }
+              : {
+                  opacity: 0,
+                  x: 30,
+                  y: 20,
+                }
+          }
+          transition={{
+            duration: 0.9,
+            delay: introDone ? 0.2 : 0,
+            ease,
+          }}
+          className="
+    pointer-events-none
+    absolute
+    bottom-6
+    right-6
+    z-10
+    flex 
+    md:gap-x-6
+
+   flex-col
+   lg:flex-row
+    text-right
+    md:bottom-10
+    md:right-10
+    lg:right-14
+  "
+        >
+          {introDone && (
+            <>
+              <TextReveal
+                as="p"
+                mode="words"
+                viewport={false}
+                delay={0.16}
+                className="
+                hidden
+                sm:block
+          satoshi-black
+          text-sm
+          leading-none
+          tracking-[-0.02em]
+          text-color
+          md:text-lg
+          xl:text-xl
+        "
+              >
+                Portfolio / 2026
+              </TextReveal>
+
+              <p className="satoshi-black hidden sm:block text-xs leading-none tracking-[-0.02em] text-color md:text-lg xl:text-xl">
+                <LocalTime />
+              </p>
             </>
-          )}
-        </motion.div>
-
-        <motion.div
-          initial={false}
-          animate={
-            introDone
-              ? {
-                  opacity: 1,
-                  y: 0,
-                }
-              : {
-                  opacity: 0,
-                  y: 20,
-                }
-          }
-          transition={{
-            duration: 0.9,
-            delay: introDone ? 0.25 : 0,
-            ease,
-          }}
-          className="absolute bottom-10 left-10 z-10 hidden px-4 text-left lg:block"
-        >
-          {introDone && (
-            <MagneticComp>
-              <TransitionLink
-                href="/projects"
-                transitionLabel="Selected Work"
-                direction="left"
-                className="inline-block"
-              >
-                <TextReveal
-                  as="span"
-                  mode="words"
-                  viewport={false}
-                  delay={0.05}
-                  className="text-4xl satoshi-black text-color sm:text-4xl"
-                >
-                  Archives
-                </TextReveal>
-              </TransitionLink>
-            </MagneticComp>
-          )}
-        </motion.div>
-
-        <motion.div
-          initial={false}
-          animate={
-            introDone
-              ? {
-                  opacity: 1,
-                  y: 0,
-                }
-              : {
-                  opacity: 0,
-                  y: 20,
-                }
-          }
-          transition={{
-            duration: 0.9,
-            delay: introDone ? 0.3 : 0,
-            ease,
-          }}
-          className="absolute bottom-10 right-10 z-10 hidden px-4 text-left lg:block"
-        >
-          {introDone && (
-            <MagneticComp>
-              <TransitionLink
-                href="/contact"
-                transitionLabel="Let's Collaborate"
-                className="inline-block"
-              >
-                <TextReveal
-                  as="span"
-                  mode="words"
-                  viewport={false}
-                  delay={0.05}
-                  className="text-4xl satoshi-black text-color sm:text-4xl"
-                >
-                  Collaborate
-                </TextReveal>
-              </TransitionLink>
-            </MagneticComp>
           )}
         </motion.div>
       </div>

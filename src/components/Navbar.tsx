@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
-import WaveLinkText from "./WaveLink";
-import TransitionLink from "./TransitionLink";
 import { useProjectNav } from "./ProjectNavContext";
+import TransitionLink from "./TransitionLink";
+import WaveLinkText from "./WaveLink";
 
 const PROJECT_EASE = [0.76, 0, 0.24, 1] as const;
+
+const INFO_HIDE_SCROLL = 80;
+const INFO_SHOW_SCROLL = 140;
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -17,11 +20,50 @@ const Navbar = () => {
 
   const [showProjectTitle, setShowProjectTitle] = useState(true);
   const [isProjectTitleHovered, setIsProjectTitleHovered] = useState(false);
+  const [showSecondaryInfo, setShowSecondaryInfo] = useState(true);
 
   const lastScrollYRef = useRef(0);
-  const tickingRef = useRef(false);
+  const projectTitleTickingRef = useRef(false);
+  const navbarInfoTickingRef = useRef(false);
 
   const isProjectDetailPage = pathname.startsWith("/project/");
+
+  useEffect(() => {
+    const updateNavbarInfo = () => {
+      const currentScrollY = window.scrollY;
+
+      setShowSecondaryInfo((currentlyVisible) => {
+        if (currentScrollY <= INFO_HIDE_SCROLL) {
+          return true;
+        }
+
+        if (currentScrollY >= INFO_SHOW_SCROLL) {
+          return false;
+        }
+
+        return currentlyVisible;
+      });
+
+      navbarInfoTickingRef.current = false;
+    };
+
+    const handleNavbarInfoScroll = () => {
+      if (navbarInfoTickingRef.current) return;
+
+      navbarInfoTickingRef.current = true;
+      window.requestAnimationFrame(updateNavbarInfo);
+    };
+
+    updateNavbarInfo();
+
+    window.addEventListener("scroll", handleNavbarInfoScroll, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleNavbarInfoScroll);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isProjectDetailPage) {
@@ -41,12 +83,12 @@ const Navbar = () => {
       if (currentScrollY <= 20) {
         setShowProjectTitle(true);
         lastScrollYRef.current = currentScrollY;
-        tickingRef.current = false;
+        projectTitleTickingRef.current = false;
         return;
       }
 
       if (Math.abs(scrollDifference) < 5) {
-        tickingRef.current = false;
+        projectTitleTickingRef.current = false;
         return;
       }
 
@@ -58,22 +100,22 @@ const Navbar = () => {
       }
 
       lastScrollYRef.current = currentScrollY;
-      tickingRef.current = false;
+      projectTitleTickingRef.current = false;
     };
 
-    const handleScroll = () => {
-      if (tickingRef.current) return;
+    const handleProjectTitleScroll = () => {
+      if (projectTitleTickingRef.current) return;
 
-      tickingRef.current = true;
+      projectTitleTickingRef.current = true;
       window.requestAnimationFrame(updateScrollDirection);
     };
 
-    window.addEventListener("scroll", handleScroll, {
+    window.addEventListener("scroll", handleProjectTitleScroll, {
       passive: true,
     });
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleProjectTitleScroll);
     };
   }, [isProjectDetailPage, pathname]);
 
@@ -93,32 +135,70 @@ const Navbar = () => {
         (pathname.startsWith("/projects") || pathname.startsWith("/project/")));
 
     return [
-      "inline-block transition-opacity duration-300",
+      "inline-block -mt-1 text-xl transition-opacity duration-300",
       isActive ? "opacity-100" : "opacity-80 hover:opacity-100",
     ].join(" ");
   };
 
+  const secondaryInfoAnimation = showSecondaryInfo
+    ? {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+      }
+    : {
+        opacity: 0,
+        y: -8,
+        filter: "blur(5px)",
+      };
+
   return (
-    <div className="fixed top-0 z-[99] hidden w-full md:block">
-      <div className="z-50 flex w-full items-start justify-between bg-dark px-20 py-3 text-[16px] font-extrabold text-color">
+    <div className="fixed top-0 z-[99] hidden w-full bg-transparent lg:block">
+      <div className="z-50 flex w-full items-start justify-between px-20 py-3 text-[16px] font-extrabold text-color">
         <div className="h-full w-full">
           <div className="flex items-start justify-between">
             <div className="tracking-tighter">
               <h1 className="m-0 leading-none opacity-70">Name:</h1>
+
               <p className="m-0 leading-tight">Rustam Kerimov</p>
             </div>
 
-            <div className="tracking-tighter">
+            <motion.div
+              initial={false}
+              animate={secondaryInfoAnimation}
+              transition={{
+                duration: showSecondaryInfo ? 0.6 : 0.4,
+                ease: PROJECT_EASE,
+              }}
+              className={`tracking-tighter ${
+                showSecondaryInfo
+                  ? "pointer-events-auto"
+                  : "pointer-events-none"
+              }`}
+            >
               <h1 className="m-0 leading-none opacity-70">Occupation:</h1>
 
               <p className="m-0 leading-tight">Graphic designer</p>
-            </div>
+            </motion.div>
 
-            <div className="tracking-tighter">
+            <motion.div
+              initial={false}
+              animate={secondaryInfoAnimation}
+              transition={{
+                duration: showSecondaryInfo ? 0.6 : 0.4,
+                delay: showSecondaryInfo ? 0.05 : 0,
+                ease: PROJECT_EASE,
+              }}
+              className={`tracking-tighter ${
+                showSecondaryInfo
+                  ? "pointer-events-auto"
+                  : "pointer-events-none"
+              }`}
+            >
               <h1 className="m-0 leading-none opacity-70">Location:</h1>
 
               <p className="m-0 leading-tight">Oslo, Norway</p>
-            </div>
+            </motion.div>
 
             <div className="tracking-tighter">
               <h1 className="m-0 leading-none opacity-70">Navigation:</h1>
@@ -159,6 +239,7 @@ const Navbar = () => {
                               delayChildren: 0.05,
                             },
                           },
+
                           hidden: {
                             opacity: 1,
                             transition: {
@@ -186,6 +267,7 @@ const Navbar = () => {
                                   ease: PROJECT_EASE,
                                 },
                               },
+
                               hidden: {
                                 opacity: 0,
                                 y: -8,
@@ -258,15 +340,18 @@ const Navbar = () => {
                                       duration: 0.7,
                                       ease: PROJECT_EASE,
                                     },
+
                                     pathOffset: {
                                       duration: 0.7,
                                       ease: PROJECT_EASE,
                                     },
+
                                     opacity: {
                                       duration: 0.12,
                                     },
                                   },
                                 },
+
                                 hidden: {
                                   pathLength: 0,
                                   pathOffset: 1,
@@ -276,10 +361,12 @@ const Navbar = () => {
                                       duration: 0.55,
                                       ease: PROJECT_EASE,
                                     },
+
                                     pathOffset: {
                                       duration: 0.55,
                                       ease: PROJECT_EASE,
                                     },
+
                                     opacity: {
                                       duration: 0.1,
                                       delay: 0.45,

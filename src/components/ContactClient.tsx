@@ -84,7 +84,7 @@ function SentenceInput({
       onChange={onChange}
       placeholder={placeholder}
       required={required}
-      className={`mx-2 mb-2 block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.82em] font-semibold  leading-none text-[#e4dfd3] outline-none transition placeholder:text-[#a3b18a] focus:text-color md:min-w-[320px] ${className}`}
+      className={`mx-2 mb-2 block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.72em] font-black  leading-none text-[#a3b18a] outline-none transition placeholder:text-[#a3b18a]/80 focus:text-color md:min-w-[320px] ${className}`}
     />
   );
 }
@@ -120,7 +120,7 @@ function SentenceTextarea({
         scrollbarColor: "rgba(245, 236, 220, 0.35) transparent",
         scrollbarWidth: "thin",
       }}
-      className="max-h-[360px] min-h-[100px] w-full resize-none overflow-y-auto border-0 bg-transparent px-0 pb-4 pr-5 text-[clamp(2rem,4.4vw,5rem)] font-semibold normal-case leading-[1.08] tracking-[-0.035em] text-[#e4dfd3] outline-none transition placeholder:text-[#a3b18a] focus:text-color [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-color/25 [&::-webkit-scrollbar-thumb]:transition [&::-webkit-scrollbar-thumb:hover]:bg-color/45"
+      className="max-h-[360px] min-h-[100px] w-full resize-none overflow-y-auto border-0 bg-transparent px-0 pb-4 pr-5 text-[clamp(1.8rem,4.2vw,4.8rem)] font-black normal-case leading-[1.08] tracking-[-0.035em] text-[#a3b18a] outline-none transition  placeholder:text-[#a3b18a]/80 focus:text-color [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-color/25 [&::-webkit-scrollbar-thumb]:transition [&::-webkit-scrollbar-thumb:hover]:bg-color/45"
     />
   );
 }
@@ -227,8 +227,6 @@ const ContactClient = () => {
     <SmoothScroll>
       <section className="min-h-screen overflow-clip bg-dark px-4 pb-12 pt-28 text-color md:px-10 md:pb-16 md:pt-36 lg:px-16">
         <div className="mx-auto w-full max-w-[1800px]">
-          {/* HERO */}
-          {/* HERO */}
           <div className="grid min-h-[calc(100svh-7rem)] grid-cols-1 items-end gap-8 pb-16 md:grid-cols-[1fr_0.7fr] md:pb-20 lg:pb-24">
             <div>
               <TextReveal
@@ -255,7 +253,6 @@ together`}
             </TextReveal>
           </div>
 
-          {/* BRIEF */}
           {/* BRIEF */}
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.72fr_1.28fr] lg:items-start lg:gap-20">
             {" "}
@@ -436,7 +433,7 @@ together`}
 
                   <div className="text-[clamp(2.25rem,5.4vw,5.9rem)] font-black normal-case leading-[1.12] tracking-[-0.035em] text-color">
                     <p>
-                      Hey Rustam, my name is:{" "}
+                      Hey Rustam, my name is:
                       <SentenceInput
                         inputRef={nameInputRef}
                         id="name"
