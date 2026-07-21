@@ -1788,19 +1788,26 @@ export default function Index() {
           }}
           className="
     pointer-events-none
+    hidden
     absolute
     bottom-6
     right-6
     z-10
-    flex 
-    md:gap-x-6
 
-   flex-col
-   lg:flex-row
+    sm:flex
+    sm:flex-col
+    sm:gap-x-8
+    sm:gap-y-2
+
     text-right
+
     md:bottom-10
     md:right-10
-    lg:right-14
+
+    xl:right-14
+    xl:flex
+    xl:flex-row
+    xl:gap-x-20
   "
         >
           {introDone && (
@@ -1811,21 +1818,51 @@ export default function Index() {
                 viewport={false}
                 delay={0.16}
                 className="
-                hidden
-                sm:block
+          col-span-2
+          justify-self-end
+
           satoshi-black
-          text-sm
+          text-color
+          text-[13px]
           leading-none
           tracking-[-0.02em]
-          text-color
-          md:text-lg
-          xl:text-xl
+
+          lg:col-span-1
+          xl:text-[18px]
         "
               >
                 Portfolio / 2026
               </TextReveal>
 
-              <p className="satoshi-black hidden sm:block text-xs leading-none tracking-[-0.02em] text-color md:text-lg xl:text-xl">
+              <TextReveal
+                as="p"
+                mode="words"
+                viewport={false}
+                delay={0.16}
+                className="
+          satoshi-black
+          text-color
+          text-[13px]
+          leading-none
+          tracking-[-0.02em]
+
+          xl:text-[18px]
+        "
+              >
+                Status / Open for work
+              </TextReveal>
+
+              <p
+                className="
+          satoshi-black
+          text-color
+          text-[13px]
+          leading-none
+          tracking-[-0.02em]
+
+          xl:text-[18px]
+        "
+              >
                 <LocalTime />
               </p>
             </>

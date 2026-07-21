@@ -135,7 +135,7 @@ const Navbar = () => {
         (pathname.startsWith("/projects") || pathname.startsWith("/project/")));
 
     return [
-      "inline-block -mt-1 text-xl transition-opacity duration-300",
+      "inline-block -mt-1 text-2xl transition-opacity duration-300",
       isActive ? "opacity-100" : "opacity-80 hover:opacity-100",
     ].join(" ");
   };
@@ -157,8 +157,8 @@ const Navbar = () => {
   }`;
 
   return (
-    <div className="fixed top-0 z-[99] hidden w-full bg-transparent lg:block">
-      <div className="z-50 flex w-full items-start justify-between px-20 py-3 text-[16px] font-extrabold text-color">
+    <div className="fixed top-0 z-[99] py-4 hidden w-full bg-transparent lg:block">
+      <div className="z-50 flex w-full items-start justify-between px-20 py-3 text-[10px] xl:text-[14px] font-extrabold text-color">
         <div className="h-full w-full">
           <div className="flex items-start justify-between">
             <motion.div
@@ -170,9 +170,9 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <h1 className="m-0 leading-none opacity-70">Name:</h1>
-
-              <p className="m-0 leading-tight">Rustam Kerimov</p>
+              <p className="m-0 leading-tight uppercase">
+                Name / Rustam Kerimov
+              </p>
             </motion.div>
 
             <motion.div
@@ -185,9 +185,9 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <h1 className="m-0 leading-none opacity-70">Occupation:</h1>
-
-              <p className="m-0 leading-tight">Graphic designer</p>
+              <p className="m-0 leading-tight uppercase">
+                Occupation / Graphic designer
+              </p>
             </motion.div>
 
             <motion.div
@@ -200,21 +200,19 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <h1 className="m-0 leading-none opacity-70">Location:</h1>
-
-              <p className="m-0 leading-tight">Oslo, Norway</p>
+              <p className="m-0 leading-tight uppercase">
+                Location / Oslo, Norway
+              </p>
             </motion.div>
 
             <div className="tracking-tighter">
-              <h1 className="m-0 leading-none opacity-70">Navigation:</h1>
-
-              <div className="m-0 flex gap-x-1 leading-tight">
+              <div className="m-0 flex items-center gap-x-4 leading-tight">
                 <TransitionLink
                   href="/"
                   transitionLabel="Welcome Back"
                   className={getLinkClassName("/")}
                 >
-                  <WaveLinkText text="Home," />
+                  <WaveLinkText text="HOME" />
                 </TransitionLink>
 
                 <div className="relative inline-block">
@@ -223,7 +221,7 @@ const Navbar = () => {
                     transitionLabel="Selected Work"
                     className={getLinkClassName("/projects")}
                   >
-                    <WaveLinkText text="My work," />
+                    <WaveLinkText text="MY WORK" />
                   </TransitionLink>
 
                   <AnimatePresence initial={false}>
@@ -385,7 +383,7 @@ const Navbar = () => {
                   transitionLabel="Let's Collaborate"
                   className={getLinkClassName("/contact")}
                 >
-                  <WaveLinkText text="Contact" />
+                  <WaveLinkText text="CONTACT" />
                 </TransitionLink>
               </div>
             </div>

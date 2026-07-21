@@ -79,15 +79,15 @@ const BurgerMenu = () => {
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label={isOpen ? "Close menu" : "Open menu"}
         aria-expanded={isOpen}
-        className="relative z-[70] flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-color"
+        className="relative z-[70] flex items-center gap-3 text-sm uppercase tracking-[0.2em] text-color"
       >
         <span
-          className={`inline-block h-1.5 w-1.5 rounded-full bg-[#ecdfcc] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`inline-block h-1 w-1 rounded-full bg-[#ecdfcc] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             isOpen ? "scale-150" : "scale-100"
           }`}
         />
 
-        <span>{isOpen ? "Close" : "Menu"}</span>
+        <span className="font-semibold">{isOpen ? "Close" : "Menu"}</span>
       </button>
 
       <motion.div
