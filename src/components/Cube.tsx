@@ -1748,7 +1748,7 @@ export default function Index() {
                 mode="words"
                 viewport={false}
                 delay={0.05}
-                className="satoshi-black text-4xl leading-[0.95] tracking-[-0.02em] text-color sm:text-5xl lg:text-6xl"
+                className="satoshi-black text-4xl leading-[0.95] tracking-[-0.02em] text-color sm:text-4xl lg:text-5xl"
               >
                 Kerimov
               </TextReveal>
@@ -1758,7 +1758,7 @@ export default function Index() {
                 mode="words"
                 viewport={false}
                 delay={0.12}
-                className="satoshi-black text-5xl leading-[0.82] tracking-[-0.02em] text-color sm:text-6xl lg:text-7xl"
+                className="satoshi-black text-5xl leading-[0.82] tracking-[-0.02em] text-color sm:text-5xl lg:text-6xl"
               >
                 Designs
               </TextReveal>
@@ -1796,18 +1796,22 @@ export default function Index() {
 
     sm:flex
     sm:flex-col
-    sm:gap-x-8
     sm:gap-y-2
 
     text-right
+    text-[13px]
+           lg:text[11px]
+
+          xl:text-[18px]
 
     md:bottom-10
     md:right-10
 
-    xl:right-14
-    xl:flex
-    xl:flex-row
-    xl:gap-x-20
+    lg:right-14
+    lg:flex
+    lg:flex-row
+    lg:gap-x-22
+    xl:gap-x-34
   "
         >
           {introDone && (
@@ -1823,12 +1827,11 @@ export default function Index() {
 
           satoshi-black
           text-color
-          text-[13px]
           leading-none
           tracking-[-0.02em]
 
           lg:col-span-1
-          xl:text-[18px]
+             
         "
               >
                 Portfolio / 2026
@@ -1842,11 +1845,9 @@ export default function Index() {
                 className="
           satoshi-black
           text-color
-          text-[13px]
           leading-none
           tracking-[-0.02em]
 
-          xl:text-[18px]
         "
               >
                 Status / Open for work
@@ -1856,11 +1857,9 @@ export default function Index() {
                 className="
           satoshi-black
           text-color
-          text-[13px]
           leading-none
           tracking-[-0.02em]
 
-          xl:text-[18px]
         "
               >
                 <LocalTime />
