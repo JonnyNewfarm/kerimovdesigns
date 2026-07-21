@@ -431,19 +431,10 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
           <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-[1200px]">
               <TextReveal
-                as="p"
-                mode="words"
-                delay={0.05}
-                className="mb-8 text-xs font-black uppercase tracking-[0.25em] text-white/50"
-              >
-                Selected Project
-              </TextReveal>
-
-              <TextReveal
                 as="h1"
                 mode="lines"
                 delay={0.12}
-                className="text-left text-5xl font-black uppercase leading-[0.9] tracking-[-0.04em] text-color sm:text-7xl md:text-7xl xl:text-[9rem]"
+                className="text-left text-5xl font-black uppercase leading-[0.9] tracking-[-0.025em] text-color sm:text-7xl md:text-7xl xl:text-[9rem]"
               >
                 {getTitleLines(project.title)}
               </TextReveal>
