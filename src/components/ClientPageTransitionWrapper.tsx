@@ -15,7 +15,7 @@ import { usePathname, useRouter } from "next/navigation";
 export type TransitionDirection = "left" | "right";
 
 type TransitionStatus = "idle" | "entering" | "leaving";
-type TransitionVariant = "horizontal" | "projectDetails";
+type TransitionVariant = "destination" | "projectDetails";
 
 type PageTransitionContextType = {
   startTransition: (
@@ -46,11 +46,8 @@ interface ClientPageTransitionWrapperProps {
   children: ReactNode;
 }
 
-const DESKTOP_HORIZONTAL_ENTER_DURATION = 750;
-const MOBILE_HORIZONTAL_ENTER_DURATION = 600;
-
-const DESKTOP_PROJECT_ENTER_DURATION = 950;
-const MOBILE_PROJECT_ENTER_DURATION = 760;
+const DESKTOP_ENTER_DURATION = 950;
+const MOBILE_ENTER_DURATION = 760;
 
 const DESKTOP_LEAVE_DURATION = 650;
 const MOBILE_LEAVE_DURATION = 460;
@@ -142,114 +139,52 @@ function getTransitionVariant(href: string): TransitionVariant {
     return "projectDetails";
   }
 
-  return "horizontal";
+  return "destination";
 }
 
-function getEnterDuration(
-  variant: TransitionVariant,
-  isMobile: boolean,
-): number {
-  if (variant === "projectDetails") {
-    return isMobile
-      ? MOBILE_PROJECT_ENTER_DURATION
-      : DESKTOP_PROJECT_ENTER_DURATION;
-  }
-
-  return isMobile
-    ? MOBILE_HORIZONTAL_ENTER_DURATION
-    : DESKTOP_HORIZONTAL_ENTER_DURATION;
+function getEnterDuration(isMobile: boolean): number {
+  return isMobile ? MOBILE_ENTER_DURATION : DESKTOP_ENTER_DURATION;
 }
 
-function getEnterDurationSeconds(
-  variant: TransitionVariant,
-  isMobile: boolean,
-): number {
-  return getEnterDuration(variant, isMobile) / 1000;
+function getEnterDurationSeconds(isMobile: boolean): number {
+  return getEnterDuration(isMobile) / 1000;
 }
 
-function getInitialPosition(
-  variant: TransitionVariant,
-  direction: TransitionDirection,
-) {
-  if (variant === "projectDetails") {
-    return {
-      x: "0%",
-      y: "100%",
-    };
-  }
-
+function getInitialPosition() {
   return {
-    x: direction === "right" ? "100%" : "-100%",
-    y: "0%",
+    x: "0%",
+    y: "100%",
   };
 }
 
 function CurvedOverlay({
   status,
-  direction,
   variant,
   isMobile,
   width,
   height,
 }: {
   status: TransitionStatus;
-  direction: TransitionDirection;
   variant: TransitionVariant;
   isMobile: boolean;
   width: number;
   height: number;
 }) {
   if (!width || !height) {
-    return <div className="fixed inset-0 bg-dark" />;
+    return (
+      <div
+        className="fixed inset-0"
+        style={{
+          backgroundColor: variant === "projectDetails" ? "#4b4f47" : "#667a6c",
+        }}
+      />
+    );
   }
 
-  const sideCurve = isMobile ? 13 : 48;
-  const topCurve = isMobile ? 8 : 28;
-  const bottomCurve = isMobile ? 8 : 28;
+  const topCurve = 10;
+  const bottomCurve = 10;
 
-  /*
-   * ORIGINAL REGULAR ENTERING
-   * Ikke endret.
-   */
-
-  const enteringFromLeftInitialPath = `
-    M 0 0
-    L ${width} 0
-    Q ${width + sideCurve} ${height / 2} ${width} ${height}
-    L 0 ${height}
-    Z
-  `;
-
-  const enteringFromLeftTargetPath = `
-    M 0 0
-    L ${width} 0
-    Q ${width} ${height / 2} ${width} ${height}
-    L 0 ${height}
-    Z
-  `;
-
-  const enteringFromRightInitialPath = `
-    M ${width} 0
-    L 0 0
-    Q ${-sideCurve} ${height / 2} 0 ${height}
-    L ${width} ${height}
-    Z
-  `;
-
-  const enteringFromRightTargetPath = `
-    M ${width} 0
-    L 0 0
-    Q 0 ${height / 2} 0 ${height}
-    L ${width} ${height}
-    Z
-  `;
-
-  /*
-   * ORIGINAL PROJECT DETAIL ENTERING
-   * Ikke endret.
-   */
-
-  const projectEnteringInitialPath = `
+  const enteringInitialPath = `
     M 0 ${topCurve}
     Q ${width / 2} ${-topCurve} ${width} ${topCurve}
     L ${width} ${height}
@@ -257,7 +192,7 @@ function CurvedOverlay({
     Z
   `;
 
-  const projectEnteringTargetPath = `
+  const enteringTargetPath = `
     M 0 0
     Q ${width / 2} 0 ${width} 0
     L ${width} ${height}
@@ -266,11 +201,9 @@ function CurvedOverlay({
   `;
 
   /*
-   * ORIGINAL PROJECT DETAIL LEAVING
-   * Ikke endret.
+   * Alle overganger forlater skjermen oppover.
    */
-
-  const projectLeavingInitialPath = `
+  const leavingInitialPath = `
     M 0 0
     L ${width} 0
     L ${width} ${height}
@@ -278,7 +211,7 @@ function CurvedOverlay({
     Z
   `;
 
-  const projectLeavingTargetPath = `
+  const leavingTargetPath = `
     M 0 0
     L ${width} 0
     L ${width} ${height}
@@ -286,73 +219,22 @@ function CurvedOverlay({
     Z
   `;
 
-  const leavingToRightInitialPath = `
-    M 0 0
-    Q ${-bottomCurve} ${height / 2} 0 ${height}
-    L ${width} ${height}
-    L ${width} 0
-    Z
-  `;
+  const initialPath =
+    status === "leaving" ? leavingInitialPath : enteringInitialPath;
 
-  const leavingToRightTargetPath = `
-    M 0 0
-    Q 0 ${height / 2} 0 ${height}
-    L ${width} ${height}
-    L ${width} 0
-    Z
-  `;
-
-  const leavingToLeftInitialPath = `
-    M 0 0
-    L ${width} 0
-    Q ${width + bottomCurve} ${height / 2} ${width} ${height}
-    L 0 ${height}
-    Z
-  `;
-
-  const leavingToLeftTargetPath = `
-    M 0 0
-    L ${width} 0
-    Q ${width} ${height / 2} ${width} ${height}
-    L 0 ${height}
-    Z
-  `;
-
-  let initialPath: string;
-  let targetPath: string;
-
-  if (status === "leaving") {
-    if (variant === "projectDetails") {
-      initialPath = projectLeavingInitialPath;
-      targetPath = projectLeavingTargetPath;
-    } else if (direction === "right") {
-      initialPath = leavingToLeftInitialPath;
-      targetPath = leavingToLeftTargetPath;
-    } else {
-      initialPath = leavingToRightInitialPath;
-      targetPath = leavingToRightTargetPath;
-    }
-  } else if (variant === "projectDetails") {
-    initialPath = projectEnteringInitialPath;
-    targetPath = projectEnteringTargetPath;
-  } else if (direction === "right") {
-    initialPath = enteringFromRightInitialPath;
-    targetPath = enteringFromRightTargetPath;
-  } else {
-    initialPath = enteringFromLeftInitialPath;
-    targetPath = enteringFromLeftTargetPath;
-  }
+  const targetPath =
+    status === "leaving" ? leavingTargetPath : enteringTargetPath;
 
   const pathDuration =
     status === "entering"
-      ? getEnterDurationSeconds(variant, isMobile)
+      ? getEnterDurationSeconds(isMobile)
       : isMobile
-        ? 0.42
+        ? 0.6
         : 0.65;
 
   return (
     <motion.svg
-      key={`${status}-${variant}-${direction}-${
+      key={`${status}-${variant}-${
         isMobile ? "mobile" : "desktop"
       }-${width}-${height}`}
       className="absolute left-0 top-0 h-full w-screen overflow-visible"
@@ -379,13 +261,11 @@ function CurvedOverlay({
 function TransitionText({
   status,
   label,
-  direction,
   variant,
   isMobile,
 }: {
   status: TransitionStatus;
   label: string;
-  direction: TransitionDirection;
   variant: TransitionVariant;
   isMobile: boolean;
 }) {
@@ -395,27 +275,14 @@ function TransitionText({
     ? Math.min(14, Math.max(7, 120 / Math.max(labelLength * 0.95, 7)))
     : Math.min(13, Math.max(3.8, 96 / Math.max(labelLength * 0.95, 7)));
 
-  const initialTextPosition =
-    variant === "projectDetails"
-      ? {
-          x: "0vw",
-          y: "12vh",
-        }
-      : {
-          x: direction === "right" ? "10vw" : "-10vw",
-          y: "0vh",
-        };
-
-  const textDuration =
-    variant === "projectDetails" ? 0.55 : isMobile ? 0.4 : 0.46;
-
   return (
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4 md:px-8">
       <motion.div
         className="w-fit max-w-[92vw] md:max-w-[96vw]"
         initial={{
-          ...initialTextPosition,
-          scaleX: variant === "projectDetails" ? 1 : 1.04,
+          x: "0vw",
+          y: "12vh",
+          scaleX: 1,
         }}
         animate={{
           x: "0vw",
@@ -423,7 +290,7 @@ function TransitionText({
           scaleX: 1,
         }}
         transition={{
-          duration: status === "entering" ? textDuration : 0,
+          duration: status === "entering" ? 0.55 : 0,
           delay: status === "entering" ? 0.05 : 0,
           ease: transitionEase,
         }}
@@ -439,8 +306,8 @@ function TransitionText({
             y: 0,
           }}
           transition={{
-            duration: variant === "projectDetails" ? 0.35 : 0.28,
-            delay: variant === "projectDetails" ? 0.2 : 0.12,
+            duration: 0.35,
+            delay: 0.2,
             ease: transitionEase,
           }}
         >
@@ -474,10 +341,8 @@ export default function ClientPageTransitionWrapper({
   const [status, setStatus] = useState<TransitionStatus>("idle");
   const [pendingHref, setPendingHref] = useState<string | null>(null);
   const [transitionLabel, setTransitionLabel] = useState("");
-  const [transitionDirection, setTransitionDirection] =
-    useState<TransitionDirection>("left");
   const [transitionVariant, setTransitionVariant] =
-    useState<TransitionVariant>("horizontal");
+    useState<TransitionVariant>("destination");
 
   const previousPathname = useRef(pathname);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -496,7 +361,7 @@ export default function ClientPageTransitionWrapper({
   const startTransition = (
     href: string,
     label?: string,
-    direction: TransitionDirection = "left",
+    _direction: TransitionDirection = "left",
   ) => {
     if (!href || href === pathname || status !== "idle") {
       return;
@@ -510,11 +375,10 @@ export default function ClientPageTransitionWrapper({
     clearCurrentTimeout();
 
     const variant = getTransitionVariant(href);
-    const enterDuration = getEnterDuration(variant, isMobile);
+    const enterDuration = getEnterDuration(isMobile);
 
     setPendingHref(href);
     setTransitionLabel(label || "Loading");
-    setTransitionDirection(direction);
     setTransitionVariant(variant);
     setStatus("entering");
 
@@ -542,7 +406,7 @@ export default function ClientPageTransitionWrapper({
       setStatus("idle");
       setPendingHref(null);
       setTransitionLabel("");
-      setTransitionVariant("horizontal");
+      setTransitionVariant("destination");
     }, leaveDuration);
   }, [pathname, pendingHref, leaveDuration]);
 
@@ -554,15 +418,9 @@ export default function ClientPageTransitionWrapper({
 
   const isTransitioning = status !== "idle";
 
-  const initialPosition = getInitialPosition(
-    transitionVariant,
-    transitionDirection,
-  );
+  const initialPosition = getInitialPosition();
 
-  const overlayEnterDuration = getEnterDurationSeconds(
-    transitionVariant,
-    isMobile,
-  );
+  const overlayEnterDuration = getEnterDurationSeconds(isMobile);
 
   const coverHeight = viewportSize.coverHeight
     ? `${viewportSize.coverHeight}px`
@@ -588,16 +446,10 @@ export default function ClientPageTransitionWrapper({
     [visibleHeight],
   );
 
-  const leavingPosition =
-    transitionVariant === "projectDetails"
-      ? {
-          x: "0%",
-          y: "-100%",
-        }
-      : {
-          x: transitionDirection === "right" ? "-100%" : "100%",
-          y: "0%",
-        };
+  const leavingPosition = {
+    x: "0%",
+    y: "-100%",
+  };
 
   return (
     <PageTransitionContext.Provider
@@ -635,7 +487,6 @@ export default function ClientPageTransitionWrapper({
           >
             <CurvedOverlay
               status={status}
-              direction={transitionDirection}
               variant={transitionVariant}
               isMobile={isMobile}
               width={viewportSize.width || 1}
@@ -649,7 +500,6 @@ export default function ClientPageTransitionWrapper({
               <TransitionText
                 status={status}
                 label={transitionLabel}
-                direction={transitionDirection}
                 variant={transitionVariant}
                 isMobile={isMobile}
               />

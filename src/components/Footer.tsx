@@ -84,7 +84,7 @@ ideas into visuals.`}
               <div className="flex flex-col gap-1 text-xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-color/80 md:text-3xl">
                 <TransitionLink
                   href="/"
-                  transitionLabel="Welcome back"
+                  transitionLabel="Index"
                   className="transition hover:text-color"
                 >
                   <WaveLinkText text="Home" />

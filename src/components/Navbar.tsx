@@ -209,7 +209,7 @@ const Navbar = () => {
               <div className="m-0 flex items-center gap-x-4 leading-tight">
                 <TransitionLink
                   href="/"
-                  transitionLabel="Welcome Back"
+                  transitionLabel="Index"
                   className={getLinkClassName("/")}
                 >
                   <WaveLinkText text="HOME" />
