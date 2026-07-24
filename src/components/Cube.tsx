@@ -1728,8 +1728,8 @@ export default function Index() {
           className="
     pointer-events-none
     absolute
+    z-[9999999]
 bottom-[calc(1.5rem-(100dvh-100svh))]    left-6
-    z-10
     
     text-left
     md:bottom-10
