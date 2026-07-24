@@ -29,21 +29,35 @@ const Navbar = () => {
   const isProjectDetailPage = pathname.startsWith("/project/");
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const updateNavbarInfo = () => {
       const currentScrollY = window.scrollY;
+      const scrollDifference = currentScrollY - lastScrollY;
 
-      setShowSecondaryInfo((currentlyVisible) => {
-        if (currentScrollY <= INFO_HIDE_SCROLL) {
-          return true;
-        }
+      // Alltid synlig øverst
+      if (currentScrollY <= INFO_HIDE_SCROLL) {
+        setShowSecondaryInfo(true);
+        lastScrollY = currentScrollY;
+        navbarInfoTickingRef.current = false;
+        return;
+      }
 
-        if (currentScrollY >= INFO_SHOW_SCROLL) {
-          return false;
-        }
+      // Ignorer bittesmå scrollbevegelser
+      if (Math.abs(scrollDifference) < 4) {
+        navbarInfoTickingRef.current = false;
+        return;
+      }
 
-        return currentlyVisible;
-      });
+      if (scrollDifference > 0) {
+        // Scroller ned
+        setShowSecondaryInfo(false);
+      } else {
+        // Scroller opp
+        setShowSecondaryInfo(true);
+      }
 
+      lastScrollY = currentScrollY;
       navbarInfoTickingRef.current = false;
     };
 
@@ -53,8 +67,6 @@ const Navbar = () => {
       navbarInfoTickingRef.current = true;
       window.requestAnimationFrame(updateNavbarInfo);
     };
-
-    updateNavbarInfo();
 
     window.addEventListener("scroll", handleNavbarInfoScroll, {
       passive: true,
