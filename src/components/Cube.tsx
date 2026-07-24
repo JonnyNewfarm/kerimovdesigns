@@ -1729,7 +1729,7 @@ export default function Index() {
     pointer-events-none
     absolute
     z-[9999]
-bottom-[calc(1.5rem-(100dvh-100svh))]    left-6
+bottom-6    left-6
     
     text-left
     md:bottom-10
