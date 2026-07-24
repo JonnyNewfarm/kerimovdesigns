@@ -34,15 +34,11 @@ const ProjectsTableMobile = ({
   return (
     <section className="min-h-screen bg-dark pb-24 text-color">
       <div className="px-6 pt-28">
-        <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-white/40">
-          Selected Work
-        </p>
-
         <h1 className="text-4xl font-black uppercase leading-[0.95] tracking-[-0.01em]">
-          My Projects
+          Selected <br /> Work
         </h1>
 
-        <div className="mt-7">
+        <div className="mt-9">
           <ProjectTagFilter
             availableTags={availableTags}
             activeTags={activeTags}
@@ -52,7 +48,7 @@ const ProjectsTableMobile = ({
 
       {projects.length ? (
         <>
-          <div className="mt-12 flex flex-col gap-16 px-6">
+          <div className="mt-15 flex flex-col gap-16 px-6">
             {projects.map((project, index) => (
               <ProjectCard
                 key={project.id}
