@@ -1582,7 +1582,7 @@ export default function Index() {
   return (
     <motion.div
       ref={container}
-      className="min-h-[150dvh]"
+      className="min-h-[150svh] md:min-h-[150dvh]"
       initial={false}
       animate={{
         opacity: 1,
@@ -1647,9 +1647,9 @@ export default function Index() {
         </TransitionLink>
       </div>
 
-      <div className="sticky top-0 relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden uppercase">
+      <div className="sticky top-0 flex h-[100svh] flex-col items-center justify-center overflow-hidden uppercase md:h-[100dvh]">
+        {" "}
         {introChecked && shouldUseIntro && <HeroIntro isDone={introDone} />}
-
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
             initial={false}
@@ -1705,7 +1705,6 @@ export default function Index() {
             )}
           </motion.div>
         </div>
-
         <motion.div
           initial={false}
           animate={
@@ -1765,7 +1764,6 @@ export default function Index() {
             </div>
           )}
         </motion.div>
-
         <motion.div
           initial={false}
           animate={

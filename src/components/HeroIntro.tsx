@@ -123,20 +123,6 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
             </div>
           </motion.div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{
-            duration: 0.6,
-            delay: 0.25,
-            ease,
-          }}
-          className="absolute bottom-8 right-8 hidden text-right text-[13px] font-black uppercase tracking-[0.42em] text-color md:bottom-12 md:right-12 md:block"
-        >
-          <div>Rustam Kerimov</div>
-          <div>Graphic designer</div>
-        </motion.div>
       </div>
     </motion.div>
   );
