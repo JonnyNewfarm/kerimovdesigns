@@ -2443,7 +2443,7 @@ const Cube = ({
     }
 
     if (isMobile) {
-      group.current.scale.set(1.08, 1.08, 1.08);
+      group.current.scale.set(1.07, 1.07, 1.07);
 
       return;
     }
