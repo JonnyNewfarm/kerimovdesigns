@@ -1517,7 +1517,38 @@ function useScrollLock(locked: boolean) {
   }, [locked]);
 }
 
+function useLockedMobileViewportHeight() {
+  useLayoutEffect(() => {
+    const setHeight = () => {
+      const height = window.innerHeight;
+
+      document.documentElement.style.setProperty(
+        "--hero-mobile-height",
+        `${height}px`,
+      );
+    };
+
+    setHeight();
+
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+
+    const handleBreakpointChange = () => {
+      if (!mediaQuery.matches) {
+        setHeight();
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleBreakpointChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleBreakpointChange);
+    };
+  }, []);
+}
+
 export default function Index() {
+  useLockedMobileViewportHeight();
+
   const container = useRef<HTMLDivElement | null>(null);
 
   const isDraggingCubeRef = useRef(false);
@@ -1582,7 +1613,11 @@ export default function Index() {
   return (
     <motion.div
       ref={container}
-      className="min-h-[150svh] md:min-h-[150dvh]"
+      className="
+    relative
+    h-[calc(var(--hero-mobile-height)*1.5)]
+    md:h-[150dvh]
+  "
       initial={false}
       animate={{
         opacity: 1,
@@ -1647,7 +1682,21 @@ export default function Index() {
         </TransitionLink>
       </div>
 
-      <div className="sticky top-0 flex h-[100svh] flex-col items-center justify-center overflow-hidden uppercase md:h-[100dvh]">
+      <div
+        className="
+    sticky
+    top-0
+    flex
+    h-[var(--hero-mobile-height)]
+    w-full
+    flex-col
+    items-center
+    justify-center
+    overflow-hidden
+    uppercase
+    md:h-[100dvh]
+  "
+      >
         {" "}
         {introChecked && shouldUseIntro && <HeroIntro isDone={introDone} />}
         <div className="absolute inset-0 flex items-center justify-center">
