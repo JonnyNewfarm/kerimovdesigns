@@ -315,7 +315,7 @@ function TransitionText({
         </motion.p>
 
         <h2
-          className="m-0 whitespace-nowrap text-left font-extrabold uppercase leading-[0.86] tracking-[-0.02em] text-white/85"
+          className="m-0 text-center text-left font-extrabold uppercase leading-[0.86] tracking-[-0.02em] text-white/85"
           style={{
             fontSize: isMobile
               ? `clamp(32px, ${fontVw}vw, 86px)`
