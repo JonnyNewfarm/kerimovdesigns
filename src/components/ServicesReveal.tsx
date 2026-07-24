@@ -48,12 +48,12 @@ export default function ServicesReveal() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full overflow-hidden bg-dark px-4 py-[22vh] text-color md:px-10 lg:px-16"
+      className="relative w-full overflow-hidden  px-4 py-[22vh] md:px-10 lg:px-16"
     >
       <div className="mx-auto w-full max-w-[1800px]">
-        <div className="mb-10 flex items-start justify-between text-xs font-black uppercase tracking-[0.24em] text-color/50 md:text-sm">
+        <div className="mb-10 flex items-start justify-between text-xs font-black uppercase tracking-[0.24em]  md:text-sm">
           <p className="invisible">
-            <span className="mr-4 text-color">07</span>
+            <span className="mr-4 ">07</span>
             About
           </p>
 
@@ -67,7 +67,7 @@ export default function ServicesReveal() {
           </TextReveal>
         </div>
 
-        <h2 className="select-none text-[10vw] font-black uppercase leading-[0.9] tracking-[-0.045em] text-color md:text-[8.4vw] lg:text-[6.45vw]">
+        <h2 className="select-none text-[10vw] font-black uppercase leading-[0.9] tracking-[-0.045em]  md:text-[8.4vw] lg:text-[6.45vw]">
           <span className="block">Hi, I’m Rustam —</span>
           <span className="block">a graphic designer</span>
 
@@ -94,7 +94,7 @@ export default function ServicesReveal() {
             as="p"
             mode="words"
             delay={0.2}
-            className="max-w-[760px] text-[6.3vw] font-black uppercase leading-[0.96] tracking-[-0.055em] text-color md:text-[3.45vw] lg:text-[2.45vw]"
+            className="max-w-[760px] text-[6.3vw] font-black uppercase leading-[0.96] tracking-[-0.055em]  md:text-[3.45vw] lg:text-[2.45vw]"
           >
             Design is more than work — it turns imagination into something
             people can see and feel.
@@ -104,7 +104,7 @@ export default function ServicesReveal() {
             as="p"
             mode="words"
             delay={0.32}
-            className="max-w-[500px] justify-self-end text-base font-bold leading-[1.35] text-color/60 md:text-lg"
+            className="max-w-[500px] justify-self-end text-base font-bold leading-[1.35] opacity-90 md:text-lg"
           >
             Inspired by art, movies and the world around me, I create visuals
             that bring ideas to life.

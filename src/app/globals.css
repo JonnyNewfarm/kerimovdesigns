@@ -1,14 +1,64 @@
 @import "tailwindcss";
+@import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  font-family: "Satoshi", Arial, Helvetica, sans-serif;
 
+  background-color: #f1eee8;
+  color: #181c14;
+}
 
-html, body {
-  scrollbar-width: none; 
-  -ms-overflow-style: none; 
-  background: #181c14; 
-  
-  
+html.dark,
+html.dark body {
+  background-color: #181c14;
+  color: #ecdfcc;
+}
+
+.bg-dark {
+  background-color: #f1eee8;
+}
+
+.dark .bg-dark {
+  background-color: #181c14;
+}
+
+.text-color {
+  color: #181c14;
+}
+
+.dark .text-color {
+  color: #ecdfcc;
+}
+
+.bg-color {
+  background-color: #181c14;
+}
+
+.dark .bg-color {
+  background-color: #ecdfcc;
+}
+
+.text-dark {
+  color: #f1eee8;
+}
+
+.dark .text-dark {
+  color: #181c14;
+}
+
+.border-color {
+  border-color: #181c14;
+}
+
+.dark .border-color {
+  border-color: #ecdfcc;
 }
 
 @font-face {
