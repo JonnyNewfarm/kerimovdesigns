@@ -1727,8 +1727,10 @@ export default function Index() {
           className="
     pointer-events-none
     absolute
-    bottom-6
-    left-6
+bottom-[calc(1.5rem+100vh-100dvh)]
+transition-[bottom]
+duration-200
+ease-out    left-6
     z-10
     
     text-left
@@ -1746,7 +1748,7 @@ export default function Index() {
                 mode="words"
                 viewport={false}
                 delay={0.05}
-                className="satoshi-black text-4xl leading-[0.95] tracking-[-0.02em] text-color sm:text-4xl lg:text-5xl"
+                className="satoshi-black text-3xl leading-[0.95] tracking-[-0.02em] text-color sm:text-4xl lg:text-5xl"
               >
                 Kerimov
               </TextReveal>
@@ -1756,7 +1758,7 @@ export default function Index() {
                 mode="words"
                 viewport={false}
                 delay={0.12}
-                className="satoshi-black text-5xl leading-[0.82] tracking-[-0.02em] text-color sm:text-5xl lg:text-6xl"
+                className="satoshi-black text-4xl leading-[0.82] tracking-[-0.02em] text-color sm:text-5xl lg:text-6xl"
               >
                 Designs
               </TextReveal>
