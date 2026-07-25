@@ -577,7 +577,9 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                         className="relative"
                         animate={{
                           filter:
-                            shouldBlur && !isActive ? "blur(5px)" : "blur(0px)",
+                            shouldBlur && !isActive
+                              ? "blur(clamp(2px, 0.5vw, 5px))"
+                              : "blur(0px)",
                         }}
                         transition={{
                           duration: 0.35,
