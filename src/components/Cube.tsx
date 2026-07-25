@@ -1671,7 +1671,8 @@ export default function Index() {
                   antialias: false,
                   powerPreference: "high-performance",
                 }}
-              >s
+              >
+                s
                 {isMdUp && (
                   <OrbitControls
                     enableZoom={false}
@@ -1688,11 +1689,8 @@ export default function Index() {
                     }}
                   />
                 )}
-
                 <ambientLight intensity={2} />
-
                 <directionalLight position={[2, 1, 1]} />
-
                 <Cube
                   key="cube-ready"
                   scrollProgress={smoothProgress}
