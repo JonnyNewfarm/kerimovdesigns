@@ -1,9 +1,10 @@
-import { getProjectById } from "@/app/actions";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import SmoothScroll from "@/components/SmoothScroll";
+
+import { getProjectById } from "@/app/actions";
 import ProjectModalWrapper from "@/components/ProjectModalWrapper";
 import { ProjectNavTitleSetter } from "@/components/ProjectNavContext";
-import type { Metadata } from "next";
+import SmoothScroll from "@/components/SmoothScroll";
 
 type ParamsType = Promise<{
   projectId: string;

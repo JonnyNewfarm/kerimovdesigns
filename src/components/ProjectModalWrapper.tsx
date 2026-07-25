@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import TextReveal from "./TextReveal";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+
 import MagneticComp from "./MagneticComp";
+import TextReveal from "./TextReveal";
 
 export interface Project {
   id: string;
@@ -123,7 +124,9 @@ const fieldVariants = {
   },
 };
 
-const formatCount = (count: number) => String(count).padStart(2, "0");
+const formatCount = (count: number) => {
+  return String(count).padStart(2, "0");
+};
 
 const RollingDigit = ({
   digit,
@@ -174,7 +177,9 @@ const RollingCount = ({
       setHasStarted(true);
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [value]);
 
   const currentValue = hasStarted ? value : 0;
@@ -214,6 +219,7 @@ const ProjectDescription = ({
 
   const previewText = paragraphs[0] || description;
   const textToShow = isExpanded ? description : previewText;
+
   const hasMoreText =
     paragraphs.length > 1 || description.length > previewText.length;
 
@@ -229,7 +235,10 @@ const ProjectDescription = ({
         y: 0,
         filter: "blur(0px)",
       }}
-      viewport={{ once: true, amount: 0.25 }}
+      viewport={{
+        once: true,
+        amount: 0.25,
+      }}
       transition={{
         duration: 0.85,
         ease,
@@ -259,10 +268,12 @@ const ProjectDescription = ({
         {hasMoreText && (
           <button
             type="button"
-            onClick={() => setIsExpanded((prev) => !prev)}
+            onClick={() => {
+              setIsExpanded((prev) => !prev);
+            }}
             aria-expanded={isExpanded}
             aria-controls="project-description-content"
-            className="mt-8 inline-flex items-center cursor-pointer gap-3 text-[10px] font-black uppercase tracking-[0.32em] text-white/55 transition-opacity duration-300 hover:opacity-100 sm:text-xs"
+            className="mt-8 inline-flex cursor-pointer items-center gap-3 text-[10px] font-black uppercase tracking-[0.32em] text-white/55 transition-opacity duration-300 hover:opacity-100 sm:text-xs"
           >
             <span>{isExpanded ? "Show less" : "Read more"}</span>
 
@@ -286,6 +297,7 @@ const ProjectDescription = ({
                   strokeWidth="1.5"
                   strokeLinecap="square"
                 />
+
                 <path
                   d="M4 14L11 7"
                   stroke="currentColor"
@@ -318,9 +330,11 @@ const formatTag = (tag: string) => {
 
 const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [isClient, setIsClient] = useState(false);
+
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
+
   const [imageDimensions, setImageDimensions] = useState<
     Record<number, ImageDimensions>
   >({});
@@ -354,64 +368,29 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
   const projectTags = getProjectTags(project.tags);
 
   const activeImage = activeIndex !== null ? images[activeIndex] : null;
+
   const activeDimensions =
     activeIndex !== null ? imageDimensions[activeIndex] : null;
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    images.forEach((src, index) => {
-      const img = new window.Image();
-
-      img.src = src;
-
-      const markAsReady = () => {
-        setLoadedImages((prev) => ({
-          ...prev,
-          [index]: true,
-        }));
-
-        setImageDimensions((prev) => ({
-          ...prev,
-          [index]: {
-            width: img.naturalWidth || 850,
-            height: img.naturalHeight || 450,
-          },
-        }));
-      };
-
-      if (img.decode) {
-        img
-          .decode()
-          .then(markAsReady)
-          .catch(() => {
-            if (img.complete) {
-              markAsReady();
-            } else {
-              img.onload = markAsReady;
-            }
-          });
-      } else {
-        img.onload = markAsReady;
-      }
-    });
-  }, [images]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         setActiveIndex(null);
+        setHoveredIndex(null);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const openImage = (index: number) => {
-    if (!loadedImages[index] || !imageDimensions[index]) return;
+    if (!loadedImages[index] || !imageDimensions[index]) {
+      return;
+    }
 
     setHoveredIndex(null);
     setActiveIndex(index);
@@ -421,8 +400,6 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
     setActiveIndex(null);
     setHoveredIndex(null);
   };
-
-  if (!isClient) return null;
 
   return (
     <LayoutGroup>
@@ -451,7 +428,10 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                 y: 0,
                 filter: "blur(0px)",
               }}
-              viewport={{ once: true, amount: 0.25 }}
+              viewport={{
+                once: true,
+                amount: 0.25,
+              }}
               transition={{
                 duration: 0.85,
                 ease,
@@ -460,7 +440,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
               className="flex items-center gap-8 xl:justify-end xl:pb-4"
             >
               <div className="flex flex-col">
-                <span className="mb-2 text-[10px]  uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                <span className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
                   Images
                 </span>
 
@@ -468,7 +448,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
               </div>
 
               <div className="flex flex-col">
-                <span className="mb-2 text-[10px]  uppercase tracking-[0.22em] text-white/45 sm:text-xs">
+                <span className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:text-xs">
                   Videos
                 </span>
 
@@ -480,7 +460,10 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.25 }}
+            viewport={{
+              once: true,
+              amount: 0.25,
+            }}
             variants={{
               hidden: {},
               visible: {
@@ -501,7 +484,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                 Tags
               </TextReveal>
 
-              <p className="text-sm max-w-60 uppercase leading-relaxed text-white/85 sm:text-base">
+              <p className="max-w-60 text-sm uppercase leading-relaxed text-white/85 sm:text-base">
                 {projectTags.length > 0
                   ? projectTags.map(formatTag).join(", ")
                   : "—"}
@@ -543,14 +526,16 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
         <div className="mb-20 mt-20 flex min-h-[70vh] w-full flex-col gap-y-20 px-4 sm:mt-28 sm:gap-y-32 sm:px-8 lg:mt-32">
           {images.map((src, index) => {
             const imageNumber = String(index + 1).padStart(2, "0");
+
             const isActive = activeIndex === index;
-            const isLoaded = loadedImages[index];
+            const isLoaded = Boolean(loadedImages[index]);
 
             const shouldBlur =
               (hoveredIndex !== null && hoveredIndex !== index) ||
               (activeIndex !== null && activeIndex !== index);
 
             const layout = imageLayout[index % imageLayout.length];
+
             const dimensions = imageDimensions[index];
 
             return (
@@ -611,23 +596,58 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                           width={dimensions?.width || 850}
                           height={dimensions?.height || 450}
                           sizes="(max-width: 768px) 80vw, 520px"
-                          priority={index < 3}
-                          onLoad={() => {
-                            setLoadedImages((prev) => ({
-                              ...prev,
-                              [index]: true,
-                            }));
+                          priority={index === 0}
+                          onLoad={(event) => {
+                            const image = event.currentTarget;
+
+                            setImageDimensions((prev) => {
+                              const width = image.naturalWidth || 850;
+
+                              const height = image.naturalHeight || 450;
+
+                              const current = prev[index];
+
+                              if (
+                                current?.width === width &&
+                                current?.height === height
+                              ) {
+                                return prev;
+                              }
+
+                              return {
+                                ...prev,
+                                [index]: {
+                                  width,
+                                  height,
+                                },
+                              };
+                            });
+
+                            setLoadedImages((prev) => {
+                              if (prev[index]) {
+                                return prev;
+                              }
+
+                              return {
+                                ...prev,
+                                [index]: true,
+                              };
+                            });
                           }}
-                          onClick={() => openImage(index)}
+                          onClick={() => {
+                            openImage(index);
+                          }}
                         />
 
                         {!isLoaded && (
                           <div
-                            className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                            className="pointer-events-none absolute inset-0 overflow-hidden bg-white/[0.035]"
                             aria-hidden="true"
                           >
-                            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/35">
-                              Loading {imageNumber}
+                            <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-white/[0.02] via-white/[0.07] to-white/[0.02]" />
+
+                            <span className="absolute left-3 top-3 font-mono text-[9px] uppercase tracking-[0.2em] text-white/30 sm:left-4 sm:top-4 sm:text-[10px]">
+                              {imageNumber}
                             </span>
                           </div>
                         )}
@@ -660,6 +680,7 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                 muted
                 loop
                 playsInline
+                preload="metadata"
                 src={project.srcVideo}
               />
             </div>
