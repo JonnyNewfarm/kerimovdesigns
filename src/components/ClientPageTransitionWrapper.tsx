@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -9,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 
 export type TransitionDirection = "left" | "right";
@@ -26,9 +27,91 @@ type PageTransitionContextType = {
   isTransitioning: boolean;
 };
 
+type TransitionState = {
+  status: TransitionStatus;
+  label: string;
+  variant: TransitionVariant;
+};
+
+interface ClientPageTransitionWrapperProps {
+  children: ReactNode;
+}
+
 const PageTransitionContext = createContext<PageTransitionContextType | null>(
   null,
 );
+
+const DESKTOP_ENTER_DURATION = 0.95;
+const MOBILE_ENTER_DURATION = 0.76;
+
+const DESKTOP_LEAVE_DURATION = 0.65;
+const MOBILE_LEAVE_DURATION = 0.46;
+
+const MOBILE_VIEWPORT_EXTRA_COVER = 120;
+
+const transitionEase = [0.76, 0, 0.24, 1] as const;
+
+const IDLE_TRANSITION: TransitionState = {
+  status: "idle",
+  label: "",
+  variant: "destination",
+};
+
+const INITIAL_OVERLAY_POSITION = {
+  y: "100%",
+};
+
+const ENTERING_OVERLAY_POSITION = {
+  y: "0%",
+};
+
+const LEAVING_OVERLAY_POSITION = {
+  y: "-100%",
+};
+
+/*
+ * Et fast viewBox gjør at vi ikke trenger å lagre viewportens
+ * bredde og høyde i React-state.
+ *
+ * preserveAspectRatio="none" strekker SVG-en til skjermen.
+ */
+const SVG_WIDTH = 1000;
+const SVG_HEIGHT = 1000;
+
+const TOP_CURVE = 10;
+const BOTTOM_CURVE = 10;
+
+const ENTERING_INITIAL_PATH = `
+  M 0 ${TOP_CURVE}
+  Q ${SVG_WIDTH / 2} ${-TOP_CURVE} ${SVG_WIDTH} ${TOP_CURVE}
+  L ${SVG_WIDTH} ${SVG_HEIGHT}
+  L 0 ${SVG_HEIGHT}
+  Z
+`;
+
+const ENTERING_TARGET_PATH = `
+  M 0 0
+  Q ${SVG_WIDTH / 2} 0 ${SVG_WIDTH} 0
+  L ${SVG_WIDTH} ${SVG_HEIGHT}
+  L 0 ${SVG_HEIGHT}
+  Z
+`;
+
+const LEAVING_INITIAL_PATH = `
+  M 0 0
+  L ${SVG_WIDTH} 0
+  L ${SVG_WIDTH} ${SVG_HEIGHT}
+  Q ${SVG_WIDTH / 2} ${SVG_HEIGHT + BOTTOM_CURVE} 0 ${SVG_HEIGHT}
+  Z
+`;
+
+const LEAVING_TARGET_PATH = `
+  M 0 0
+  L ${SVG_WIDTH} 0
+  L ${SVG_WIDTH} ${SVG_HEIGHT}
+  Q ${SVG_WIDTH / 2} ${SVG_HEIGHT} 0 ${SVG_HEIGHT}
+  Z
+`;
 
 export function usePageTransition() {
   const context = useContext(PageTransitionContext);
@@ -42,94 +125,32 @@ export function usePageTransition() {
   return context;
 }
 
-interface ClientPageTransitionWrapperProps {
-  children: ReactNode;
-}
-
-const DESKTOP_ENTER_DURATION = 950;
-const MOBILE_ENTER_DURATION = 760;
-
-const DESKTOP_LEAVE_DURATION = 650;
-const MOBILE_LEAVE_DURATION = 460;
-
-const MOBILE_VIEWPORT_EXTRA_COVER = 120;
-
-const transitionEase = [0.76, 0, 0.24, 1] as const;
-
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const check = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    check();
-
-    window.addEventListener("resize", check);
-
-    return () => {
-      window.removeEventListener("resize", check);
-    };
-  }, []);
-
-  return isMobile;
-}
-
-function useViewportSize(isMobile: boolean) {
-  const [size, setSize] = useState({
-    width: 0,
-    visibleHeight: 0,
-    coverHeight: 0,
-  });
-
-  useEffect(() => {
-    let frameId: number | null = null;
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
 
     const update = () => {
-      if (frameId) {
-        cancelAnimationFrame(frameId);
-      }
+      setIsMobile((current) => {
+        if (current === mediaQuery.matches) {
+          return current;
+        }
 
-      frameId = requestAnimationFrame(() => {
-        const width = window.innerWidth;
-
-        const visibleHeight = Math.ceil(
-          window.visualViewport?.height ?? window.innerHeight,
-        );
-
-        const coverHeight = Math.ceil(
-          visibleHeight + (isMobile ? MOBILE_VIEWPORT_EXTRA_COVER : 0),
-        );
-
-        setSize({
-          width,
-          visibleHeight,
-          coverHeight,
-        });
+        return mediaQuery.matches;
       });
     };
 
     update();
 
-    window.addEventListener("resize", update);
-    window.addEventListener("orientationchange", update);
-    window.visualViewport?.addEventListener("resize", update);
-    window.visualViewport?.addEventListener("scroll", update);
+    mediaQuery.addEventListener("change", update);
 
     return () => {
-      if (frameId) {
-        cancelAnimationFrame(frameId);
-      }
-
-      window.removeEventListener("resize", update);
-      window.removeEventListener("orientationchange", update);
-      window.visualViewport?.removeEventListener("resize", update);
-      window.visualViewport?.removeEventListener("scroll", update);
+      mediaQuery.removeEventListener("change", update);
     };
-  }, [isMobile]);
+  }, []);
 
-  return size;
+  return isMobile;
 }
 
 function getTransitionVariant(href: string): TransitionVariant {
@@ -142,107 +163,46 @@ function getTransitionVariant(href: string): TransitionVariant {
   return "destination";
 }
 
-function getEnterDuration(isMobile: boolean): number {
+function getEnterDuration(isMobile: boolean) {
   return isMobile ? MOBILE_ENTER_DURATION : DESKTOP_ENTER_DURATION;
 }
 
-function getEnterDurationSeconds(isMobile: boolean): number {
-  return getEnterDuration(isMobile) / 1000;
-}
-
-function getInitialPosition() {
-  return {
-    x: "0%",
-    y: "100%",
-  };
+function getLeaveDuration(isMobile: boolean) {
+  return isMobile ? MOBILE_LEAVE_DURATION : DESKTOP_LEAVE_DURATION;
 }
 
 function CurvedOverlay({
   status,
   variant,
   isMobile,
-  width,
-  height,
 }: {
   status: TransitionStatus;
   variant: TransitionVariant;
   isMobile: boolean;
-  width: number;
-  height: number;
 }) {
-  if (!width || !height) {
-    return (
-      <div
-        className="fixed inset-0"
-        style={{
-          backgroundColor: variant === "projectDetails" ? "#4b4f47" : "#667a6c",
-        }}
-      />
-    );
-  }
+  const isLeaving = status === "leaving";
 
-  const topCurve = 10;
-  const bottomCurve = 10;
+  const initialPath = isLeaving ? LEAVING_INITIAL_PATH : ENTERING_INITIAL_PATH;
 
-  const enteringInitialPath = `
-    M 0 ${topCurve}
-    Q ${width / 2} ${-topCurve} ${width} ${topCurve}
-    L ${width} ${height}
-    L 0 ${height}
-    Z
-  `;
+  const targetPath = isLeaving ? LEAVING_TARGET_PATH : ENTERING_TARGET_PATH;
 
-  const enteringTargetPath = `
-    M 0 0
-    Q ${width / 2} 0 ${width} 0
-    L ${width} ${height}
-    L 0 ${height}
-    Z
-  `;
+  const duration = isLeaving
+    ? getLeaveDuration(isMobile)
+    : getEnterDuration(isMobile);
 
-  /*
-   * Alle overganger forlater skjermen oppover.
-   */
-  const leavingInitialPath = `
-    M 0 0
-    L ${width} 0
-    L ${width} ${height}
-    Q ${width / 2} ${height + bottomCurve} 0 ${height}
-    Z
-  `;
-
-  const leavingTargetPath = `
-    M 0 0
-    L ${width} 0
-    L ${width} ${height}
-    Q ${width / 2} ${height} 0 ${height}
-    Z
-  `;
-
-  const initialPath =
-    status === "leaving" ? leavingInitialPath : enteringInitialPath;
-
-  const targetPath =
-    status === "leaving" ? leavingTargetPath : enteringTargetPath;
-
-  const pathDuration =
-    status === "entering"
-      ? getEnterDurationSeconds(isMobile)
-      : isMobile
-        ? 0.6
-        : 0.65;
+  const backgroundColor = variant === "projectDetails" ? "#4b4f47" : "#667a6c";
 
   return (
     <motion.svg
-      key={`${status}-${variant}-${
-        isMobile ? "mobile" : "desktop"
-      }-${width}-${height}`}
-      className="absolute left-0 top-0 h-full w-screen overflow-visible"
-      viewBox={`0 0 ${width} ${height}`}
+      key={status}
+      aria-hidden="true"
+      focusable="false"
+      className="absolute left-0 top-0 h-full w-full overflow-visible"
+      viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
       preserveAspectRatio="none"
     >
       <motion.path
-        fill={variant === "projectDetails" ? "#4b4f47" : "#667a6c"}
+        fill={backgroundColor}
         initial={{
           d: initialPath,
         }}
@@ -250,7 +210,7 @@ function CurvedOverlay({
           d: targetPath,
         }}
         transition={{
-          duration: pathDuration,
+          duration,
           ease: transitionEase,
         }}
       />
@@ -280,14 +240,10 @@ function TransitionText({
       <motion.div
         className="w-fit max-w-[92vw] md:max-w-[96vw]"
         initial={{
-          x: "0vw",
           y: "12vh",
-          scaleX: 1,
         }}
         animate={{
-          x: "0vw",
           y: "0vh",
-          scaleX: 1,
         }}
         transition={{
           duration: status === "entering" ? 0.55 : 0,
@@ -315,7 +271,7 @@ function TransitionText({
         </motion.p>
 
         <h2
-          className="m-0 text-center text-left font-extrabold uppercase leading-[0.86] tracking-[-0.02em] text-white/85"
+          className="m-0 text-left font-extrabold uppercase leading-[0.86] tracking-[-0.02em] text-white/85"
           style={{
             fontSize: isMobile
               ? `clamp(32px, ${fontVw}vw, 86px)`
@@ -336,177 +292,158 @@ export default function ClientPageTransitionWrapper({
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
-  const viewportSize = useViewportSize(isMobile);
 
-  const [status, setStatus] = useState<TransitionStatus>("idle");
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
-  const [transitionLabel, setTransitionLabel] = useState("");
-  const [transitionVariant, setTransitionVariant] =
-    useState<TransitionVariant>("destination");
+  const [transition, setTransition] =
+    useState<TransitionState>(IDLE_TRANSITION);
 
-  const previousPathname = useRef(pathname);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const previousPathnameRef = useRef(pathname);
+  const pendingHrefRef = useRef<string | null>(null);
+  const statusRef = useRef<TransitionStatus>("idle");
 
-  const leaveDuration = isMobile
-    ? MOBILE_LEAVE_DURATION
-    : DESKTOP_LEAVE_DURATION;
+  const isTransitioning = transition.status !== "idle";
 
-  const clearCurrentTimeout = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  };
+  const startTransition = useCallback(
+    (
+      href: string,
+      label?: string,
+      _direction: TransitionDirection = "left",
+    ) => {
+      if (!href || href === pathname || statusRef.current !== "idle") {
+        return;
+      }
 
-  const startTransition = (
-    href: string,
-    label?: string,
-    _direction: TransitionDirection = "left",
-  ) => {
-    if (!href || href === pathname || status !== "idle") {
-      return;
-    }
+      if (shouldReduceMotion) {
+        router.push(href);
+        return;
+      }
 
-    if (shouldReduceMotion) {
-      router.push(href);
-      return;
-    }
+      statusRef.current = "entering";
+      pendingHrefRef.current = href;
 
-    clearCurrentTimeout();
+      /*
+       * Starter innlasting av den nye siden mens overlayet
+       * beveger seg inn over skjermen.
+       */
+      router.prefetch(href);
 
-    const variant = getTransitionVariant(href);
-    const enterDuration = getEnterDuration(isMobile);
+      setTransition({
+        status: "entering",
+        label: label || "Loading",
+        variant: getTransitionVariant(href),
+      });
+    },
+    [pathname, router, shouldReduceMotion],
+  );
 
-    setPendingHref(href);
-    setTransitionLabel(label || "Loading");
-    setTransitionVariant(variant);
-    setStatus("entering");
-
-    timeoutRef.current = setTimeout(() => {
-      router.push(href);
-    }, enterDuration);
-  };
-
+  /*
+   * Når pathname faktisk har blitt oppdatert, vet vi at den
+   * nye siden er klar og overlayet kan bevege seg ut.
+   */
   useEffect(() => {
-    if (pathname === previousPathname.current) {
+    if (pathname === previousPathnameRef.current) {
       return;
     }
 
-    previousPathname.current = pathname;
+    previousPathnameRef.current = pathname;
 
-    if (!pendingHref) {
+    if (!pendingHrefRef.current) {
       return;
     }
 
-    clearCurrentTimeout();
+    statusRef.current = "leaving";
 
-    setStatus("leaving");
+    setTransition((current) => ({
+      ...current,
+      status: "leaving",
+    }));
+  }, [pathname]);
 
-    timeoutRef.current = setTimeout(() => {
-      setStatus("idle");
-      setPendingHref(null);
-      setTransitionLabel("");
-      setTransitionVariant("destination");
-    }, leaveDuration);
-  }, [pathname, pendingHref, leaveDuration]);
+  /*
+   * Kjører når selve transform-animasjonen på overlayet
+   * er ferdig. Dermed trenger vi ingen setTimeout.
+   */
+  const handleOverlayAnimationComplete = useCallback(() => {
+    if (statusRef.current === "entering") {
+      const href = pendingHrefRef.current;
 
-  useEffect(() => {
-    return () => {
-      clearCurrentTimeout();
-    };
-  }, []);
+      if (href) {
+        router.push(href);
+      }
 
-  const isTransitioning = status !== "idle";
+      return;
+    }
 
-  const initialPosition = getInitialPosition();
+    if (statusRef.current === "leaving") {
+      statusRef.current = "idle";
+      pendingHrefRef.current = null;
 
-  const overlayEnterDuration = getEnterDurationSeconds(isMobile);
+      setTransition(IDLE_TRANSITION);
+    }
+  }, [router]);
 
-  const coverHeight = viewportSize.coverHeight
-    ? `${viewportSize.coverHeight}px`
-    : isMobile
-      ? `calc(100dvh + ${MOBILE_VIEWPORT_EXTRA_COVER}px)`
-      : "100dvh";
+  const contextValue = useMemo<PageTransitionContextType>(
+    () => ({
+      startTransition,
+      isTransitioning,
+    }),
+    [startTransition, isTransitioning],
+  );
 
-  const visibleHeight = viewportSize.visibleHeight
-    ? `${viewportSize.visibleHeight}px`
+  const overlayHeight = isMobile
+    ? `calc(100dvh + ${MOBILE_VIEWPORT_EXTRA_COVER}px)`
     : "100dvh";
 
-  const overlayStyle = useMemo(
-    () => ({
-      height: coverHeight,
-    }),
-    [coverHeight],
-  );
+  const contentHeight = "100dvh";
 
-  const contentStyle = useMemo(
-    () => ({
-      height: visibleHeight,
-    }),
-    [visibleHeight],
-  );
-
-  const leavingPosition = {
-    x: "0%",
-    y: "-100%",
-  };
+  const overlayDuration =
+    transition.status === "entering"
+      ? getEnterDuration(isMobile)
+      : getLeaveDuration(isMobile);
 
   return (
-    <PageTransitionContext.Provider
-      value={{
-        startTransition,
-        isTransitioning,
-      }}
-    >
+    <PageTransitionContext.Provider value={contextValue}>
       {children}
 
-      <AnimatePresence>
-        {isTransitioning && !shouldReduceMotion && (
-          <motion.div
-            className="pointer-events-none fixed left-0 top-0 z-[99999] w-screen overflow-visible text-dark will-change-transform"
-            style={overlayStyle}
-            initial={initialPosition}
-            animate={
-              status === "entering"
-                ? {
-                    x: "0%",
-                    y: "0%",
-                  }
-                : leavingPosition
-            }
-            exit={leavingPosition}
-            transition={{
-              duration:
-                status === "entering"
-                  ? overlayEnterDuration
-                  : isMobile
-                    ? 0.46
-                    : 0.65,
-              ease: transitionEase,
+      {isTransitioning && !shouldReduceMotion && (
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none fixed left-0 top-0 z-[99999] w-screen overflow-visible text-dark will-change-transform"
+          style={{
+            height: overlayHeight,
+          }}
+          initial={INITIAL_OVERLAY_POSITION}
+          animate={
+            transition.status === "entering"
+              ? ENTERING_OVERLAY_POSITION
+              : LEAVING_OVERLAY_POSITION
+          }
+          transition={{
+            duration: overlayDuration,
+            ease: transitionEase,
+          }}
+          onAnimationComplete={handleOverlayAnimationComplete}
+        >
+          <CurvedOverlay
+            status={transition.status}
+            variant={transition.variant}
+            isMobile={isMobile}
+          />
+
+          <div
+            className="relative z-10 w-full overflow-hidden"
+            style={{
+              height: contentHeight,
             }}
           >
-            <CurvedOverlay
-              status={status}
-              variant={transitionVariant}
+            <TransitionText
+              status={transition.status}
+              label={transition.label}
+              variant={transition.variant}
               isMobile={isMobile}
-              width={viewportSize.width || 1}
-              height={viewportSize.coverHeight || 1}
             />
-
-            <div
-              className="relative z-10 w-full overflow-hidden"
-              style={contentStyle}
-            >
-              <TransitionText
-                status={status}
-                label={transitionLabel}
-                variant={transitionVariant}
-                isMobile={isMobile}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
     </PageTransitionContext.Provider>
   );
 }

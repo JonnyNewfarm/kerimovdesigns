@@ -1748,7 +1748,7 @@ ease-out    left-6
                 mode="words"
                 viewport={false}
                 delay={0.05}
-                className="satoshi-black text-2xl leading-[0.95] tracking-[-0.02em] text-color sm:text-4xl xl:text-5xl"
+                className="satoshi-black text-xl leading-[0.95] tracking-[-0.02em] text-color sm:text-4xl xl:text-5xl"
               >
                 Kerimov
               </TextReveal>
@@ -1758,7 +1758,7 @@ ease-out    left-6
                 mode="words"
                 viewport={false}
                 delay={0.12}
-                className="satoshi-black text-3xl leading-[0.82] tracking-[-0.02em] text-color sm:text-5xl xl:text-6xl"
+                className="satoshi-black text-2xl leading-[0.82] tracking-[-0.02em] text-color sm:text-5xl xl:text-6xl"
               >
                 Designs
               </TextReveal>

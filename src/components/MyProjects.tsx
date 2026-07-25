@@ -68,26 +68,6 @@ const MOBILE_CONTAINER_MAX_WIDTH = 430;
 const MOBILE_CARD_BASE_WIDTH = 360;
 const MOBILE_CARD_BASE_HEIGHT = 214;
 
-const MOTION_EASE = [0.22, 1, 0.36, 1] as const;
-
-const IMAGE_MOVE_VARIANTS = {
-  rest: {
-    y: 0,
-  },
-  hover: {
-    y: -8,
-  },
-};
-
-const IMAGE_SCALE_VARIANTS = {
-  rest: {
-    scale: 1,
-  },
-  hover: {
-    scale: 1.025,
-  },
-};
-
 const PANEL_POSITIONS = [
   "leftOfCard",
   "leftOfCard",
@@ -257,17 +237,31 @@ const mobileLayout: MobileLayoutItem[] = [
   },
 ];
 
-function formatTags(tags: ProjectListItem["tags"]): string[] {
-  if (!tags) return [];
+function formatTags(tags: ProjectListItem["tags"]) {
+  if (!tags) {
+    return [];
+  }
 
   const tagList = Array.isArray(tags) ? tags : [tags];
 
-  return tagList.map((tag) => tag.replaceAll("-", " "));
+  return tagList.map((tag) => {
+    const slug = tag.trim();
+
+    return {
+      slug,
+      label: slug.replaceAll("-", " "),
+    };
+  });
 }
 
 function formatTools(tools: ProjectListItem["tools"]) {
-  if (!tools) return "";
-  if (Array.isArray(tools)) return tools.join(", ");
+  if (!tools) {
+    return "";
+  }
+
+  if (Array.isArray(tools)) {
+    return tools.join(", ");
+  }
 
   return tools;
 }
@@ -303,17 +297,32 @@ function getMobileCardHeight(baseScale: number) {
 }
 
 function getBreakpointWidth(width: number) {
-  if (width >= 1536) return 1536;
-  if (width >= 1280) return 1280;
-  if (width >= 1024) return 1024;
-  if (width >= 768) return 768;
-  if (width >= 640) return 640;
+  if (width >= 1536) {
+    return 1536;
+  }
+
+  if (width >= 1280) {
+    return 1280;
+  }
+
+  if (width >= 1024) {
+    return 1024;
+  }
+
+  if (width >= 768) {
+    return 768;
+  }
+
+  if (width >= 640) {
+    return 640;
+  }
 
   return 0;
 }
 
 function useResponsiveLayout() {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(null);
+
   const [breakpointWidth, setBreakpointWidth] = useState(0);
 
   useEffect(() => {
@@ -326,7 +335,9 @@ function useResponsiveLayout() {
 
       frameId = requestAnimationFrame(() => {
         const windowWidth = window.innerWidth;
+
         const nextMode: LayoutMode = windowWidth >= 1024 ? "desktop" : "mobile";
+
         const nextBreakpointWidth = getBreakpointWidth(windowWidth);
 
         setLayoutMode((currentMode) => {
@@ -338,6 +349,8 @@ function useResponsiveLayout() {
             ? currentWidth
             : nextBreakpointWidth;
         });
+
+        frameId = null;
       });
     };
 
@@ -466,6 +479,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
         const resolvedTop = getResponsiveDesktopTop(item, breakpointWidth);
 
         const imageHeight = BASE_HEIGHT * item.scale;
+
         const textBlockHeight = 120;
 
         return resolvedTop + imageHeight + textBlockHeight;
@@ -484,6 +498,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
         const resolvedScale = getResponsiveMobileScale(item, breakpointWidth);
 
         const imageHeight = getMobileCardHeight(resolvedScale);
+
         const textBlockHeight = 110;
 
         return resolvedTop + imageHeight + textBlockHeight;
@@ -505,7 +520,17 @@ export default function MyProjects({ projects }: MyProjectsProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative mb-20 min-h-screen w-full overflow-hidden bg-dark text-color lg:pt-40 xl:pt-10"
+      className="
+        relative
+        mb-20
+        min-h-screen
+        w-full
+        overflow-hidden
+        bg-dark
+        text-color
+        lg:pt-40
+        xl:pt-10
+      "
     >
       {showDesktop && (
         <div
@@ -666,7 +691,7 @@ export default function MyProjects({ projects }: MyProjectsProps) {
                   </p>
 
                   <p className="text-4xl text-color/70 transition group-hover:text-color">
-                    Archives
+                    Projects
                   </p>
                 </div>
               </MagneticComp>
@@ -739,6 +764,10 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
     onHoverChange(null);
   }, [onHoverChange]);
 
+  const displayedScale = isDimmed ? baseScale * 0.965 : baseScale;
+
+  const renderedImageWidth = Math.ceil(BASE_WIDTH * baseScale);
+
   return (
     <motion.div
       className="absolute"
@@ -750,44 +779,39 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
       <motion.div
         style={{
           y: driftY,
-          willChange: "transform",
         }}
       >
         <MagneticComp>
-          <motion.div
-            initial="rest"
-            animate={isActive ? "hover" : "rest"}
-            onHoverStart={handleHoverStart}
-            onHoverEnd={handleHoverEnd}
+          <div
             className="group relative"
-            style={{
-              transformOrigin: "center center",
-            }}
+            onPointerEnter={handleHoverStart}
+            onPointerLeave={handleHoverEnd}
           >
             <TransitionLink
               href={`/project/${project.id}`}
               transitionLabel={project.title}
               className="block"
             >
-              <motion.div
-                animate={{
-                  scale: isDimmed ? baseScale * 0.965 : baseScale,
+              <div
+                className="
+                    transition-[transform,opacity]
+                    duration-[350ms]
+                    ease-[cubic-bezier(0.22,1,0.36,1)]
+                  "
+                style={{
+                  transform: `scale(${displayedScale})`,
+                  transformOrigin: "center center",
                   opacity: isDimmed ? 0.5 : 1,
                 }}
-                transition={{
-                  duration: 0.35,
-                  ease: MOTION_EASE,
-                }}
-                style={{
-                  willChange: "transform, opacity",
-                }}
               >
-                <motion.div
-                  variants={IMAGE_MOVE_VARIANTS}
-                  transition={{
-                    duration: 0.35,
-                    ease: MOTION_EASE,
-                  }}
+                <div
+                  className="
+                      translate-y-0
+                      transition-transform
+                      duration-[350ms]
+                      ease-[cubic-bezier(0.22,1,0.36,1)]
+                      group-hover:-translate-y-2
+                    "
                 >
                   <div
                     className="relative overflow-hidden"
@@ -796,27 +820,27 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                       height: BASE_HEIGHT,
                     }}
                   >
-                    <motion.div
-                      className="h-full w-full"
-                      variants={IMAGE_SCALE_VARIANTS}
-                      transition={{
-                        duration: 0.45,
-                        ease: MOTION_EASE,
-                      }}
-                      style={{
-                        willChange: "transform",
-                      }}
+                    <div
+                      className="
+                          h-full
+                          w-full
+                          scale-100
+                          transition-transform
+                          duration-[450ms]
+                          ease-[cubic-bezier(0.22,1,0.36,1)]
+                          group-hover:scale-[1.025]
+                        "
                     >
                       <Image
                         fill
                         src={project.src}
                         alt={project.title}
                         className="object-cover"
-                        sizes="720px"
+                        sizes={`${renderedImageWidth}px`}
                       />
-                    </motion.div>
+                    </div>
                   </div>
-                </motion.div>
+                </div>
 
                 <div className="mt-5 flex items-baseline gap-4">
                   <span className="text-3xl uppercase leading-none tracking-[-0.08em] text-color">
@@ -827,12 +851,12 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                     {project.title}
                   </span>
                 </div>
-              </motion.div>
+              </div>
             </TransitionLink>
 
             {isActive && (
               <div
-                className={`pointer-events-none absolute z-50 w-[280px] ${
+                className={`pointer-events-auto absolute z-50 w-[280px] ${
                   panelPosition === "leftOfCard" ? "text-right" : ""
                 }`}
                 style={{
@@ -862,12 +886,32 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                     {tags.length > 0 && (
                       <div className="space-y-1">
                         {tags.map((tag) => (
-                          <p
-                            key={tag}
-                            className="text-[13px] uppercase tracking-[0.18em] text-color/55"
+                          <TransitionLink
+                            key={tag.slug}
+                            href={`/projects?tags=${encodeURIComponent(
+                              tag.slug,
+                            )}`}
+                            transitionLabel={tag.label}
+                            className={`
+                                  block
+                                  w-fit
+                                  text-[13px]
+                                  uppercase
+                                  tracking-[0.18em]
+                                  text-color/55
+                                  underline-offset-4
+                                  transition-colors
+                                  hover:text-color
+                                  hover:underline
+                                  ${
+                                    panelPosition === "leftOfCard"
+                                      ? "ml-auto"
+                                      : ""
+                                  }
+                                `}
                           >
-                            {tag}
-                          </p>
+                            {tag.label}
+                          </TransitionLink>
                         ))}
                       </div>
                     )}
@@ -891,7 +935,7 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                 </div>
               </div>
             )}
-          </motion.div>
+          </div>
         </MagneticComp>
       </motion.div>
     </motion.div>
@@ -931,6 +975,8 @@ const MobileProjectItem = memo(function MobileProjectItem({
 
   const cardHeight = useMemo(() => getMobileCardHeight(baseScale), [baseScale]);
 
+  const renderedImageWidth = Math.ceil(cardWidth);
+
   return (
     <div
       className="absolute"
@@ -942,7 +988,6 @@ const MobileProjectItem = memo(function MobileProjectItem({
       <motion.div
         style={{
           y: driftY,
-          willChange: "transform",
         }}
       >
         <TransitionLink
@@ -962,7 +1007,7 @@ const MobileProjectItem = memo(function MobileProjectItem({
               src={project.src}
               alt={project.title}
               className="object-cover"
-              sizes="(max-width: 639px) 100vw, 504px"
+              sizes={`${renderedImageWidth}px`}
             />
           </div>
 
