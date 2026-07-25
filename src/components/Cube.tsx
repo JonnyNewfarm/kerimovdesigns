@@ -1661,14 +1661,17 @@ export default function Index() {
             {hasMounted && introDone && (
               <Canvas
                 key="hero-canvas-ready"
-                className="h-3/4 w-full"
+                className="h-[75svh] w-full md:h-3/4"
                 dpr={[1, 1.5]}
                 frameloop="always"
+                resize={{
+                  scroll: false,
+                }}
                 gl={{
                   antialias: false,
                   powerPreference: "high-performance",
                 }}
-              >
+              >s
                 {isMdUp && (
                   <OrbitControls
                     enableZoom={false}

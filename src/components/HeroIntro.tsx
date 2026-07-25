@@ -47,7 +47,7 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
         duration: isDone ? 0.95 : 0,
         ease,
       }}
-      className="absolute inset-0 z-50 bg-[#181c14]"
+      className="fixed inset-0 z-[999] bg-[#181c14]"
       style={{
         pointerEvents: isDone ? "none" : "auto",
       }}
