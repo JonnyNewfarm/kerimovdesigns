@@ -1672,7 +1672,6 @@ export default function Index() {
                   powerPreference: "high-performance",
                 }}
               >
-                s
                 {isMdUp && (
                   <OrbitControls
                     enableZoom={false}
