@@ -1582,7 +1582,7 @@ export default function Index() {
   return (
     <motion.div
       ref={container}
-      className="min-h-[150dvh]"
+      className="min-h-[150vh] md:min-h-[150dvh]"
       initial={false}
       animate={{
         opacity: 1,
@@ -1647,8 +1647,7 @@ export default function Index() {
         </TransitionLink>
       </div>
 
-      <div className="sticky top-0 flex flex-col items-center justify-center overflow-hidden uppercase h-[100dvh]">
-        {" "}
+      <div className="sticky top-0 flex h-[100vh] flex-col items-center justify-center overflow-hidden uppercase md:h-[100dvh]">
         {introChecked && shouldUseIntro && <HeroIntro isDone={introDone} />}
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
@@ -1661,12 +1660,9 @@ export default function Index() {
             {hasMounted && introDone && (
               <Canvas
                 key="hero-canvas-ready"
-                className="h-[75svh] w-full md:h-3/4"
+                className="h-3/4 w-full"
                 dpr={[1, 1.5]}
                 frameloop="always"
-                resize={{
-                  scroll: false,
-                }}
                 gl={{
                   antialias: false,
                   powerPreference: "high-performance",
@@ -1688,8 +1684,11 @@ export default function Index() {
                     }}
                   />
                 )}
+
                 <ambientLight intensity={2} />
+
                 <directionalLight position={[2, 1, 1]} />
+
                 <Cube
                   key="cube-ready"
                   scrollProgress={smoothProgress}
