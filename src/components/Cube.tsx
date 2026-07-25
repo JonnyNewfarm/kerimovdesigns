@@ -1661,7 +1661,7 @@ export default function Index() {
               <Canvas
                 key="hero-canvas-ready"
                 className="h-3/4 w-full"
-                dpr={[1, 1.5]}
+                dpr={isMdUp ? [1, 1.5] : 1.35}
                 frameloop="always"
                 gl={{
                   antialias: false,
