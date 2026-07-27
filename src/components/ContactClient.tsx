@@ -225,27 +225,28 @@ const ContactClient = () => {
 
   return (
     <SmoothScroll>
-      <section className="min-h-screen overflow-clip bg-dark px-4 pb-12 pt-28 text-color md:px-10 md:pb-16 md:pt-36 lg:px-16">
+      <section className="min-h-screen overflow-clip bg-dark px-4   text-color md:px-10  lg:px-16">
         <div className="mx-auto w-full max-w-[1800px]">
-          <div className="grid min-h-[calc(100svh-7rem)] grid-cols-1 items-end gap-8 pb-16 md:grid-cols-[1fr_0.7fr] md:pb-20 lg:pb-24">
-            <div>
-              <TextReveal
-                as="h1"
-                mode="lines"
-                delay={0.12}
-                className="max-w-[1050px] text-[clamp(3.6rem,6.2vw,7.2rem)] font-black uppercase leading-[0.9] tracking-[-0.02em] text-color"
-              >
-                {`Let's 
-work on a project
-together`}
-              </TextReveal>
+          <div className="h-screen  relative w-full">
+            <div className="absolute top-[25vh] left-0 md:left-10">
+              <div className="flex flex-col text-[clamp(3rem,5vw,6rem)] font-black uppercase leading-[0.9] tracking-[-0.02em] text-color">
+                <TextReveal as="h1" mode="lines" delay={0.12}>
+                  Let's work
+                </TextReveal>
+                <TextReveal as="h1" mode="lines" delay={0.12}>
+                  on a project
+                </TextReveal>
+                <TextReveal as="h1" mode="lines" delay={0.12}>
+                  together{" "}
+                </TextReveal>
+              </div>
             </div>
 
             <TextReveal
               as="p"
               mode="words"
               delay={0.35}
-              className="max-w-[520px] text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg"
+              className="max-w-[520px] absolute bottom-10 right-10 text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg"
             >
               Send a message about identity, motion, logos or visual direction.
               Keep it simple — what you need, when you need it and what you want
