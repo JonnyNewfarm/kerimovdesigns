@@ -1694,7 +1694,7 @@ export default function Index({ href, title }: IndexProps) {
               <Canvas
                 key="hero-canvas-ready"
                 className="h-3/4 w-full"
-                dpr={isMdUp ? [1, 1.5] : 1.4}
+                dpr={isMdUp ? [1, 1.5] : 1.35}
                 frameloop="always"
                 gl={{
                   antialias: false,
