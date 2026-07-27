@@ -33,12 +33,14 @@ import {
   useScroll,
   useSpring,
   useTransform,
+  useAnimation,
 } from "framer-motion";
 import { OrbitControls } from "@react-three/drei";
 import HeroIntro from "./HeroIntro";
 import TextReveal from "@/components/TextReveal";
-import TransitionLink from "./TransitionLink";
-import LocalTime from "./LocalTime";
+import TransitionLink from "../TransitionLink";
+import LocalTime from "../LocalTime";
+import Link from "next/link";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -1517,7 +1519,12 @@ function useScrollLock(locked: boolean) {
   }, [locked]);
 }
 
-export default function Index() {
+type IndexProps = {
+  title: string;
+  href: string;
+};
+
+export default function Index({ href, title }: IndexProps) {
   const container = useRef<HTMLDivElement | null>(null);
 
   const isDraggingCubeRef = useRef(false);
@@ -1527,6 +1534,7 @@ export default function Index() {
   const visualIdentityTransitionRef = useRef<HTMLAnchorElement | null>(null);
   const animationTransitionRef = useRef<HTMLAnchorElement | null>(null);
   const logoTransitionRef = useRef<HTMLAnchorElement | null>(null);
+  const [animateSpan, setAnimateSpan] = useState<boolean>(false);
 
   const isMdUp = useIsMdUp();
   const [hasMounted, setHasMounted] = useState(false);
@@ -1549,8 +1557,6 @@ export default function Index() {
   const smoothProgress = useSpring(progress, {
     damping: 20,
   });
-
-  const lineWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   useEffect(() => {
     setHasMounted(true);
@@ -1578,6 +1584,33 @@ export default function Index() {
       window.clearTimeout(timer);
     };
   }, []);
+
+  const underlineControls = useAnimation();
+
+  const animateUnderline = async () => {
+    await underlineControls.start({
+      scaleX: 0,
+      transformOrigin: "right center",
+      transition: {
+        duration: 0.25,
+        ease: "easeIn",
+      },
+    });
+
+    underlineControls.set({
+      scaleX: 0,
+      transformOrigin: "left center",
+    });
+
+    await underlineControls.start({
+      scaleX: 1,
+      transformOrigin: "left center",
+      transition: {
+        duration: 0.25,
+        ease: "easeOut",
+      },
+    });
+  };
 
   return (
     <motion.div
@@ -1661,7 +1694,7 @@ export default function Index() {
               <Canvas
                 key="hero-canvas-ready"
                 className="h-3/4 w-full"
-                dpr={isMdUp ? [1, 1.5] : 1.35}
+                dpr={isMdUp ? [1, 1.5] : 1.4}
                 frameloop="always"
                 gl={{
                   antialias: false,
@@ -1742,25 +1775,17 @@ ease-out    left-6
   "
         >
           {introDone && (
-            <div className="flex flex-col">
+            <div className="hidden lg:block relative pt-6">
+              <p className="absolute top-0 right-0 text-sm">2026</p>
+
               <TextReveal
                 as="h1"
                 mode="words"
                 viewport={false}
                 delay={0.05}
-                className="satoshi-black text-xl leading-[0.95] tracking-[-0.02em] text-color sm:text-4xl xl:text-5xl"
+                className="satoshi-black relative  leading-[0.95] tracking-[-0.02em] text-color  lg:text-5xl"
               >
-                Kerimov
-              </TextReveal>
-
-              <TextReveal
-                as="h2"
-                mode="words"
-                viewport={false}
-                delay={0.12}
-                className="satoshi-black text-2xl leading-[0.82] tracking-[-0.02em] text-color sm:text-5xl xl:text-6xl"
-              >
-                Designs
+                Portfolio
               </TextReveal>
             </div>
           )}
@@ -1786,8 +1811,6 @@ ease-out    left-6
             ease,
           }}
           className="
-    pointer-events-none
-    hidden
     absolute
     bottom-6
     right-6
@@ -1798,10 +1821,7 @@ ease-out    left-6
     sm:gap-y-2
 
     text-right
-    text-[13px]
-           lg:text[11px]
-
-          xl:text-[18px]
+text-[10px] xl:text-[14px]          
 
     md:bottom-10
     md:right-10
@@ -1815,26 +1835,84 @@ ease-out    left-6
         >
           {introDone && (
             <>
-              <TextReveal
-                as="p"
-                mode="words"
-                viewport={false}
-                delay={0.16}
-                className="
-          col-span-2
-          justify-self-end
-
-          satoshi-black
+              <div className=" flex flex-row items-center gap-x-1">
+                <TextReveal
+                  className=" satoshi-black
+          hidden
+          sm:block
           text-color
           leading-none
-          tracking-[-0.02em]
-
-          lg:col-span-1
-             
+          tracking-[-0.02em]"
+                >
+                  Latest Project
+                </TextReveal>
+                <TextReveal className="hidden lg:block">/</TextReveal>
+                <TransitionLink
+                  className="relative group hidden  sm:inline-block -mb-2"
+                  href={`/project/${href}`}
+                  transitionLabel={title}
+                >
+                  <TextReveal
+                    as="span"
+                    mode="words"
+                    viewport={false}
+                    delay={0.16}
+                    className="
+                  
+        satoshi-black
+        text-color
+        leading-none
+        tracking-[-0.02em]
+      "
+                  >
+                    {title}
+                  </TextReveal>
+                  <span
+                    className="
+                  
+          pointer-events-none
+          absolute
+          bottom-1
+          left-0
+          h-px
+          w-full
+          overflow-hidden
         "
-              >
-                Portfolio / 2026
-              </TextReveal>
+                  >
+                    {/* Synlig strek som forsvinner mot høyre */}
+                    <span
+                      className="
+            absolute
+            inset-0
+            origin-right
+            scale-x-100
+            bg-current
+            transition-transform
+            duration-500
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+            group-hover:scale-x-0
+          "
+                    />
+
+                    {/* Ny strek som kommer inn fra venstre */}
+                    <span
+                      className="
+            absolute
+            inset-0
+            origin-left
+            scale-x-0
+            bg-current
+            transition-transform
+            duration-500
+            delay-0
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+            group-hover:scale-x-100
+            group-hover:delay-[180ms]
+          "
+                    />
+                  </span>
+                </TransitionLink>
+              </div>
 
               <TextReveal
                 as="p"
@@ -1844,6 +1922,8 @@ ease-out    left-6
                 className="
           satoshi-black
           text-color
+          hidden
+          md:block
           leading-none
           tracking-[-0.02em]
 
@@ -2444,7 +2524,7 @@ const Cube = ({
     }
 
     if (isMobile) {
-      group.current.scale.set(1.092, 1.092, 1.092);
+      group.current.scale.set(1.05, 1.05, 1.05);
 
       return;
     }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import Navbar from "@/components/Navbar";
-import NavbarMobile from "@/components/NavbarMobile";
+import Navbar from "@/components/navbar/Navbar";
+import NavbarMobile from "@/components/navbar/NavbarMobile";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 import PageTransitionProvider from "@/components/ClientPageTransitionWrapper";

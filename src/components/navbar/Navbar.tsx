@@ -4,9 +4,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { useProjectNav } from "./ProjectNavContext";
-import TransitionLink from "./TransitionLink";
-import WaveLinkText from "./WaveLink";
+import { useProjectNav } from "../ProjectNavContext";
+import TransitionLink from "../TransitionLink";
+import WaveLinkText from "../WaveLink";
 
 const PROJECT_EASE = [0.76, 0, 0.24, 1] as const;
 
