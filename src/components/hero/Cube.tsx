@@ -1835,7 +1835,10 @@ text-[10px] xl:text-[14px]
         >
           {introDone && (
             <>
-              <div className=" flex flex-row items-center gap-x-1">
+              <div
+                className=" flex text-[12px] md:text-[10px] xl:text-[14px]          
+ flex-row items-center gap-x-1"
+              >
                 <TextReveal
                   className=" satoshi-black
        
