@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import WaveLinkText from "./WaveLink";
 import TextReveal from "./TextReveal";
-import ContactLetter from "./ContactLetter";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -258,8 +257,6 @@ const ContactClient = () => {
 
             <div className="absolute bottom-8 left-0 md:bottom-12 md:left-auto md:right-0">
               <div className="flex max-w-[520px] flex-col items-start md:items-end">
-                <ContactLetter />
-
                 <TextReveal
                   as="p"
                   mode="words"
