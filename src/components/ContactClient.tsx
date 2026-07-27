@@ -228,29 +228,52 @@ const ContactClient = () => {
     <SmoothScroll>
       <section className="min-h-screen overflow-clip bg-dark px-4   text-color md:px-10  lg:px-16">
         <div className="mx-auto w-full max-w-[1800px]">
-          <div className="h-screen  relative w-full">
-            <div className="absolute top-[25vh] left-0 md:left-10">
-              <div className="flex flex-col text-[clamp(3rem,5vw,6rem)] font-black uppercase leading-[0.9] tracking-[-0.02em] text-color">
+          <div className="relative h-[100svh] w-full">
+            <div className="absolute left-0 top-[21svh] md:top-[19svh]">
+              <div
+                className="
+        flex
+        flex-col
+        text-[clamp(3.4rem,6.8vw,8rem)]
+        font-black
+        uppercase
+        leading-[0.88]
+        tracking-[-0.045em]
+        text-color
+      "
+              >
                 <TextReveal as="h1" mode="lines" delay={0.12}>
-                  Let's work
+                  Let&apos;s work
                 </TextReveal>
-                <TextReveal as="h1" mode="lines" delay={0.12}>
+
+                <TextReveal as="h1" mode="lines" delay={0.16}>
                   on a project
                 </TextReveal>
-                <TextReveal as="h1" mode="lines" delay={0.12}>
-                  together{" "}
+
+                <TextReveal as="h1" mode="lines" delay={0.2}>
+                  together
                 </TextReveal>
               </div>
             </div>
 
-            <div className="absolute  items-center bottom-10 right-10">
-              <div className="flex flex-col items-start md:items-end">
+            <div className="absolute bottom-8 left-0 md:bottom-12 md:left-auto md:right-0">
+              <div className="flex max-w-[520px] flex-col items-start md:items-end">
                 <ContactLetter />
+
                 <TextReveal
                   as="p"
                   mode="words"
                   delay={0.35}
-                  className="max-w-[520px] text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg"
+                  className="
+          mt-4
+          max-w-[500px]
+          text-base
+          font-bold
+          leading-[1.4]
+          text-color/55
+          md:text-right
+          md:text-lg
+        "
                 >
                   Send a message about identity, motion, logos or visual
                   direction. Keep it simple — what you need, when you need it
@@ -279,7 +302,6 @@ const ContactClient = () => {
                 }}
                 className="grid grid-cols-1 gap-10 text-sm font-black uppercase tracking-[0.18em] text-color/70 sm:grid-cols-2 lg:grid-cols-1"
               >
-                {/* DETAILS */}
                 <motion.div
                   variants={{
                     hidden: {
@@ -324,7 +346,6 @@ const ContactClient = () => {
                   </div>
                 </motion.div>
 
-                {/* SOCIALS */}
                 <motion.div
                   variants={{
                     hidden: {
@@ -372,7 +393,6 @@ const ContactClient = () => {
                   </div>
                 </motion.div>
 
-                {/* AVAILABILITY */}
                 <motion.div
                   variants={{
                     hidden: {
@@ -406,7 +426,6 @@ const ContactClient = () => {
                 </motion.div>
               </motion.div>
             </aside>
-            {/* RIGHT SIDE / FORM */}
             <form
               onSubmit={handleSubmit}
               noValidate

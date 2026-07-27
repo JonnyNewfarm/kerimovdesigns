@@ -28,7 +28,7 @@ export default function ContactLetter() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      {/* Konvoluttramme */}
+      {/* Frame */}
       <motion.path
         d="M7 12H41V36H7V12Z"
         variants={pathAnimation}
@@ -38,7 +38,7 @@ export default function ContactLetter() {
         }}
       />
 
-      {/* Bretten fra toppen */}
+      {/* Top fold */}
       <motion.path
         d="M8 13L24 26L40 13"
         variants={pathAnimation}
@@ -49,7 +49,7 @@ export default function ContactLetter() {
         }}
       />
 
-      {/* Nederste venstre brett */}
+      {/* Bottom fold */}
       <motion.path
         d="M8 35L19 24"
         variants={pathAnimation}
@@ -60,7 +60,7 @@ export default function ContactLetter() {
         }}
       />
 
-      {/* Nederste høyre brett */}
+      {/* bottom right fold */}
       <motion.path
         d="M40 35L29 24"
         variants={pathAnimation}
