@@ -6,6 +6,8 @@ import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 
 import MagneticComp from "./MagneticComp";
 import TextReveal from "./TextReveal";
+import { div } from "three/tsl";
+import Link from "next/link";
 
 export interface Project {
   id: string;
@@ -484,11 +486,65 @@ const ProjectModalWrapper = ({ project }: ProjectModalWrapperProps) => {
                 Tags
               </TextReveal>
 
-              <p className="max-w-60 text-sm uppercase leading-relaxed text-white/85 sm:text-base">
+              <div className="grid max-w-66 grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-2 text-sm uppercase  text-white/85 sm:text-base">
                 {projectTags.length > 0
-                  ? projectTags.map(formatTag).join(", ")
+                  ? projectTags.map((tag) => {
+                      return (
+                        <Link
+                          className="relative w-fit whitespace-nowrap  group"
+                          key={tag}
+                          href={`/projects?tags=${tag}`}
+                        >
+                          <p> {formatTag(tag)} </p>
+                          <span
+                            className="
+                  
+          pointer-events-none
+          absolute
+          bottom-1
+          left-0
+          h-px
+          w-full
+          overflow-hidden
+        "
+                          >
+                            {/* Synlig strek som forsvinner mot høyre */}
+                            <span
+                              className="
+            absolute
+            inset-0
+            origin-right
+            scale-x-100
+            bg-current
+            transition-transform
+            duration-500
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+            group-hover:scale-x-0
+          "
+                            />
+
+                            {/* Ny strek som kommer inn fra venstre */}
+                            <span
+                              className="
+            absolute
+            inset-0
+            origin-left
+            scale-x-0
+            bg-current
+            transition-transform
+            duration-500
+            delay-0
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+            group-hover:scale-x-100
+            group-hover:delay-[180ms]
+          "
+                            />
+                          </span>
+                        </Link>
+                      );
+                    })
                   : "—"}
-              </p>
+              </div>
             </motion.div>
 
             <motion.div variants={fieldVariants}>

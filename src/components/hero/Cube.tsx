@@ -1838,17 +1838,16 @@ text-[10px] xl:text-[14px]
               <div className=" flex flex-row items-center gap-x-1">
                 <TextReveal
                   className=" satoshi-black
-          hidden
-          sm:block
+       
           text-color
           leading-none
           tracking-[-0.02em]"
                 >
                   Latest Project
                 </TextReveal>
-                <TextReveal className="hidden lg:block">/</TextReveal>
+                <TextReveal className="">/</TextReveal>
                 <TransitionLink
-                  className="relative group hidden  sm:inline-block -mb-2"
+                  className="relative group  -mb-1.5"
                   href={`/project/${href}`}
                   transitionLabel={title}
                 >
@@ -1923,7 +1922,7 @@ text-[10px] xl:text-[14px]
           satoshi-black
           text-color
           hidden
-          md:block
+          lg:block
           leading-none
           tracking-[-0.02em]
 
@@ -1934,6 +1933,8 @@ text-[10px] xl:text-[14px]
 
               <p
                 className="
+                  hidden
+          md:block
           satoshi-black
           text-color
           leading-none
