@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import WaveLinkText from "./WaveLink";
 import TextReveal from "./TextReveal";
+import ContactLetter from "./ContactLetter";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -242,16 +243,21 @@ const ContactClient = () => {
               </div>
             </div>
 
-            <TextReveal
-              as="p"
-              mode="words"
-              delay={0.35}
-              className="max-w-[520px] absolute bottom-10 right-10 text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg"
-            >
-              Send a message about identity, motion, logos or visual direction.
-              Keep it simple — what you need, when you need it and what you want
-              it to feel like.
-            </TextReveal>
+            <div className="absolute  items-center bottom-10 right-10">
+              <div className="flex flex-col items-start md:items-end">
+                <ContactLetter />
+                <TextReveal
+                  as="p"
+                  mode="words"
+                  delay={0.35}
+                  className="max-w-[520px] text-base font-bold leading-[1.35] text-color/55 md:justify-self-end md:text-right md:text-lg"
+                >
+                  Send a message about identity, motion, logos or visual
+                  direction. Keep it simple — what you need, when you need it
+                  and what you want it to feel like.
+                </TextReveal>
+              </div>
+            </div>
           </div>
 
           {/* BRIEF */}

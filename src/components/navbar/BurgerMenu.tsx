@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import TransitionLink from "../TransitionLink";
+import { rotate } from "three/tsl";
 
 const menuLinks = [
   {
@@ -79,8 +80,18 @@ const BurgerMenu = () => {
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label={isOpen ? "Close menu" : "Open menu"}
         aria-expanded={isOpen}
-        className="relative z-[70] flex items-center gap-3 text-sm uppercase tracking-[0.2em] text-color"
+        className="relative z-[70] flex items-center gap-x-3 text-sm uppercase tracking-[0.2em] text-color"
       >
+        <span className="relative p-2">
+          <span
+            className={`w-2.5 absolute top-1/2 transition-transform ease-in-out  block h-[1.5px] bg-white ${isOpen ? "rotate-45" : ""}`}
+          />{" "}
+          <span />
+          <span
+            className={`w-2.5 absolute top-1/2 transition-transform ease-in-out   block h-[1.5px] bg-white ${isOpen ? "-rotate-45" : ""}`}
+          />{" "}
+          <span />
+        </span>
         <span className="font-semibold">{isOpen ? "Close" : "Menu"}</span>
       </button>
 
@@ -126,12 +137,8 @@ const BurgerMenu = () => {
           }}
           className="mb-4  pb-6"
         >
-          <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/40">
+          <h2 className="text-3xl font-black uppercase leading-[0.9] tracking-[-0.05em]">
             Navigation
-          </p>
-
-          <h2 className="text-4xl font-black uppercase leading-[0.9] tracking-[-0.05em]">
-            Menu
           </h2>
         </motion.div>
 
