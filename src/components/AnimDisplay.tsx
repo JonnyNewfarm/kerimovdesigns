@@ -211,15 +211,6 @@ export default function AnimDisplay() {
               >
                 <div>
                   <TextReveal
-                    as="p"
-                    mode="words"
-                    delay={0.05}
-                    className="mb-5 text-xs font-black uppercase tracking-[0.24em] text-color/45 md:text-sm"
-                  >
-                    {item.title}
-                  </TextReveal>
-
-                  <TextReveal
                     as="h2"
                     mode="words"
                     delay={0.12}

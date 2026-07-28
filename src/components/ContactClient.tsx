@@ -255,20 +255,19 @@ const ContactClient = () => {
               </div>
             </div>
 
-            <div className="absolute bottom-8 left-0 md:bottom-12 md:left-auto md:right-0">
-              <div className="flex max-w-[520px] flex-col items-start md:items-end">
+            <div className="absolute bottom-20 right-0 md:bottom-12 md:left-auto md:right-0">
+              <div className="flex max-w-[350px] md:max-w-[520px] flex-col items-end justify-end">
                 <TextReveal
                   as="p"
                   mode="words"
                   delay={0.35}
                   className="
           mt-4
-          max-w-[500px]
-          text-base
+          text-sm
           font-bold
           leading-[1.4]
           text-color/55
-          md:text-right
+          text-right
           md:text-lg
         "
                 >

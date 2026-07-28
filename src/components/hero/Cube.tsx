@@ -1,6 +1,8 @@
 "use client";
 
 import React, {
+  Suspense,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -40,8 +42,7 @@ import HeroIntro from "./HeroIntro";
 import TextReveal from "@/components/TextReveal";
 import TransitionLink from "../TransitionLink";
 import LocalTime from "../LocalTime";
-import Link from "next/link";
-
+import { usePageTransition } from "@/components/ClientPageTransitionWrapper";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 function useIsMdUp() {
@@ -1519,6 +1520,95 @@ function useScrollLock(locked: boolean) {
   }, [locked]);
 }
 
+function CubeLoadingPlaceholder({ visible }: { visible: boolean }) {
+  return (
+    <motion.div
+      initial={false}
+      animate={{
+        opacity: visible ? 1 : 0,
+        visibility: visible ? "visible" : "hidden",
+      }}
+      transition={{
+        duration: 0.4,
+        ease,
+      }}
+      className="
+        pointer-events-none
+        absolute
+        inset-0
+        z-[5]
+        flex
+        items-center
+        justify-center
+      "
+      aria-hidden={!visible}
+    >
+      <div className="flex flex-col items-center gap-y-5">
+        <motion.div
+          animate={
+            visible
+              ? {
+                  opacity: [0.25, 0.6, 0.25],
+                  scale: [0.985, 1, 0.985],
+                }
+              : undefined
+          }
+          transition={{
+            duration: 1.6,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="
+  relative
+  h-[75vw]
+  w-[75vw]
+  max-h-[360px]
+  max-w-[360px]
+
+  sm:h-[40vw]
+  sm:w-[40vw]
+
+  md:h-[280px]
+  md:w-[280px]
+
+  xl:h-[310px]
+  xl:w-[310px]
+"
+        >
+          <div className="absolute inset-0 border border-[#ecdfcc]/20" />
+
+          <div
+            className="
+              absolute
+              left-0
+              top-0
+              h-px
+              w-full
+              origin-left
+              bg-[#ecdfcc]/20
+            "
+          />
+        </motion.div>
+        <div className="flex w-full justify-between flex-row">
+          <p
+            className="
+            satoshi-black
+            text-[10px]
+            uppercase
+            tracking-[-0.02em]
+            text-[#ecdfcc]/80
+          "
+          >
+            Preparing cube{" "}
+          </p>
+
+          <span className="rounded-full h-4 w-4 border border-l-transparent border-white/90 bg-transparent animate-spin" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 type IndexProps = {
   title: string;
   href: string;
@@ -1545,8 +1635,33 @@ export default function Index({ href, title }: IndexProps) {
 
   const [introDone, setIntroDone] = useState(false);
 
-  useScrollLock(hasMounted && !introDone);
+  const [cubeReady, setCubeReady] = useState(false);
 
+  const { isTransitioning } = usePageTransition();
+
+  const [allowCanvasMount, setAllowCanvasMount] = useState(false);
+
+  const [introExited, setIntroExited] = useState(false);
+
+  useEffect(() => {
+    if (isTransitioning) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setAllowCanvasMount(true);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [isTransitioning]);
+
+  const handleCubeReady = useCallback(() => {
+    setCubeReady(true);
+  }, []);
+
+  useScrollLock(hasMounted && !introExited);
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ["start start", "end end"],
@@ -1566,17 +1681,19 @@ export default function Index({ href, title }: IndexProps) {
     if (hasSeenIntro) {
       setShouldUseIntro(false);
       setIntroDone(true);
+      setIntroExited(true);
       setIntroChecked(true);
 
       return;
     }
 
     setShouldUseIntro(true);
+    setIntroDone(false);
+    setIntroExited(false);
     setIntroChecked(true);
 
     const timer = window.setTimeout(() => {
       sessionStorage.setItem("hero-intro-seen", "true");
-
       setIntroDone(true);
     }, 3200);
 
@@ -1681,21 +1798,43 @@ export default function Index({ href, title }: IndexProps) {
       </div>
 
       <div className="sticky top-0 flex h-[100vh] flex-col items-center justify-center overflow-hidden uppercase md:h-[100dvh]">
-        {introChecked && shouldUseIntro && <HeroIntro isDone={introDone} />}
+        {introChecked && shouldUseIntro && (
+          <HeroIntro
+            isDone={introDone}
+            onExitComplete={() => {
+              setIntroExited(true);
+              setShouldUseIntro(false);
+            }}
+          />
+        )}{" "}
         <div className="absolute inset-0 flex items-center justify-center">
+          <CubeLoadingPlaceholder visible={introExited && !cubeReady} />
           <motion.div
             initial={false}
             animate={{
-              opacity: 1,
+              opacity: introDone && cubeReady ? 1 : 0,
+            }}
+            transition={{
+              duration: 0.7,
+              ease,
+            }}
+            style={{
+              pointerEvents: introDone && cubeReady ? "auto" : "none",
             }}
             className="relative h-full w-full"
           >
-            {hasMounted && introDone && (
+            {hasMounted && allowCanvasMount && (
               <Canvas
                 key="hero-canvas-ready"
                 className="h-3/4 w-full"
                 dpr={isMdUp ? [1, 1.5] : 1.35}
-                frameloop="always"
+                frameloop={
+                  isTransitioning
+                    ? "never"
+                    : introExited && cubeReady
+                      ? "always"
+                      : "demand"
+                }
                 gl={{
                   antialias: false,
                   powerPreference: "high-performance",
@@ -1722,17 +1861,20 @@ export default function Index({ href, title }: IndexProps) {
 
                 <directionalLight position={[2, 1, 1]} />
 
-                <Cube
-                  key="cube-ready"
-                  scrollProgress={smoothProgress}
-                  introDone={introDone}
-                  isDraggingCubeRef={isDraggingCubeRef}
-                  contactTransitionRef={contactTransitionRef}
-                  clientWorkTransitionRef={clientWorkTransitionRef}
-                  visualIdentityTransitionRef={visualIdentityTransitionRef}
-                  animationTransitionRef={animationTransitionRef}
-                  logoTransitionRef={logoTransitionRef}
-                />
+                <Suspense fallback={null}>
+                  <Cube
+                    key="cube-ready"
+                    scrollProgress={smoothProgress}
+                    introDone={introDone}
+                    isDraggingCubeRef={isDraggingCubeRef}
+                    contactTransitionRef={contactTransitionRef}
+                    clientWorkTransitionRef={clientWorkTransitionRef}
+                    visualIdentityTransitionRef={visualIdentityTransitionRef}
+                    animationTransitionRef={animationTransitionRef}
+                    logoTransitionRef={logoTransitionRef}
+                    onReady={handleCubeReady}
+                  />
+                </Suspense>
               </Canvas>
             )}
           </motion.div>
@@ -1963,6 +2105,7 @@ type CubeProps = {
   visualIdentityTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
   animationTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
   logoTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
+  onReady: () => void;
 };
 const Cube = ({
   scrollProgress,
@@ -1973,6 +2116,7 @@ const Cube = ({
   visualIdentityTransitionRef,
   animationTransitionRef,
   logoTransitionRef,
+  onReady,
 }: CubeProps) => {
   const group = useRef<Group>(null);
 
@@ -2544,15 +2688,25 @@ const Cube = ({
     );
   });
 
-  if (
-    !rustamTexture ||
-    !topTextTexture ||
-    !visualIdentityTexture ||
-    !movingGraphicsTextTexture ||
-    !movingGraphicsVideoTexture ||
-    !clientWorkTexture ||
-    !logoInspirationTexture
-  ) {
+  const isCubeReady = Boolean(
+    rustamTexture &&
+      topTextTexture &&
+      visualIdentityTexture &&
+      movingGraphicsTextTexture &&
+      movingGraphicsVideoTexture &&
+      clientWorkTexture &&
+      logoInspirationTexture,
+  );
+
+  useEffect(() => {
+    if (!isCubeReady) {
+      return;
+    }
+
+    onReady();
+  }, [isCubeReady, onReady]);
+
+  if (!isCubeReady) {
     return null;
   }
 

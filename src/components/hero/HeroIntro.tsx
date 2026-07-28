@@ -22,30 +22,62 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
   const [activeFaceIndex, setActiveFaceIndex] = useState(0);
 
   useEffect(() => {
-    if (isDone) return;
+    if (isDone) {
+      return;
+    }
 
     setActiveFaceIndex(0);
 
     const timers = [
-      window.setTimeout(() => setActiveFaceIndex(1), 520),
-      window.setTimeout(() => setActiveFaceIndex(2), 1040),
-      window.setTimeout(() => setActiveFaceIndex(3), 1560),
-      window.setTimeout(() => setActiveFaceIndex(4), 2080),
+      window.setTimeout(() => {
+        setActiveFaceIndex(1);
+      }, 520),
+
+      window.setTimeout(() => {
+        setActiveFaceIndex(2);
+      }, 1040),
+
+      window.setTimeout(() => {
+        setActiveFaceIndex(3);
+      }, 1560),
+
+      window.setTimeout(() => {
+        setActiveFaceIndex(4);
+      }, 2080),
     ];
 
     return () => {
-      timers.forEach((timer) => window.clearTimeout(timer));
+      timers.forEach((timer) => {
+        window.clearTimeout(timer);
+      });
     };
   }, [isDone]);
 
   return (
     <motion.div
-      initial={{ y: "0%" }}
-      animate={isDone ? { y: "-100%" } : { y: "0%" }}
+      initial={{
+        y: "0%",
+      }}
+      animate={
+        isDone
+          ? {
+              y: "-100%",
+            }
+          : {
+              y: "0%",
+            }
+      }
       transition={{
         delay: isDone ? 0.45 : 0,
         duration: isDone ? 0.95 : 0,
         ease,
+      }}
+      onAnimationComplete={() => {
+        if (!isDone) {
+          return;
+        }
+
+        onExitComplete?.();
       }}
       className="fixed inset-0 z-[999] bg-[#181c14]"
       style={{
@@ -55,8 +87,16 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
       <div className="relative h-full w-full overflow-hidden">
         <div className="absolute bottom-8 left-8 md:bottom-12 md:left-12">
           <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.92 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            initial={{
+              opacity: 0,
+              y: 16,
+              scale: 0.92,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+            }}
             transition={{
               duration: 0.65,
               ease,
@@ -67,7 +107,18 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
               Loading
             </div>
 
-            <div className="h-[92px] w-[92px] perspective-[800px] [--cube-depth:46px] md:h-[118px] md:w-[118px] md:[--cube-depth:59px]">
+            <div
+              className="
+                h-[92px]
+                w-[92px]
+                perspective-[800px]
+                [--cube-depth:46px]
+
+                md:h-[118px]
+                md:w-[118px]
+                md:[--cube-depth:59px]
+              "
+            >
               <motion.div
                 animate={{
                   transform: cubeTransforms[activeFaceIndex],
@@ -112,8 +163,12 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
 
             <div className="h-px w-[160px] overflow-hidden bg-[#ecdfcc]/20 md:w-[210px]">
               <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
+                initial={{
+                  scaleX: 0,
+                }}
+                animate={{
+                  scaleX: 1,
+                }}
                 transition={{
                   duration: 2.65,
                   ease,

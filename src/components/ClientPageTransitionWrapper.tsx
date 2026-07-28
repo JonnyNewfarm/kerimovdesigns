@@ -69,12 +69,6 @@ const LEAVING_OVERLAY_POSITION = {
   y: "-100%",
 };
 
-/*
- * Et fast viewBox gjør at vi ikke trenger å lagre viewportens
- * bredde og høyde i React-state.
- *
- * preserveAspectRatio="none" strekker SVG-en til skjermen.
- */
 const SVG_WIDTH = 1000;
 const SVG_HEIGHT = 1000;
 
@@ -320,10 +314,6 @@ export default function ClientPageTransitionWrapper({
       statusRef.current = "entering";
       pendingHrefRef.current = href;
 
-      /*
-       * Starter innlasting av den nye siden mens overlayet
-       * beveger seg inn over skjermen.
-       */
       router.prefetch(href);
 
       setTransition({
@@ -335,10 +325,6 @@ export default function ClientPageTransitionWrapper({
     [pathname, router, shouldReduceMotion],
   );
 
-  /*
-   * Når pathname faktisk har blitt oppdatert, vet vi at den
-   * nye siden er klar og overlayet kan bevege seg ut.
-   */
   useEffect(() => {
     if (pathname === previousPathnameRef.current) {
       return;
@@ -350,18 +336,26 @@ export default function ClientPageTransitionWrapper({
       return;
     }
 
-    statusRef.current = "leaving";
+    let firstFrame = 0;
+    let secondFrame = 0;
 
-    setTransition((current) => ({
-      ...current,
-      status: "leaving",
-    }));
+    firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        statusRef.current = "leaving";
+
+        setTransition((current) => ({
+          ...current,
+          status: "leaving",
+        }));
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+    };
   }, [pathname]);
 
-  /*
-   * Kjører når selve transform-animasjonen på overlayet
-   * er ferdig. Dermed trenger vi ingen setTimeout.
-   */
   const handleOverlayAnimationComplete = useCallback(() => {
     if (statusRef.current === "entering") {
       const href = pendingHrefRef.current;

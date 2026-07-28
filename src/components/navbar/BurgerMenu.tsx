@@ -84,11 +84,11 @@ const BurgerMenu = () => {
       >
         <span className="relative p-2">
           <span
-            className={`w-2.5 absolute top-1/2 transition-transform ease-in-out  block h-[1.5px] bg-white ${isOpen ? "rotate-45" : ""}`}
+            className={`w-2.5 absolute top-1/2 -translate-y-1/2 transition-transform ease-in-out  block h-[1.5px] bg-[#ecdfcc] ${isOpen ? "rotate-45 w-3" : ""}`}
           />{" "}
           <span />
           <span
-            className={`w-2.5 absolute top-1/2 transition-transform ease-in-out   block h-[1.5px] bg-white ${isOpen ? "-rotate-45" : ""}`}
+            className={`w-2.5 absolute top-1/2 -translate-y-1/2 transition-transform ease-in-out   block h-[1.5px] bg-[#ecdfcc] ${isOpen ? "-rotate-45 w-3" : ""}`}
           />{" "}
           <span />
         </span>
