@@ -1,562 +1,882 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+
 import SmoothScroll from "@/components/SmoothScroll";
-import toast from "react-hot-toast";
-import { motion } from "framer-motion";
-import WaveLinkText from "./WaveLink";
-import TextReveal from "./TextReveal";
+import TextReveal from "@/components/TextReveal";
+import MagneticComp from "./MagneticComp";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = [0.76, 0, 0.24, 1] as const;
 
-type FadeInProps = {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-  y?: number;
-  amount?: number;
+const panelVariants = {
+  hidden: {
+    y: "100%",
+  },
+  visible: {
+    y: "0%",
+    transition: {
+      duration: 0.9,
+      ease,
+    },
+  },
+  exit: {
+    y: "100%",
+    transition: {
+      duration: 0.75,
+      ease,
+    },
+  },
 };
 
-function FadeIn({
-  children,
-  className = "",
-  delay = 0,
-  y = 28,
-  amount = 0.25,
-}: FadeInProps) {
-  return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        y,
-        filter: "blur(8px)",
-      }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-        filter: "blur(0px)",
-      }}
-      viewport={{ once: true, amount }}
-      transition={{
-        duration: 0.9,
-        delay,
-        ease,
-      }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-type SentenceInputProps = {
-  id: string;
-  name: string;
-  value: string;
-  placeholder: string;
-  type?: "text" | "email";
-  required?: boolean;
-  className?: string;
-  inputRef?: React.Ref<HTMLInputElement>;
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => void;
+const backdropVariants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.45,
+      ease,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.4,
+      ease,
+    },
+  },
 };
 
-function SentenceInput({
-  id,
-  name,
-  value,
-  placeholder,
-  type = "text",
-  required = false,
-  className = "",
-  inputRef,
-  onChange,
-}: SentenceInputProps) {
-  return (
-    <input
-      ref={inputRef}
-      id={id}
-      name={name}
-      type={type}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      required={required}
-      className={`mx-2 mb-2 block min-w-[220px] max-w-full border-0 bg-transparent px-1 pb-1 text-[0.72em] font-black  leading-none text-[#a3b18a] outline-none transition placeholder:text-[#a3b18a]/80 focus:text-color md:min-w-[320px] ${className}`}
-    />
-  );
-}
-
-type SentenceTextareaProps = {
-  id: string;
-  name: string;
-  value: string;
-  placeholder: string;
-  required?: boolean;
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => void;
-};
-
-function SentenceTextarea({
-  id,
-  name,
-  value,
-  placeholder,
-  required = false,
-  onChange,
-}: SentenceTextareaProps) {
-  return (
-    <textarea
-      id={id}
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      required={required}
-      style={{
-        scrollbarColor: "rgba(245, 236, 220, 0.35) transparent",
-        scrollbarWidth: "thin",
-      }}
-      className="max-h-[360px] min-h-[100px] w-full resize-none overflow-y-auto border-0 bg-transparent px-0 pb-4 pr-5 text-[clamp(1.8rem,4.2vw,4.8rem)] font-black normal-case leading-[1.08] tracking-[-0.035em] text-[#a3b18a] outline-none transition  placeholder:text-[#a3b18a]/80 focus:text-color [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-color/25 [&::-webkit-scrollbar-thumb]:transition [&::-webkit-scrollbar-thumb:hover]:bg-color/45"
-    />
-  );
-}
-
-const ContactClient = () => {
-  const nameInputRef = useRef<HTMLInputElement | null>(null);
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    organization: "",
-    message: "",
-  });
-
-  const [validationErrors, setValidationErrors] = useState<{
-    name?: string;
-    email?: string;
-    message?: string;
-  }>({});
-
-  const [submitted, setSubmitted] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+export default function ContactPage() {
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
-    nameInputRef.current?.focus({ preventScroll: true });
-  }, []);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-    if (validationErrors[e.target.name as keyof typeof validationErrors]) {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [e.target.name]: undefined,
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const errors: typeof validationErrors = {};
-
-    if (!form.name.trim()) errors.name = "Name is required.";
-
-    if (!form.email.trim()) {
-      errors.email = "Email is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      errors.email = "Email must be valid.";
-    }
-
-    if (!form.message.trim()) {
-      errors.message = "Message is required.";
-    } else if (form.message.length < 10) {
-      errors.message = "Message must be at least 10 characters.";
-    }
-
-    return errors;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    setSubmitted(true);
-    setIsSending(true);
-
-    const errors = validateForm();
-    setValidationErrors(errors);
-
-    if (Object.keys(errors).length > 0) {
-      setIsSending(false);
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        body: JSON.stringify(form),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        toast.success("Message sent!");
-        setForm({ name: "", email: "", organization: "", message: "" });
-        setValidationErrors({});
-        setSubmitted(false);
-
-        requestAnimationFrame(() => {
-          nameInputRef.current?.focus({ preventScroll: true });
-        });
-      } else {
-        toast.error("Something went wrong.");
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsFormOpen(false);
       }
-    } catch {
-      toast.error("Network error. Please try again later.");
-    } finally {
-      setIsSending(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    if (!isFormOpen) {
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+      };
     }
-  };
+
+    const body = document.body;
+    const html = document.documentElement;
+
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyOverscroll = body.style.overscrollBehavior;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousHtmlOverscroll = html.style.overscrollBehavior;
+
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "none";
+
+    html.style.overflow = "hidden";
+    html.style.overscrollBehavior = "none";
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+
+      body.style.overflow = previousBodyOverflow;
+      body.style.overscrollBehavior = previousBodyOverscroll;
+
+      html.style.overflow = previousHtmlOverflow;
+      html.style.overscrollBehavior = previousHtmlOverscroll;
+    };
+  }, [isFormOpen]);
 
   return (
-    <SmoothScroll>
-      <section className="min-h-screen overflow-clip bg-dark px-4   text-color md:px-10  lg:px-16">
-        <div className="mx-auto w-full max-w-[1800px]">
-          <div className="relative h-[100svh] w-full">
-            <div className="absolute left-0 top-[21svh] md:top-[19svh]">
+    <>
+      <SmoothScroll>
+        <main
+          className="
+            min-h-[100svh]
+            bg-[#181c14]
+            px-4
+            pb-20
+            pt-10
+            text-[#ecdfcc]
+            md:px-12
+            lg:px-18
+            xl:px-20
+          "
+        >
+          <section
+            className="
+              flex
+              min-h-[100svh]
+              flex-col
+              gap-y-20
+              md:gap-y-8
+            "
+          >
+            {/* Tittel */}
+            <div className="w-full">
+              <TextReveal
+                as="h1"
+                mode="lines"
+                viewport={false}
+                delay={0.08}
+                stagger={0.12}
+                duration={1}
+                y="110%"
+                rotate={2}
+                className="
+                  mt-24
+                  max-w-[950px]
+                  text-[clamp(3rem,7vw,7.5rem)]
+                  font-semibold
+                  uppercase
+                  leading-[0.82]
+                  tracking-[-0.025em]
+                  md:text-[clamp(2rem,6vw,6.5rem)]
+                "
+              >
+                {"Let's work\ntogether."}
+              </TextReveal>
+            </div>
+
+            {/* Nederste del */}
+            <div className="flex w-full flex-col">
+              {/* Details og Socials */}
               <div
                 className="
-        flex
-        flex-col
-        text-[clamp(3.4rem,6.8vw,8rem)]
-        font-black
-        uppercase
-        leading-[0.88]
-        tracking-[-0.045em]
-        text-color
-      "
+                  mb-8
+                  ml-auto
+                  flex
+                  flex-col
+                  items-end
+                  gap-y-6
+                  text-right
+                  md:mb-10
+                  md:gap-y-8
+                "
               >
-                <TextReveal as="h1" mode="lines" delay={0.12}>
-                  Let&apos;s work
-                </TextReveal>
-
-                <TextReveal as="h1" mode="lines" delay={0.16}>
-                  on a project
-                </TextReveal>
-
-                <TextReveal as="h1" mode="lines" delay={0.2}>
-                  together
-                </TextReveal>
-              </div>
-            </div>
-
-            <div className="absolute bottom-20 right-0 md:bottom-12 md:left-auto md:right-0">
-              <div className="flex max-w-[350px] md:max-w-[520px] flex-col items-end justify-end">
-                <TextReveal
-                  as="p"
-                  mode="words"
-                  delay={0.35}
-                  className="
-          mt-4
-          text-sm
-          font-bold
-          leading-[1.4]
-          text-color/55
-          text-right
-          md:text-lg
-        "
-                >
-                  Send a message about identity, motion, logos or visual
-                  direction. Keep it simple — what you need, when you need it
-                  and what you want it to feel like.
-                </TextReveal>
-              </div>
-            </div>
-          </div>
-
-          {/* BRIEF */}
-          <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.72fr_1.28fr] lg:items-start lg:gap-20">
-            {" "}
-            {/* LEFT SIDE */}
-            <aside className="order-2 lg:sticky lg:top-28 lg:order-1">
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.25 }}
-                variants={{
-                  hidden: {},
-                  visible: {
-                    transition: {
-                      staggerChildren: 0.08,
-                    },
-                  },
-                }}
-                className="grid grid-cols-1 gap-10 text-sm font-black uppercase tracking-[0.18em] text-color/70 sm:grid-cols-2 lg:grid-cols-1"
-              >
-                <motion.div
-                  variants={{
-                    hidden: {
-                      opacity: 0,
-                      y: 30,
-                      filter: "blur(8px)",
-                    },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      filter: "blur(0px)",
-                      transition: {
-                        duration: 0.85,
-                        ease,
-                      },
-                    },
-                  }}
-                >
+                {/* Details */}
+                <div className="flex flex-col items-end text-right">
                   <TextReveal
                     as="p"
-                    mode="words"
-                    className="mb-3 text-xs tracking-[0.24em] text-color/35"
+                    viewport={false}
+                    delay={0.25}
+                    duration={0.65}
+                    y="100%"
+                    className="
+                      mb-3
+                      text-[11px]
+                      uppercase
+                      opacity-50
+                    "
                   >
                     Details
                   </TextReveal>
 
-                  <div className="flex flex-col gap-2">
-                    <p>Rustam Kerimov</p>
+                  <div
+                    className="
+                      flex
+                      flex-col
+                      items-end
+                      gap-y-1
+                      text-right
+                      text-sm
+                      leading-[1.4]
+                      md:text-base
+                    "
+                  >
+                    <TextReveal
+                      as="p"
+                      viewport={false}
+                      delay={0.31}
+                      duration={0.7}
+                      y="100%"
+                    >
+                      Rustam Kerimov
+                    </TextReveal>
 
                     <a
                       href="mailto:rustam-98@hotmail.com"
-                      className="w-fit normal-case tracking-normal"
+                      className="
+                        w-fit
+                        transition-opacity
+                        duration-300
+                        hover:opacity-50
+                      "
                     >
-                      <WaveLinkText text="rustam-98@hotmail.com" />
+                      <TextReveal
+                        as="span"
+                        viewport={false}
+                        delay={0.35}
+                        duration={0.7}
+                        y="100%"
+                      >
+                        rustam-98@hotmail.com
+                      </TextReveal>
                     </a>
 
-                    <a href="tel:+4745268163" className="w-fit">
-                      <WaveLinkText text="+47 45 26 81 63" />
+                    <a
+                      href="tel:+4745268163"
+                      className="
+                        w-fit
+                        transition-opacity
+                        duration-300
+                        hover:opacity-50
+                      "
+                    >
+                      <TextReveal
+                        as="span"
+                        viewport={false}
+                        delay={0.39}
+                        duration={0.7}
+                        y="100%"
+                      >
+                        +47 45 26 81 63
+                      </TextReveal>
                     </a>
 
-                    <p>Oslo, Norway</p>
+                    <TextReveal
+                      as="p"
+                      viewport={false}
+                      delay={0.43}
+                      duration={0.7}
+                      y="100%"
+                    >
+                      Oslo, Norway
+                    </TextReveal>
                   </div>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  variants={{
-                    hidden: {
-                      opacity: 0,
-                      y: 30,
-                      filter: "blur(8px)",
-                    },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      filter: "blur(0px)",
-                      transition: {
-                        duration: 0.85,
-                        ease,
-                      },
-                    },
-                  }}
-                >
+                {/* Socials */}
+                <div className="flex flex-col items-end text-right">
                   <TextReveal
                     as="p"
-                    mode="words"
-                    className="mb-3 text-xs tracking-[0.24em] text-color/35"
+                    viewport={false}
+                    delay={0.47}
+                    duration={0.65}
+                    y="100%"
+                    className="
+                      mb-3
+                      text-[11px]
+                      uppercase
+                      opacity-50
+                    "
                   >
                     Socials
                   </TextReveal>
 
-                  <div className="flex flex-col gap-2">
+                  <div
+                    className="
+                      flex
+                      flex-col
+                      items-end
+                      gap-y-1
+                      text-right
+                      text-sm
+                      leading-[1.4]
+                      md:text-base
+                    "
+                  >
                     <a
+                      href="#"
                       target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://www.instagram.com/rustam.kerim0v?igsh=MTlhcjl5YzV0bm15cQ%3D%3D&utm_source=qr"
-                      className="w-fit"
+                      rel="noreferrer"
+                      className="
+                        w-fit
+                        transition-opacity
+                        duration-300
+                        hover:opacity-50
+                      "
                     >
-                      <WaveLinkText text="Instagram" />
+                      <TextReveal
+                        as="span"
+                        viewport={false}
+                        delay={0.51}
+                        duration={0.7}
+                        y="100%"
+                      >
+                        Instagram
+                      </TextReveal>
                     </a>
 
                     <a
+                      href="#"
                       target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://linkedin.com/in/rustam-kerimov-75bb5a331"
-                      className="w-fit"
+                      rel="noreferrer"
+                      className="
+                        w-fit
+                        transition-opacity
+                        duration-300
+                        hover:opacity-50
+                      "
                     >
-                      <WaveLinkText text="LinkedIn" />
+                      <TextReveal
+                        as="span"
+                        viewport={false}
+                        delay={0.55}
+                        duration={0.7}
+                        y="100%"
+                      >
+                        LinkedIn
+                      </TextReveal>
                     </a>
                   </div>
-                </motion.div>
+                </div>
+              </div>
 
-                <motion.div
-                  variants={{
-                    hidden: {
-                      opacity: 0,
-                      y: 30,
-                      filter: "blur(8px)",
-                    },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      filter: "blur(0px)",
-                      transition: {
-                        duration: 0.85,
-                        ease,
-                      },
-                    },
-                  }}
-                >
+              {/* Availability og Send message */}
+              <div
+                className="
+                  flex
+                  w-full
+                  flex-col
+                  items-start
+                  justify-between
+                  gap-x-5
+                  gap-y-8
+                  pt-5
+                  text-left
+                  md:flex-row
+                  md:gap-x-12
+                  md:gap-y-0
+                "
+              >
+                {/* Availability */}
+                <div className="min-w-0 max-w-[400px]">
                   <TextReveal
                     as="p"
-                    mode="words"
-                    className="mb-3 text-xs tracking-[0.24em] text-color/35"
+                    viewport={false}
+                    delay={0.61}
+                    duration={0.65}
+                    y="100%"
+                    className="
+                      mb-3
+                      text-[11px]
+                      uppercase
+                      opacity-50
+                    "
                   >
                     Availability
                   </TextReveal>
 
-                  <p className="max-w-[340px] text-base font-bold normal-case leading-[1.35] tracking-normal text-color/55">
-                    Available for visual identities, motion pieces, logos and
-                    selected design projects.
-                  </p>
-                </motion.div>
-              </motion.div>
-            </aside>
-            <form
-              onSubmit={handleSubmit}
-              noValidate
-              className="order-1 lg:order-2"
-            >
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 30,
-                  filter: "blur(8px)",
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)",
-                }}
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{
-                  duration: 0.9,
-                  ease,
-                }}
-              >
-                <div className="max-w-[1250px]">
                   <TextReveal
                     as="p"
-                    mode="words"
-                    className="mb-10 text-xs font-black uppercase tracking-[0.24em] text-color/35"
+                    viewport={false}
+                    delay={0.66}
+                    stagger={0.025}
+                    duration={0.75}
+                    y="100%"
+                    className="text-sm leading-[1.4] md:text-base"
                   >
-                    Fill the brief
+                    Available for visual identities, motion pieces, logos and
+                    selected design projects.
                   </TextReveal>
+                </div>
 
-                  <div className="text-[clamp(2.25rem,5.4vw,5.9rem)] font-black normal-case leading-[1.12] tracking-[-0.035em] text-color">
-                    <p>
-                      Hey Rustam, my name is:
-                      <SentenceInput
-                        inputRef={nameInputRef}
-                        id="name"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        placeholder="your name"
-                        required
+                {/* Send message */}
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    y: 14,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  transition={{
+                    delay: 0.72,
+                    duration: 0.7,
+                    ease,
+                  }}
+                  className="shrink-0"
+                >
+                  <MagneticComp>
+                    <button
+                      type="button"
+                      onClick={() => setIsFormOpen(true)}
+                      className="
+                        group
+                        relative
+                        flex
+                        cursor-pointer
+                        items-center
+                        justify-center
+                        overflow-hidden
+                        border
+                        border-[#ecdfcc]
+                        px-3
+                        py-3
+                        text-xs
+                        hover:border-[#667a6c]
+                        sm:px-4
+                        sm:text-sm
+                        md:px-5
+                        md:text-lg
+                      "
+                    >
+                      <span
+                        className="
+                          absolute
+                          inset-0
+                          origin-bottom
+                          scale-y-0
+                          bg-[#667a6c]
+                          transition-transform
+                          duration-500
+                          ease-[cubic-bezier(0.76,0,0.24,1)]
+                          group-hover:scale-y-100
+                        "
                       />
-                    </p>
 
-                    <p className="mt-2 md:mt-3">
-                      and I’m from:{" "}
-                      <SentenceInput
-                        id="organization"
-                        name="organization"
-                        value={form.organization}
-                        onChange={handleChange}
-                        placeholder="studio / company"
-                      />
-                    </p>
+                      <TextReveal
+                        as="span"
+                        viewport={false}
+                        delay={0.78}
+                        duration={0.7}
+                        y="100%"
+                        className="
+                          relative
+                          z-10
+                          whitespace-nowrap
+                          uppercase
+                        "
+                      >
+                        Send message
+                      </TextReveal>
+                    </button>
+                  </MagneticComp>
+                </motion.div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </SmoothScroll>
 
-                    <p className="mt-2 md:mt-3">
-                      You can reach me at:{" "}
-                      <SentenceInput
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        placeholder="your email"
-                        required
-                        className="md:min-w-[440px]"
-                      />
-                    </p>
+      <AnimatePresence>
+        {isFormOpen && (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="
+              fixed
+              inset-0
+              z-[300]
+              overflow-hidden
+              overscroll-none
+            "
+          >
+            {/* Bakgrunn bak panelet */}
+            <motion.button
+              type="button"
+              aria-label="Close contact form"
+              variants={backdropVariants}
+              onClick={() => setIsFormOpen(false)}
+              className="
+                absolute
+                inset-0
+                cursor-default
+                bg-[#181c14]/70
+                backdrop-blur-[2px]
+              "
+            />
+
+            {/* Skjema som glir opp */}
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="contact-form-title"
+              variants={panelVariants}
+              onWheel={(event) => event.stopPropagation()}
+              onTouchMove={(event) => event.stopPropagation()}
+              className="
+                absolute
+                bottom-0
+                left-0
+                right-0
+                max-h-[96dvh]
+                touch-pan-y
+                overflow-y-auto
+                overscroll-contain
+                bg-[#4b4f47]
+                px-5
+                pb-8
+                pt-5
+                text-[#ecdfcc]
+
+                [scrollbar-width:thin]
+                [&::-webkit-scrollbar]:w-[2px]
+                [&::-webkit-scrollbar-thumb]:bg-black
+                [&::-webkit-scrollbar-track]:bg-transparent
+
+                md:px-12
+                md:pb-12
+                md:pt-8
+              "
+            >
+              <div className="mx-auto max-w-[1800px]">
+                <div
+                  className="
+                    mb-14
+                    flex
+                    items-start
+                    justify-between
+                    border-b
+                    border-[#ecdfcc]/25
+                    pb-5
+                    md:mb-20
+                  "
+                >
+                  <div>
+                    <TextReveal
+                      as="p"
+                      viewport={false}
+                      delay={0.38}
+                      duration={0.65}
+                      y="100%"
+                      className="
+                        mb-3
+                        text-[11px]
+                        uppercase
+                        opacity-50
+                      "
+                    >
+                      New inquiry
+                    </TextReveal>
+
+                    <h2 id="contact-form-title">
+                      <TextReveal
+                        as="span"
+                        viewport={false}
+                        delay={0.43}
+                        duration={0.9}
+                        y="110%"
+                        rotate={2}
+                        className="
+                          text-3xl
+                          uppercase
+                          font-semibold
+                          tracking-[-0.02em]
+                          md:text-3xl
+                        "
+                      >
+                        Send a message
+                      </TextReveal>
+                    </h2>
                   </div>
 
-                  <div className="mt-10 md:mt-12">
-                    <label
-                      htmlFor="message"
-                      className="mb-4 block text-[clamp(2.25rem,5.4vw,5.9rem)] font-black normal-case leading-[1.12] tracking-[-0.035em] text-color"
-                    >
-                      Message:
-                    </label>
+                  <motion.button
+                    type="button"
+                    onClick={() => setIsFormOpen(false)}
+                    aria-label="Close contact form"
+                    initial={{
+                      opacity: 0,
+                      scale: 0.8,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                    }}
+                    transition={{
+                      delay: 0.48,
+                      duration: 0.65,
+                      ease,
+                    }}
+                    className="
+                      group
+                      relative
+                      flex
+                      h-11
+                      w-11
+                      shrink-0
+                      cursor-pointer
+                      items-center
+                      justify-center
+                      overflow-hidden
+                      rounded-full
+                      border
+                      border-[#ecdfcc]/35
+                      text-xl
+                      hover:border-[#667a6c]
+                    "
+                  >
+                    <span
+                      className="
+                        absolute
+                        inset-0
+                        origin-bottom
+                        scale-y-0
+                        bg-[#667a6c]
+                        transition-transform
+                        duration-500
+                        ease-[cubic-bezier(0.76,0,0.24,1)]
+                        group-hover:scale-y-100
+                      "
+                    />
 
-                    <SentenceTextarea
+                    <span className="relative z-10">×</span>
+                  </motion.button>
+                </div>
+
+                <form
+                  className="
+                    grid
+                    gap-x-10
+                    gap-y-12
+                    md:grid-cols-2
+                  "
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                  }}
+                >
+                  <FormField
+                    id="name"
+                    name="name"
+                    label="Your name"
+                    type="text"
+                    placeholder="Name"
+                    delay={0.54}
+                  />
+
+                  <FormField
+                    id="email"
+                    name="email"
+                    label="Your email"
+                    type="email"
+                    placeholder="Email address"
+                    delay={0.59}
+                  />
+
+                  <FormField
+                    id="company"
+                    name="company"
+                    label="Company"
+                    type="text"
+                    placeholder="Company name"
+                    required={false}
+                    delay={0.64}
+                  />
+
+                  <FormField
+                    id="project"
+                    name="project"
+                    label="Project type"
+                    type="text"
+                    placeholder="Identity, motion, logo..."
+                    delay={0.69}
+                  />
+
+                  <div className="md:col-span-2">
+                    <TextReveal
+                      as="label"
+                      htmlFor="message"
+                      viewport={false}
+                      delay={0.74}
+                      duration={0.65}
+                      y="100%"
+                      className="
+                        mb-4
+                        block
+                        text-[11px]
+                        uppercase
+                        opacity-80
+                      "
+                    >
+                      Tell me about the project
+                    </TextReveal>
+
+                    <motion.textarea
                       id="message"
                       name="message"
-                      value={form.message}
-                      onChange={handleChange}
-                      placeholder="Tell me what you want to make..."
                       required
+                      rows={4}
+                      placeholder="Project details, timing and budget..."
+                      initial={{
+                        opacity: 0,
+                        y: 18,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        delay: 0.78,
+                        duration: 0.75,
+                        ease,
+                      }}
+                      className="
+                        w-full
+                        resize-none
+                        border-b
+                        border-[#ecdfcc]/35
+                        bg-transparent
+                        pb-5
+                        text-2xl
+                        text-[#ecdfcc]
+                        outline-none
+                        transition-colors
+                        duration-300
+                        placeholder:text-[#ecdfcc]/30
+                        focus:border-[#ecdfcc]
+                        md:text-4xl
+                      "
                     />
                   </div>
 
-                  {submitted &&
-                    (validationErrors.name ||
-                      validationErrors.email ||
-                      validationErrors.message) && (
-                      <div className="mt-10 flex flex-col gap-2 text-sm font-black uppercase tracking-[0.16em] text-red-500">
-                        {validationErrors.name && (
-                          <p>{validationErrors.name}</p>
-                        )}
-
-                        {validationErrors.email && (
-                          <p>{validationErrors.email}</p>
-                        )}
-
-                        {validationErrors.message && (
-                          <p>{validationErrors.message}</p>
-                        )}
-                      </div>
-                    )}
-
-                  <FadeIn
-                    delay={0.18}
-                    y={24}
-                    className="mt-8 flex flex-col gap-5 pb-24 sm:flex-row sm:items-center lg:pb-40"
+                  <motion.div
+                    initial={{
+                      opacity: 0,
+                      y: 18,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    transition={{
+                      delay: 0.84,
+                      duration: 0.75,
+                      ease,
+                    }}
+                    className="
+                      flex
+                      justify-end
+                      md:col-span-2
+                    "
                   >
-                    <button
-                      type="submit"
-                      disabled={isSending}
-                      className="group relative w-fit cursor-pointer overflow-hidden border border-color bg-color px-8 py-4 text-sm font-black uppercase tracking-[0.2em] text-dark transition disabled:cursor-not-allowed disabled:opacity-40 md:text-lg"
-                    >
-                      <WaveLinkText
-                        text={isSending ? "Sending..." : "Send message"}
-                      />
-                    </button>
+                    <MagneticComp>
+                      <button
+                        type="submit"
+                        className="
+                          group
+                          relative
+                          flex
+                          cursor-pointer
+                          items-center
+                          justify-center
+                          overflow-hidden
+                          border
+                          border-[#ecdfcc]
+                          py-4
+                          text-xl
+                          uppercase
+                          hover:border-[#667a6c]
+                        "
+                      >
+                        <span
+                          className="
+                            absolute
+                            inset-0
+                            origin-bottom
+                            scale-y-0
+                            bg-[#667a6c]
+                            transition-transform
+                            duration-500
+                            ease-[cubic-bezier(0.76,0,0.24,1)]
+                            group-hover:scale-y-100
+                          "
+                        />
 
-                    <p className="max-w-[420px] text-sm font-bold leading-[1.35] text-color/40">
-                      Start with your name and send your project message.
-                    </p>
-                  </FadeIn>
-                </div>
-              </motion.div>
-            </form>
-          </div>
-        </div>
-      </section>
-    </SmoothScroll>
+                        <TextReveal
+                          as="span"
+                          viewport={false}
+                          delay={0.88}
+                          duration={0.7}
+                          y="100%"
+                          className="relative z-10 px-4"
+                        >
+                          Submit inquiry
+                        </TextReveal>
+                      </button>
+                    </MagneticComp>
+                  </motion.div>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
+}
+
+type FormFieldProps = {
+  id: string;
+  name: string;
+  label: string;
+  type: "text" | "email";
+  placeholder: string;
+  required?: boolean;
+  delay?: number;
 };
 
-export default ContactClient;
+function FormField({
+  id,
+  name,
+  label,
+  type,
+  placeholder,
+  required = true,
+  delay = 0,
+}: FormFieldProps) {
+  return (
+    <div>
+      <TextReveal
+        as="label"
+        htmlFor={id}
+        viewport={false}
+        delay={delay}
+        duration={0.65}
+        y="100%"
+        className="
+          mb-4
+          block
+          text-[11px]
+          uppercase
+          opacity-90
+        "
+      >
+        {label}
+      </TextReveal>
+
+      <motion.input
+        id={id}
+        name={name}
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        initial={{
+          opacity: 0,
+          y: 18,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          delay: delay + 0.04,
+          duration: 0.75,
+          ease,
+        }}
+        className="
+          w-full
+          border-b
+          border-[#ecdfcc]/35
+          bg-transparent
+          pb-5
+          text-2xl
+          text-[#ecdfcc]
+          outline-none
+          transition-colors
+          duration-300
+          placeholder:text-[#ecdfcc]/30
+          focus:border-[#ecdfcc]
+          md:text-4xl
+        "
+      />
+    </div>
+  );
+}
