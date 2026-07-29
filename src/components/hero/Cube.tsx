@@ -205,11 +205,7 @@ const cubeProjects: {
   {
     title: "Rustam Kerimov",
     subtitle: "Graphic Designer",
-    images: [
-      "/cube-img/rustam-4.jpg",
-      "/cube-img/rustam-3.jpg",
-      "/cube-img/rustam-5.jpg",
-    ],
+    images: ["cube-img/rk-portrait-04.jpg"],
   },
   {
     title: "Echo Festival",
@@ -271,22 +267,8 @@ const faceCollageLayout: CollageTile[] = [
     imageSlot: 0,
     x: 0,
     y: 0,
-    width: 0.62,
+    width: 1,
     height: 1,
-  },
-  {
-    imageSlot: 1,
-    x: 0.62,
-    y: 0,
-    width: 0.38,
-    height: 0.46,
-  },
-  {
-    imageSlot: 2,
-    x: 0.62,
-    y: 0.46,
-    width: 0.38,
-    height: 0.54,
   },
 ];
 
@@ -1544,65 +1526,73 @@ function CubeLoadingPlaceholder({ visible }: { visible: boolean }) {
       aria-hidden={!visible}
     >
       <div className="flex flex-col items-center gap-y-5">
-        <motion.div
-          animate={
-            visible
-              ? {
-                  opacity: [0.25, 0.6, 0.25],
-                  scale: [0.985, 1, 0.985],
-                }
-              : undefined
-          }
-          transition={{
-            duration: 1.6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+        <div
           className="
-  relative
-  h-[75vw]
-  w-[75vw]
-  max-h-[360px]
-  max-w-[360px]
+            relative
+            h-[75vw]
+            w-[75vw]
+            max-h-[360px]
+            max-w-[360px]
 
-  sm:h-[40vw]
-  sm:w-[40vw]
+            sm:h-[40vw]
+            sm:w-[40vw]
 
-  md:h-[280px]
-  md:w-[280px]
+            md:h-[280px]
+            md:w-[280px]
 
-  xl:h-[310px]
-  xl:w-[310px]
-"
+            xl:h-[310px]
+            xl:w-[310px]
+          "
         >
-          <div className="absolute inset-0 border border-[#ecdfcc]/20" />
+          {/* Svak statisk kant */}
+          <div className="absolute inset-0 border border-[#ecdfcc]/10" />
 
-          <div
-            className="
-              absolute
-              left-0
-              top-0
-              h-px
-              w-full
-              origin-left
-              bg-[#ecdfcc]/20
-            "
-          />
-        </motion.div>
-        <div className="flex w-full justify-between flex-row">
+          {/* Kant med et lite gap som beveger seg rundt */}
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="absolute inset-0 h-full w-full overflow-visible"
+          >
+            <motion.rect
+              x="0.25"
+              y="0.25"
+              width="99.5"
+              height="99.5"
+              fill="none"
+              stroke="#ecdfcc"
+              strokeOpacity="0.55"
+              strokeWidth="0.5"
+              vectorEffect="non-scaling-stroke"
+              pathLength="100"
+              strokeDasharray="94 6"
+              animate={
+                visible
+                  ? {
+                      strokeDashoffset: [0, -100],
+                    }
+                  : undefined
+              }
+              transition={{
+                duration: 2.4,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          </svg>
+        </div>
+
+        <div className="flex w-full justify-between">
           <p
             className="
-            satoshi-black
-            text-[10px]
-            uppercase
-            tracking-[-0.02em]
-            text-[#ecdfcc]/80
-          "
+              satoshi-black
+              text-[10px]
+              uppercase
+              tracking-[-0.02em]
+              text-[#ecdfcc]/80
+            "
           >
-            Preparing cube{" "}
+            Preparing cube
           </p>
-
-          <span className="rounded-full h-4 w-4 border border-l-transparent border-white/90 bg-transparent animate-spin" />
         </div>
       </div>
     </motion.div>
