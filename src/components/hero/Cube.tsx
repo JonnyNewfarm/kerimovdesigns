@@ -1614,7 +1614,6 @@ export default function Index({ href, title }: IndexProps) {
   const visualIdentityTransitionRef = useRef<HTMLAnchorElement | null>(null);
   const animationTransitionRef = useRef<HTMLAnchorElement | null>(null);
   const logoTransitionRef = useRef<HTMLAnchorElement | null>(null);
-  const [animateSpan, setAnimateSpan] = useState<boolean>(false);
 
   const isMdUp = useIsMdUp();
   const [hasMounted, setHasMounted] = useState(false);
