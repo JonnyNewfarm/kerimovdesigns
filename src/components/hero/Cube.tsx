@@ -59,12 +59,12 @@ import {
   faceCollageLayout,
   logoImagePaths,
   visualImagePaths,
-} from "./CubeConstants";
+} from "./cubeConstants";
 import {
   gradientFragmentShader,
   gradientPalettes,
   gradientVertexShader,
-} from "./CubeShaders";
+} from "./cubeShaders";
 import {
   createClientWorkTexture,
   createCollageTexture,
@@ -74,7 +74,7 @@ import {
   createVisualIdentityTexture,
   loadSatoshiFont,
   waitForTextureImage,
-} from "./CubeTextures";
+} from "./cubeTextures";
 
 export type CubeProps = {
   scrollProgress: MotionValue<number>;
