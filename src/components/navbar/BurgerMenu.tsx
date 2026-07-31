@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import TransitionLink from "../TransitionLink";
-import { rotate } from "three/tsl";
 
 const menuLinks = [
   {

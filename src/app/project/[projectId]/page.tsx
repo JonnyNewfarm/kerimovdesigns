@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getProjectById } from "@/app/actions";
-import ProjectModalWrapper from "@/components/ProjectModalWrapper";
+import ProjectModalWrapper from "@/components/project/ProjectModalWrapper";
 import { ProjectNavTitleSetter } from "@/components/ProjectNavContext";
 import SmoothScroll from "@/components/SmoothScroll";
 
@@ -16,12 +16,15 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { projectId } = await params;
+
   const project = await getProjectById(projectId);
 
   if (!project) {
     return {
       title: "Project Not Found | Rustam Kerimov",
+
       description: "The project you are looking for does not exist.",
+
       icons: {
         icon: "/favicon.ico",
       },
@@ -33,12 +36,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${project.title} | Rustam Kerimov`,
     description,
+
     icons: {
       icon: "/favicon.ico",
     },
+
     openGraph: {
       title: `${project.title} | Rustam Kerimov`,
       description,
+
       images: project.src
         ? [
             {
@@ -51,8 +57,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const Page = async ({ params }: Props) => {
+export default async function Page({ params }: Props) {
   const { projectId } = await params;
+
   const project = await getProjectById(projectId);
 
   if (!project) {
@@ -68,6 +75,4 @@ const Page = async ({ params }: Props) => {
       </main>
     </SmoothScroll>
   );
-};
-
-export default Page;
+}

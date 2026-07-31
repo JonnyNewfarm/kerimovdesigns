@@ -7,11 +7,12 @@ export default function LocalTime() {
 
   useEffect(() => {
     const updateTime = () => {
-      const formattedTime = new Intl.DateTimeFormat("nb-NO", {
+      const formattedTime = new Intl.DateTimeFormat("en-GB", {
         timeZone: "Europe/Oslo",
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
+        timeZoneName: "short",
       }).format(new Date());
 
       setTime(formattedTime);
@@ -27,6 +28,6 @@ export default function LocalTime() {
   }, []);
 
   return (
-    <span className="whitespace-nowrap">Local time / {time || "--:--"}</span>
+    <span className="whitespace-nowrap">LOCAL TIME / {time || "--:--"}</span>
   );
 }

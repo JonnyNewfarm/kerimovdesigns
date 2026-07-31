@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getProjectById, getProjects, updateProject } from "@/app/actions";
-import UploadImage from "@/components/UploadImage";
+import UploadImage from "@/components/admin/UploadImage";
 
 type Project = {
   id: string;

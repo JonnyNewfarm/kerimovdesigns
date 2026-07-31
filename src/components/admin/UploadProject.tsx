@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { createProject } from "@/app/actions";
-import UploadImage from "@/components/UploadImage";
+import UploadImage from "@/components/admin/UploadImage";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function UploadProject() {
