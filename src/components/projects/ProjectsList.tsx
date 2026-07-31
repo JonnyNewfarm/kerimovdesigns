@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import TransitionLink from "@/components/TransitionLink";
 
-import type { ProjectListItem } from "./projectTypes";
+import type { ProjectListItem } from "./projectsTypes";
 import { PROJECTS_PER_VIEW, projectsEase } from "./projectUtils";
 
 type ProjectsListProps = {
