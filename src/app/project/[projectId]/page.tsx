@@ -22,9 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!project) {
     return {
       title: "Project Not Found | Rustam Kerimov",
-
       description: "The project you are looking for does not exist.",
-
       icons: {
         icon: "/favicon.ico",
       },

@@ -3,10 +3,10 @@ export const revalidate = 60;
 import SmoothScroll from "@/components/SmoothScroll";
 import { getProjects } from "./actions";
 import { getLatestProject } from "./actions";
-import AnimDisplay from "@/components/AnimDisplay";
 import ServicesReveal from "@/components/ServicesReveal";
 import CubeHero from "@/components/hero/CubeHero";
 import LandingPageProjects from "@/components/landingpage-projects/LandingPageProjects";
+import AnimAndVisualDisplay from "@/components/AnimAndVisualDisplay";
 
 export default async function Home() {
   const projects = await getProjects();
@@ -20,7 +20,7 @@ export default async function Home() {
 
         <LandingPageProjects projects={projects} />
 
-        <AnimDisplay />
+        <AnimAndVisualDisplay />
       </div>
     </SmoothScroll>
   );

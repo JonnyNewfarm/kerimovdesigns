@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 import PageTransitionProvider from "@/components/ClientPageTransitionWrapper";
 import { ProjectNavProvider } from "@/components/ProjectNavContext";
+import { HeroIntroProvider } from "@/components/HeroIntroContext";
 
 export const metadata: Metadata = {
   title: "Rustam Kerimov | Portfolio",
@@ -23,12 +24,15 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <PageTransitionProvider>
-          <ProjectNavProvider>
-            <Navbar />
-            <NavbarMobile />
-            {children}
-          </ProjectNavProvider>
-          <Footer />
+          <HeroIntroProvider>
+            <ProjectNavProvider>
+              <Navbar />
+              <NavbarMobile />
+              {children}
+            </ProjectNavProvider>
+
+            <Footer />
+          </HeroIntroProvider>
         </PageTransitionProvider>
 
         <Toaster
@@ -41,10 +45,16 @@ export default function RootLayout({
               fontFamily: "Satoshi, sans-serif",
             },
             success: {
-              iconTheme: { primary: "#4ade80", secondary: "#1c1a17" },
+              iconTheme: {
+                primary: "#4ade80",
+                secondary: "#1c1a17",
+              },
             },
             error: {
-              iconTheme: { primary: "#f87171", secondary: "#1c1a17" },
+              iconTheme: {
+                primary: "#f87171",
+                secondary: "#1c1a17",
+              },
             },
           }}
         />

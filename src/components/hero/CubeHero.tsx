@@ -21,6 +21,7 @@ import Cube from "./Cube";
 import CubeLoadingPlaceholder from "./CubeLoadingPlaceholder";
 import useIsMdUp from "./hooks/UseIsMdup";
 import useScrollLock from "./hooks/UseScrollLock";
+import { useHeroIntro } from "../HeroIntroContext";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -60,8 +61,7 @@ export default function Index({ href, title }: IndexProps) {
 
   const [allowCanvasMount, setAllowCanvasMount] = useState(false);
 
-  const [introExited, setIntroExited] = useState(false);
-
+  const { introExited, setIntroExited } = useHeroIntro();
   useEffect(() => {
     if (isTransitioning) {
       return;
@@ -329,286 +329,205 @@ export default function Index({ href, title }: IndexProps) {
           </motion.div>
         </div>
 
-        <div
+        <motion.div
+          initial={false}
+          animate={
+            introExited
+              ? {
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                }
+              : {
+                  opacity: 0,
+                  y: 12,
+                  filter: "blur(5px)",
+                }
+          }
+          transition={{
+            duration: 0.8,
+            delay: introExited ? 0.08 : 0,
+            ease: [0.76, 0, 0.24, 1],
+          }}
+          style={{
+            pointerEvents: introExited ? "auto" : "none",
+          }}
           className="
-            absolute
-            bottom-6
-            left-0
-            right-0
-            z-10
-            px-6
-            md:bottom-10
-            md:px-10
-            lg:px-20
-          "
+    absolute
+    bottom-6
+    left-0
+    right-0
+    z-10
+    px-6
+    md:bottom-10
+    md:px-10
+    lg:px-20
+  "
         >
           <div
             className="
-              flex
-              w-full
-              items-end
-              justify-between
-            "
+      flex
+      w-full
+      items-end
+      justify-between
+    "
           >
-            <motion.div
-              initial={false}
-              animate={
-                introDone
-                  ? {
-                      opacity: 1,
-                      x: 0,
-                      y: 0,
-                    }
-                  : {
-                      opacity: 0,
-                      x: -30,
-                      y: 20,
-                    }
-              }
-              transition={{
-                duration: 0.9,
-                delay: introDone ? 0.15 : 0,
-                ease,
-              }}
+            <div
               className="
-                pointer-events-none
-                hidden
-                text-left
-                lg:block
-              "
+        pointer-events-none
+        hidden
+        text-left
+        lg:block
+      "
             >
-              {introDone && (
-                <div
+              <div className="relative pt-6">
+                <h1
                   className="
-                    relative
-                    pt-6
-                  "
+            satoshi-black
+            relative
+            whitespace-nowrap
+            leading-[0.95]
+            tracking-[-0.02em]
+            text-color
+            lg:text-4xl
+          "
                 >
-                  <TextReveal
-                    as="h1"
-                    mode="words"
-                    viewport={false}
-                    delay={0.05}
-                    className="
-                      satoshi-black
-                      relative
-                      whitespace-nowrap
-                      leading-[0.95]
-                      tracking-[-0.02em]
-                      text-color
-                      lg:text-4xl
-                    "
-                  >
-                    Portfolio / 2026
-                  </TextReveal>
-                </div>
-              )}
-            </motion.div>
+                  Portfolio / 2026
+                </h1>
+              </div>
+            </div>
 
-            <motion.div
-              initial={false}
-              animate={
-                introDone
-                  ? {
-                      opacity: 1,
-                      x: 0,
-                      y: 0,
-                    }
-                  : {
-                      opacity: 0,
-                      x: 30,
-                      y: 20,
-                    }
-              }
-              transition={{
-                duration: 0.9,
-                delay: introDone ? 0.2 : 0,
-                ease,
-              }}
+            <div
               className="
-                flex
-                items-center
-                gap-x-1
-                whitespace-nowrap
-                text-[12px]
-                md:text-[10px]
-                xl:text-[14px]
-              "
+        flex
+        items-center
+        gap-x-1
+        whitespace-nowrap
+        text-[12px]
+        md:text-[10px]
+        xl:text-[14px]
+      "
             >
-              {introDone && (
-                <>
-                  <TextReveal
-                    className="
-                      satoshi-black
-                      leading-none
-                      tracking-[-0.02em]
-                      text-color
-                    "
-                  >
-                    Latest Project
-                  </TextReveal>
+              <span
+                className="
+          satoshi-black
+          leading-none
+          tracking-[-0.02em]
+          text-color
+        "
+              >
+                Latest Project
+              </span>
 
-                  <TextReveal>/</TextReveal>
+              <span>/</span>
 
-                  <TransitionLink
-                    className="
-                      group
-                      relative
-                      -mb-1.5
-                    "
-                    href={`/project/${href}`}
-                    transitionLabel={title}
-                  >
-                    <TextReveal
-                      as="span"
-                      mode="words"
-                      viewport={false}
-                      delay={0.16}
-                      className="
-                        satoshi-black
-                        leading-none
-                        tracking-[-0.02em]
-                        text-color
-                      "
-                    >
-                      {title}
-                    </TextReveal>
-
-                    <span
-                      className="
-                        pointer-events-none
-                        absolute
-                        bottom-1
-                        left-0
-                        h-px
-                        w-full
-                        overflow-hidden
-                      "
-                    >
-                      <span
-                        className="
-                          absolute
-                          inset-0
-                          origin-right
-                          scale-x-100
-                          bg-current
-                          transition-transform
-                          duration-500
-                          ease-[cubic-bezier(0.76,0,0.24,1)]
-                          group-hover:scale-x-0
-                        "
-                      />
-
-                      <span
-                        className="
-                          absolute
-                          inset-0
-                          origin-left
-                          scale-x-0
-                          bg-current
-                          transition-transform
-                          duration-500
-                          delay-0
-                          ease-[cubic-bezier(0.76,0,0.24,1)]
-                          group-hover:scale-x-100
-                          group-hover:delay-[180ms]
-                        "
-                      />
-                    </span>
-                  </TransitionLink>
-                </>
-              )}
-            </motion.div>
-
-            <motion.div
-              initial={false}
-              animate={
-                introDone
-                  ? {
-                      opacity: 1,
-                      x: 0,
-                      y: 0,
-                    }
-                  : {
-                      opacity: 0,
-                      x: 30,
-                      y: 20,
-                    }
-              }
-              transition={{
-                duration: 0.9,
-                delay: introDone ? 0.2 : 0,
-                ease,
-              }}
-              className="
-                hidden
-                text-[10px]
-                lg:block
-                xl:text-[14px]
-              "
-            >
-              {introDone && (
-                <TextReveal
-                  as="p"
-                  mode="words"
-                  viewport={false}
-                  delay={0.16}
+              <TransitionLink
+                className="
+          group
+          relative
+          
+        "
+                href={`/project/${href}`}
+                transitionLabel={title}
+              >
+                <span
                   className="
-                    satoshi-black
-                    whitespace-nowrap
-                    leading-none
-                    tracking-[-0.02em]
-                    text-color
-                  "
+            satoshi-black
+            leading-none
+            tracking-[-0.02em]
+            text-color
+          "
                 >
-                  Status / Open for work
-                </TextReveal>
-              )}
-            </motion.div>
+                  {title}
+                </span>
 
-            <motion.div
-              initial={false}
-              animate={
-                introDone
-                  ? {
-                      opacity: 1,
-                      x: 0,
-                      y: 0,
-                    }
-                  : {
-                      opacity: 0,
-                      x: 30,
-                      y: 20,
-                    }
-              }
-              transition={{
-                duration: 0.9,
-                delay: introDone ? 0.2 : 0,
-                ease,
-              }}
-              className="
-                hidden
-                text-[10px]
-                lg:block
-                xl:text-[14px]
-              "
-            >
-              {introDone && (
-                <p
+                <span
                   className="
-                    satoshi-black
-                    whitespace-nowrap
-                    leading-none
-                    tracking-[-0.02em]
-                    text-color
-                  "
+            pointer-events-none
+            absolute
+            bottom-0
+            left-0
+            h-px
+            w-full
+            overflow-hidden
+          "
                 >
-                  <LocalTime />
-                </p>
-              )}
-            </motion.div>
+                  <span
+                    className="
+              absolute
+              inset-0
+              origin-right
+              scale-x-100
+              bg-current
+              transition-transform
+              duration-500
+              ease-[cubic-bezier(0.76,0,0.24,1)]
+              group-hover:scale-x-0
+            "
+                  />
+
+                  <span
+                    className="
+              absolute
+              inset-0
+              origin-left
+              scale-x-0
+              bg-current
+              transition-transform
+              duration-500
+              delay-0
+              ease-[cubic-bezier(0.76,0,0.24,1)]
+              group-hover:scale-x-100
+              group-hover:delay-[180ms]
+            "
+                  />
+                </span>
+              </TransitionLink>
+            </div>
+
+            <div
+              className="
+        hidden
+        text-[10px]
+        lg:block
+        xl:text-[14px]
+      "
+            >
+              <p
+                className="
+          satoshi-black
+          whitespace-nowrap
+          leading-none
+          tracking-[-0.02em]
+          text-color
+        "
+              >
+                Status / Open for work
+              </p>
+            </div>
+
+            <div
+              className="
+        hidden
+        text-[10px]
+        lg:block
+        xl:text-[14px]
+      "
+            >
+              <p
+                className="
+          satoshi-black
+          whitespace-nowrap
+          leading-none
+          tracking-[-0.02em]
+          text-color
+        "
+              >
+                <LocalTime />
+              </p>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );

@@ -100,7 +100,7 @@ export default function ProjectGalleryItem({
                 w-full
                 select-none
                 transition-opacity
-                duration-700
+                duration-300
                 ease-[cubic-bezier(0.22,1,0.36,1)]
                 ${
                   isLoaded

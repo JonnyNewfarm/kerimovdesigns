@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { useHeroIntro } from "../HeroIntroContext";
 import { useProjectNav } from "../ProjectNavContext";
 import TransitionLink from "../TransitionLink";
 import WaveLinkText from "../WaveLink";
@@ -11,11 +12,12 @@ import WaveLinkText from "../WaveLink";
 const PROJECT_EASE = [0.76, 0, 0.24, 1] as const;
 
 const INFO_HIDE_SCROLL = 80;
-const INFO_SHOW_SCROLL = 140;
 
 const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
+
+  const { introExited } = useHeroIntro();
   const { projectTitle } = useProjectNav();
 
   const [showProjectTitle, setShowProjectTitle] = useState(true);
@@ -26,7 +28,14 @@ const Navbar = () => {
   const projectTitleTickingRef = useRef(false);
   const navbarInfoTickingRef = useRef(false);
 
+  const isHomePage = pathname === "/";
   const isProjectDetailPage = pathname.startsWith("/project/");
+
+  /*
+   * På forsiden venter navbaren på at hero-introen er ferdig.
+   * På alle andre sider vises navbaren direkte, også etter refresh.
+   */
+  const shouldShowNavbar = !isHomePage || introExited;
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -35,25 +44,24 @@ const Navbar = () => {
       const currentScrollY = window.scrollY;
       const scrollDifference = currentScrollY - lastScrollY;
 
-      // Alltid synlig øverst
       if (currentScrollY <= INFO_HIDE_SCROLL) {
         setShowSecondaryInfo(true);
+
         lastScrollY = currentScrollY;
         navbarInfoTickingRef.current = false;
+
         return;
       }
 
-      // Ignorer bittesmå scrollbevegelser
       if (Math.abs(scrollDifference) < 4) {
         navbarInfoTickingRef.current = false;
+
         return;
       }
 
       if (scrollDifference > 0) {
-        // Scroller ned
         setShowSecondaryInfo(false);
       } else {
-        // Scroller opp
         setShowSecondaryInfo(true);
       }
 
@@ -62,9 +70,12 @@ const Navbar = () => {
     };
 
     const handleNavbarInfoScroll = () => {
-      if (navbarInfoTickingRef.current) return;
+      if (navbarInfoTickingRef.current) {
+        return;
+      }
 
       navbarInfoTickingRef.current = true;
+
       window.requestAnimationFrame(updateNavbarInfo);
     };
 
@@ -81,10 +92,12 @@ const Navbar = () => {
     if (!isProjectDetailPage) {
       setShowProjectTitle(false);
       setIsProjectTitleHovered(false);
+
       return;
     }
 
     setShowProjectTitle(true);
+
     lastScrollYRef.current = window.scrollY;
 
     const updateScrollDirection = () => {
@@ -94,13 +107,16 @@ const Navbar = () => {
 
       if (currentScrollY <= 20) {
         setShowProjectTitle(true);
+
         lastScrollYRef.current = currentScrollY;
         projectTitleTickingRef.current = false;
+
         return;
       }
 
       if (Math.abs(scrollDifference) < 5) {
         projectTitleTickingRef.current = false;
+
         return;
       }
 
@@ -116,9 +132,12 @@ const Navbar = () => {
     };
 
     const handleProjectTitleScroll = () => {
-      if (projectTitleTickingRef.current) return;
+      if (projectTitleTickingRef.current) {
+        return;
+      }
 
       projectTitleTickingRef.current = true;
+
       window.requestAnimationFrame(updateScrollDirection);
     };
 
@@ -134,6 +153,7 @@ const Navbar = () => {
   const handleCloseProject = () => {
     if (window.history.length > 1) {
       router.back();
+
       return;
     }
 
@@ -169,8 +189,41 @@ const Navbar = () => {
   }`;
 
   return (
-    <div className="fixed top-0 z-[99] py-4 hidden w-full bg-transparent lg:block">
-      <div className="z-50 flex w-full items-start justify-between px-20 py-3 text-[10px] xl:text-[14px] font-extrabold text-color">
+    <motion.nav
+      initial={false}
+      animate={
+        shouldShowNavbar
+          ? {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+            }
+          : {
+              opacity: 0,
+              y: -12,
+              filter: "blur(5px)",
+            }
+      }
+      transition={{
+        duration: 0.8,
+        delay: isHomePage && introExited ? 0.08 : 0,
+        ease: PROJECT_EASE,
+      }}
+      style={{
+        pointerEvents: shouldShowNavbar ? "auto" : "none",
+      }}
+      className="
+        fixed
+        top-0
+        z-[99]
+        hidden
+        w-full
+        bg-transparent
+        py-4
+        lg:block
+      "
+    >
+      <div className="text-color z-50 flex w-full items-start justify-between px-20 py-3 text-[10px] font-extrabold xl:text-[14px]">
         <div className="h-full w-full">
           <div className="flex items-start justify-between">
             <motion.div
@@ -182,7 +235,7 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <p className="m-0 leading-tight uppercase">
+              <p className="m-0 uppercase leading-tight">
                 Name / Rustam Kerimov
               </p>
             </motion.div>
@@ -197,7 +250,7 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <p className="m-0 leading-tight uppercase">
+              <p className="m-0 uppercase leading-tight">
                 Occupation / Graphic designer
               </p>
             </motion.div>
@@ -212,7 +265,7 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <p className="m-0 leading-tight uppercase">
+              <p className="m-0 uppercase leading-tight">
                 Location / Oslo, Norway
               </p>
             </motion.div>
@@ -402,7 +455,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.nav>
   );
 };
 

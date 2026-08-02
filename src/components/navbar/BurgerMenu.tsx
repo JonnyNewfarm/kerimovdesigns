@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+
 import TransitionLink from "../TransitionLink";
+
+const MENU_EASE = [0.76, 0, 0.24, 1] as const;
+const REVEAL_EASE = [0.22, 1, 0.36, 1] as const;
 
 const menuLinks = [
   {
@@ -23,7 +27,7 @@ const menuLinks = [
   },
 ];
 
-const BurgerMenu = () => {
+export default function BurgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [instantClose, setInstantClose] = useState(false);
 
@@ -34,91 +38,200 @@ const BurgerMenu = () => {
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
-    if (previousPathname.current !== pathname) {
-      setInstantClose(true);
-      setIsOpen(false);
-      previousPathname.current = pathname;
+    if (previousPathname.current === pathname) return;
 
-      requestAnimationFrame(() => {
-        setInstantClose(false);
-      });
-    }
+    setInstantClose(true);
+    setIsOpen(false);
+    previousPathname.current = pathname;
+
+    const frame = requestAnimationFrame(() => {
+      setInstantClose(false);
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, [pathname]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+
       if (
         isOpen &&
         menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
         buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
+        !menuRef.current.contains(target) &&
+        !buttonRef.current.contains(target)
       ) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    const previousOverflow = document.body.style.overflow;
 
     if (isOpen) {
       document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = "";
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
 
+  const isActiveLink = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    return pathname.startsWith(href);
+  };
+
   return (
     <>
-      <button
+      <motion.button
         ref={buttonRef}
-        onClick={() => setIsOpen((prev) => !prev)}
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
         aria-label={isOpen ? "Close menu" : "Open menu"}
         aria-expanded={isOpen}
-        className="relative z-[70] flex items-center gap-x-3 text-sm uppercase tracking-[0.2em] text-color"
-      >
-        <span className="relative p-2">
-          <span
-            className={`w-2.5 absolute top-1/2 -translate-y-1/2 transition-transform ease-in-out  block h-[1.5px] bg-[#ecdfcc] ${isOpen ? "rotate-45 w-3" : ""}`}
-          />{" "}
-          <span />
-          <span
-            className={`w-2.5 absolute top-1/2 -translate-y-1/2 transition-transform ease-in-out   block h-[1.5px] bg-[#ecdfcc] ${isOpen ? "-rotate-45 w-3" : ""}`}
-          />{" "}
-          <span />
-        </span>
-        <span className="font-semibold">{isOpen ? "Close" : "Menu"}</span>
-      </button>
-
-      <motion.div
+        aria-controls="mobile-navigation"
         initial={false}
-        animate={{
-          opacity: isOpen ? 1 : 0,
-          pointerEvents: isOpen ? "auto" : "none",
-        }}
-        transition={{
-          duration: instantClose ? 0 : 0.35,
-          ease: "easeInOut",
-        }}
-        className="fixed inset-0 z-40 bg-black/45 backdrop-blur-sm"
-      />
+        animate={isOpen ? "open" : "closed"}
+        className="
+          relative
+          z-[70]
+          flex
+          cursor-pointer
+          items-center
+          gap-3
+          text-[11px]
+          font-medium
+          uppercase
+          tracking-[0.18em]
+          text-[#ecdfcc]
+          lg:hidden
+        "
+      >
+        <span className="relative flex h-5 w-5 items-center justify-center">
+          <motion.span
+            variants={{
+              closed: {
+                rotate: 0,
+                width: 11,
+              },
+              open: {
+                rotate: 45,
+                width: 15,
+              },
+            }}
+            transition={{
+              duration: 0.5,
+              ease: MENU_EASE,
+            }}
+            className="absolute h-px bg-current"
+          />
+
+          <motion.span
+            variants={{
+              closed: {
+                rotate: 0,
+                width: 11,
+              },
+              open: {
+                rotate: -45,
+                width: 15,
+              },
+            }}
+            transition={{
+              duration: 0.5,
+              ease: MENU_EASE,
+            }}
+            className="absolute h-px bg-current"
+          />
+        </span>
+
+        <span className="relative h-[1.2em] overflow-hidden">
+          <motion.span
+            animate={{
+              y: isOpen ? "-50%" : "0%",
+            }}
+            transition={{
+              duration: 0.5,
+              ease: MENU_EASE,
+            }}
+            className="flex flex-col"
+          >
+            <span className="h-[1.2em] leading-[1.2em]">Menu</span>
+            <span className="h-[1.2em] leading-[1.2em]">Close</span>
+          </motion.span>
+        </span>
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{
+              opacity: 0,
+              transition: {
+                duration: instantClose ? 0 : 0.35,
+                ease: MENU_EASE,
+              },
+            }}
+            transition={{
+              duration: 0.4,
+              ease: MENU_EASE,
+            }}
+            className="
+              fixed
+              inset-0
+              z-40
+              bg-black/45
+              backdrop-blur-sm
+              md:hidden
+            "
+          />
+        )}
+      </AnimatePresence>
 
       <motion.div
         ref={menuRef}
+        id="mobile-navigation"
         initial={false}
         animate={{
           y: isOpen ? "0%" : "-100%",
-          opacity: 1,
         }}
         transition={{
-          duration: instantClose ? 0 : 0.65,
-          ease: [0.76, 0, 0.24, 1],
+          duration: instantClose ? 0 : isOpen ? 0.8 : 0.65,
+          ease: MENU_EASE,
         }}
-        className="fixed inset-0 z-50 flex min-h-screen flex-col bg-dark px-6 pb-10 pt-28 text-color"
+        aria-hidden={!isOpen}
+        className="
+          fixed
+          inset-0
+          z-50
+          flex
+          min-h-dvh
+          flex-col
+          overflow-hidden
+          bg-[#161310]
+          px-6
+          pb-8
+          pt-28
+          text-[#ecdfcc]
+          lg:hidden
+        "
         style={{
           pointerEvents: isOpen ? "auto" : "none",
         }}
@@ -127,52 +240,83 @@ const BurgerMenu = () => {
           initial={false}
           animate={{
             opacity: isOpen ? 1 : 0,
-            y: isOpen ? 0 : 18,
+            y: isOpen ? 0 : 16,
           }}
           transition={{
-            duration: instantClose ? 0 : 0.4,
-            delay: isOpen ? 0.2 : 0,
-            ease: [0.22, 1, 0.36, 1],
+            duration: instantClose ? 0 : 0.55,
+            delay: isOpen ? 0.18 : 0,
+            ease: REVEAL_EASE,
           }}
-          className="mb-4  pb-6"
+          className="
+            mb-8
+            flex
+            items-end
+            justify-between
+            border-b
+            border-white/10
+            pb-5
+          "
         >
-          <h2 className="text-3xl font-black uppercase leading-[0.9] tracking-[-0.05em]">
+          <p className="text-[10px] uppercase tracking-[0.24em] text-[#ecdfcc]/80">
             Navigation
-          </h2>
+          </p>
         </motion.div>
 
-        <div className="flex flex-1 flex-col justify-between">
-          <nav className="flex flex-col border-t border-white/10">
-            {menuLinks.map((link, index) => (
-              <motion.div
-                key={link.href}
-                initial={false}
-                animate={{
-                  opacity: isOpen ? 1 : 0,
-                  y: isOpen ? 0 : 20,
-                }}
-                transition={{
-                  duration: instantClose ? 0 : 0.4,
-                  delay: isOpen ? 0.25 + index * 0.08 : 0,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                <TransitionLink
-                  href={link.href}
-                  transitionLabel={link.transitionLabel}
-                  direction="right"
-                  className="flex items-center justify-between border-b border-white/10 py-6"
-                >
-                  <span className="text-2xl uppercase leading-none tracking-[-0.04em]">
-                    {link.label}
-                  </span>
+        <div className="flex flex-1 flex-col">
+          <nav className="flex flex-col">
+            {menuLinks.map((link, index) => {
+              const active = isActiveLink(link.href);
 
-                  <span className="text-xs uppercase tracking-[0.18em] text-white/35">
-                    0{index + 1}
-                  </span>
-                </TransitionLink>
-              </motion.div>
-            ))}
+              return (
+                <motion.div
+                  key={link.href}
+                  initial={false}
+                  animate={{
+                    opacity: isOpen ? 1 : 0,
+                    y: isOpen ? 0 : 28,
+                  }}
+                  transition={{
+                    duration: instantClose ? 0 : 0.6,
+                    delay: isOpen ? 0.24 + index * 0.08 : 0,
+                    ease: REVEAL_EASE,
+                  }}
+                >
+                  <TransitionLink
+                    href={link.href}
+                    transitionLabel={link.transitionLabel}
+                    direction="right"
+                    className="
+                      relative
+                      flex
+                      min-h-[96px]
+                      items-center
+                      justify-between
+                      border-b
+                      border-white/10
+                      py-5
+                    "
+                  >
+                    <span>
+                      <span
+                        className="
+                          text-[clamp(2rem,9vw,2.6rem)]
+                          font-medium
+                          uppercase
+                          leading-[0.85]
+                          tracking-[-0.035em]
+                        "
+                      >
+                        {link.label}
+                      </span>
+                    </span>
+
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-[#ecdfcc]/30">
+                      0{index + 1}
+                    </span>
+                  </TransitionLink>
+                </motion.div>
+              );
+            })}
           </nav>
 
           <motion.div
@@ -182,17 +326,17 @@ const BurgerMenu = () => {
               y: isOpen ? 0 : 18,
             }}
             transition={{
-              duration: instantClose ? 0 : 0.4,
-              delay: isOpen ? 0.45 : 0,
-              ease: [0.22, 1, 0.36, 1],
+              duration: instantClose ? 0 : 0.55,
+              delay: isOpen ? 0.5 : 0,
+              ease: REVEAL_EASE,
             }}
-            className="mt-12 border-t border-white/10 pt-6"
+            className="mt-auto border-t border-white/10 pt-6"
           >
-            <p className="mb-2 text-[10px] uppercase tracking-[0.24em] text-white/40">
+            <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-[#ecdfcc]/35">
               Studio
             </p>
 
-            <p className="max-w-[260px] text-sm leading-relaxed text-white/65">
+            <p className="max-w-[290px] text-sm leading-[1.55] text-[#ecdfcc]/60">
               Graphic design, digital experiences and selected creative
               development.
             </p>
@@ -201,6 +345,4 @@ const BurgerMenu = () => {
       </motion.div>
     </>
   );
-};
-
-export default BurgerMenu;
+}

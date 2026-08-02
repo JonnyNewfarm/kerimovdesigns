@@ -464,7 +464,7 @@ const ProjectArticle = memo(function ProjectArticle({
   );
 });
 
-export default function AnimDisplay() {
+export default function AnimAndVisualDisplay() {
   const sectionRef = useRef<HTMLElement | null>(null);
 
   const latestPointerRef = useRef({
