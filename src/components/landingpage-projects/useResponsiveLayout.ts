@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import type { LayoutMode } from "./projectTypes";
 
-import { getBreakpointWidth } from "./projectUtils";
+import { getBreakpointWidth } from "./projectutils";
 
 export default function useResponsiveLayout() {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(null);
