@@ -1,12 +1,12 @@
 export const revalidate = 60;
 
-import MyProjects from "@/components/MyProjects";
 import SmoothScroll from "@/components/SmoothScroll";
 import { getProjects } from "./actions";
 import { getLatestProject } from "./actions";
 import AnimDisplay from "@/components/AnimDisplay";
 import ServicesReveal from "@/components/ServicesReveal";
 import CubeHero from "@/components/hero/CubeHero";
+import LandingPageProjects from "@/components/landingpage-projects/LandingPageProjects";
 
 export default async function Home() {
   const projects = await getProjects();
@@ -18,7 +18,7 @@ export default async function Home() {
         <CubeHero title={latestProject?.title!} href={latestProject?.id!} />
         <ServicesReveal />
 
-        <MyProjects projects={projects} />
+        <LandingPageProjects projects={projects} />
 
         <AnimDisplay />
       </div>

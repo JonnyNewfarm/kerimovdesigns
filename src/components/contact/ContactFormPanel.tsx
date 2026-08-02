@@ -199,38 +199,76 @@ export default function ContactFormPanel({
                     ease: contactEase,
                   }}
                   className="
-                    group
-                    relative
-                    flex
-                    h-11
-                    w-11
-                    shrink-0
-                    cursor-pointer
-                    items-center
-                    justify-center
-                    overflow-hidden
-                    rounded-full
-                    border
-                    border-[#ecdfcc]/35
-                    text-xl
-                    hover:border-[#667a6c]
-                  "
+    group
+    relative
+    flex
+    h-11
+    w-11
+    shrink-0
+    cursor-pointer
+    items-center
+    justify-center
+    overflow-hidden
+    rounded-full
+    border
+    border-white/30
+    transition-colors
+    duration-500
+
+  "
                 >
                   <span
                     className="
-                      absolute
-                      inset-0
-                      origin-bottom
-                      scale-y-0
+      absolute
+      inset-0
+      origin-bottom
+      scale-y-0
                       bg-[#667a6c]
-                      transition-transform
-                      duration-500
-                      ease-[cubic-bezier(0.76,0,0.24,1)]
-                      group-hover:scale-y-100
-                    "
+      transition-transform
+      duration-500
+      ease-[cubic-bezier(0.76,0,0.24,1)]
+      group-hover:scale-y-100
+    "
                   />
 
-                  <span className="relative z-10">×</span>
+                  <span className="relative z-10 block h-4 w-4">
+                    <span
+                      className="
+        absolute
+        left-1/2
+        top-1/2
+        h-px
+        w-4
+        -translate-x-1/2
+        -translate-y-1/2
+        bg-current
+        transition-transform
+        duration-500
+        ease-[cubic-bezier(0.76,0,0.24,1)]
+        group-hover:rotate-45
+      "
+                    />
+
+                    <span
+                      className="
+        absolute
+        left-1/2
+        top-1/2
+        h-px
+        w-4
+        -translate-x-1/2
+        -translate-y-1/2
+        rotate-0
+        scale-x-0
+        bg-current
+        transition-transform
+        duration-500
+        ease-[cubic-bezier(0.76,0,0.24,1)]
+        group-hover:-rotate-45
+        group-hover:scale-x-100
+      "
+                    />
+                  </span>
                 </motion.button>
               </div>
 

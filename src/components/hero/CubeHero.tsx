@@ -329,162 +329,115 @@ export default function Index({ href, title }: IndexProps) {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={false}
-          animate={
-            introDone
-              ? {
-                  opacity: 1,
-                  x: 0,
-                  y: 0,
-                }
-              : {
-                  opacity: 0,
-                  x: -30,
-                  y: 20,
-                }
-          }
-          transition={{
-            duration: 0.9,
-            delay: introDone ? 0.15 : 0,
-            ease,
-          }}
-          className="
-            pointer-events-none
-            absolute
-            bottom-[calc(1.5rem+100vh-100dvh)]
-            left-6
-            z-10
-            text-left
-            transition-[bottom]
-            duration-200
-            ease-out
-            md:bottom-10
-            md:left-10
-            md:translate-x-0
-            lg:left-14
-          "
-        >
-          {introDone && (
-            <div
-              className="
-                relative
-                hidden
-                pt-6
-                lg:block
-              "
-            >
-              <p
-                className="
-                  absolute
-                  right-0
-                  top-0
-                  text-sm
-                "
-              >
-                2026
-              </p>
-
-              <TextReveal
-                as="h1"
-                mode="words"
-                viewport={false}
-                delay={0.05}
-                className="
-                  satoshi-black
-                  relative
-                  leading-[0.95]
-                  tracking-[-0.02em]
-                  text-color
-                  lg:text-5xl
-                "
-              >
-                Portfolio
-              </TextReveal>
-            </div>
-          )}
-        </motion.div>
-
-        <motion.div
-          initial={false}
-          animate={
-            introDone
-              ? {
-                  opacity: 1,
-                  x: 0,
-                  y: 0,
-                }
-              : {
-                  opacity: 0,
-                  x: 30,
-                  y: 20,
-                }
-          }
-          transition={{
-            duration: 0.9,
-            delay: introDone ? 0.2 : 0,
-            ease,
-          }}
+        <div
           className="
             absolute
             bottom-6
-            right-6
+            left-0
+            right-0
             z-10
-            text-right
-            text-[10px]
-            sm:flex
-            sm:flex-col
-            sm:gap-y-2
+            px-6
             md:bottom-10
-            md:right-10
-            lg:right-14
-            lg:flex
-            lg:flex-row
-            lg:gap-x-22
-            xl:gap-x-34
-            xl:text-[14px]
+            md:px-10
+            lg:px-20
           "
         >
-          {introDone && (
-            <>
-              <div
-                className="
-                  flex
-                  flex-row
-                  items-center
-                  gap-x-1
-                  text-[12px]
-                  md:text-[10px]
-                  xl:text-[14px]
-                "
-              >
-                <TextReveal
+          <div
+            className="
+              flex
+              w-full
+              items-end
+              justify-between
+            "
+          >
+            <motion.div
+              initial={false}
+              animate={
+                introDone
+                  ? {
+                      opacity: 1,
+                      x: 0,
+                      y: 0,
+                    }
+                  : {
+                      opacity: 0,
+                      x: -30,
+                      y: 20,
+                    }
+              }
+              transition={{
+                duration: 0.9,
+                delay: introDone ? 0.15 : 0,
+                ease,
+              }}
+              className="
+                pointer-events-none
+                hidden
+                text-left
+                lg:block
+              "
+            >
+              {introDone && (
+                <div
                   className="
-                    satoshi-black
-                    leading-none
-                    tracking-[-0.02em]
-                    text-color
-                  "
-                >
-                  Latest Project
-                </TextReveal>
-
-                <TextReveal className="">/</TextReveal>
-
-                <TransitionLink
-                  className="
-                    group
                     relative
-                    -mb-1.5
+                    pt-6
                   "
-                  href={`/project/${href}`}
-                  transitionLabel={title}
                 >
                   <TextReveal
-                    as="span"
+                    as="h1"
                     mode="words"
                     viewport={false}
-                    delay={0.16}
+                    delay={0.05}
+                    className="
+                      satoshi-black
+                      relative
+                      whitespace-nowrap
+                      leading-[0.95]
+                      tracking-[-0.02em]
+                      text-color
+                      lg:text-4xl
+                    "
+                  >
+                    Portfolio / 2026
+                  </TextReveal>
+                </div>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={false}
+              animate={
+                introDone
+                  ? {
+                      opacity: 1,
+                      x: 0,
+                      y: 0,
+                    }
+                  : {
+                      opacity: 0,
+                      x: 30,
+                      y: 20,
+                    }
+              }
+              transition={{
+                duration: 0.9,
+                delay: introDone ? 0.2 : 0,
+                ease,
+              }}
+              className="
+                flex
+                items-center
+                gap-x-1
+                whitespace-nowrap
+                text-[12px]
+                md:text-[10px]
+                xl:text-[14px]
+              "
+            >
+              {introDone && (
+                <>
+                  <TextReveal
                     className="
                       satoshi-black
                       leading-none
@@ -492,85 +445,170 @@ export default function Index({ href, title }: IndexProps) {
                       text-color
                     "
                   >
-                    {title}
+                    Latest Project
                   </TextReveal>
 
-                  <span
+                  <TextReveal>/</TextReveal>
+
+                  <TransitionLink
                     className="
-                      pointer-events-none
-                      absolute
-                      bottom-1
-                      left-0
-                      h-px
-                      w-full
-                      overflow-hidden
+                      group
+                      relative
+                      -mb-1.5
                     "
+                    href={`/project/${href}`}
+                    transitionLabel={title}
                   >
+                    <TextReveal
+                      as="span"
+                      mode="words"
+                      viewport={false}
+                      delay={0.16}
+                      className="
+                        satoshi-black
+                        leading-none
+                        tracking-[-0.02em]
+                        text-color
+                      "
+                    >
+                      {title}
+                    </TextReveal>
+
                     <span
                       className="
+                        pointer-events-none
                         absolute
-                        inset-0
-                        origin-right
-                        scale-x-100
-                        bg-current
-                        transition-transform
-                        duration-500
-                        ease-[cubic-bezier(0.76,0,0.24,1)]
-                        group-hover:scale-x-0
+                        bottom-1
+                        left-0
+                        h-px
+                        w-full
+                        overflow-hidden
                       "
-                    />
+                    >
+                      <span
+                        className="
+                          absolute
+                          inset-0
+                          origin-right
+                          scale-x-100
+                          bg-current
+                          transition-transform
+                          duration-500
+                          ease-[cubic-bezier(0.76,0,0.24,1)]
+                          group-hover:scale-x-0
+                        "
+                      />
 
-                    <span
-                      className="
-                        absolute
-                        inset-0
-                        origin-left
-                        scale-x-0
-                        bg-current
-                        transition-transform
-                        duration-500
-                        delay-0
-                        ease-[cubic-bezier(0.76,0,0.24,1)]
-                        group-hover:scale-x-100
-                        group-hover:delay-[180ms]
-                      "
-                    />
-                  </span>
-                </TransitionLink>
-              </div>
+                      <span
+                        className="
+                          absolute
+                          inset-0
+                          origin-left
+                          scale-x-0
+                          bg-current
+                          transition-transform
+                          duration-500
+                          delay-0
+                          ease-[cubic-bezier(0.76,0,0.24,1)]
+                          group-hover:scale-x-100
+                          group-hover:delay-[180ms]
+                        "
+                      />
+                    </span>
+                  </TransitionLink>
+                </>
+              )}
+            </motion.div>
 
-              <TextReveal
-                as="p"
-                mode="words"
-                viewport={false}
-                delay={0.16}
-                className="
-                  satoshi-black
-                  hidden
-                  leading-none
-                  tracking-[-0.02em]
-                  text-color
-                  lg:block
-                "
-              >
-                Status / Open for work
-              </TextReveal>
+            <motion.div
+              initial={false}
+              animate={
+                introDone
+                  ? {
+                      opacity: 1,
+                      x: 0,
+                      y: 0,
+                    }
+                  : {
+                      opacity: 0,
+                      x: 30,
+                      y: 20,
+                    }
+              }
+              transition={{
+                duration: 0.9,
+                delay: introDone ? 0.2 : 0,
+                ease,
+              }}
+              className="
+                hidden
+                text-[10px]
+                lg:block
+                xl:text-[14px]
+              "
+            >
+              {introDone && (
+                <TextReveal
+                  as="p"
+                  mode="words"
+                  viewport={false}
+                  delay={0.16}
+                  className="
+                    satoshi-black
+                    whitespace-nowrap
+                    leading-none
+                    tracking-[-0.02em]
+                    text-color
+                  "
+                >
+                  Status / Open for work
+                </TextReveal>
+              )}
+            </motion.div>
 
-              <p
-                className="
-                  satoshi-black
-                  hidden
-                  leading-none
-                  tracking-[-0.02em]
-                  text-color
-                  md:block
-                "
-              >
-                <LocalTime />
-              </p>
-            </>
-          )}
-        </motion.div>
+            <motion.div
+              initial={false}
+              animate={
+                introDone
+                  ? {
+                      opacity: 1,
+                      x: 0,
+                      y: 0,
+                    }
+                  : {
+                      opacity: 0,
+                      x: 30,
+                      y: 20,
+                    }
+              }
+              transition={{
+                duration: 0.9,
+                delay: introDone ? 0.2 : 0,
+                ease,
+              }}
+              className="
+                hidden
+                text-[10px]
+                lg:block
+                xl:text-[14px]
+              "
+            >
+              {introDone && (
+                <p
+                  className="
+                    satoshi-black
+                    whitespace-nowrap
+                    leading-none
+                    tracking-[-0.02em]
+                    text-color
+                  "
+                >
+                  <LocalTime />
+                </p>
+              )}
+            </motion.div>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

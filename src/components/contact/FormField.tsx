@@ -12,8 +12,13 @@ type FormFieldProps = {
   label: string;
   type: "text" | "email";
   placeholder: string;
+  value: string;
+  error?: string;
   required?: boolean;
   delay?: number;
+  autoComplete?: string;
+  onChangeAction: (value: string) => void;
+  onBlurAction: () => void;
 };
 
 export default function FormField({
@@ -22,9 +27,16 @@ export default function FormField({
   label,
   type,
   placeholder,
+  value,
+  error,
   required = true,
   delay = 0,
+  autoComplete,
+  onChangeAction,
+  onBlurAction,
 }: FormFieldProps) {
+  const errorId = `${id}-error`;
+
   return (
     <div>
       <TextReveal
@@ -43,14 +55,19 @@ export default function FormField({
         "
       >
         {label}
+        {!required ? " / Optional" : ""}
       </TextReveal>
 
       <motion.input
         id={id}
         name={name}
         type={type}
+        value={value}
         required={required}
         placeholder={placeholder}
+        autoComplete={autoComplete}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
         initial={{
           opacity: 0,
           y: 18,
@@ -64,10 +81,13 @@ export default function FormField({
           duration: 0.75,
           ease: contactEase,
         }}
-        className="
+        onChange={(event) => {
+          onChangeAction(event.target.value);
+        }}
+        onBlur={onBlurAction}
+        className={`
           w-full
           border-b
-          border-[#ecdfcc]/35
           bg-transparent
           pb-5
           text-2xl
@@ -76,10 +96,43 @@ export default function FormField({
           transition-colors
           duration-300
           placeholder:text-[#ecdfcc]/30
-          focus:border-[#ecdfcc]
           md:text-4xl
-        "
+          ${
+            error
+              ? "border-red-400 focus:border-red-400"
+              : "border-[#ecdfcc]/35 focus:border-[#ecdfcc]"
+          }
+        `}
       />
+
+      <div className="min-h-6 pt-2">
+        {error ? (
+          <motion.p
+            id={errorId}
+            role="alert"
+            initial={{
+              opacity: 0,
+              y: -4,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.3,
+              ease: contactEase,
+            }}
+            className="
+              text-[11px]
+              uppercase
+              tracking-[0.08em]
+              text-red-400
+            "
+          >
+            {error}
+          </motion.p>
+        ) : null}
+      </div>
     </div>
   );
 }

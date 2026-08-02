@@ -33,52 +33,48 @@ export default function ProjectGalleryItem({
   onOpenAction,
   onLoadAction,
 }: ProjectGalleryItemProps) {
-  const imageNumber = String(index + 1).padStart(2, "0");
-
   return (
     <div className={`flex w-full ${layout.row}`}>
-      <MagneticComp>
-        <motion.div
-          layoutId={`project-image-${index}`}
-          className={`
-            group
-            relative
-            w-full
-            ${layout.size}
-            ${layout.offset}
-          `}
-          onMouseEnter={() => {
-            if (!isActive) {
-              onHoverAction(index);
-            }
-          }}
-          onMouseLeave={() => {
-            if (!isActive) {
-              onHoverAction(null);
-            }
-          }}
-          animate={{
-            opacity: shouldBlur && !isActive ? 0.45 : 1,
-          }}
-          style={{
-            pointerEvents: isActive ? "none" : "auto",
-
-            visibility: isActive ? "hidden" : "visible",
-          }}
-          transition={{
-            opacity: {
-              duration: 0.35,
-              ease: projectEase,
-            },
-
-            layout: {
-              duration: 0.75,
-              ease: projectLayoutEase,
-            },
-          }}
-        >
+      <motion.div
+        layoutId={`project-image-${index}`}
+        className={`
+          relative
+          w-full
+          ${layout.size}
+          ${layout.offset}
+        `}
+        animate={{
+          opacity: shouldBlur && !isActive ? 0.45 : 1,
+        }}
+        style={{
+          pointerEvents: isActive ? "none" : "auto",
+          visibility: isActive ? "hidden" : "visible",
+          willChange: "transform",
+        }}
+        transition={{
+          opacity: {
+            duration: 0.35,
+            ease: projectEase,
+          },
+          layout: {
+            duration: 0.75,
+            ease: projectLayoutEase,
+          },
+        }}
+      >
+        <MagneticComp>
           <motion.div
-            className="relative"
+            className="group relative w-full"
+            onMouseEnter={() => {
+              if (!isActive) {
+                onHoverAction(index);
+              }
+            }}
+            onMouseLeave={() => {
+              if (!isActive) {
+                onHoverAction(null);
+              }
+            }}
             animate={{
               filter:
                 shouldBlur && !isActive
@@ -98,9 +94,11 @@ export default function ProjectGalleryItem({
               height={dimensions?.height || 450}
               sizes="(max-width: 768px) 80vw, 520px"
               priority={index === 0}
+              draggable={false}
               className={`
                 h-auto
                 w-full
+                select-none
                 transition-opacity
                 duration-700
                 ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -119,12 +117,17 @@ export default function ProjectGalleryItem({
                 });
               }}
               onClick={() => {
+                if (!isLoaded) {
+                  return;
+                }
+
                 onOpenAction(index);
               }}
             />
 
             {!isLoaded ? (
               <div
+                aria-hidden="true"
                 className="
                   pointer-events-none
                   absolute
@@ -132,7 +135,6 @@ export default function ProjectGalleryItem({
                   overflow-hidden
                   bg-white/[0.035]
                 "
-                aria-hidden="true"
               >
                 <div
                   className="
@@ -145,55 +147,11 @@ export default function ProjectGalleryItem({
                     to-white/[0.02]
                   "
                 />
-
-                <span
-                  className="
-                    absolute
-                    left-3
-                    top-3
-                    font-mono
-                    text-[9px]
-                    uppercase
-                    tracking-[0.2em]
-                    text-white/30
-                    sm:left-4
-                    sm:top-4
-                    sm:text-[10px]
-                  "
-                >
-                  {imageNumber}
-                </span>
               </div>
             ) : null}
           </motion.div>
-
-          <div
-            className="
-              pointer-events-none
-              absolute
-              left-4
-              top-4
-              opacity-0
-              transition
-              duration-500
-              group-hover:opacity-100
-            "
-          >
-            <span
-              className="
-                font-mono
-                text-[11px]
-                uppercase
-                tracking-[0.25em]
-                text-white
-                mix-blend-difference
-              "
-            >
-              {imageNumber}
-            </span>
-          </div>
-        </motion.div>
-      </MagneticComp>
+        </MagneticComp>
+      </motion.div>
     </div>
   );
 }

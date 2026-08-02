@@ -82,28 +82,6 @@ export default function ProjectImageModal({
                 object-contain
               "
             />
-
-            <div
-              className="
-                pointer-events-none
-                absolute
-                left-4
-                top-4
-              "
-            >
-              <span
-                className="
-                  font-mono
-                  text-[11px]
-                  uppercase
-                  tracking-[0.25em]
-                  text-white
-                  mix-blend-difference
-                "
-              >
-                {String(activeIndex + 1).padStart(2, "0")}
-              </span>
-            </div>
           </motion.div>
         </motion.div>
       ) : null}
