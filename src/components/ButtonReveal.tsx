@@ -1,13 +1,13 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { motion, type HTMLMotionProps, type Variants } from "framer-motion";
+import type { ReactNode } from "react";
 
 const defaultEase = [0.22, 1, 0.36, 1] as const;
 
 type ButtonRevealProps = Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  "children"
+  HTMLMotionProps<"button">,
+  "children" | "initial" | "animate" | "variants"
 > & {
   children: ReactNode;
   contentClassName?: string;
