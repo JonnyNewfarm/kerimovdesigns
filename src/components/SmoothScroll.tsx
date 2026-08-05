@@ -1,45 +1,57 @@
 "use client";
 
-import { useEffect, useContext, createContext, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import Lenis from "lenis";
 
 const SmoothScrollerContext = createContext<Lenis | null>(null);
 
-export const useSmoothScroller = () => useContext(SmoothScrollerContext);
+export const useSmoothScroller = () => {
+  return useContext(SmoothScrollerContext);
+};
 
-export default function SmoothScroll({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [lenisRef, setLenis] = useState<Lenis | null>(null);
+type SmoothScrollProps = {
+  children: ReactNode;
+};
+
+export default function SmoothScroll({ children }: SmoothScrollProps) {
+  const [lenis, setLenis] = useState<Lenis | null>(null);
 
   useEffect(() => {
     const scroller = new Lenis({
-      duration: 1.1,
+      duration: 0.9,
+      easing: (time) => Math.min(1, 1.001 - Math.pow(2, -10 * time)),
       smoothWheel: true,
       syncTouch: false,
+      wheelMultiplier: 0.9,
+      touchMultiplier: 1,
     });
 
     setLenis(scroller);
 
-    let frameId = 0;
+    let frameId: number;
 
     const raf = (time: number) => {
       scroller.raf(time);
-      frameId = requestAnimationFrame(raf);
+      frameId = window.requestAnimationFrame(raf);
     };
 
-    frameId = requestAnimationFrame(raf);
+    frameId = window.requestAnimationFrame(raf);
 
     return () => {
-      cancelAnimationFrame(frameId);
+      window.cancelAnimationFrame(frameId);
       scroller.destroy();
+      setLenis(null);
     };
   }, []);
 
   return (
-    <SmoothScrollerContext.Provider value={lenisRef}>
+    <SmoothScrollerContext.Provider value={lenis}>
       {children}
     </SmoothScrollerContext.Provider>
   );

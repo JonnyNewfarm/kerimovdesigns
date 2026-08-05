@@ -64,8 +64,7 @@ export default function ProjectGallery({
     }
   };
 
-  const showPauseIcon = isVideoPlaying && isVideoHovered;
-
+  const showPauseIcon = isVideoPlaying;
   return (
     <div
       className="
