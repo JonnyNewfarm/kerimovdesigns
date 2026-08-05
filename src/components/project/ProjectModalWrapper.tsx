@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { LayoutGroup } from "framer-motion";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 import ProjectGallery from "./ProjectGallery";
 import ProjectHeader from "./ProjectHeader";
@@ -26,7 +26,6 @@ export default function ProjectModalWrapper({
   project,
 }: ProjectModalWrapperProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const [loadedImages, setLoadedImages] = useState<LoadedImages>({});
@@ -44,7 +43,6 @@ export default function ProjectModalWrapper({
   }, [project.tags]);
 
   const imageCount = images.length;
-
   const videoCount = project.srcVideo ? 1 : 0;
 
   const activeImage =
@@ -55,10 +53,12 @@ export default function ProjectModalWrapper({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setActiveIndex(null);
-        setHoveredIndex(null);
+      if (event.key !== "Escape") {
+        return;
       }
+
+      setActiveIndex(null);
+      setHoveredIndex(null);
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -68,9 +68,46 @@ export default function ProjectModalWrapper({
     };
   }, []);
 
+  useLayoutEffect(() => {
+    if (activeIndex === null) {
+      return;
+    }
+
+    const html = document.documentElement;
+    const body = document.body;
+
+    const previousHtmlOverflow = html.style.overflow;
+    const previousHtmlOverscrollBehavior = html.style.overscrollBehavior;
+
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyOverscrollBehavior = body.style.overscrollBehavior;
+
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+
+    html.style.overflow = "hidden";
+    html.style.overscrollBehavior = "none";
+
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "none";
+
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    return () => {
+      html.style.overflow = previousHtmlOverflow;
+      html.style.overscrollBehavior = previousHtmlOverscrollBehavior;
+
+      body.style.overflow = previousBodyOverflow;
+      body.style.overscrollBehavior = previousBodyOverscrollBehavior;
+
+      body.style.paddingRight = "";
+    };
+  }, [activeIndex]);
+
   const openImage = (index: number) => {
     const isLoaded = loadedImages[index];
-
     const dimensions = imageDimensions[index];
 
     if (!isLoaded || !dimensions) {

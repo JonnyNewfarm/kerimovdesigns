@@ -140,7 +140,7 @@ export default function ProjectPreview({
                   key={`preview-image-${project.id}`}
                   initial={{
                     opacity: 0,
-                    scale: 1.025,
+                    scale: 0.9,
                     filter: "blur(10px)",
                   }}
                   animate={{
@@ -149,7 +149,7 @@ export default function ProjectPreview({
                     filter: "blur(0px)",
                   }}
                   transition={{
-                    duration: 0.9,
+                    duration: 1.4,
                     ease: imageRevealEase,
                   }}
                   className="absolute inset-0"

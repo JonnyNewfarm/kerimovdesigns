@@ -1,5 +1,13 @@
-import Image from "next/image";
+"use client";
+
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
+import {
+  useEffect,
+  useRef,
+  type MouseEvent,
+  type WheelEvent as ReactWheelEvent,
+} from "react";
 
 import { projectLayoutEase } from "./projectAnimations";
 import type { ImageDimensions } from "./projectTypes";
@@ -12,6 +20,8 @@ type ProjectImageModalProps = {
   onCloseAction: () => void;
 };
 
+const CLOSE_ANIMATION_DURATION = 750;
+
 export default function ProjectImageModal({
   title,
   activeIndex,
@@ -19,38 +29,100 @@ export default function ProjectImageModal({
   dimensions,
   onCloseAction,
 }: ProjectImageModalProps) {
+  const isClosingRef = useRef(false);
+  const scrollBlockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (activeIndex !== null) {
+      isClosingRef.current = false;
+    }
+  }, [activeIndex]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollBlockTimeoutRef.current) {
+        clearTimeout(scrollBlockTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const closeImage = () => {
+    if (isClosingRef.current) {
+      return;
+    }
+
+    isClosingRef.current = true;
+    onCloseAction();
+  };
+
+  const closeFromScroll = (event: ReactWheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (isClosingRef.current) {
+      return;
+    }
+
+    isClosingRef.current = true;
+
+    const blockMomentumScroll = (wheelEvent: WheelEvent) => {
+      wheelEvent.preventDefault();
+    };
+
+    window.addEventListener("wheel", blockMomentumScroll, {
+      passive: false,
+      capture: true,
+    });
+
+    onCloseAction();
+
+    scrollBlockTimeoutRef.current = setTimeout(() => {
+      window.removeEventListener("wheel", blockMomentumScroll, {
+        capture: true,
+      });
+
+      scrollBlockTimeoutRef.current = null;
+    }, CLOSE_ANIMATION_DURATION);
+  };
+
+  const handleImageClick = (event: MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    closeImage();
+  };
+
   return (
     <AnimatePresence mode="sync">
       {activeIndex !== null && src ? (
         <motion.div
           key="fullscreen-image"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Fullscreen image: ${title}`}
           className="
-            pointer-events-none
             fixed
             inset-0
             z-50
             flex
             items-center
             justify-center
+            overflow-hidden
+            overscroll-none
           "
-          initial={{
-            opacity: 1,
-          }}
-          animate={{
-            opacity: 1,
-          }}
-          exit={{
-            opacity: 1,
-          }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 1 }}
+          onClick={closeImage}
+          onWheel={closeFromScroll}
         >
           <motion.div
             layoutId={`project-image-${activeIndex}`}
             className="
-              pointer-events-auto
               relative
               cursor-pointer
             "
-            onClick={onCloseAction}
+            onClick={handleImageClick}
             style={{
               willChange: "transform",
               transform: "translateZ(0)",
