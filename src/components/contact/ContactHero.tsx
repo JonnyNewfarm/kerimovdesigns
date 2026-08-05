@@ -84,7 +84,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                   duration={0.65}
                   y="100%"
                   className="
-                    mb-3
+                    mb-1.5
                     text-[11px]
                     uppercase
                     opacity-50
@@ -175,7 +175,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                   duration={0.65}
                   y="100%"
                   className="
-                    mb-3
+                    mb-1.5
                     text-[11px]
                     uppercase
                     opacity-50
@@ -336,7 +336,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                         inset-0
                         origin-bottom
                         scale-y-0
-                        bg-[#667a6c]
+                        bg-[#48544c]
                         transition-transform
                         duration-500
                         ease-[cubic-bezier(0.76,0,0.24,1)]

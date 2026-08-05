@@ -11,6 +11,7 @@ import {
   contactEase,
   panelVariants,
 } from "./contactAnimations";
+import MagneticComp from "../MagneticComp";
 
 type ContactFormPanelProps = {
   isOpen: boolean;
@@ -120,9 +121,8 @@ export default function ContactFormPanel({
               pt-5
               text-[#ecdfcc]
 
-              [scrollbar-width:thin]
-              [&::-webkit-scrollbar]:w-[2px]
-              [&::-webkit-scrollbar-thumb]:bg-black
+              [scrollbar-width:none]
+             
               [&::-webkit-scrollbar-track]:bg-transparent
 
               md:px-12
@@ -181,95 +181,97 @@ export default function ContactFormPanel({
                   </h2>
                 </div>
 
-                <motion.button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Close contact form"
-                  initial={{
-                    opacity: 0,
-                    scale: 0.8,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                  }}
-                  transition={{
-                    delay: 0.48,
-                    duration: 0.65,
-                    ease: contactEase,
-                  }}
-                  className="
-    group
-    relative
-    flex
-    h-11
-    w-11
-    shrink-0
-    cursor-pointer
-    items-center
-    justify-center
-    overflow-hidden
-    rounded-full
-    border
-    border-white/30
-    transition-colors
-    duration-500
-
-  "
-                >
-                  <span
+                <MagneticComp>
+                  <motion.button
+                    type="button"
+                    onClick={onClose}
+                    aria-label="Close contact form"
+                    initial={{
+                      opacity: 0,
+                      scale: 0.8,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                    }}
+                    transition={{
+                      delay: 0.48,
+                      duration: 0.65,
+                      ease: contactEase,
+                    }}
                     className="
-      absolute
-      inset-0
-      origin-bottom
-      scale-y-0
-                      bg-[#667a6c]
-      transition-transform
+      group
+      relative
+      flex
+      h-11
+      w-11
+      shrink-0
+      cursor-pointer
+      items-center
+      justify-center
+      overflow-hidden
+      rounded-full
+      border
+      border-[#ecdfcc]/40
+      transition-colors
       duration-500
-      ease-[cubic-bezier(0.76,0,0.24,1)]
-      group-hover:scale-y-100
+      hover:border-[#25221d]
     "
-                  />
-
-                  <span className="relative z-10 block h-4 w-4">
+                  >
                     <span
                       className="
         absolute
-        left-1/2
-        top-1/2
-        h-px
-        w-4
-        -translate-x-1/2
-        -translate-y-1/2
-        bg-current
+        inset-0
+        origin-bottom
+        scale-y-0
+        
+        bg-[#25221d]
         transition-transform
         duration-500
         ease-[cubic-bezier(0.76,0,0.24,1)]
-        group-hover:rotate-45
+        group-hover:scale-y-100
       "
                     />
 
-                    <span
-                      className="
-        absolute
-        left-1/2
-        top-1/2
-        h-px
-        w-4
-        -translate-x-1/2
-        -translate-y-1/2
-        rotate-0
-        scale-x-0
-        bg-current
-        transition-transform
-        duration-500
-        ease-[cubic-bezier(0.76,0,0.24,1)]
-        group-hover:-rotate-45
-        group-hover:scale-x-100
-      "
-                    />
-                  </span>
-                </motion.button>
+                    <span className="relative z-10 block h-4 w-4">
+                      <span
+                        className="
+          absolute
+          left-1/2
+          top-1/2
+          h-px
+          w-4
+          -translate-x-1/2
+          -translate-y-1/2
+          bg-current
+          transition-transform
+          duration-500
+          ease-[cubic-bezier(0.76,0,0.24,1)]
+          group-hover:rotate-45
+        "
+                      />
+
+                      <span
+                        className="
+          absolute
+          left-1/2
+          top-1/2
+          h-px
+          w-4
+          -translate-x-1/2
+          -translate-y-1/2
+          scale-x-0
+          bg-current
+          transition-transform
+          duration-500
+          ease-[cubic-bezier(0.76,0,0.24,1)]
+          group-hover:-rotate-45
+          group-hover:scale-x-100
+        "
+                      />
+                    </span>
+                  </motion.button>
+                </MagneticComp>
               </div>
 
               <ContactForm />

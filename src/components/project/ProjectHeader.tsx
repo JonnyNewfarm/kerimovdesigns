@@ -31,7 +31,7 @@ export default function ProjectHeader({
         w-full
         max-w-[1600px]
         px-7
-        pt-32
+        pt-[24vh]
         sm:px-14
       "
     >
@@ -57,11 +57,11 @@ export default function ProjectHeader({
                 font-black
                 uppercase
                 leading-[0.9]
-                tracking-[-0.025em]
+                tracking-[-0.020em]
                 text-color
                 sm:text-7xl
                 md:text-7xl
-                xl:text-[9rem]
+                xl:text-[5.8rem]
               "
             >
               {getTitleLines(title)}

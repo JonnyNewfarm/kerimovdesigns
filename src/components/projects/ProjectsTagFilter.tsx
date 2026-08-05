@@ -3,6 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import TextReveal from "../TextReveal";
+import ButtonReveal from "../ButtonReveal";
 
 interface ProjectsTagFilterProps {
   availableTags?: string[];
@@ -111,10 +113,10 @@ const ProjectsTagFilter = ({
   };
 
   return (
-    <div ref={containerRef} className="relative z-20 w-full md:z-[200]">
+    <div ref={containerRef} className="relative w-full">
       {" "}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <button
+        <ButtonReveal
           type="button"
           onClick={clearTags}
           aria-pressed={selectedTags.length === 0}
@@ -128,7 +130,7 @@ const ProjectsTagFilter = ({
           {selectedTags.length === 0 ? (
             <span className="absolute -bottom-1 left-0 h-px w-full bg-white" />
           ) : null}
-        </button>
+        </ButtonReveal>
 
         {visibleTags.map((tag) => {
           const isSelected = selectedTags.includes(tag);
@@ -138,7 +140,7 @@ const ProjectsTagFilter = ({
 
           return (
             <div key={tag} className="relative  inline-flex items-center">
-              <button
+              <ButtonReveal
                 type="button"
                 onClick={() => toggleTag(tag)}
                 disabled={isDisabled}
@@ -152,7 +154,7 @@ const ProjectsTagFilter = ({
                 }`}
               >
                 {formatTag(tag)}
-              </button>
+              </ButtonReveal>
 
               {isSelected && (
                 <motion.button
@@ -201,13 +203,28 @@ const ProjectsTagFilter = ({
           );
         })}
 
-        {availableTags.length > VISIBLE_TAGS_COUNT ? (
-          <button
+        {availableTags.length > VISIBLE_TAGS_COUNT && (
+          <ButtonReveal
             type="button"
             onClick={() => setIsOpen((current) => !current)}
             aria-expanded={isOpen}
             aria-controls="all-project-tags"
-            className="group inline-flex cursor-pointer items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/55 transition-colors duration-300 hover:text-white sm:text-xs"
+            className="
+      group
+      inline-flex
+      cursor-pointer
+      items-center
+      gap-2
+      text-[10px]
+      font-black
+      uppercase
+      tracking-[0.2em]
+      text-white/55
+      transition-colors
+      duration-300
+      hover:text-white
+      sm:text-xs
+    "
           >
             <span>View all tags</span>
 
@@ -219,14 +236,14 @@ const ProjectsTagFilter = ({
                 duration: 0.35,
                 ease,
               }}
-              className="relative h-3 w-3 shrink-0"
+              className="relative ml-2 h-3 w-3 "
               aria-hidden="true"
             >
-              <span className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-current" />
-              <span className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-current" />
+              <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 bg-white/70" />
+              <span className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-white/70" />
             </motion.span>
-          </button>
-        ) : null}
+          </ButtonReveal>
+        )}
       </div>
       <AnimatePresence initial={false}>
         {isOpen ? (
@@ -349,8 +366,8 @@ const ProjectsTagFilter = ({
                           </svg>
                         ) : null}
                       </span>
-
-                      <span
+                      <TextReveal
+                        key={tag}
                         className={`truncate py-2 text-[12px] font-black uppercase tracking-[0.18em] transition-colors duration-300 sm:text-md ${
                           isSelected
                             ? "text-white"
@@ -358,9 +375,14 @@ const ProjectsTagFilter = ({
                               ? "text-white/40"
                               : "text-white/70 group-hover:text-white"
                         }`}
+                        as="span"
+                        viewport={false}
+                        delay={0.006}
+                        duration={0.8}
+                        y="100%"
                       >
                         {formatTag(tag)}
-                      </span>
+                      </TextReveal>
                     </motion.button>
                   );
                 })}

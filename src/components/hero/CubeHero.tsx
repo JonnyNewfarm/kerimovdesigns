@@ -1,5 +1,8 @@
 "use client";
 
+import { OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import React, {
   Suspense,
   useCallback,
@@ -7,23 +10,34 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Canvas } from "@react-three/fiber";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { OrbitControls } from "@react-three/drei";
 
-import HeroIntro from "./HeroIntro";
-import TextReveal from "@/components/TextReveal";
-import TransitionLink from "../TransitionLink";
-import LocalTime from "../LocalTime";
 import { usePageTransition } from "@/components/ClientPageTransitionWrapper";
+
+import { useHeroIntro } from "../HeroIntroContext";
+import LinkReveal from "../LinkReveal";
+import LocalTime from "../LocalTime";
+import TextReveal from "../TextReveal";
+import TransitionLink from "../TransitionLink";
 
 import Cube from "./Cube";
 import CubeLoadingPlaceholder from "./CubeLoadingPlaceholder";
+import HeroIntro from "./HeroIntro";
 import useIsMdUp from "./hooks/UseIsMdup";
 import useScrollLock from "./hooks/UseScrollLock";
-import { useHeroIntro } from "../HeroIntroContext";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+
+const BOTTOM_REVEAL_DELAYS = {
+  time: 0.05,
+  status: 0.17,
+  latestProject: 0.29,
+  portfolio: 0.41,
+} as const;
+
+const BOTTOM_REVEAL_DURATION = 0.75;
+const BOTTOM_REVEAL_STAGGER = 0.025;
+const BOTTOM_REVEAL_Y = "115%";
+const BOTTOM_REVEAL_ROTATE = 1.5;
 
 type IndexProps = {
   title: string;
@@ -36,32 +50,24 @@ export default function Index({ href, title }: IndexProps) {
   const isDraggingCubeRef = useRef(false);
 
   const clientWorkTransitionRef = useRef<HTMLAnchorElement | null>(null);
-
   const contactTransitionRef = useRef<HTMLAnchorElement | null>(null);
-
   const visualIdentityTransitionRef = useRef<HTMLAnchorElement | null>(null);
-
   const animationTransitionRef = useRef<HTMLAnchorElement | null>(null);
-
   const logoTransitionRef = useRef<HTMLAnchorElement | null>(null);
 
   const isMdUp = useIsMdUp();
 
   const [hasMounted, setHasMounted] = useState(false);
-
   const [introChecked, setIntroChecked] = useState(false);
-
   const [shouldUseIntro, setShouldUseIntro] = useState(false);
-
   const [introDone, setIntroDone] = useState(false);
-
   const [cubeReady, setCubeReady] = useState(false);
-
-  const { isTransitioning } = usePageTransition();
-
   const [allowCanvasMount, setAllowCanvasMount] = useState(false);
 
+  const { isTransitioning } = usePageTransition();
   const { introExited, setIntroExited } = useHeroIntro();
+  const canRevealBottomLine = introExited && cubeReady;
+
   useEffect(() => {
     if (isTransitioning) {
       return;
@@ -87,10 +93,14 @@ export default function Index({ href, title }: IndexProps) {
     offset: ["start start", "end end"],
   });
 
-  const progress = useTransform(scrollYProgress, [0, 1], [0, 4.4]);
+  const cubeProgress = useTransform(scrollYProgress, [0, 1], [0, 4.4]);
 
-  const smoothProgress = useSpring(progress, {
-    damping: 20,
+  const cubeScrollProgress = useSpring(cubeProgress, {
+    stiffness: 140,
+    damping: 27,
+    mass: 0.15,
+    restDelta: 0.001,
+    restSpeed: 0.01,
   });
 
   useEffect(() => {
@@ -114,19 +124,18 @@ export default function Index({ href, title }: IndexProps) {
 
     const timer = window.setTimeout(() => {
       sessionStorage.setItem("hero-intro-seen", "true");
-
       setIntroDone(true);
     }, 3200);
 
     return () => {
       window.clearTimeout(timer);
     };
-  }, []);
+  }, [setIntroExited]);
 
   return (
     <motion.div
       ref={container}
-      className="min-h-[150vh] md:min-h-[150dvh]"
+      className="min-h-[230vh] md:min-h-[230dvh]"
       initial={false}
       animate={{
         opacity: 1,
@@ -313,7 +322,7 @@ export default function Index({ href, title }: IndexProps) {
                 <Suspense fallback={null}>
                   <Cube
                     key="cube-ready"
-                    scrollProgress={smoothProgress}
+                    scrollProgress={cubeScrollProgress}
                     introDone={introDone}
                     isDraggingCubeRef={isDraggingCubeRef}
                     contactTransitionRef={contactTransitionRef}
@@ -332,7 +341,7 @@ export default function Index({ href, title }: IndexProps) {
         <motion.div
           initial={false}
           animate={
-            introExited
+            canRevealBottomLine
               ? {
                   opacity: 1,
                   y: 0,
@@ -346,185 +355,217 @@ export default function Index({ href, title }: IndexProps) {
           }
           transition={{
             duration: 0.8,
-            delay: introExited ? 0.08 : 0,
             ease: [0.76, 0, 0.24, 1],
           }}
           style={{
-            pointerEvents: introExited ? "auto" : "none",
+            pointerEvents: canRevealBottomLine ? "auto" : "none",
           }}
           className="
-    absolute
-    bottom-6
-    left-0
-    right-0
-    z-10
-    px-6
-    md:bottom-10
-    md:px-10
-    lg:px-20
-  "
+            absolute
+            bottom-6
+            left-0
+            right-0
+            z-10
+            px-6
+            md:bottom-10
+            md:px-10
+            lg:px-20
+          "
         >
           <div
             className="
-      flex
-      w-full
-      items-end
-      justify-between
-    "
+              flex
+              w-full
+              items-end
+              justify-between
+            "
           >
             <div
               className="
-        pointer-events-none
-        hidden
-        text-left
-        lg:block
-      "
+                pointer-events-none
+                hidden
+                text-left
+                lg:block
+              "
             >
               <div className="relative pt-6">
-                <h1
+                <TextReveal
+                  as="h1"
+                  mode="words"
+                  viewport={false}
+                  active={canRevealBottomLine}
+                  delay={BOTTOM_REVEAL_DELAYS.portfolio}
+                  stagger={BOTTOM_REVEAL_STAGGER}
+                  duration={BOTTOM_REVEAL_DURATION}
+                  y={BOTTOM_REVEAL_Y}
+                  rotate={BOTTOM_REVEAL_ROTATE}
                   className="
-            satoshi-black
-            relative
-            whitespace-nowrap
-            leading-[0.95]
-            tracking-[-0.02em]
-            text-color
-            lg:text-4xl
-          "
+                    satoshi-black
+                    relative
+                    whitespace-nowrap
+                    leading-[0.95]
+                    tracking-[-0.02em]
+                    text-color
+                    lg:text-4xl
+                  "
                 >
                   Portfolio / 2026
-                </h1>
+                </TextReveal>
               </div>
             </div>
 
-            <div
-              className="
-        flex
-        items-center
-        gap-x-1
-        whitespace-nowrap
-        text-[12px]
-        md:text-[10px]
-        xl:text-[14px]
-      "
+            <LinkReveal
+              active={canRevealBottomLine}
+              delay={BOTTOM_REVEAL_DELAYS.latestProject}
+              duration={BOTTOM_REVEAL_DURATION}
+              y={BOTTOM_REVEAL_Y}
+              rotate={BOTTOM_REVEAL_ROTATE}
             >
-              <span
+              <div
                 className="
-          satoshi-black
-          leading-none
-          tracking-[-0.02em]
-          text-color
-        "
-              >
-                Latest Project
-              </span>
-
-              <span>/</span>
-
-              <TransitionLink
-                className="
-          group
-          relative
-          
-        "
-                href={`/project/${href}`}
-                transitionLabel={title}
+                  flex
+                  items-center
+                  gap-x-1
+                  whitespace-nowrap
+                  text-[12px]
+                  md:text-[10px]
+                  xl:text-[14px]
+                "
               >
                 <span
                   className="
-            satoshi-black
-            leading-none
-            tracking-[-0.02em]
-            text-color
-          "
+                    satoshi-black
+                    leading-none
+                    tracking-[-0.02em]
+                    text-color
+                  "
                 >
-                  {title}
+                  Latest Project
                 </span>
 
-                <span
+                <span>/</span>
+
+                <TransitionLink
                   className="
-            pointer-events-none
-            absolute
-            bottom-0
-            left-0
-            h-px
-            w-full
-            overflow-hidden
-          "
+                    group
+                    relative
+                  "
+                  href={`/project/${href}`}
+                  transitionLabel={title}
                 >
                   <span
                     className="
-              absolute
-              inset-0
-              origin-right
-              scale-x-100
-              bg-current
-              transition-transform
-              duration-500
-              ease-[cubic-bezier(0.76,0,0.24,1)]
-              group-hover:scale-x-0
-            "
-                  />
+                      satoshi-black
+                      leading-none
+                      tracking-[-0.02em]
+                      text-color
+                    "
+                  >
+                    {title}
+                  </span>
 
                   <span
                     className="
-              absolute
-              inset-0
-              origin-left
-              scale-x-0
-              bg-current
-              transition-transform
-              duration-500
-              delay-0
-              ease-[cubic-bezier(0.76,0,0.24,1)]
-              group-hover:scale-x-100
-              group-hover:delay-[180ms]
-            "
-                  />
-                </span>
-              </TransitionLink>
-            </div>
+                      pointer-events-none
+                      absolute
+                      bottom-0
+                      left-0
+                      h-px
+                      w-full
+                      overflow-hidden
+                    "
+                  >
+                    <span
+                      className="
+                        absolute
+                        inset-0
+                        origin-right
+                        scale-x-100
+                        bg-current
+                        transition-transform
+                        duration-500
+                        ease-[cubic-bezier(0.76,0,0.24,1)]
+                        group-hover:scale-x-0
+                      "
+                    />
+
+                    <span
+                      className="
+                        absolute
+                        inset-0
+                        origin-left
+                        scale-x-0
+                        bg-current
+                        transition-transform
+                        duration-500
+                        delay-0
+                        ease-[cubic-bezier(0.76,0,0.24,1)]
+                        group-hover:scale-x-100
+                        group-hover:delay-[180ms]
+                      "
+                    />
+                  </span>
+                </TransitionLink>
+              </div>
+            </LinkReveal>
 
             <div
               className="
-        hidden
-        text-[10px]
-        lg:block
-        xl:text-[14px]
-      "
+                hidden
+                text-[10px]
+                lg:block
+                xl:text-[14px]
+              "
             >
-              <p
+              <TextReveal
+                as="p"
+                mode="words"
+                viewport={false}
+                active={canRevealBottomLine}
+                delay={BOTTOM_REVEAL_DELAYS.status}
+                stagger={BOTTOM_REVEAL_STAGGER}
+                duration={BOTTOM_REVEAL_DURATION}
+                y={BOTTOM_REVEAL_Y}
+                rotate={BOTTOM_REVEAL_ROTATE}
                 className="
-          satoshi-black
-          whitespace-nowrap
-          leading-none
-          tracking-[-0.02em]
-          text-color
-        "
+                  satoshi-black
+                  whitespace-nowrap
+                  leading-none
+                  tracking-[-0.02em]
+                  text-color
+                "
               >
                 Status / Open for work
-              </p>
+              </TextReveal>
             </div>
 
             <div
               className="
-        hidden
-        text-[10px]
-        lg:block
-        xl:text-[14px]
-      "
+                hidden
+                text-[10px]
+                lg:block
+                xl:text-[14px]
+              "
             >
-              <p
-                className="
-          satoshi-black
-          whitespace-nowrap
-          leading-none
-          tracking-[-0.02em]
-          text-color
-        "
+              <LinkReveal
+                active={canRevealBottomLine}
+                delay={BOTTOM_REVEAL_DELAYS.time}
+                duration={BOTTOM_REVEAL_DURATION}
+                y={BOTTOM_REVEAL_Y}
+                rotate={BOTTOM_REVEAL_ROTATE}
               >
-                <LocalTime />
-              </p>
+                <p
+                  className="
+                    satoshi-black
+                    whitespace-nowrap
+                    leading-none
+                    tracking-[-0.02em]
+                    text-color
+                  "
+                >
+                  <LocalTime />
+                </p>
+              </LinkReveal>
             </div>
           </div>
         </motion.div>

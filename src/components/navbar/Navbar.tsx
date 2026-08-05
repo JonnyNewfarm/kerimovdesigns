@@ -5,13 +5,24 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { useHeroIntro } from "../HeroIntroContext";
+import LinkReveal from "../LinkReveal";
 import { useProjectNav } from "../ProjectNavContext";
+import TextReveal from "../TextReveal";
 import TransitionLink from "../TransitionLink";
 import WaveLinkText from "../WaveLink";
 
 const PROJECT_EASE = [0.76, 0, 0.24, 1] as const;
 
 const INFO_HIDE_SCROLL = 80;
+
+const REVEAL_DELAYS = {
+  name: 0.05,
+  occupation: 0.17,
+  location: 0.29,
+  home: 0.41,
+  work: 0.49,
+  contact: 0.57,
+} as const;
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -31,10 +42,6 @@ const Navbar = () => {
   const isHomePage = pathname === "/";
   const isProjectDetailPage = pathname.startsWith("/project/");
 
-  /*
-   * På forsiden venter navbaren på at hero-introen er ferdig.
-   * På alle andre sider vises navbaren direkte, også etter refresh.
-   */
   const shouldShowNavbar = !isHomePage || introExited;
 
   useEffect(() => {
@@ -235,9 +242,20 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <p className="m-0 uppercase leading-tight">
+              <TextReveal
+                as="p"
+                mode="words"
+                viewport={false}
+                active={shouldShowNavbar}
+                delay={REVEAL_DELAYS.name}
+                stagger={0.025}
+                duration={0.75}
+                y="115%"
+                rotate={1.5}
+                className="m-0 uppercase leading-tight"
+              >
                 Name / Rustam Kerimov
-              </p>
+              </TextReveal>
             </motion.div>
 
             <motion.div
@@ -250,9 +268,20 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <p className="m-0 uppercase leading-tight">
+              <TextReveal
+                as="p"
+                mode="words"
+                viewport={false}
+                active={shouldShowNavbar}
+                delay={REVEAL_DELAYS.occupation}
+                stagger={0.025}
+                duration={0.75}
+                y="115%"
+                rotate={1.5}
+                className="m-0 uppercase leading-tight"
+              >
                 Occupation / Graphic designer
-              </p>
+              </TextReveal>
             </motion.div>
 
             <motion.div
@@ -265,29 +294,56 @@ const Navbar = () => {
               }}
               className={secondaryInfoClassName}
             >
-              <p className="m-0 uppercase leading-tight">
+              <TextReveal
+                as="p"
+                mode="words"
+                viewport={false}
+                active={shouldShowNavbar}
+                delay={REVEAL_DELAYS.location}
+                stagger={0.025}
+                duration={0.75}
+                y="115%"
+                rotate={1.5}
+                className="m-0 uppercase leading-tight"
+              >
                 Location / Oslo, Norway
-              </p>
+              </TextReveal>
             </motion.div>
 
             <div className="tracking-tighter">
               <div className="m-0 flex items-center gap-x-4 leading-tight">
-                <TransitionLink
-                  href="/"
-                  transitionLabel="Index"
-                  className={getLinkClassName("/")}
+                <LinkReveal
+                  active={shouldShowNavbar}
+                  delay={REVEAL_DELAYS.home}
+                  duration={0.75}
+                  y="115%"
+                  rotate={1.5}
                 >
-                  <WaveLinkText text="HOME" />
-                </TransitionLink>
+                  <TransitionLink
+                    href="/"
+                    transitionLabel="Index"
+                    className={getLinkClassName("/")}
+                  >
+                    <WaveLinkText text="HOME" />
+                  </TransitionLink>
+                </LinkReveal>
 
                 <div className="relative inline-block">
-                  <TransitionLink
-                    href="/projects"
-                    transitionLabel="Selected Work"
-                    className={getLinkClassName("/projects")}
+                  <LinkReveal
+                    active={shouldShowNavbar}
+                    delay={REVEAL_DELAYS.work}
+                    duration={0.75}
+                    y="115%"
+                    rotate={1.5}
                   >
-                    <WaveLinkText text="MY WORK" />
-                  </TransitionLink>
+                    <TransitionLink
+                      href="/projects"
+                      transitionLabel="Selected Work"
+                      className={getLinkClassName("/projects")}
+                    >
+                      <WaveLinkText text="MY WORK" />
+                    </TransitionLink>
+                  </LinkReveal>
 
                   <AnimatePresence initial={false}>
                     {isProjectDetailPage && projectTitle && (
@@ -443,13 +499,21 @@ const Navbar = () => {
                   </AnimatePresence>
                 </div>
 
-                <TransitionLink
-                  href="/contact"
-                  transitionLabel="Let's Collaborate"
-                  className={getLinkClassName("/contact")}
+                <LinkReveal
+                  active={shouldShowNavbar}
+                  delay={REVEAL_DELAYS.contact}
+                  duration={0.75}
+                  y="115%"
+                  rotate={1.5}
                 >
-                  <WaveLinkText text="CONTACT" />
-                </TransitionLink>
+                  <TransitionLink
+                    href="/contact"
+                    transitionLabel="Let's Collaborate"
+                    className={getLinkClassName("/contact")}
+                  >
+                    <WaveLinkText text="CONTACT" />
+                  </TransitionLink>
+                </LinkReveal>
               </div>
             </div>
           </div>

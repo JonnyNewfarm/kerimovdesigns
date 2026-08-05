@@ -147,9 +147,9 @@ ideas into visuals.`}
               as="p"
               mode="words"
               delay={0.05}
-              className="mb-1 text-color/35"
+              className="mb-1 text-color opacity-85 text-xs"
             >
-              Created by
+              Design / Code
             </TextReveal>
 
             <a
@@ -167,7 +167,7 @@ ideas into visuals.`}
               as="p"
               mode="words"
               delay={0.08}
-              className="mb-1 text-color/35"
+              className="mb-1 opacity-85 text-xs "
             >
               Email
             </TextReveal>
@@ -185,7 +185,7 @@ ideas into visuals.`}
               as="p"
               mode="words"
               delay={0.11}
-              className="mb-1 text-color/35"
+              className="mb-1 opacity-85 text-xs"
             >
               Local time
             </TextReveal>
@@ -198,7 +198,7 @@ ideas into visuals.`}
               as="p"
               mode="words"
               delay={0.14}
-              className="mb-1 text-color/35"
+              className="mb-1 opacity-85 text-xs"
             >
               Location
             </TextReveal>

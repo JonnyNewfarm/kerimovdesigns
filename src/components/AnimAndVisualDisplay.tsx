@@ -386,7 +386,8 @@ const ProjectArticle = memo(function ProjectArticle({
         delay={0.12}
         className="
           max-w-[1100px]
-          text-[14vw]
+          text-[10vw]
+          text-wrap
           font-black
           uppercase
           leading-[0.88]
@@ -419,7 +420,7 @@ const ProjectArticle = memo(function ProjectArticle({
           <p
             className="
               mb-2
-              text-xs
+              text-[12px]
               font-black
               uppercase
               tracking-[0.22em]
@@ -698,8 +699,8 @@ export default function AnimAndVisualDisplay() {
         <div className="mt-24 md:mt-32 lg:mt-40">
           <TextReveal
             as="h2"
-            mode="words"
-            delay={0.05}
+            mode="lines"
+            delay={0.01}
             className="
               max-w-[1300px]
               text-[12vw]

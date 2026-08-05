@@ -6,6 +6,7 @@ import TransitionLink from "@/components/TransitionLink";
 
 import type { ProjectListItem } from "./projectsTypes";
 import { PROJECTS_PER_VIEW, projectsEase } from "./projectUtils";
+import TextReveal from "../TextReveal";
 
 type ProjectsListProps = {
   projects: ProjectListItem[];
@@ -30,29 +31,29 @@ export default function ProjectsList({
 }: ProjectsListProps) {
   return (
     <div className="relative min-h-[390px] flex-1 overflow-hidden">
-      <AnimatePresence initial={false} mode="wait" custom={direction}>
+      <AnimatePresence mode="wait" custom={direction}>
         {hasProjects ? (
           <motion.div
             key={`projects-${activeTagsKey || "all"}-${pageIndex}`}
             custom={direction}
             initial={{
               opacity: 0,
-              x: direction === 1 ? 42 : -42,
-              filter: "blur(7px)",
+              y: 14,
+              filter: "blur(4px)",
             }}
             animate={{
               opacity: 1,
-              x: 0,
+              y: 0,
               filter: "blur(0px)",
             }}
             exit={{
               opacity: 0,
-              x: direction === 1 ? -28 : 28,
-              filter: "blur(7px)",
+              y: -10,
+              filter: "blur(3px)",
             }}
             transition={{
-              duration: 0.42,
-              ease: projectsEase,
+              duration: 0.65,
+              ease: [0.22, 1, 0.36, 1],
             }}
             className="absolute inset-0"
           >
@@ -70,31 +71,40 @@ export default function ProjectsList({
                     onSelectProject(realIndex);
                   }}
                   className="
-                    group
-                    inline-flex
-                    min-h-[78px]
-                    w-fit
-                    items-center
-                    py-5
-                    text-left
-                    transition-opacity
-                    duration-300
-                  "
+              group
+              inline-flex
+              min-h-[78px]
+              w-fit
+              items-center
+              py-5
+              text-left
+              transition-opacity
+              duration-300
+            "
                 >
                   <div className="flex min-w-0 items-start gap-4">
                     <span
                       className={`
-                        mt-1
-                        text-[10px]
-                        uppercase
-                        tracking-[0.22em]
-                        transition-all
-                        duration-300
-                        sm:text-xs
-                        ${isActive ? "text-white opacity-100" : "opacity-35"}
-                      `}
+                  mt-1
+                  text-[10px]
+                  uppercase
+                  tracking-[0.22em]
+                  transition-all
+                  duration-300
+                  sm:text-xs
+                  ${isActive ? "text-white opacity-100" : "opacity-35"}
+                `}
                     >
-                      {String(startIndex + realIndex + 1).padStart(2, "0")}
+                      <TextReveal
+                        key={`${project.id}-${pageIndex}-${activeTagsKey}-number`}
+                        as="span"
+                        viewport={false}
+                        delay={0.08 + index * 0.055}
+                        duration={0.55}
+                        y="75%"
+                      >
+                        {String(startIndex + realIndex + 1).padStart(2, "0")}
+                      </TextReveal>
                     </span>
 
                     <div className="min-w-0">
@@ -103,23 +113,32 @@ export default function ProjectsList({
                           onSelectProject(realIndex);
                         }}
                         className={`
-                          w-fit
-                          max-w-full
-                          truncate
-                          font-black
-                          uppercase
-                          leading-none
-                          tracking-[-0.045em]
-                          transition-all
-                          duration-500
-                          ${
-                            isActive
-                              ? "translate-x-3 text-[clamp(1.75rem,2.1vw,2.65rem)] text-white opacity-100"
-                              : "translate-x-0 text-[clamp(1.45rem,1.75vw,2.15rem)] text-white/45 opacity-80"
-                          }
-                        `}
+                    w-fit
+                    max-w-full
+                    truncate
+                    font-black
+                    uppercase
+                    leading-none
+                    tracking-[-0.045em]
+                    transition-all
+                    duration-500
+                    ${
+                      isActive
+                        ? "translate-x-3 text-[clamp(1.75rem,2.1vw,2.65rem)] text-white opacity-100"
+                        : "translate-x-0 text-[clamp(1.45rem,1.75vw,2.15rem)] text-white/45 opacity-80"
+                    }
+                  `}
                       >
-                        {project.title}
+                        <TextReveal
+                          key={`${project.id}-${pageIndex}-${activeTagsKey}-title`}
+                          as="span"
+                          viewport={false}
+                          delay={0.1 + index * 0.055}
+                          duration={0.7}
+                          y="85%"
+                        >
+                          {project.title}
+                        </TextReveal>
                       </h2>
                     </div>
                   </div>

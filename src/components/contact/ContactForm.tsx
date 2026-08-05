@@ -302,6 +302,7 @@ export default function ContactForm() {
             mb-4
             block
             text-[11px]
+            md:text-[16px]
             uppercase
             opacity-80
           "
@@ -349,7 +350,7 @@ export default function ContactForm() {
             md:text-4xl
             ${
               errors.message
-                ? "border-red-400 focus:border-red-400"
+                ? "border-[#d6493a] focus:border-[#d6493a]"
                 : "border-[#ecdfcc]/35 focus:border-[#ecdfcc]"
             }
           `}
@@ -376,7 +377,7 @@ export default function ContactForm() {
                 text-[11px]
                 uppercase
                 tracking-[0.08em]
-                text-red-400
+                text-[#d6493a]
               "
             >
               {errors.message}
@@ -421,7 +422,7 @@ export default function ContactForm() {
               py-4
               text-xl
               uppercase
-              hover:border-[#667a6c]
+              hover:border-[#4b503d]
             "
           >
             <span
@@ -430,7 +431,7 @@ export default function ContactForm() {
                 inset-0
                 origin-bottom
                 scale-y-0
-                bg-[#667a6c]
+                bg-[#25221D]
                 transition-transform
                 duration-500
                 ease-[cubic-bezier(0.76,0,0.24,1)]

@@ -76,21 +76,23 @@ export default function ProjectsSidebar({
           activeTags={activeTags}
         />
       </div>
-
       <TextReveal
         as="p"
         mode="words"
-        delay={0.05}
+        viewport={false}
+        delay={0.02}
+        duration={0.65}
+        y="80%"
         className="
-          mb-2
-          mt-5
-          text-[10px]
-          font-black
-          uppercase
-          tracking-[0.35em]
-          text-white/80
-          sm:text-xs
-        "
+    mb-2
+    mt-5
+    text-[10px]
+    font-black
+    uppercase
+    tracking-[0.35em]
+    text-white/80
+    sm:text-xs
+  "
       >
         Selected Work
       </TextReveal>

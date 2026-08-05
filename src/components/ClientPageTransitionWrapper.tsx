@@ -184,8 +184,7 @@ function CurvedOverlay({
     ? getLeaveDuration(isMobile)
     : getEnterDuration(isMobile);
 
-  const backgroundColor = variant === "projectDetails" ? "#4b4f47" : "#667a6c";
-
+  const backgroundColor = variant === "projectDetails" ? "#4b5249" : "#626b60";
   return (
     <motion.svg
       key={status}
@@ -226,8 +225,8 @@ function TransitionText({
   const labelLength = label.length;
 
   const fontVw = isMobile
-    ? Math.min(14, Math.max(7, 120 / Math.max(labelLength * 0.95, 7)))
-    : Math.min(13, Math.max(3.8, 96 / Math.max(labelLength * 0.95, 7)));
+    ? Math.min(10.5, Math.max(5.8, 92 / Math.max(labelLength, 8)))
+    : Math.min(9, Math.max(3.2, 78 / Math.max(labelLength, 8)));
 
   return (
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden px-4 md:px-8">
@@ -268,8 +267,8 @@ function TransitionText({
           className="m-0 text-left font-extrabold uppercase leading-[0.86] tracking-[-0.02em] text-white/85"
           style={{
             fontSize: isMobile
-              ? `clamp(32px, ${fontVw}vw, 86px)`
-              : `clamp(34px, ${fontVw}vw, 230px)`,
+              ? `clamp(24px, ${fontVw}vw, 84px)`
+              : `clamp(24px, ${fontVw}vw, 240px)`,
           }}
         >
           {label}

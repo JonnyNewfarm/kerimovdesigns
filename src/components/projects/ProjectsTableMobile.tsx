@@ -1,7 +1,13 @@
+"use client";
+
+import { motion } from "framer-motion";
 import Image from "next/image";
-import React, { ReactNode } from "react";
-import TransitionLink from "../TransitionLink";
+import type { ReactNode } from "react";
+
+import PageTransitionGate from "./PageTransitionGate";
 import ProjectTagFilter from "@/components/projects/ProjectsTagFilter";
+import TextReveal from "@/components/TextReveal";
+import TransitionLink from "../TransitionLink";
 
 type ProjectListItem = {
   id: string;
@@ -20,6 +26,9 @@ interface ProjectsTableMobileProps {
   availableTags?: string[];
   activeTags?: string[];
 }
+
+const revealEase = [0.22, 1, 0.36, 1] as const;
+
 const formatTag = (tag: string) => {
   return tag.replaceAll("-", " ");
 };
@@ -33,50 +42,154 @@ const ProjectsTableMobile = ({
 }: ProjectsTableMobileProps) => {
   return (
     <section className="min-h-screen bg-dark pb-24 text-color">
-      <div className="px-6 pt-28">
-        <h1 className="text-4xl font-black uppercase leading-[0.95] tracking-[-0.01em]">
-          Selected <br /> Work
-        </h1>
+      <PageTransitionGate className="min-h-screen">
+        <div className="px-6 pt-28">
+          <TextReveal
+            as="h1"
+            mode="words"
+            viewport={false}
+            delay={0.02}
+            duration={0.75}
+            y="90%"
+            className="
+              text-2xl
+              font-black
+              uppercase
+              leading-[0.95]
+              tracking-[-0.01em]
+            "
+          >
+            Selected Work
+          </TextReveal>
+          <TextReveal
+            as="p"
+            mode="words"
+            viewport={false}
+            delay={0.06}
+            duration={0.7}
+            y="80%"
+            className="
+    mt-1.5
+    max-w-[310px]
+    text-lg
+opacity-90
+    leading-[1.1]
+    text-color
+  "
+          >
+            A selection of recent projects and collaborations.
+          </TextReveal>
 
-        <div className="mt-9">
-          <ProjectTagFilter
-            availableTags={availableTags}
-            activeTags={activeTags}
-          />
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 10,
+              filter: "blur(4px)",
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+            }}
+            transition={{
+              delay: 0.08,
+              duration: 0.65,
+              ease: revealEase,
+            }}
+            className="relative z-30 mt-9"
+          >
+            <ProjectTagFilter
+              availableTags={availableTags}
+              activeTags={activeTags}
+            />
+          </motion.div>
         </div>
-      </div>
 
-      {projects.length ? (
-        <>
-          <div className="mt-15 flex flex-col gap-16 px-6">
-            {projects.map((project, index) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                number={startIndex + index + 1}
-                priority={index === 0}
-              />
-            ))}
-          </div>
+        {projects.length > 0 ? (
+          <>
+            <div className="mt-5 flex flex-col gap-16 px-6">
+              {projects.map((project, index) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  number={startIndex + index + 1}
+                  index={index}
+                  priority={index === 0}
+                />
+              ))}
+            </div>
 
-          {children ? <div className="mt-16 px-6 pt-8">{children}</div> : null}
-        </>
-      ) : (
-        <div className="flex min-h-[55vh] flex-col items-center justify-center gap-5 px-6 text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-white/50">
-            No projects found
-          </p>
+            {children ? (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: 16,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  delay: 0.18,
+                  duration: 0.65,
+                  ease: revealEase,
+                }}
+                className="mt-16 px-6 pt-8"
+              >
+                {children}
+              </motion.div>
+            ) : null}
+          </>
+        ) : (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 18,
+              filter: "blur(5px)",
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+            }}
+            transition={{
+              duration: 0.65,
+              ease: revealEase,
+            }}
+            className="
+              flex
+              min-h-[55vh]
+              flex-col
+              items-center
+              justify-center
+              gap-5
+              px-6
+              text-center
+            "
+          >
+            <p className="text-sm uppercase tracking-[0.2em] text-white/50">
+              No projects found
+            </p>
 
-          {activeTags.length > 0 ? (
-            <a
-              href="/projects"
-              className="border-b border-white/40 pb-1 text-xs uppercase tracking-[0.2em] text-white"
-            >
-              View all projects
-            </a>
-          ) : null}
-        </div>
-      )}
+            {activeTags.length > 0 ? (
+              <a
+                href="/projects"
+                className="
+                  border-b
+                  border-white/40
+                  pb-1
+                  text-xs
+                  uppercase
+                  tracking-[0.2em]
+                  text-white
+                "
+              >
+                View all projects
+              </a>
+            ) : null}
+          </motion.div>
+        )}
+      </PageTransitionGate>
     </section>
   );
 };
@@ -84,22 +197,68 @@ const ProjectsTableMobile = ({
 interface ProjectCardProps {
   project: ProjectListItem;
   number: number;
+  index: number;
   priority?: boolean;
 }
 
 const ProjectCard = ({
   project,
   number,
+  index,
   priority = false,
 }: ProjectCardProps) => {
+  const cardDelay = 0.08 + Math.min(index, 4) * 0.08;
+
   return (
-    <article className="flex flex-col">
+    <motion.article
+      initial={{
+        opacity: 0,
+        y: 24,
+        filter: "blur(6px)",
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+      }}
+      transition={{
+        delay: cardDelay,
+        duration: 0.75,
+        ease: revealEase,
+      }}
+      className="flex flex-col"
+    >
       <TransitionLink
         href={`/project/${project.id}`}
         transitionLabel={project.title}
         className="block"
       >
-        <div className="relative aspect-[4/3] w-full overflow-hidden border border-white/15 bg-white/5">
+        <motion.div
+          initial={{
+            opacity: 0,
+            scale: 1.025,
+            filter: "blur(8px)",
+          }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            filter: "blur(0px)",
+          }}
+          transition={{
+            delay: cardDelay,
+            duration: 0.85,
+            ease: revealEase,
+          }}
+          className="
+            relative
+            aspect-[4/3]
+            w-full
+            overflow-hidden
+            border
+            border-white/15
+            bg-white/5
+          "
+        >
           <Image
             src={project.src}
             alt={project.title}
@@ -109,29 +268,109 @@ const ProjectCard = ({
             sizes="(max-width: 767px) 100vw, 0px"
             className="object-cover"
           />
-        </div>
+        </motion.div>
       </TransitionLink>
 
       <div className="mt-4">
-        <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/35">
+        <TextReveal
+          as="p"
+          viewport={false}
+          delay={cardDelay + 0.04}
+          duration={0.55}
+          y="75%"
+          className="
+            mb-3
+            text-[10px]
+            uppercase
+            tracking-[0.28em]
+            text-white/35
+          "
+        >
           {String(number).padStart(2, "0")}
-        </p>
+        </TextReveal>
 
-        <h2 className="text-2xl uppercase leading-[0.95] tracking-[-0.04em]">
-          {project.title}
-        </h2>
+        <TransitionLink
+          href={`/project/${project.id}`}
+          transitionLabel={project.title}
+          className="inline-block"
+        >
+          <TextReveal
+            as="h2"
+            mode="words"
+            viewport={false}
+            delay={cardDelay + 0.07}
+            duration={0.7}
+            y="85%"
+            className="
+              text-2xl
+              uppercase
+              leading-[0.95]
+              tracking-[-0.04em]
+            "
+          >
+            {project.title}
+          </TextReveal>
+        </TransitionLink>
 
-        <div className="mt-6 flex items-start justify-between gap-6 border-t border-white/15 pt-4 text-xs uppercase tracking-[0.18em] text-white/55">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 10,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: cardDelay + 0.12,
+            duration: 0.6,
+            ease: revealEase,
+          }}
+          className="
+            mt-6
+            flex
+            items-start
+            justify-between
+            gap-6
+            border-t
+            border-white/15
+            pt-4
+            text-xs
+            uppercase
+            tracking-[0.18em]
+            text-white/55
+          "
+        >
           <div className="flex max-w-[60%] flex-wrap gap-x-3 gap-y-1">
-            {project.tags.map((tag) => (
-              <span key={tag}>{formatTag(tag)}</span>
+            {project.tags.map((tag, tagIndex) => (
+              <TextReveal
+                key={tag}
+                as="span"
+                viewport={false}
+                delay={cardDelay + 0.14 + tagIndex * 0.025}
+                duration={0.55}
+                y="75%"
+              >
+                {formatTag(tag)}
+              </TextReveal>
             ))}
           </div>
 
-          <span className="max-w-[40%] text-right">{project.tools ?? ""}</span>
-        </div>
+          {project.tools ? (
+            <TextReveal
+              as="span"
+              viewport={false}
+              delay={cardDelay + 0.16}
+              duration={0.55}
+              y="75%"
+              className="max-w-[40%] text-right"
+            >
+              {project.tools}
+            </TextReveal>
+          ) : null}
+        </motion.div>
       </div>
-    </article>
+    </motion.article>
   );
 };
 

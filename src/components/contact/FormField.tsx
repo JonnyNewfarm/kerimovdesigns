@@ -49,7 +49,8 @@ export default function FormField({
         className="
           mb-4
           block
-          text-[11px]
+          text-[12px]
+          md:text-[16px]
           uppercase
           opacity-90
         "
@@ -95,11 +96,11 @@ export default function FormField({
           outline-none
           transition-colors
           duration-300
-          placeholder:text-[#ecdfcc]/30
+          placeholder:text-[#ecdfcc]40
           md:text-4xl
           ${
             error
-              ? "border-red-400 focus:border-red-400"
+              ? "border-[#d6493a] focus:border-[#d6493a]"
               : "border-[#ecdfcc]/35 focus:border-[#ecdfcc]"
           }
         `}
@@ -126,7 +127,7 @@ export default function FormField({
               text-[11px]
               uppercase
               tracking-[0.08em]
-              text-red-400
+              text-[#d6493a]
             "
           >
             {error}

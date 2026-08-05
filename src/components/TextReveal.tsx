@@ -19,6 +19,7 @@ type TextRevealProps = {
   rotate?: number;
   blur?: number;
   viewport?: boolean;
+  active?: boolean;
   htmlFor?: string;
 };
 
@@ -36,6 +37,7 @@ export default function TextReveal({
   rotate,
   blur = 0,
   viewport = true,
+  active = true,
   htmlFor,
 }: TextRevealProps) {
   const MotionTag = motion[as] as any;
@@ -102,13 +104,15 @@ export default function TextReveal({
     },
   };
 
+  const controlledAnimation = active ? "visible" : "hidden";
+
   return (
     <MotionTag
       htmlFor={as === "label" ? htmlFor : undefined}
       variants={containerVariants}
       initial="hidden"
-      whileInView={viewport ? "visible" : undefined}
-      animate={!viewport ? "visible" : undefined}
+      animate={!viewport ? controlledAnimation : undefined}
+      whileInView={viewport && active ? "visible" : undefined}
       viewport={viewport ? { once, amount } : undefined}
       className={className}
     >
@@ -126,6 +130,7 @@ export default function TextReveal({
           >
             <motion.span variants={itemVariants} className="inline-block">
               {isSpaceChar ? "\u00A0" : item}
+
               {mode === "words" && index !== items.length - 1 ? "\u00A0" : null}
             </motion.span>
           </span>

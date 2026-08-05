@@ -22,6 +22,8 @@ type ProjectPreviewProps = {
   activeTagsKey: string;
 };
 
+const imageRevealEase = [0.22, 1, 0.36, 1] as const;
+
 export default function ProjectPreview({
   project,
   hasProjects,
@@ -81,7 +83,7 @@ export default function ProjectPreview({
         xl:col-span-8
       "
     >
-      <AnimatePresence initial={false} mode="wait">
+      <AnimatePresence mode="wait">
         {hasProjects && project ? (
           <motion.div
             key={`project-view-${activeTagsKey || "all"}`}
@@ -134,24 +136,43 @@ export default function ProjectPreview({
                 "
                 aria-label={`Open project ${project.title}`}
               >
-                <Image
-                  src={project.src}
-                  alt={project.title}
-                  fill
-                  priority
-                  sizes="
-                    (min-width: 1280px) 66vw,
-                    (min-width: 768px) 58vw,
-                    100vw
-                  "
-                  className="
-                    object-cover
-                    transition-transform
-                    duration-700
-                    ease-out
-                    group-hover:scale-[1.03]
-                  "
-                />
+                <motion.div
+                  key={`preview-image-${project.id}`}
+                  initial={{
+                    opacity: 0,
+                    scale: 1.025,
+                    filter: "blur(10px)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                    filter: "blur(0px)",
+                  }}
+                  transition={{
+                    duration: 0.9,
+                    ease: imageRevealEase,
+                  }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={project.src}
+                    alt={project.title}
+                    fill
+                    priority
+                    sizes="
+                      (min-width: 1280px) 66vw,
+                      (min-width: 768px) 58vw,
+                      100vw
+                    "
+                    className="
+                      object-cover
+                      transition-transform
+                      duration-700
+                      ease-out
+                      group-hover:scale-[1.03]
+                    "
+                  />
+                </motion.div>
 
                 <motion.div
                   aria-hidden="true"
@@ -251,7 +272,7 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
           <TextReveal
             as="p"
             mode="words"
-            delay={0}
+            delay={0.05}
             viewport={false}
             className="
               mb-3
@@ -273,9 +294,8 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
             <TextReveal
               as="h2"
               mode="words"
-              delay={0}
-              stagger={0.012}
-              duration={0.42}
+              delay={0.06}
+              duration={0.6}
               viewport={false}
               className="
                 max-w-[980px]
@@ -306,9 +326,13 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
             {project.tags.length > 0 ? (
               <ProjectMetadataItem label="Tags">
                 <div className="flex flex-wrap gap-x-3 gap-y-2">
-                  {project.tags.map((tag) => (
-                    <span
+                  {project.tags.map((tag, index) => (
+                    <TextReveal
                       key={tag}
+                      as="span"
+                      viewport={false}
+                      delay={0.06 + index * 0.025}
+                      duration={0.6}
                       className="
                         text-sm
                         uppercase
@@ -317,7 +341,7 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
                       "
                     >
                       {formatProjectTag(tag)}
-                    </span>
+                    </TextReveal>
                   ))}
                 </div>
               </ProjectMetadataItem>
@@ -325,7 +349,11 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
 
             {project.type ? (
               <ProjectMetadataItem label="Year">
-                <p
+                <TextReveal
+                  as="p"
+                  viewport={false}
+                  delay={0.1}
+                  duration={0.6}
                   className="
                     text-sm
                     uppercase
@@ -334,13 +362,17 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
                   "
                 >
                   {project.type}
-                </p>
+                </TextReveal>
               </ProjectMetadataItem>
             ) : null}
 
             {project.tools ? (
               <ProjectMetadataItem label="Tools">
-                <p
+                <TextReveal
+                  as="p"
+                  viewport={false}
+                  delay={0.12}
+                  duration={0.6}
                   className="
                     text-sm
                     uppercase
@@ -349,7 +381,7 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
                   "
                 >
                   {project.tools}
-                </p>
+                </TextReveal>
               </ProjectMetadataItem>
             ) : null}
           </div>
@@ -367,7 +399,11 @@ type ProjectMetadataItemProps = {
 function ProjectMetadataItem({ label, children }: ProjectMetadataItemProps) {
   return (
     <div>
-      <p
+      <TextReveal
+        as="p"
+        viewport={false}
+        delay={0.06}
+        duration={0.6}
         className="
           mb-2
           text-[10px]
@@ -379,9 +415,9 @@ function ProjectMetadataItem({ label, children }: ProjectMetadataItemProps) {
         "
       >
         {label}
-      </p>
+      </TextReveal>
 
-      {children}
+      <div>{children}</div>
     </div>
   );
 }

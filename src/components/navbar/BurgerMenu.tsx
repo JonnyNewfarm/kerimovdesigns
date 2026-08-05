@@ -109,7 +109,7 @@ export default function BurgerMenu() {
         animate={isOpen ? "open" : "closed"}
         className="
           relative
-          z-[70]
+          z-[100]
           flex
           cursor-pointer
           items-center

@@ -6,6 +6,7 @@ import ProjectPreview from "./ProjectPreview";
 import ProjectsSidebar from "./ProjectsSidebar";
 import type { ProjectListItem, ProjectsTableProps } from "./projectsTypes";
 import { PROJECTS_PER_VIEW } from "./projectUtils";
+import PageTransitionGate from "./PageTransitionGate";
 
 export default function ProjectsTable({
   projects,
@@ -144,11 +145,11 @@ export default function ProjectsTable({
     setPageIndex(nextPageIndex);
     setActiveIndex(nextActiveIndex);
   };
-
   return (
-    <section className="w-full bg-dark text-color">
-      <div
-        className="
+    <section className="min-h-screen w-full bg-dark text-color">
+      <PageTransitionGate className="min-h-screen">
+        <div
+          className="
           mx-auto
           grid
           min-h-screen
@@ -165,33 +166,34 @@ export default function ProjectsTable({
           lg:px-8
           xl:px-18
         "
-      >
-        <ProjectsSidebar
-          visibleProjects={visibleProjects}
-          activeIndex={activeIndex}
-          pageIndex={pageIndex}
-          totalPages={totalPages}
-          direction={direction}
-          startIndex={startIndex}
-          activeTagsKey={activeTagsKey}
-          availableTags={availableTags}
-          activeTags={activeTags}
-          hasProjects={hasProjects}
-          canGoPrevPage={canGoPrevPage}
-          canGoNextPage={canGoNextPage}
-          onSelectProject={setProjectIndex}
-          onPrevPage={goToPrevPage}
-          onNextPage={goToNextPage}
         >
-          {children}
-        </ProjectsSidebar>
+          <ProjectsSidebar
+            visibleProjects={visibleProjects}
+            activeIndex={activeIndex}
+            pageIndex={pageIndex}
+            totalPages={totalPages}
+            direction={direction}
+            startIndex={startIndex}
+            activeTagsKey={activeTagsKey}
+            availableTags={availableTags}
+            activeTags={activeTags}
+            hasProjects={hasProjects}
+            canGoPrevPage={canGoPrevPage}
+            canGoNextPage={canGoNextPage}
+            onSelectProject={setProjectIndex}
+            onPrevPage={goToPrevPage}
+            onNextPage={goToNextPage}
+          >
+            {children}
+          </ProjectsSidebar>
 
-        <ProjectPreview
-          project={activeProject}
-          hasProjects={hasProjects}
-          activeTagsKey={activeTagsKey}
-        />
-      </div>
+          <ProjectPreview
+            project={activeProject}
+            hasProjects={hasProjects}
+            activeTagsKey={activeTagsKey}
+          />
+        </div>
+      </PageTransitionGate>
     </section>
   );
 }

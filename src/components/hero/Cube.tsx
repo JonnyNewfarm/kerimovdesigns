@@ -619,17 +619,8 @@ export default function Cube({
     });
 
     if (!isDraggingCubeRef.current) {
-      group.current.rotation.x = MathUtils.lerp(
-        group.current.rotation.x,
-        value,
-        0.045,
-      );
-
-      group.current.rotation.y = MathUtils.lerp(
-        group.current.rotation.y,
-        value * 1.4,
-        0.045,
-      );
+      group.current.rotation.x = value;
+      group.current.rotation.y = value * 1.4;
     }
 
     if (isMobile) {
@@ -648,7 +639,6 @@ export default function Cube({
       targetScaleRef.current,
     );
   });
-
   const isCubeReady = Boolean(
     rustamTexture &&
       topTextTexture &&
