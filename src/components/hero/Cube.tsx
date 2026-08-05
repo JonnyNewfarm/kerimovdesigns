@@ -663,7 +663,6 @@ export default function Cube({
 
   return (
     <group ref={group}>
-      {/* TOP FACE: RUSTAM / ABOUT */}
       <group
         position={[0, FACE_OVERLAY_POSITION, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -706,12 +705,10 @@ export default function Cube({
         </mesh>
       </group>
 
-      {/* BOTTOM FACE: ANIMATIONS */}
       <group
         position={[0, -FACE_OVERLAY_POSITION, 0]}
         rotation={[Math.PI / 2, 0, Math.PI * 2]}
       >
-        {/* Tekstlaget */}
         <mesh renderOrder={30} raycast={() => null}>
           <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
 

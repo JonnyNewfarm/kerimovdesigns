@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  motion,
-  type ButtonHTMLAttributes,
-  type Variants,
-} from "framer-motion";
-import type { ReactNode } from "react";
+import { motion, type Variants } from "framer-motion";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 const defaultEase = [0.22, 1, 0.36, 1] as const;
 
@@ -14,7 +10,6 @@ type ButtonRevealProps = Omit<
   "children"
 > & {
   children: ReactNode;
-  className?: string;
   contentClassName?: string;
   delay?: number;
   duration?: number;
@@ -43,14 +38,22 @@ export default function ButtonReveal({
       y,
       opacity: 0,
       rotate,
-      ...(blur > 0 ? { filter: `blur(${blur}px)` } : {}),
+      ...(blur > 0
+        ? {
+            filter: `blur(${blur}px)`,
+          }
+        : {}),
     },
 
     visible: {
       y: 0,
       opacity: 1,
       rotate: 0,
-      ...(blur > 0 ? { filter: "blur(0px)" } : {}),
+      ...(blur > 0
+        ? {
+            filter: "blur(0px)",
+          }
+        : {}),
       transition: {
         delay,
         duration,
