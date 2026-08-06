@@ -46,7 +46,6 @@ const animations: AnimationProject[] = [
     hoverText: "View case",
     cursorClass: "text-[#34294a]",
   },
-
   {
     title: "Poster collection",
     heading: "Poster design",
@@ -76,7 +75,9 @@ function useDesktopMediaQuery() {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const mediaQuery = window.matchMedia(
+      "(min-width: 1024px) and (pointer: fine)",
+    );
 
     const updateDesktopState = () => {
       setIsDesktop(mediaQuery.matches);
@@ -123,6 +124,7 @@ const CustomCursor = memo(function CustomCursor({
       style={{
         x: cursorX,
         y: cursorY,
+        willChange: "transform",
       }}
       animate={{
         opacity: cursorState.visible ? 1 : 0,
@@ -144,26 +146,23 @@ const CustomCursor = memo(function CustomCursor({
         left-0
         top-0
         z-[9999]
-        hidden
+        flex
         -translate-x-1/2
         -translate-y-1/2
-        lg:flex
       "
     >
       <div
         className={`
-    relative
-    overflow-hidden
-    text-center
-    text-[7vw]
-    font-black
-    uppercase
-    leading-[0.78]
-    tracking-[-0.035em]
-    md:text-[5.8vw]
-    lg:text-[4.8vw]
-    ${cursorState.className}
-  `}
+          relative
+          overflow-hidden
+          text-center
+          text-[4.8vw]
+          font-black
+          uppercase
+          leading-[0.78]
+          tracking-[-0.035em]
+          ${cursorState.className}
+        `}
       >
         {cursorState.text}
       </div>
@@ -173,7 +172,6 @@ const CustomCursor = memo(function CustomCursor({
 
 type ProjectMediaProps = {
   item: AnimationProject;
-  index: number;
   onPointerEnter: (
     event: ReactPointerEvent<HTMLAnchorElement>,
     item: AnimationProject,
@@ -184,7 +182,6 @@ type ProjectMediaProps = {
 
 const ProjectMedia = memo(function ProjectMedia({
   item,
-  index,
   onPointerEnter,
   onPointerMove,
   onPointerLeave,
@@ -193,41 +190,52 @@ const ProjectMedia = memo(function ProjectMedia({
     href: item.href,
     transitionLabel: item.title,
     "aria-label": `View ${item.title}`,
-    "data-project-index": index,
-    onPointerEnter: (event: ReactPointerEvent<HTMLAnchorElement>) =>
-      onPointerEnter(event, item),
+    onPointerEnter: (event: ReactPointerEvent<HTMLAnchorElement>) => {
+      onPointerEnter(event, item);
+    },
     onPointerMove,
     onPointerLeave,
   };
 
   if (item.video) {
     return (
-      <div>
-        <TransitionLink
-          {...sharedProps}
+      <TransitionLink
+        {...sharedProps}
+        className="
+          group
+          relative
+          block
+          aspect-video
+          w-full
+          overflow-hidden
+          bg-color/[0.04]
+        "
+      >
+        <video
+          src={item.video}
+          muted
+          loop
+          playsInline
+          preload="metadata"
           className="
-            group
-            relative
-            block
-            aspect-video
+            h-full
             w-full
-            overflow-hidden
-            bg-color/[0.04]
+            object-cover
           "
-        >
-          <div
-            className="
-              pointer-events-none
-              absolute
-              inset-0
-              bg-dark/0
-              transition-colors
-              duration-500
-              group-hover:bg-dark/10
-            "
-          />
-        </TransitionLink>
-      </div>
+        />
+
+        <div
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+            bg-dark/0
+            transition-colors
+            duration-500
+            lg:group-hover:bg-dark/10
+          "
+        />
+      </TransitionLink>
     );
   }
 
@@ -235,58 +243,64 @@ const ProjectMedia = memo(function ProjectMedia({
     <TransitionLink
       {...sharedProps}
       className="
-      group
-      relative
-      grid
-      w-full
-      grid-cols-2
-      items-stretch
-      overflow-hidden
-      bg-color/[0.04]
-    "
+        group
+        relative
+        grid
+        w-full
+        grid-cols-2
+        items-stretch
+        overflow-hidden
+        bg-color/[0.04]
+      "
     >
       {item.images?.map((image, imageIndex) => (
         <div
           key={image}
           className="
-          relative
-          flex
-          min-w-0
-          items-stretch
-          justify-center
-          overflow-hidden
-          bg-black
-        "
+            relative
+            flex
+            min-w-0
+            items-stretch
+            justify-center
+            overflow-hidden
+            bg-black
+          "
         >
           <Image
             src={image}
             alt={`${item.title} image ${imageIndex + 1}`}
             width={1200}
             height={1600}
-            sizes="(max-width: 1024px) 50vw, 38vw"
+            sizes="
+              (max-width: 767px) 50vw,
+              (max-width: 1023px) 50vw,
+              39vw
+            "
+            quality={80}
+            loading="lazy"
             className="
-            h-auto
-            w-full
-            object-contain
-            transition-transform
-            duration-700
-            ease-out
-            group-hover:scale-[1.015]
-          "
+              h-auto
+              w-full
+              object-contain
+              transition-transform
+              duration-700
+              ease-out
+              lg:group-hover:scale-[1.015]
+            "
           />
         </div>
       ))}
 
       <div
         className="
-        pointer-events-none
-        absolute
-        inset-0
-        bg-dark/0
-        transition-colors
-        duration-500
-        group-hover:bg-dark/10
-      "
+          pointer-events-none
+          absolute
+          inset-0
+          bg-dark/0
+          transition-colors
+          duration-500
+          lg:group-hover:bg-dark/10
+        "
       />
     </TransitionLink>
   );
@@ -330,8 +344,8 @@ const ProjectArticle = memo(function ProjectArticle({
         delay={0.12}
         className="
           max-w-[1100px]
-          text-[10vw]
           text-wrap
+          text-[10vw]
           font-black
           uppercase
           leading-[0.88]
@@ -345,7 +359,6 @@ const ProjectArticle = memo(function ProjectArticle({
 
       <ProjectMedia
         item={item}
-        index={index}
         onPointerEnter={onPointerEnter}
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
@@ -412,14 +425,6 @@ const ProjectArticle = memo(function ProjectArticle({
 export default function AnimAndVisualDisplay() {
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  const latestPointerRef = useRef({
-    x: -9999,
-    y: -9999,
-  });
-
-  const pointerFrameRef = useRef<number | null>(null);
-  const scrollFrameRef = useRef<number | null>(null);
-
   const [cursorState, setCursorState] =
     useState<CursorState>(INITIAL_CURSOR_STATE);
 
@@ -434,26 +439,12 @@ export default function AnimAndVisualDisplay() {
   });
 
   const firstY = useTransform(scrollYProgress, [0, 1], [-10, 20]);
-
   const secondY = useTransform(scrollYProgress, [0, 1], [15, -15]);
 
   const updatePointerPosition = useCallback(
     (clientX: number, clientY: number) => {
-      latestPointerRef.current = {
-        x: clientX,
-        y: clientY,
-      };
-
-      if (pointerFrameRef.current !== null) {
-        return;
-      }
-
-      pointerFrameRef.current = window.requestAnimationFrame(() => {
-        pointerX.set(latestPointerRef.current.x);
-        pointerY.set(latestPointerRef.current.y);
-
-        pointerFrameRef.current = null;
-      });
+      pointerX.set(clientX);
+      pointerY.set(clientY);
     },
     [pointerX, pointerY],
   );
@@ -471,105 +462,23 @@ export default function AnimAndVisualDisplay() {
     });
   }, []);
 
-  const updateHoveredProjectAtPointer = useCallback(() => {
-    if (!isDesktop) {
-      return;
-    }
-
-    const { x, y } = latestPointerRef.current;
-
-    const element = document.elementFromPoint(x, y);
-
-    const projectElement = element?.closest(
-      "[data-project-index]",
-    ) as HTMLElement | null;
-
-    if (!projectElement) {
-      hideCursor();
-      return;
-    }
-
-    const index = Number(projectElement.dataset.projectIndex);
-
-    const item = animations[index];
-
-    if (!item) {
-      hideCursor();
-      return;
-    }
-
-    setCursorState((currentState) => {
-      if (
-        currentState.visible &&
-        currentState.text === item.hoverText &&
-        currentState.className === item.cursorClass
-      ) {
-        return currentState;
-      }
-
-      return {
-        text: item.hoverText,
-        className: item.cursorClass,
-        visible: true,
-      };
-    });
-  }, [hideCursor, isDesktop]);
-
   useEffect(() => {
     if (!isDesktop) {
       hideCursor();
       return;
     }
 
-    const handleWindowPointerMove = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse") {
-        return;
-      }
-
-      updatePointerPosition(event.clientX, event.clientY);
-    };
-
-    const handleWindowScroll = () => {
-      if (scrollFrameRef.current !== null) {
-        return;
-      }
-
-      scrollFrameRef.current = window.requestAnimationFrame(() => {
-        updateHoveredProjectAtPointer();
-        scrollFrameRef.current = null;
-      });
-    };
-
-    window.addEventListener("pointermove", handleWindowPointerMove, {
+    window.addEventListener("scroll", hideCursor, {
       passive: true,
     });
 
-    window.addEventListener("scroll", handleWindowScroll, {
-      passive: true,
-    });
+    window.addEventListener("blur", hideCursor);
 
     return () => {
-      window.removeEventListener("pointermove", handleWindowPointerMove);
-
-      window.removeEventListener("scroll", handleWindowScroll);
-
-      if (pointerFrameRef.current !== null) {
-        window.cancelAnimationFrame(pointerFrameRef.current);
-      }
-
-      if (scrollFrameRef.current !== null) {
-        window.cancelAnimationFrame(scrollFrameRef.current);
-      }
-
-      pointerFrameRef.current = null;
-      scrollFrameRef.current = null;
+      window.removeEventListener("scroll", hideCursor);
+      window.removeEventListener("blur", hideCursor);
     };
-  }, [
-    hideCursor,
-    isDesktop,
-    updateHoveredProjectAtPointer,
-    updatePointerPosition,
-  ]);
+  }, [hideCursor, isDesktop]);
 
   const handleProjectPointerMove = useCallback(
     (event: ReactPointerEvent<HTMLAnchorElement>) => {
@@ -590,10 +499,20 @@ export default function AnimAndVisualDisplay() {
 
       updatePointerPosition(event.clientX, event.clientY);
 
-      setCursorState({
-        text: item.hoverText,
-        className: item.cursorClass,
-        visible: true,
+      setCursorState((currentState) => {
+        if (
+          currentState.visible &&
+          currentState.text === item.hoverText &&
+          currentState.className === item.cursorClass
+        ) {
+          return currentState;
+        }
+
+        return {
+          text: item.hoverText,
+          className: item.cursorClass,
+          visible: true,
+        };
       });
     },
     [isDesktop, updatePointerPosition],
@@ -615,29 +534,24 @@ export default function AnimAndVisualDisplay() {
         lg:px-16
       "
     >
-      <CustomCursor x={pointerX} y={pointerY} cursorState={cursorState} />
+      {isDesktop && (
+        <CustomCursor x={pointerX} y={pointerY} cursorState={cursorState} />
+      )}
 
       <div className="mx-auto w-full max-w-[1800px]">
         <div className="flex flex-col gap-32 lg:gap-48">
-          <ProjectArticle
-            item={animations[0]}
-            index={0}
-            projectY={firstY}
-            isDesktop={isDesktop}
-            onPointerEnter={handleProjectPointerEnter}
-            onPointerMove={handleProjectPointerMove}
-            onPointerLeave={hideCursor}
-          />
-
-          <ProjectArticle
-            item={animations[1]}
-            index={1}
-            projectY={secondY}
-            isDesktop={isDesktop}
-            onPointerEnter={handleProjectPointerEnter}
-            onPointerMove={handleProjectPointerMove}
-            onPointerLeave={hideCursor}
-          />
+          {animations.map((item, index) => (
+            <ProjectArticle
+              key={item.title}
+              item={item}
+              index={index}
+              projectY={index === 0 ? firstY : secondY}
+              isDesktop={isDesktop}
+              onPointerEnter={handleProjectPointerEnter}
+              onPointerMove={handleProjectPointerMove}
+              onPointerLeave={hideCursor}
+            />
+          ))}
         </div>
 
         <div className="mt-24 md:mt-32 lg:mt-40">
@@ -656,7 +570,7 @@ export default function AnimAndVisualDisplay() {
               lg:text-[5vw]
             "
           >
-            Selected work across motion and poster design.{" "}
+            Selected work across motion and poster design.
           </TextReveal>
         </div>
       </div>
