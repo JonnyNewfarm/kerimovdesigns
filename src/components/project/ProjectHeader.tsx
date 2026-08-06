@@ -92,8 +92,8 @@ export default function ProjectHeader({
               flex
               items-center
               gap-8
-              xl:justify-end
-              xl:pb-4
+              sm:justify-end
+              sm:pb-4
             "
           >
             <div className="flex flex-col">

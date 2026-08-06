@@ -19,23 +19,8 @@ export const PANEL_POSITIONS = [
   "leftOfCard",
 ] as const;
 
-export const PANEL_TOP_OVERRIDES = [
-  null,
-  null,
-  null,
-  null,
-  84,
-  null,
-] as const;
 
-export const PANEL_GAP_OVERRIDES = [
-  34,
-  null,
-  null,
-  20,
-  30,
-  null,
-] as const;
+
 
 export const desktopLayout: LayoutItem[] = [
   {
@@ -69,11 +54,11 @@ export const desktopLayout: LayoutItem[] = [
     driftDirection: 1,
   },
   {
-    left: "22%",
-    leftMd: "22%",
-    leftLg: "22%",
-    leftXl: "22%",
-    left2xl: "22%",
+    left: "48%",
+    leftMd: "48%",
+    leftLg: "48%",
+    leftXl: "48%",
+    left2xl: "48%",
     top: 1100,
     topMd: 1100,
     topLg: 1100,

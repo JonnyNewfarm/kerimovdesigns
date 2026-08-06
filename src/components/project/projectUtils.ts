@@ -8,31 +8,31 @@ export const imageLayouts: ImageLayout[] = [
     row: "justify-start",
     offset:
       "translate-x-0 sm:translate-x-10 lg:translate-x-20",
-    size: "max-w-[280px] sm:max-w-[360px] lg:max-w-[560px] xl:max-w-[640px]",
+    size: "max-w-[280px] sm:max-w-[400px] lg:max-w-[560px] xl:max-w-[680px]",
   },
   {
     row: "justify-end",
     offset:
       "translate-x-0 sm:-translate-x-12 lg:-translate-x-32",
-    size: "max-w-[240px] sm:max-w-[330px] lg:max-w-[390px]",
+    size: "max-w-[240px] sm:max-w-[380px] lg:max-w-[410px]",
   },
   {
     row: "justify-center",
     offset:
       "translate-x-0 sm:-translate-x-24 lg:-translate-x-40",
-    size: "max-w-[260px] sm:max-w-[350px] lg:max-w-[420px]",
+    size: "max-w-[260px] sm:max-w-[390px] lg:max-w-[420px]",
   },
   {
     row: "justify-end",
     offset:
       "translate-x-0 sm:-translate-x-4 lg:-translate-x-16",
-    size: "max-w-[300px] sm:max-w-[380px] lg:max-w-[460px]",
+    size: "max-w-[300px] sm:max-w-[400px] lg:max-w-[460px]",
   },
   {
     row: "justify-start",
     offset:
       "translate-x-0 sm:translate-x-32 lg:translate-x-56",
-    size: "max-w-[230px] sm:max-w-[320px] lg:max-w-[380px]",
+    size: "max-w-[230px] sm:max-w-[360px] lg:max-w-[380px]",
   },
   {
     row: "justify-center",

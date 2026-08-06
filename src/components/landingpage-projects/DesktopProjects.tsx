@@ -67,7 +67,7 @@ export default function DesktopProjects({
           z-30
           max-w-[760px]
           xl:left-[8%]
-          xl:top-[210px]
+          xl:top-[160px]
         "
       >
         <div className="flex w-full items-end justify-end ">

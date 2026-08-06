@@ -170,6 +170,33 @@ body {
   transform: scale(1);
 }
 
+.poster-cursor-text {
+  position: relative;
+  display: inline-block;
+  color: #b4cdbd;
+
+  filter:
+    contrast(1.15)
+    saturate(1.1);
+
+  text-shadow:
+    0 0 1px rgba(25, 174, 88, 0.75),
+    0 0 5px rgba(25, 174, 88, 0.12);
+}
+
+.poster-cursor-text::after {
+  content: attr(data-text);
+
+  position: absolute;
+  inset: 0;
+
+  color: #19ae58;
+  pointer-events: none;
+
+  filter: url("#cursor-grit");
+
+  opacity: 0.9;
+}
 
 
 /* link 404 */

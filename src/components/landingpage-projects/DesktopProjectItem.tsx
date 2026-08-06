@@ -7,13 +7,7 @@ import { motion, useTransform } from "framer-motion";
 import MagneticComp from "@/components/MagneticComp";
 import TransitionLink from "@/components/TransitionLink";
 
-import {
-  BASE_HEIGHT,
-  BASE_WIDTH,
-  PANEL_GAP_OVERRIDES,
-  PANEL_POSITIONS,
-  PANEL_TOP_OVERRIDES,
-} from "./projectLayouts";
+import { BASE_HEIGHT, BASE_WIDTH, PANEL_POSITIONS } from "./projectLayouts";
 
 import type { DesktopProjectItemProps } from "./projectTypes";
 
@@ -45,11 +39,11 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
 
   const automaticPanelTop = baseScale < 0.7 ? 105 : baseScale < 0.8 ? 54 : 12;
 
-  const panelTop = PANEL_TOP_OVERRIDES[index] ?? automaticPanelTop;
+  const panelTop = automaticPanelTop;
 
   const automaticPanelGap = baseScale < 0.7 ? 10 : baseScale < 0.8 ? 18 : 32;
 
-  const panelGap = PANEL_GAP_OVERRIDES[index] ?? automaticPanelGap;
+  const panelGap = automaticPanelGap;
 
   const visualImageEdge = (BASE_WIDTH * (1 + baseScale)) / 2;
 
@@ -215,7 +209,7 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                   <div>
                     <p
                       className="
-                      pt-3
+                      pt-1
                         text-md
                         uppercase
                         font-black

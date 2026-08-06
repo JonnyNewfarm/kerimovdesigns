@@ -36,17 +36,6 @@ type AnimationProject = {
 
 const animations: AnimationProject[] = [
   {
-    title: "Echo festival",
-    heading: "Moving graphics",
-    type: "Animated graphics",
-    description:
-      "A high-energy visual piece built around movement, contrast and bold screen composition.",
-    video: "/echo-new.mp4",
-    href: "/project/692fa8ade953917a4953f016",
-    hoverText: "View case",
-    cursorClass: "text-[#c8dde6]",
-  },
-  {
     title: "Drømmenes Melodi",
     heading: "Visual identity",
     type: "Visual identity",
@@ -56,6 +45,18 @@ const animations: AnimationProject[] = [
     href: "/project/69300cd7a94f6af6c6b7d9d8",
     hoverText: "View case",
     cursorClass: "text-[#34294a]",
+  },
+
+  {
+    title: "Poster collection",
+    heading: "Poster design",
+    type: "Posters",
+    description:
+      "A collection of experimental posters exploring typography, composition, colour and visual hierarchy.",
+    images: ["/poster-2.jpg", "/poster-9.jpg"],
+    href: "/project/6a738fe5c50ff327148b02f9",
+    hoverText: "View posters",
+    cursorClass: "poster-cursor-text",
   },
 ];
 
@@ -91,50 +92,6 @@ function useDesktopMediaQuery() {
   }, []);
 
   return isDesktop;
-}
-
-function useViewportVideo() {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const video = videoRef.current;
-
-    if (!container || !video) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          void video.play().catch(() => {
-            // Autoplay may be blocked by the browser.
-          });
-
-          return;
-        }
-
-        video.pause();
-      },
-      {
-        rootMargin: "150px 0px",
-        threshold: 0.05,
-      },
-    );
-
-    observer.observe(container);
-
-    return () => {
-      observer.disconnect();
-      video.pause();
-    };
-  }, []);
-
-  return {
-    containerRef,
-    videoRef,
-  };
 }
 
 type CustomCursorProps = {
@@ -195,16 +152,18 @@ const CustomCursor = memo(function CustomCursor({
     >
       <div
         className={`
-          text-center
-          text-[7vw]
-          font-black
-          uppercase
-          leading-[0.78]
-          tracking-[-0.035em]
-          md:text-[5.8vw]
-          lg:text-[4.8vw]
-          ${cursorState.className}
-        `}
+    relative
+    overflow-hidden
+    text-center
+    text-[7vw]
+    font-black
+    uppercase
+    leading-[0.78]
+    tracking-[-0.035em]
+    md:text-[5.8vw]
+    lg:text-[4.8vw]
+    ${cursorState.className}
+  `}
       >
         {cursorState.text}
       </div>
@@ -230,8 +189,6 @@ const ProjectMedia = memo(function ProjectMedia({
   onPointerMove,
   onPointerLeave,
 }: ProjectMediaProps) {
-  const { containerRef, videoRef } = useViewportVideo();
-
   const sharedProps = {
     href: item.href,
     transitionLabel: item.title,
@@ -245,7 +202,7 @@ const ProjectMedia = memo(function ProjectMedia({
 
   if (item.video) {
     return (
-      <div ref={containerRef}>
+      <div>
         <TransitionLink
           {...sharedProps}
           className="
@@ -258,25 +215,6 @@ const ProjectMedia = memo(function ProjectMedia({
             bg-color/[0.04]
           "
         >
-          <video
-            ref={videoRef}
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            disablePictureInPicture
-            className="
-              h-full
-              w-full
-              object-cover
-              transition-transform
-              duration-700
-              ease-out
-              group-hover:scale-[1.03]
-            "
-            src={item.video}
-          />
-
           <div
             className="
               pointer-events-none
@@ -712,7 +650,7 @@ export default function AnimAndVisualDisplay() {
               lg:text-[5vw]
             "
           >
-            Selected work across motion and identity.
+            Selected work across motion and poster design.{" "}
           </TextReveal>
         </div>
       </div>

@@ -42,8 +42,12 @@ export default function ProjectMetadata({
         border-t
         border-[#ecebeb]/20
         pt-6
-        sm:grid-cols-3
-        sm:gap-10
+        sm:flex
+        sm:flex-row
+        sm:justify-start
+        sm:gap-x-30
+        md:gap-x-50
+        
       "
     >
       <motion.div variants={fieldVariants}>
@@ -65,7 +69,7 @@ export default function ProjectMetadata({
         <div
           className="
             grid
-            max-w-66
+            max-w-90
             grid-cols-1
             gap-x-8
             gap-y-2
@@ -136,12 +140,12 @@ export default function ProjectMetadata({
             : "—"}
         </div>
       </motion.div>
-
-      <motion.div variants={fieldVariants}>
-        <TextReveal
-          as="p"
-          mode="words"
-          className="
+      <div className="flex flex-col gap-y-4 sm:flex-row gap-x-16">
+        <motion.div variants={fieldVariants}>
+          <TextReveal
+            as="p"
+            mode="words"
+            className="
             mb-2
             text-[10px]
             uppercase
@@ -149,27 +153,27 @@ export default function ProjectMetadata({
             text-white/45
             sm:text-xs
           "
-        >
-          Year
-        </TextReveal>
+          >
+            Year
+          </TextReveal>
 
-        <p
-          className="
+          <p
+            className="
             text-sm
             leading-relaxed
             text-white/85
             sm:text-base
           "
-        >
-          {year || "—"}
-        </p>
-      </motion.div>
+          >
+            {year || "—"}
+          </p>
+        </motion.div>
 
-      <motion.div variants={fieldVariants}>
-        <TextReveal
-          as="p"
-          mode="words"
-          className="
+        <motion.div variants={fieldVariants}>
+          <TextReveal
+            as="p"
+            mode="words"
+            className="
             mb-2
             text-[10px]
             uppercase
@@ -177,21 +181,22 @@ export default function ProjectMetadata({
             text-white/45
             sm:text-xs
           "
-        >
-          Tools
-        </TextReveal>
+          >
+            Tools
+          </TextReveal>
 
-        <p
-          className="
+          <p
+            className="
             text-sm
             leading-relaxed
             text-white/85
             sm:text-base
           "
-        >
-          {tools || "—"}
-        </p>
-      </motion.div>
+          >
+            {tools || "—"}
+          </p>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
