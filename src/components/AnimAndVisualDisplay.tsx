@@ -56,7 +56,7 @@ const animations: AnimationProject[] = [
     images: ["/poster-2.jpg", "/poster-9.jpg"],
     href: "/project/6a738fe5c50ff327148b02f9",
     hoverText: "View posters",
-    cursorClass: "poster-cursor-text",
+    cursorClass: "text-[#d7deda]",
   },
 ];
 
