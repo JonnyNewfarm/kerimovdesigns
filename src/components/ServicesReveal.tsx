@@ -101,24 +101,17 @@ export default function ServicesReveal() {
           </TextReveal>
         </div>
 
-        <h2
-          className="
-    select-none
-    font-black
-    uppercase
-    tracking-[-0.05em]
-  "
-        >
+        <h2 className="select-none font-black uppercase">
           {/* Mobile */}
           <span
             className="
-      block
-      max-w-[96vw]
-      text-[8.8vw]
-      leading-[1.1]
-      sm:text-[8.2vw]
-      md:hidden
-    "
+              block
+              text-[8.8vw]
+              leading-[0.98]
+              tracking-[-0.045em]
+              sm:text-[8.2vw]
+              md:hidden
+            "
           >
             Hi, I’m Rustam — a graphic designer creating{" "}
             <ScrollFillText progress={scrollYProgress} from={0.12} to={0.3}>
@@ -139,12 +132,14 @@ export default function ServicesReveal() {
           {/* Desktop */}
           <span
             className="
-      hidden
-      text-[8.4vw]
-      leading-[0.9]
-      md:block
-      lg:text-[6.45vw]
-    "
+              hidden
+              text-[8.4vw]
+              sm:text-[7vw]
+              leading-[0.9]
+              tracking-[-0.035em]
+              md:block
+              lg:text-[6vw]
+            "
           >
             <span className="block">Hi, I’m Rustam —</span>
 
