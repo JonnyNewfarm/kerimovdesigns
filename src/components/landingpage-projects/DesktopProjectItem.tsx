@@ -147,11 +147,12 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-baseline gap-4">
+                <div className="mt-5 flex items-baseline gap-3">
                   <span
                     className="
-                      text-3xl
+                      text-2xl
                       uppercase
+                      
                       leading-none
                       tracking-[-0.08em]
                       text-color
@@ -159,12 +160,14 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                   >
                     {projectNumber}
                   </span>
+                  <span className="text-2xl">/</span>
 
                   <span
                     className="
-                      text-[16px]
+                      text-2xl
+                      font-bold
                       uppercase
-                      tracking-[0.24em]
+                      tracking-[-0.025em]
                       text-color/70
                     "
                   >
@@ -208,31 +211,19 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                     panelPosition === "leftOfCard" ? "right top" : "left top",
                 }}
               >
-                <div className="space-y-5">
+                <div className="space-y-2">
                   <div>
                     <p
                       className="
-                        text-[11px]
+                      pt-3
+                        text-md
                         uppercase
-                        tracking-[0.22em]
+                        font-black
+                        tracking-[0.-0.022em]
                         text-color/40
                       "
                     >
-                      Selected project
-                    </p>
-
-                    <p
-                      className="
-                        mt-2
-                        text-2xl
-                        font-black
-                        uppercase
-                        leading-none
-                        tracking-[-0.04em]
-                        text-color
-                      "
-                    >
-                      {project.title}
+                      Project Details
                     </p>
                   </div>
 

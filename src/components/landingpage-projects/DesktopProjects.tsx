@@ -70,7 +70,7 @@ export default function DesktopProjects({
           xl:top-[210px]
         "
       >
-        <div className="flex items-center gap-4">
+        <div className="flex w-full items-end justify-end ">
           <span
             className="
               text-[18px]
@@ -80,18 +80,6 @@ export default function DesktopProjects({
             "
           >
             06
-          </span>
-
-          <span
-            className="
-              text-[13px]
-              font-black
-              uppercase
-              tracking-[0.28em]
-              text-color/45
-            "
-          >
-            Latest projects
           </span>
         </div>
 

@@ -60,32 +60,7 @@ export default function MobileProjects({
         height: sectionHeight,
       }}
     >
-      <div className="absolute -top-3 left-[8%] z-30">
-        <div className="mb-2 flex items-center gap-2">
-          <span
-            className="
-              text-[10px]
-              uppercase
-              tracking-[0.18em]
-              text-color/45
-            "
-          >
-            06
-          </span>
-
-          <span
-            className="
-              text-[10px]
-              font-black
-              uppercase
-              tracking-[0.22em]
-              text-color/45
-            "
-          >
-            Latest projects
-          </span>
-        </div>
-
+      <div className="absolute  left-[8%] z-30">
         <p
           className="
             text-4xl
