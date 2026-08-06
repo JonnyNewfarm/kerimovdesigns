@@ -252,7 +252,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                 justify-between
                 gap-x-5
                 gap-y-8
-                pt-5
+                pt-2
                 text-left
                 md:flex-row
                 md:gap-x-12
@@ -267,10 +267,10 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                   duration={0.65}
                   y="100%"
                   className="
-                    mb-3
-                    text-[11px]
+                    mb-1
+                    text-[13px]
                     uppercase
-                    opacity-50
+                    opacity-80
                   "
                 >
                   Availability
@@ -283,7 +283,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                   stagger={0.025}
                   duration={0.75}
                   y="100%"
-                  className="text-sm leading-[1.4] md:text-base"
+                  className="text-lg text-color leading-[1.2] md:text-xl"
                 >
                   Available for visual identities, motion pieces, logos and
                   selected design projects.
@@ -322,7 +322,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                       border-[#ecdfcc]
                       px-3
                       py-3
-                      text-xs
+                      text-lg
                       hover:border-[#667a6c]
                       sm:px-4
                       sm:text-sm

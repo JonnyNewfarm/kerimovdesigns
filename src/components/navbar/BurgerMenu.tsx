@@ -13,7 +13,7 @@ const menuLinks = [
   {
     label: "Home",
     href: "/",
-    transitionLabel: "Welcome Back",
+    transitionLabel: "index",
   },
   {
     label: "My Work",

@@ -52,32 +52,14 @@ const ProjectsTableMobile = ({
             duration={0.75}
             y="90%"
             className="
-              text-2xl
+              text-[7vw]
               font-black
               uppercase
-              leading-[0.95]
+              leading-[1.1]
               tracking-[-0.01em]
             "
           >
-            Selected Work
-          </TextReveal>
-          <TextReveal
-            as="p"
-            mode="words"
-            viewport={false}
-            delay={0.06}
-            duration={0.7}
-            y="80%"
-            className="
-    mt-1.5
-    max-w-[310px]
-    text-lg
-opacity-90
-    leading-[1.1]
-    text-color
-  "
-          >
-            A selection of recent projects and collaborations.
+            A Selection of Projects, Practice & Collaborations{" "}
           </TextReveal>
 
           <motion.div
@@ -303,9 +285,10 @@ const ProjectCard = ({
             y="85%"
             className="
               text-2xl
+              font-semibold
               uppercase
               leading-[0.95]
-              tracking-[-0.04em]
+              tracking-[-0.025em]
             "
           >
             {project.title}

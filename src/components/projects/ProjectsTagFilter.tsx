@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+
 import TextReveal from "../TextReveal";
 import ButtonReveal from "../ButtonReveal";
 
@@ -114,7 +115,6 @@ const ProjectsTagFilter = ({
 
   return (
     <div ref={containerRef} className="relative w-full">
-      {" "}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         <ButtonReveal
           type="button"
@@ -139,15 +139,15 @@ const ProjectsTagFilter = ({
             !isSelected && selectedTags.length >= MAX_SELECTED_TAGS;
 
           return (
-            <div key={tag} className="relative  inline-flex items-center">
+            <div key={tag} className="relative inline-flex items-center">
               <ButtonReveal
                 type="button"
                 onClick={() => toggleTag(tag)}
                 disabled={isDisabled}
                 aria-pressed={isSelected}
-                className={`relative text-[10px] cursor-pointer font-black uppercase tracking-[0.2em] transition-colors duration-300 sm:text-xs ${
+                className={`relative cursor-pointer text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 sm:text-xs ${
                   isSelected
-                    ? "pr-3 text-white"
+                    ? "text-white"
                     : isDisabled
                       ? "cursor-not-allowed text-white/15"
                       : "text-white/35 hover:text-white"
@@ -156,75 +156,94 @@ const ProjectsTagFilter = ({
                 {formatTag(tag)}
               </ButtonReveal>
 
-              {isSelected && (
-                <motion.button
-                  type="button"
-                  onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-                    event.stopPropagation();
-                    toggleTag(tag);
-                  }}
-                  aria-label={`Remove ${formatTag(tag)} filter`}
-                  initial={{
-                    opacity: 0,
-                    scale: 0,
-                    rotate: -90,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    rotate: 0,
-                  }}
-                  transition={{
-                    duration: 0.3,
-                    ease,
-                  }}
-                  whileHover={{
-                    scale: 1.2,
-                    rotate: 90,
-                  }}
-                  whileTap={{
-                    scale: 0.8,
-                  }}
-                  className="absolute -right-1.5 cursor-pointer -top-2 flex h-4 w-4 items-center justify-center text-white"
-                >
-                  <svg
-                    viewBox="0 0 16 16"
-                    className="h-3 w-3 fill-none stroke-current"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    aria-hidden="true"
+              <AnimatePresence>
+                {isSelected ? (
+                  <motion.button
+                    type="button"
+                    onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                      event.stopPropagation();
+                      toggleTag(tag);
+                    }}
+                    aria-label={`Remove ${formatTag(tag)} filter`}
+                    initial={{
+                      opacity: 0,
+                      scale: 0,
+                      rotate: -90,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      rotate: 0,
+                    }}
+                    exit={{
+                      opacity: 0,
+                      scale: 0,
+                      rotate: 90,
+                    }}
+                    transition={{
+                      duration: 0.3,
+                      ease,
+                    }}
+                    whileHover={{
+                      scale: 1.2,
+                      rotate: 90,
+                    }}
+                    whileTap={{
+                      scale: 0.8,
+                    }}
+                    className="
+  absolute
+  -right-4
+  -top-2
+  z-10
+  flex
+  h-4
+  w-4
+  cursor-pointer
+  items-center
+  justify-center
+  text-white
+"
                   >
-                    <path d="M3 3L13 13" />
-                    <path d="M13 3L3 13" />
-                  </svg>
-                </motion.button>
-              )}
+                    <svg
+                      viewBox="0 0 16 16"
+                      className="h-2.5 w-2.5 fill-none stroke-current"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 3L13 13" />
+                      <path d="M13 3L3 13" />
+                    </svg>
+                  </motion.button>
+                ) : null}
+              </AnimatePresence>
             </div>
           );
         })}
 
-        {availableTags.length > VISIBLE_TAGS_COUNT && (
+        {availableTags.length > VISIBLE_TAGS_COUNT ? (
           <ButtonReveal
             type="button"
             onClick={() => setIsOpen((current) => !current)}
             aria-expanded={isOpen}
             aria-controls="all-project-tags"
             className="
-      group
-      inline-flex
-      cursor-pointer
-      items-center
-      gap-2
-      text-[10px]
-      font-black
-      uppercase
-      tracking-[0.2em]
-      text-white/55
-      transition-colors
-      duration-300
-      hover:text-white
-      sm:text-xs
-    "
+              group
+              inline-flex
+              cursor-pointer
+              items-center
+              gap-2
+              text-[10px]
+              font-black
+              uppercase
+              tracking-[0.2em]
+              text-white/55
+              transition-colors
+              duration-300
+              hover:text-white
+              sm:text-xs
+            "
           >
             <span>View all tags</span>
 
@@ -236,15 +255,16 @@ const ProjectsTagFilter = ({
                 duration: 0.35,
                 ease,
               }}
-              className="relative ml-2 h-3 w-3 "
+              className="relative ml-2 h-3 w-3"
               aria-hidden="true"
             >
               <span className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 bg-white/70" />
               <span className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-white/70" />
             </motion.span>
           </ButtonReveal>
-        )}
+        ) : null}
       </div>
+
       <AnimatePresence initial={false}>
         {isOpen ? (
           <motion.div
@@ -270,7 +290,22 @@ const ProjectsTagFilter = ({
               duration: 0.5,
               ease,
             }}
-            className="absolute left-0 top-[calc(100%+18px)] z-30 w-[calc(100vw-3rem)] max-w-[560px] overflow-hidden border-x border-b border-white/15 bg-dark shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:z-[300] md:w-full"
+            className="
+              absolute
+              left-0
+              top-[calc(100%+18px)]
+              z-30
+              w-[calc(100vw-3rem)]
+              max-w-[560px]
+              overflow-hidden
+              border-x
+              border-b
+              border-white/15
+              bg-dark
+              shadow-[0_28px_90px_rgba(0,0,0,0.6)]
+              md:z-[300]
+              md:w-full
+            "
           >
             <svg
               viewBox="0 0 1000 36"
@@ -366,6 +401,7 @@ const ProjectsTagFilter = ({
                           </svg>
                         ) : null}
                       </span>
+
                       <TextReveal
                         key={tag}
                         className={`truncate py-2 text-[12px] font-black uppercase tracking-[0.18em] transition-colors duration-300 sm:text-md ${
@@ -394,7 +430,19 @@ const ProjectsTagFilter = ({
                 type="button"
                 onClick={clearTags}
                 disabled={selectedTags.length === 0}
-                className="text-[9px] font-black cursor-pointer uppercase tracking-[0.25em] text-white/70 transition-colors duration-300 hover:text-white disabled:cursor-not-allowed disabled:text-white/15"
+                className="
+                  cursor-pointer
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.25em]
+                  text-white/70
+                  transition-colors
+                  duration-300
+                  hover:text-white
+                  disabled:cursor-not-allowed
+                  disabled:text-white/15
+                "
               >
                 Clear selection
               </button>
@@ -402,7 +450,17 @@ const ProjectsTagFilter = ({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-[9px] font-black cursor-pointer uppercase tracking-[0.25em] text-white transition-opacity duration-300 hover:opacity-60"
+                className="
+                  cursor-pointer
+                  text-[9px]
+                  font-black
+                  uppercase
+                  tracking-[0.25em]
+                  text-white
+                  transition-opacity
+                  duration-300
+                  hover:opacity-60
+                "
               >
                 Done
               </button>

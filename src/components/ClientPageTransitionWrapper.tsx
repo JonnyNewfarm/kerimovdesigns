@@ -42,10 +42,10 @@ const PageTransitionContext = createContext<PageTransitionContextType | null>(
 );
 
 const DESKTOP_ENTER_DURATION = 0.95;
-const MOBILE_ENTER_DURATION = 0.76;
+const MOBILE_ENTER_DURATION = 0.8;
 
 const DESKTOP_LEAVE_DURATION = 0.65;
-const MOBILE_LEAVE_DURATION = 0.46;
+const MOBILE_LEAVE_DURATION = 0.5;
 
 const MOBILE_VIEWPORT_EXTRA_COVER = 120;
 

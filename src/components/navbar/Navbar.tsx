@@ -213,7 +213,7 @@ const Navbar = () => {
       }
       transition={{
         duration: 0.8,
-        delay: isHomePage && introExited ? 0.08 : 0,
+        delay: isHomePage && introExited ? 0.04 : 0,
         ease: PROJECT_EASE,
       }}
       style={{

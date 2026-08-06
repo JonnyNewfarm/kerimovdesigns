@@ -103,35 +103,69 @@ export default function ServicesReveal() {
 
         <h2
           className="
-            select-none
-            text-[10vw]
-            font-black
-            uppercase
-            leading-[0.9]
-            tracking-[-0.045em]
-            md:text-[8.4vw]
-            lg:text-[6.45vw]
-          "
+    select-none
+    font-black
+    uppercase
+    tracking-[-0.05em]
+  "
         >
-          <span className="block">Hi, I’m Rustam —</span>
-
-          <span className="block">a graphic designer</span>
-
-          <span className="block">
-            creating{" "}
-            <ScrollFillText progress={scrollYProgress} from={0.12} to={0.34}>
-              visual identities,
-            </ScrollFillText>
-          </span>
-
-          <span className="block">
-            <ScrollFillText progress={scrollYProgress} from={0.26} to={0.46}>
+          {/* Mobile */}
+          <span
+            className="
+      block
+      max-w-[96vw]
+      text-[8.8vw]
+      leading-[1.1]
+      sm:text-[8.2vw]
+      md:hidden
+    "
+          >
+            Hi, I’m Rustam — a graphic designer creating{" "}
+            <ScrollFillText progress={scrollYProgress} from={0.12} to={0.3}>
+              visual
+            </ScrollFillText>{" "}
+            <ScrollFillText progress={scrollYProgress} from={0.2} to={0.4}>
+              identities,
+            </ScrollFillText>{" "}
+            <ScrollFillText progress={scrollYProgress} from={0.3} to={0.5}>
               logos
             </ScrollFillText>{" "}
             and{" "}
-            <ScrollFillText progress={scrollYProgress} from={0.36} to={0.62}>
+            <ScrollFillText progress={scrollYProgress} from={0.4} to={0.62}>
               animations.
             </ScrollFillText>
+          </span>
+
+          {/* Desktop */}
+          <span
+            className="
+      hidden
+      text-[8.4vw]
+      leading-[0.9]
+      md:block
+      lg:text-[6.45vw]
+    "
+          >
+            <span className="block">Hi, I’m Rustam —</span>
+
+            <span className="block">a graphic designer</span>
+
+            <span className="block">
+              creating{" "}
+              <ScrollFillText progress={scrollYProgress} from={0.12} to={0.34}>
+                visual identities,
+              </ScrollFillText>
+            </span>
+
+            <span className="block">
+              <ScrollFillText progress={scrollYProgress} from={0.26} to={0.46}>
+                logos
+              </ScrollFillText>{" "}
+              and{" "}
+              <ScrollFillText progress={scrollYProgress} from={0.36} to={0.62}>
+                animations.
+              </ScrollFillText>
+            </span>
           </span>
         </h2>
 

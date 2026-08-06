@@ -75,8 +75,9 @@ const MobileProjectItem = memo(function MobileProjectItem({
           <div className="mt-4">
             <p
               className="
-                text-[14px]
+                text-[15px]
                 uppercase
+                font-semibold
                 tracking-[0.22em]
                 text-color
               "
