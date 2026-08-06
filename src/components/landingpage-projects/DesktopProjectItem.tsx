@@ -2,31 +2,27 @@
 
 import Image from "next/image";
 import { memo, useCallback } from "react";
-import { motion, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
+import LinkReveal from "@/components/LinkReveal";
 import MagneticComp from "@/components/MagneticComp";
+import TextReveal from "@/components/TextReveal";
 import TransitionLink from "@/components/TransitionLink";
 
 import { BASE_HEIGHT, BASE_WIDTH, PANEL_POSITIONS } from "./projectLayouts";
 
 import type { DesktopProjectItemProps } from "./projectTypes";
 
-import {
-  formatProjectNumber,
-  formatTags,
-  formatTools,
-  getSafeDesktopLeft,
-} from "./projectutils";
+import { formatProjectNumber, formatTags, formatTools } from "./projectutils";
+
+const revealDuration = 0.65;
 
 const DesktopProjectItem = memo(function DesktopProjectItem({
   project,
   index,
-  left,
-  top,
+  align,
+  offsetX,
   baseScale,
-  drift,
-  driftDirection,
-  scrollYProgress,
   isActive,
   isDimmed,
   onHoverChange,
@@ -37,23 +33,13 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
 
   const panelPosition = PANEL_POSITIONS[index] ?? "rightOfCard";
 
-  const automaticPanelTop = baseScale < 0.7 ? 105 : baseScale < 0.8 ? 54 : 12;
+  const panelTop = baseScale < 0.7 ? 105 : baseScale < 0.8 ? 54 : 12;
 
-  const panelTop = automaticPanelTop;
-
-  const automaticPanelGap = baseScale < 0.7 ? 10 : baseScale < 0.8 ? 18 : 32;
-
-  const panelGap = automaticPanelGap;
+  const panelGap = baseScale < 0.7 ? 10 : baseScale < 0.8 ? 18 : 32;
 
   const visualImageEdge = (BASE_WIDTH * (1 + baseScale)) / 2;
 
   const panelOffset = visualImageEdge + panelGap;
-
-  const driftY = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [drift * driftDirection, drift * driftDirection * -1],
-  );
 
   const handlePointerEnter = useCallback(() => {
     onHoverChange(project.id);
@@ -67,17 +53,23 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
 
   const renderedImageWidth = Math.ceil(BASE_WIDTH * baseScale);
 
+  const alignmentClass =
+    align === "left"
+      ? "justify-start"
+      : align === "center"
+        ? "justify-center"
+        : "justify-end";
+
+  const translateX = align === "right" ? -Math.abs(offsetX) : offsetX;
+
+  const textAlignmentClass =
+    panelPosition === "leftOfCard" ? "text-right" : "text-left";
+
   return (
-    <motion.div
-      className="absolute"
-      style={{
-        top,
-        left: getSafeDesktopLeft(left, baseScale),
-      }}
-    >
-      <motion.div
+    <div className={`flex w-full ${alignmentClass}`}>
+      <div
         style={{
-          y: driftY,
+          transform: `translateX(${translateX}px)`,
         }}
       >
         <MagneticComp>
@@ -146,7 +138,6 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                     className="
                       text-2xl
                       uppercase
-                      
                       leading-none
                       tracking-[-0.08em]
                       text-color
@@ -154,6 +145,7 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                   >
                     {projectNumber}
                   </span>
+
                   <span className="text-2xl">/</span>
 
                   <span
@@ -171,129 +163,242 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
               </div>
             </TransitionLink>
 
-            {isActive && (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 10,
-                  filter: "blur(8px)",
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)",
-                }}
-                transition={{
-                  duration: 0.42,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className={`
-                  pointer-events-auto
-                  absolute
-                  z-50
-                  w-[280px]
-                  ${panelPosition === "leftOfCard" ? "text-right" : ""}
-                `}
-                style={{
-                  top: panelTop,
+            <AnimatePresence>
+              {isActive && (
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                  }}
+                  transition={{
+                    duration: 0.2,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className={`
+                    pointer-events-auto
+                    absolute
+                    z-50
+                    w-[280px]
+                    ${textAlignmentClass}
+                  `}
+                  style={{
+                    top: panelTop,
 
-                  right: panelPosition === "leftOfCard" ? panelOffset : "auto",
+                    right:
+                      panelPosition === "leftOfCard" ? panelOffset : "auto",
 
-                  left: panelPosition === "rightOfCard" ? panelOffset : "auto",
-
-                  transformOrigin:
-                    panelPosition === "leftOfCard" ? "right top" : "left top",
-                }}
-              >
-                <div className="space-y-2">
-                  <div>
-                    <p
+                    left:
+                      panelPosition === "rightOfCard" ? panelOffset : "auto",
+                  }}
+                >
+                  <div className="space-y-3">
+                    <TextReveal
+                      as="p"
+                      mode="words"
+                      viewport={false}
+                      active={isActive}
+                      delay={0}
+                      stagger={0.035}
+                      duration={revealDuration}
+                      y="105%"
                       className="
-                      pt-1
-                        text-md
-                        uppercase
+                        text-base
                         font-black
-                        tracking-[0.-0.022em]
+                        uppercase
+                        tracking-[-0.022em]
                         text-color/40
                       "
                     >
                       Project Details
-                    </p>
-                  </div>
+                    </TextReveal>
 
-                  <div className="h-px w-full bg-color/20" />
+                    <motion.div
+                      initial={{
+                        scaleX: 0,
+                        opacity: 0,
+                      }}
+                      animate={{
+                        scaleX: 1,
+                        opacity: 1,
+                      }}
+                      exit={{
+                        scaleX: 0,
+                        opacity: 0,
+                      }}
+                      transition={{
+                        delay: 0.1,
+                        duration: 0.65,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="h-px w-full bg-color/20"
+                      style={{
+                        transformOrigin:
+                          panelPosition === "leftOfCard"
+                            ? "right center"
+                            : "left center",
+                      }}
+                    />
 
-                  <div className="space-y-2">
-                    <p className="font-semibold">TAGS:</p>
+                    <div className="space-y-3">
+                      {tags.length > 0 && (
+                        <div className="space-y-1.5">
+                          <TextReveal
+                            as="p"
+                            mode="words"
+                            viewport={false}
+                            active={isActive}
+                            delay={0.14}
+                            duration={revealDuration}
+                            y="105%"
+                            className="
+                              text-sm
+                              font-semibold
+                              uppercase
+                              text-color
+                            "
+                          >
+                            Tags:
+                          </TextReveal>
 
-                    {tags.length > 0 && (
-                      <div className="space-y-1">
-                        {tags.map((tag) => (
-                          <TransitionLink
-                            key={tag.slug}
-                            href={`/projects?tags=${encodeURIComponent(
-                              tag.slug,
-                            )}`}
-                            transitionLabel={tag.label}
-                            className={`
-                              block
-                              w-fit
+                          <div className="space-y-1">
+                            {tags.map((tag, tagIndex) => (
+                              <TransitionLink
+                                key={tag.slug}
+                                href={`/projects?tags=${encodeURIComponent(
+                                  tag.slug,
+                                )}`}
+                                transitionLabel={tag.label}
+                                className={`
+                                  block
+                                  w-fit
+                                  underline-offset-4
+                                  transition-colors
+                                  hover:text-color
+                                  hover:underline
+
+                                  ${
+                                    panelPosition === "leftOfCard"
+                                      ? "ml-auto"
+                                      : ""
+                                  }
+                                `}
+                              >
+                                <LinkReveal
+                                  active={isActive}
+                                  delay={0.19 + tagIndex * 0.045}
+                                  duration={revealDuration}
+                                  y="110%"
+                                  className="
+                                    text-[13px]
+                                    uppercase
+                                    tracking-[0.18em]
+                                    text-color/55
+                                  "
+                                >
+                                  {tag.label}
+                                </LinkReveal>
+                              </TransitionLink>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {project.type && (
+                        <div className="space-y-1">
+                          <TextReveal
+                            as="p"
+                            mode="words"
+                            viewport={false}
+                            active={isActive}
+                            delay={0.28}
+                            duration={revealDuration}
+                            y="105%"
+                            className="
+                              text-sm
+                              font-semibold
+                              uppercase
+                              text-color
+                            "
+                          >
+                            Year:
+                          </TextReveal>
+
+                          <TextReveal
+                            as="p"
+                            mode="words"
+                            viewport={false}
+                            active={isActive}
+                            delay={0.33}
+                            stagger={0.025}
+                            duration={revealDuration}
+                            y="105%"
+                            className="
                               text-[13px]
                               uppercase
                               tracking-[0.18em]
                               text-color/55
-                              underline-offset-4
-                              transition-colors
-                              hover:text-color
-                              hover:underline
-
-                              ${panelPosition === "leftOfCard" ? "ml-auto" : ""}
-                            `}
+                            "
                           >
-                            {tag.label}
-                          </TransitionLink>
-                        ))}
-                      </div>
-                    )}
+                            {project.type}
+                          </TextReveal>
+                        </div>
+                      )}
 
-                    <p className="font-semibold">YEAR:</p>
+                      {tools && (
+                        <div className="space-y-1">
+                          <TextReveal
+                            as="p"
+                            mode="words"
+                            viewport={false}
+                            active={isActive}
+                            delay={0.38}
+                            duration={revealDuration}
+                            y="105%"
+                            className="
+                              text-sm
+                              font-semibold
+                              uppercase
+                              text-color
+                            "
+                          >
+                            Tools:
+                          </TextReveal>
 
-                    {project.type && (
-                      <p
-                        className="
-                          text-[13px]
-                          uppercase
-                          tracking-[0.18em]
-                          text-color/55
-                        "
-                      >
-                        {project.type}
-                      </p>
-                    )}
-
-                    <p className="font-semibold">TOOLS:</p>
-
-                    {tools && (
-                      <p
-                        className="
-                          text-[13px]
-                          uppercase
-                          leading-6
-                          tracking-[0.18em]
-                          text-color/55
-                        "
-                      >
-                        {tools}
-                      </p>
-                    )}
+                          <TextReveal
+                            as="p"
+                            mode="words"
+                            viewport={false}
+                            active={isActive}
+                            delay={0.43}
+                            stagger={0.025}
+                            duration={revealDuration}
+                            y="105%"
+                            className="
+                              text-[13px]
+                              uppercase
+                              leading-6
+                              tracking-[0.18em]
+                              text-color/55
+                            "
+                          >
+                            {tools}
+                          </TextReveal>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </MagneticComp>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 });
 

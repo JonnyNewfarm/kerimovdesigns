@@ -1,154 +1,133 @@
 "use client";
 
-import { useMemo } from "react";
-
-import type { MotionValue } from "framer-motion";
+import { useEffect, useState } from "react";
 
 import MagneticComp from "@/components/MagneticComp";
 import TransitionLink from "@/components/TransitionLink";
 
 import MobileProjectItem from "./MobileProjectItem";
 
-import { MOBILE_CONTAINER_MAX_WIDTH, mobileLayout } from "./projectLayouts";
+import { mobileLayout } from "./projectLayouts";
 
 import type { ProjectListItem } from "./projectTypes";
 
-import {
-  getMobileCardHeight,
-  getResponsiveMobileLeft,
-  getResponsiveMobileScale,
-  getResponsiveMobileTop,
-} from "./projectutils";
-
 type MobileProjectsProps = {
   projects: ProjectListItem[];
-  breakpointWidth: number;
-  scrollYProgress: MotionValue<number>;
 };
 
-export default function MobileProjects({
-  projects,
-  breakpointWidth,
-  scrollYProgress,
-}: MobileProjectsProps) {
-  const usedLayout = mobileLayout.slice(0, projects.length);
+export default function MobileProjects({ projects }: MobileProjectsProps) {
+  const [isSm, setIsSm] = useState(false);
 
-  const sectionHeight = useMemo(() => {
-    const contentHeight = Math.max(
-      ...usedLayout.map((item) => {
-        const resolvedTop = getResponsiveMobileTop(item, breakpointWidth);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 640px)");
 
-        const resolvedScale = getResponsiveMobileScale(item, breakpointWidth);
+    const updateBreakpoint = () => {
+      setIsSm(mediaQuery.matches);
+    };
 
-        const imageHeight = getMobileCardHeight(resolvedScale);
+    updateBreakpoint();
 
-        const textBlockHeight = 110;
+    mediaQuery.addEventListener("change", updateBreakpoint);
 
-        return resolvedTop + imageHeight + textBlockHeight;
-      }),
-      1700,
-    );
-
-    return contentHeight + 60;
-  }, [breakpointWidth, usedLayout]);
+    return () => {
+      mediaQuery.removeEventListener("change", updateBreakpoint);
+    };
+  }, []);
 
   return (
-    <div
-      className="relative w-full"
-      style={{
-        maxWidth: MOBILE_CONTAINER_MAX_WIDTH,
-        height: sectionHeight,
-      }}
+    <section
+      className="
+        relative
+        mx-auto
+        w-full
+        overflow-hidden
+        px-4
+        sm:px-7
+      "
     >
-      <div className="absolute  left-[8%] z-30">
-        <p
+      <header className="relative w-fit">
+        <span
+          className="
+            absolute
+            bottom-full
+            right-0
+            mb-2
+            text-[10px]
+            tracking-[0.12em]
+            text-color/50
+          "
+        >
+          {String(projects.length).padStart(2, "0")}
+        </span>
+
+        <h2
           className="
             text-4xl
+            sm:text-5xl            
             font-black
             uppercase
-            leading-[0.82]
-            tracking-[-0.07em]
+            leading-[0.78]
+            tracking-[-0.075em]
             text-color/80
           "
         >
           Recent
           <br />
           Work
-        </p>
+        </h2>
+      </header>
+
+      <div className="mt-8 flex flex-col gap-y-14">
+        {projects.map((project, index) => {
+          const item = mobileLayout[index];
+
+          if (!item) {
+            return null;
+          }
+
+          const scale =
+            isSm && item.scaleSm !== undefined ? item.scaleSm : item.scale;
+
+          return (
+            <MobileProjectItem
+              key={project.id}
+              project={project}
+              index={index}
+              align={item.align}
+              baseScale={scale}
+              offsetX={item.offsetX ?? 0}
+            />
+          );
+        })}
       </div>
-
-      {projects.map((project, index) => {
-        const item = mobileLayout[index % mobileLayout.length];
-
-        const resolvedLeft = getResponsiveMobileLeft(item, breakpointWidth);
-
-        const resolvedTop = getResponsiveMobileTop(item, breakpointWidth);
-
-        const resolvedScale = getResponsiveMobileScale(item, breakpointWidth);
-
-        return (
-          <MobileProjectItem
-            key={project.id}
-            project={project}
-            index={index}
-            left={resolvedLeft}
-            top={resolvedTop}
-            baseScale={resolvedScale}
-            drift={item.drift}
-            driftDirection={item.driftDirection}
-            scrollYProgress={scrollYProgress}
-          />
-        );
-      })}
 
       <TransitionLink
         href="/projects"
         transitionLabel="My work"
         className="
           group
-          absolute
-          left-[8%]
-          z-40
+          mt-20
+          inline-block
+          pb-8
         "
-        style={{
-          top: sectionHeight - 90,
-        }}
       >
         <MagneticComp>
           <div
             className="
+              text-4xl
               uppercase
               leading-[0.8]
               tracking-[-0.04em]
+              text-color/70
+              transition-colors
+              group-hover:text-color
             "
           >
-            <p
-              className="
-                flex
-                items-center
-                gap-x-2
-                text-4xl
-                text-color/70
-                transition
-                group-hover:text-color
-              "
-            >
-              view —
-            </p>
-
-            <p
-              className="
-                text-4xl
-                text-color/70
-                transition
-                group-hover:text-color
-              "
-            >
-              Projects
-            </p>
+            <p>View —</p>
+            <p>Projects</p>
           </div>
         </MagneticComp>
       </TransitionLink>
-    </div>
+    </section>
   );
 }

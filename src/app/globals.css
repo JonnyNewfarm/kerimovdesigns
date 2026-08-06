@@ -173,7 +173,7 @@ body {
 .poster-cursor-text {
   position: relative;
   display: inline-block;
-  color: #b4cdbd;
+  color: #cdddd3;
 
   filter:
     contrast(1.15)

@@ -14,49 +14,26 @@ export type LandingPageProjectsProps = {
   projects: ProjectListItem[];
 };
 
-export type LayoutItem = {
-  left: string;
-  leftMd?: string;
-  leftLg?: string;
-  leftXl?: string;
-  left2xl?: string;
-
-  top: number;
-  topMd?: number;
-  topLg?: number;
-  topXl?: number;
-  top2xl?: number;
-
+export type DesktopLayoutItem = {
+  align: "left" | "center" | "right";
   scale: number;
-  drift: number;
-  driftDirection: 1 | -1;
+  offsetX?: number;
 };
 
 export type MobileLayoutItem = {
-  left: string;
-  leftSm?: string;
-
-  top: number;
-  topSm?: number;
-
+  align: "left" | "right";
   scale: number;
-  scaleSm?: number;
-
-  drift: number;
-  driftDirection: 1 | -1;
+  scaleSm: number ;
+  offsetX?: number;
+  marginTop?: number;
 };
-
-export type LayoutMode = "desktop" | "mobile" | null;
 
 export type DesktopProjectItemProps = {
   project: ProjectListItem;
   index: number;
-  left: string;
-  top: number;
+  align: "left" | "center" | "right";
+  offsetX: number;
   baseScale: number;
-  drift: number;
-  driftDirection: 1 | -1;
-  scrollYProgress: MotionValue<number>;
   isActive: boolean;
   isDimmed: boolean;
   onHoverChange: (projectId: string | null) => void;
@@ -65,10 +42,7 @@ export type DesktopProjectItemProps = {
 export type MobileProjectItemProps = {
   project: ProjectListItem;
   index: number;
-  left: string;
-  top: number;
+  align: "left" | "right";
+  offsetX: number;
   baseScale: number;
-  drift: number;
-  driftDirection: 1 | -1;
-  scrollYProgress: MotionValue<number>;
 };

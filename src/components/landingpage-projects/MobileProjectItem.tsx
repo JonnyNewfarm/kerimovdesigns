@@ -2,53 +2,38 @@
 
 import Image from "next/image";
 import { memo } from "react";
-import { motion, useTransform } from "framer-motion";
 
 import TransitionLink from "@/components/TransitionLink";
 
 import type { MobileProjectItemProps } from "./projectTypes";
 
-import {
-  formatProjectNumber,
-  getMobileCardHeight,
-  getMobileCardWidth,
-  getSafeMobileLeft,
-} from "./projectutils";
+import { formatProjectNumber, getMobileCardWidth } from "./projectutils";
 
 const MobileProjectItem = memo(function MobileProjectItem({
   project,
   index,
-  left,
-  top,
+  align,
   baseScale,
-  drift,
-  driftDirection,
-  scrollYProgress,
+  offsetX,
 }: MobileProjectItemProps) {
   const projectNumber = formatProjectNumber(index);
-
-  const driftY = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [drift * driftDirection, drift * driftDirection * -1],
-  );
-
   const cardWidth = getMobileCardWidth(baseScale);
-  const cardHeight = getMobileCardHeight(baseScale);
-
-  const renderedImageWidth = Math.ceil(cardWidth);
 
   return (
     <div
-      className="absolute"
+      className={`
+        flex
+        w-full
+        ${align === "right" ? "justify-end" : "justify-start"}
+      `}
       style={{
-        top,
-        left: getSafeMobileLeft(left, baseScale),
+        paddingLeft: align === "left" ? offsetX : 0,
+        paddingRight: align === "right" ? offsetX : 0,
       }}
     >
-      <motion.div
+      <div
         style={{
-          y: driftY,
+          width: cardWidth,
         }}
       >
         <TransitionLink
@@ -56,37 +41,31 @@ const MobileProjectItem = memo(function MobileProjectItem({
           transitionLabel={project.title}
           className="block"
         >
-          <div
-            className="relative overflow-hidden"
-            style={{
-              width: cardWidth,
-              height: cardHeight,
-            }}
-          >
+          <div className="relative aspect-[360/214] overflow-hidden">
             <Image
               fill
               src={project.src}
               alt={project.title}
               className="object-cover"
-              sizes={`${renderedImageWidth}px`}
+              sizes={`${Math.ceil(cardWidth)}px`}
             />
           </div>
 
-          <div className="mt-4">
-            <p
-              className="
-                text-[15px]
-                uppercase
-                font-semibold
-                tracking-[0.22em]
-                text-color
-              "
-            >
-              {projectNumber} - {project.title}
-            </p>
-          </div>
+          <p
+            className="
+              mt-4
+              text-[15px]
+              font-semibold
+              uppercase
+              leading-none
+              tracking-[0.22em]
+              text-color
+            "
+          >
+            {projectNumber} — {project.title}
+          </p>
         </TransitionLink>
-      </motion.div>
+      </div>
     </div>
   );
 });

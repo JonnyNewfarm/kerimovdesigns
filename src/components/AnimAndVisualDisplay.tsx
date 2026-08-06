@@ -235,52 +235,58 @@ const ProjectMedia = memo(function ProjectMedia({
     <TransitionLink
       {...sharedProps}
       className="
-        group
-        relative
-        grid
-        aspect-video
-        w-full
-        grid-cols-2
-        overflow-hidden
-        bg-color/[0.04]
-      "
+      group
+      relative
+      grid
+      w-full
+      grid-cols-2
+      items-stretch
+      overflow-hidden
+      bg-color/[0.04]
+    "
     >
       {item.images?.map((image, imageIndex) => (
         <div
           key={image}
           className="
-            relative
-            h-full
-            w-full
-            overflow-hidden
-          "
+          relative
+          flex
+          min-w-0
+          items-stretch
+          justify-center
+          overflow-hidden
+          bg-black
+        "
         >
           <Image
-            fill
             src={image}
             alt={`${item.title} image ${imageIndex + 1}`}
+            width={1200}
+            height={1600}
             sizes="(max-width: 1024px) 50vw, 38vw"
             className="
-              object-cover
-              transition-transform
-              duration-700
-              ease-out
-              group-hover:scale-[1.03]
-            "
+            h-auto
+            w-full
+            object-contain
+            transition-transform
+            duration-700
+            ease-out
+            group-hover:scale-[1.015]
+          "
           />
         </div>
       ))}
 
       <div
         className="
-          pointer-events-none
-          absolute
-          inset-0
-          bg-dark/0
-          transition-colors
-          duration-500
-          group-hover:bg-dark/10
-        "
+        pointer-events-none
+        absolute
+        inset-0
+        bg-dark/0
+        transition-colors
+        duration-500
+        group-hover:bg-dark/10
+      "
       />
     </TransitionLink>
   );

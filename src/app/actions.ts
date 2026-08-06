@@ -283,6 +283,32 @@ export async function updateProject(
   }
 }
 
+const getCachedLandingProjects = unstable_cache(
+  async () => {
+    return prisma.project.findMany({
+      take: 5,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: projectListSelect,
+    });
+  },
+  ["landing-projects"],
+  {
+    tags: ["projects"],
+  },
+);
+
+export async function getLandingProjects() {
+  try {
+    return await getCachedLandingProjects();
+  } catch (error) {
+    console.error("Error fetching landing projects:", error);
+
+    throw new Error("Failed to fetch landing projects");
+  }
+}
+
 const getCachedProjects = unstable_cache(
   async (tag?: string) => {
     const where = createTagFilter(tag);
@@ -301,6 +327,8 @@ const getCachedProjects = unstable_cache(
     tags: ["projects"],
   },
 );
+
+
 
 export async function getProjects(tag?: string) {
   try {
