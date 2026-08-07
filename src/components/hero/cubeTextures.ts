@@ -231,7 +231,6 @@ export async function loadSatoshiFont() {
       return;
     }
   } catch {
-    // Fallback below.
   }
 
   const possibleFontFiles = [
@@ -267,7 +266,6 @@ export async function loadSatoshiFont() {
         return;
       }
     } catch {
-      // Try next font file.
     }
   }
 }

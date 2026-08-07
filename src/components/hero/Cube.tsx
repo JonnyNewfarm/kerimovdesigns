@@ -76,6 +76,115 @@ import {
   waitForTextureImage,
 } from "./cubeTextures";
 
+type GradientPalette = {
+  colorA: string;
+  colorB: string;
+  colorC: string;
+  colorD: string;
+};
+
+type GradientFaceMaterialProps = {
+  attach: string;
+  materialIndex: number;
+  palette: GradientPalette;
+  isMobile: boolean;
+  hoveredRef: React.MutableRefObject<boolean>;
+  introDoneRef: React.MutableRefObject<boolean>;
+  activeMaterialIndexRef: React.MutableRefObject<number | null>;
+  targetMouseUvRef: React.MutableRefObject<Vector2>;
+};
+
+function GradientFaceMaterial({
+  attach,
+  materialIndex,
+  palette,
+  isMobile,
+  hoveredRef,
+  introDoneRef,
+  activeMaterialIndexRef,
+  targetMouseUvRef,
+}: GradientFaceMaterialProps) {
+  const materialRef = useRef<ShaderMaterial>(null);
+  const elapsedRef = useRef(0);
+
+  const uniforms = useMemo(
+    () => ({
+      uTime: {
+        value: 0,
+      },
+      uHover: {
+        value: 0,
+      },
+      uMouse: {
+        value: new Vector2(0.5, 0.5),
+      },
+      uSpeed: {
+        value: SHADER_SPEED,
+      },
+      uMovement: {
+        value: SHADER_MOVEMENT,
+      },
+      uWarp: {
+        value: SHADER_WARP,
+      },
+      uDisplacement: {
+        value: SHADER_DISPLACEMENT,
+      },
+      uColorA: {
+        value: new Color(palette.colorA),
+      },
+      uColorB: {
+        value: new Color(palette.colorB),
+      },
+      uColorC: {
+        value: new Color(palette.colorC),
+      },
+      uColorD: {
+        value: new Color(palette.colorD),
+      },
+    }),
+    [palette.colorA, palette.colorB, palette.colorC, palette.colorD],
+  );
+
+  useFrame((_, delta) => {
+    elapsedRef.current += Math.min(delta, 0.1);
+    uniforms.uTime.value = elapsedRef.current;
+
+    const isActiveFace =
+      !isMobile &&
+      hoveredRef.current &&
+      introDoneRef.current &&
+      activeMaterialIndexRef.current === materialIndex;
+
+    uniforms.uHover.value = MathUtils.lerp(
+      uniforms.uHover.value,
+      isActiveFace ? 1 : 0,
+      0.08,
+    );
+
+    if (isMobile) {
+      uniforms.uMouse.value.set(0.5, 0.5);
+    } else {
+      uniforms.uMouse.value.lerp(targetMouseUvRef.current, 0.12);
+    }
+
+    if (materialRef.current) {
+      materialRef.current.uniformsNeedUpdate = true;
+    }
+  });
+
+  return (
+    <shaderMaterial
+      ref={materialRef}
+      attach={attach}
+      vertexShader={gradientVertexShader}
+      fragmentShader={gradientFragmentShader}
+      uniforms={uniforms}
+      toneMapped={false}
+    />
+  );
+}
+
 export type CubeProps = {
   scrollProgress: MotionValue<number>;
   introDone: boolean;
@@ -102,7 +211,6 @@ export default function Cube({
   const group = useRef<Group>(null);
   const mesh = useRef<Mesh>(null);
 
-  const shaderMaterials = useRef<(ShaderMaterial | null)[]>([]);
   const rustamMaterialRef = useRef<MeshBasicMaterial | null>(null);
 
   const hoveredRef = useRef(false);
@@ -584,39 +692,12 @@ export default function Cube({
     document.body.style.cursor = "pointer";
   }
 
-  useFrame(({ clock }) => {
+  useFrame(() => {
     if (!group.current) {
       return;
     }
 
-    const time = clock.getElapsedTime();
     const value = scrollProgress.get();
-
-    shaderMaterials.current.forEach((material, materialIndex) => {
-      if (!material) {
-        return;
-      }
-
-      const isActiveFace =
-        !isMobile &&
-        hoveredRef.current &&
-        introDoneRef.current &&
-        activeMaterialIndexRef.current === materialIndex;
-
-      material.uniforms.uTime.value = time;
-
-      material.uniforms.uHover.value = MathUtils.lerp(
-        material.uniforms.uHover.value,
-        isActiveFace ? 1 : 0,
-        0.08,
-      );
-
-      if (!isMobile) {
-        material.uniforms.uMouse.value.lerp(targetMouseUvRef.current, 0.12);
-      } else {
-        material.uniforms.uMouse.value.set(0.5, 0.5);
-      }
-    });
 
     if (!isDraggingCubeRef.current) {
       group.current.rotation.x = value;
@@ -625,7 +706,6 @@ export default function Cube({
 
     if (isMobile) {
       group.current.scale.set(1.05, 1.05, 1.05);
-
       return;
     }
 
@@ -639,6 +719,7 @@ export default function Cube({
       targetScaleRef.current,
     );
   });
+
   const isCubeReady = Boolean(
     rustamTexture &&
       topTextTexture &&
@@ -906,7 +987,7 @@ export default function Cube({
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
       >
-        <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
+        <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE, 24, 24, 24]} />
 
         {BOX_FACE_PROJECT_INDEXES.map((projectIndex, materialIndex) => {
           const isRustam = projectIndex === 0;
@@ -926,82 +1007,16 @@ export default function Cube({
           const palette = gradientPalettes[projectIndex];
 
           return (
-            <shaderMaterial
+            <GradientFaceMaterial
               key={materialIndex}
-              ref={(material) => {
-                shaderMaterials.current[materialIndex] = material;
-              }}
               attach={`material-${materialIndex}`}
-              vertexShader={gradientVertexShader}
-              fragmentShader={gradientFragmentShader}
-              uniforms={{
-                uTime: {
-                  value: 0,
-                },
-                uHover: {
-                  value: 0,
-                },
-                uMouse: {
-                  value: new Vector2(0.5, 0.5),
-                },
-                uSpeed: {
-                  value: SHADER_SPEED,
-                },
-                uMovement: {
-                  value: SHADER_MOVEMENT,
-                },
-                uWarp: {
-                  value: SHADER_WARP,
-                },
-                uDisplacement: {
-                  value: SHADER_DISPLACEMENT,
-                },
-                uColorA: {
-                  value: new Color(palette.colorA),
-                },
-                uColorB: {
-                  value: new Color(palette.colorB),
-                },
-                uColorC: {
-                  value: new Color(palette.colorC),
-                },
-                uColorD: {
-                  value: new Color(palette.colorD),
-                },
-              }}
-              toneMapped={false}
-              onBeforeRender={() => {
-                const material = shaderMaterials.current[materialIndex];
-
-                if (!material) {
-                  return;
-                }
-
-                const time = performance.now() * 0.001;
-
-                const isActiveFace =
-                  !isMobile &&
-                  hoveredRef.current &&
-                  introDoneRef.current &&
-                  activeMaterialIndexRef.current === materialIndex;
-
-                material.uniforms.uTime.value = time;
-
-                material.uniforms.uHover.value = MathUtils.lerp(
-                  material.uniforms.uHover.value,
-                  isActiveFace ? 1 : 0,
-                  0.08,
-                );
-
-                if (!isMobile) {
-                  material.uniforms.uMouse.value.lerp(
-                    targetMouseUvRef.current,
-                    0.12,
-                  );
-                } else {
-                  material.uniforms.uMouse.value.set(0.5, 0.5);
-                }
-              }}
+              materialIndex={materialIndex}
+              palette={palette}
+              isMobile={isMobile}
+              hoveredRef={hoveredRef}
+              introDoneRef={introDoneRef}
+              activeMaterialIndexRef={activeMaterialIndexRef}
+              targetMouseUvRef={targetMouseUvRef}
             />
           );
         })}

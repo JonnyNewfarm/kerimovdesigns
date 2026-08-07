@@ -283,16 +283,9 @@ export default function Index({ href, title }: IndexProps) {
           >
             {hasMounted && allowCanvasMount && (
               <Canvas
-                key="hero-canvas-ready"
                 className="h-3/4 w-full"
                 dpr={isMdUp ? [1, 1.5] : 1.35}
-                frameloop={
-                  isTransitioning
-                    ? "never"
-                    : introExited && cubeReady
-                      ? "always"
-                      : "demand"
-                }
+                frameloop="always"
                 gl={{
                   antialias: false,
                   powerPreference: "high-performance",
@@ -316,12 +309,10 @@ export default function Index({ href, title }: IndexProps) {
                 )}
 
                 <ambientLight intensity={2} />
-
                 <directionalLight position={[2, 1, 1]} />
 
                 <Suspense fallback={null}>
                   <Cube
-                    key="cube-ready"
                     scrollProgress={cubeScrollProgress}
                     introDone={introDone}
                     isDraggingCubeRef={isDraggingCubeRef}

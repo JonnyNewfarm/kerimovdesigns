@@ -172,6 +172,7 @@ const CustomCursor = memo(function CustomCursor({
 
 type ProjectMediaProps = {
   item: AnimationProject;
+  index: number;
   onPointerEnter: (
     event: ReactPointerEvent<HTMLAnchorElement>,
     item: AnimationProject,
@@ -182,6 +183,7 @@ type ProjectMediaProps = {
 
 const ProjectMedia = memo(function ProjectMedia({
   item,
+  index,
   onPointerEnter,
   onPointerMove,
   onPointerLeave,
@@ -190,6 +192,7 @@ const ProjectMedia = memo(function ProjectMedia({
     href: item.href,
     transitionLabel: item.title,
     "aria-label": `View ${item.title}`,
+    "data-project-index": index,
     onPointerEnter: (event: ReactPointerEvent<HTMLAnchorElement>) => {
       onPointerEnter(event, item);
     },
@@ -271,13 +274,8 @@ const ProjectMedia = memo(function ProjectMedia({
             alt={`${item.title} image ${imageIndex + 1}`}
             width={1200}
             height={1600}
-            sizes="
-              (max-width: 767px) 50vw,
-              (max-width: 1023px) 50vw,
-              39vw
-            "
+            sizes="(max-width: 1024px) 50vw, 38vw"
             quality={80}
-            loading="lazy"
             className="
               h-auto
               w-full
@@ -359,6 +357,7 @@ const ProjectArticle = memo(function ProjectArticle({
 
       <ProjectMedia
         item={item}
+        index={index}
         onPointerEnter={onPointerEnter}
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
@@ -425,6 +424,14 @@ const ProjectArticle = memo(function ProjectArticle({
 export default function AnimAndVisualDisplay() {
   const sectionRef = useRef<HTMLElement | null>(null);
 
+  const latestPointerRef = useRef({
+    x: -9999,
+    y: -9999,
+  });
+
+  const pointerFrameRef = useRef<number | null>(null);
+  const scrollFrameRef = useRef<number | null>(null);
+
   const [cursorState, setCursorState] =
     useState<CursorState>(INITIAL_CURSOR_STATE);
 
@@ -443,8 +450,23 @@ export default function AnimAndVisualDisplay() {
 
   const updatePointerPosition = useCallback(
     (clientX: number, clientY: number) => {
-      pointerX.set(clientX);
-      pointerY.set(clientY);
+      latestPointerRef.current = {
+        x: clientX,
+        y: clientY,
+      };
+
+      if (pointerFrameRef.current !== null) {
+        return;
+      }
+
+      pointerFrameRef.current = window.requestAnimationFrame(() => {
+        const { x, y } = latestPointerRef.current;
+
+        pointerX.set(x);
+        pointerY.set(y);
+
+        pointerFrameRef.current = null;
+      });
     },
     [pointerX, pointerY],
   );
@@ -462,23 +484,147 @@ export default function AnimAndVisualDisplay() {
     });
   }, []);
 
+  const showCursorForProject = useCallback((item: AnimationProject) => {
+    setCursorState((currentState) => {
+      if (
+        currentState.visible &&
+        currentState.text === item.hoverText &&
+        currentState.className === item.cursorClass
+      ) {
+        return currentState;
+      }
+
+      return {
+        text: item.hoverText,
+        className: item.cursorClass,
+        visible: true,
+      };
+    });
+  }, []);
+
+  const updateHoveredProjectAtPointer = useCallback(() => {
+    if (!isDesktop) {
+      return;
+    }
+
+    const { x, y } = latestPointerRef.current;
+
+    if (x < 0 || y < 0) {
+      hideCursor();
+      return;
+    }
+
+    const elementAtPointer = document.elementFromPoint(x, y);
+
+    const projectElement = elementAtPointer?.closest(
+      "[data-project-index]",
+    ) as HTMLElement | null;
+
+    if (!projectElement) {
+      hideCursor();
+      return;
+    }
+
+    const projectIndexValue = projectElement.dataset.projectIndex;
+
+    if (projectIndexValue === undefined) {
+      hideCursor();
+      return;
+    }
+
+    const projectIndex = Number(projectIndexValue);
+
+    if (!Number.isInteger(projectIndex)) {
+      hideCursor();
+      return;
+    }
+
+    const item = animations[projectIndex];
+
+    if (!item) {
+      hideCursor();
+      return;
+    }
+
+    showCursorForProject(item);
+  }, [hideCursor, isDesktop, showCursorForProject]);
+
   useEffect(() => {
     if (!isDesktop) {
       hideCursor();
       return;
     }
 
-    window.addEventListener("scroll", hideCursor, {
+    const handleWindowPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") {
+        return;
+      }
+
+      updatePointerPosition(event.clientX, event.clientY);
+    };
+
+    const handleWindowScroll = () => {
+      if (scrollFrameRef.current !== null) {
+        return;
+      }
+
+      scrollFrameRef.current = window.requestAnimationFrame(() => {
+        updateHoveredProjectAtPointer();
+        scrollFrameRef.current = null;
+      });
+    };
+
+    const handleWindowBlur = () => {
+      hideCursor();
+    };
+
+    const handleDocumentMouseLeave = () => {
+      hideCursor();
+    };
+
+    window.addEventListener("pointermove", handleWindowPointerMove, {
       passive: true,
     });
 
-    window.addEventListener("blur", hideCursor);
+    window.addEventListener("scroll", handleWindowScroll, {
+      passive: true,
+    });
+
+    window.addEventListener("blur", handleWindowBlur);
+
+    document.documentElement.addEventListener(
+      "mouseleave",
+      handleDocumentMouseLeave,
+    );
 
     return () => {
-      window.removeEventListener("scroll", hideCursor);
-      window.removeEventListener("blur", hideCursor);
+      window.removeEventListener("pointermove", handleWindowPointerMove);
+
+      window.removeEventListener("scroll", handleWindowScroll);
+      window.removeEventListener("blur", handleWindowBlur);
+
+      document.documentElement.removeEventListener(
+        "mouseleave",
+        handleDocumentMouseLeave,
+      );
+
+      if (pointerFrameRef.current !== null) {
+        window.cancelAnimationFrame(pointerFrameRef.current);
+      }
+
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current);
+      }
+
+      pointerFrameRef.current = null;
+      scrollFrameRef.current = null;
     };
-  }, [hideCursor, isDesktop]);
+  }, [
+    hideCursor,
+    isDesktop,
+    updateHoveredProjectAtPointer,
+    updatePointerPosition,
+  ]);
 
   const handleProjectPointerMove = useCallback(
     (event: ReactPointerEvent<HTMLAnchorElement>) => {
@@ -498,24 +644,9 @@ export default function AnimAndVisualDisplay() {
       }
 
       updatePointerPosition(event.clientX, event.clientY);
-
-      setCursorState((currentState) => {
-        if (
-          currentState.visible &&
-          currentState.text === item.hoverText &&
-          currentState.className === item.cursorClass
-        ) {
-          return currentState;
-        }
-
-        return {
-          text: item.hoverText,
-          className: item.cursorClass,
-          visible: true,
-        };
-      });
+      showCursorForProject(item);
     },
-    [isDesktop, updatePointerPosition],
+    [isDesktop, showCursorForProject, updatePointerPosition],
   );
 
   return (
