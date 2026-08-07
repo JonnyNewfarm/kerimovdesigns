@@ -186,6 +186,7 @@ function GradientFaceMaterial({
 }
 
 export type CubeProps = {
+  isActive: boolean;
   scrollProgress: MotionValue<number>;
   introDone: boolean;
   isDraggingCubeRef: React.MutableRefObject<boolean>;
@@ -198,6 +199,7 @@ export type CubeProps = {
 };
 
 export default function Cube({
+  isActive,
   scrollProgress,
   introDone,
   isDraggingCubeRef,
@@ -519,6 +521,26 @@ export default function Cube({
       movingVideoTextureRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const video = movingVideoElementRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    if (!isActive) {
+      video.pause();
+      hoveredRef.current = false;
+      activeMaterialIndexRef.current = null;
+      document.body.style.cursor = "";
+      return;
+    }
+
+    void video.play().catch(() => {
+      // Browser may delay playback until interaction.
+    });
+  }, [isActive]);
 
   useEffect(() => {
     function checkMobile() {

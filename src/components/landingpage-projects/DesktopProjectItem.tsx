@@ -265,43 +265,70 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                             Tags:
                           </TextReveal>
 
-                          <div className="space-y-1">
+                          <div className="space-y-2">
                             {tags.map((tag, tagIndex) => (
                               <TransitionLink
                                 key={tag.slug}
-                                href={`/projects?tags=${encodeURIComponent(
-                                  tag.slug,
-                                )}`}
+                                href={`/projects?tags=${encodeURIComponent(tag.slug)}`}
                                 transitionLabel={tag.label}
                                 className={`
-                                  block
-                                  w-fit
-                                  underline-offset-4
-                                  transition-colors
-                                  hover:text-color
-                                  hover:underline
+        group/tag
+        block
+        w-fit
 
-                                  ${
-                                    panelPosition === "leftOfCard"
-                                      ? "ml-auto"
-                                      : ""
-                                  }
-                                `}
+        ${panelPosition === "leftOfCard" ? "ml-auto" : ""}
+      `}
                               >
-                                <LinkReveal
-                                  active={isActive}
-                                  delay={0.19 + tagIndex * 0.045}
-                                  duration={revealDuration}
-                                  y="110%"
-                                  className="
-                                    text-[13px]
-                                    uppercase
-                                    tracking-[0.18em]
-                                    text-color/55
-                                  "
-                                >
-                                  {tag.label}
-                                </LinkReveal>
+                                <div className="relative w-fit pb-1">
+                                  <LinkReveal
+                                    active={isActive}
+                                    delay={0.19 + tagIndex * 0.045}
+                                    duration={revealDuration}
+                                    y="110%"
+                                    className="
+            text-[13px]
+            uppercase
+            tracking-[0.18em]
+            text-color/55
+            transition-colors
+            duration-300
+            group-hover/tag:text-color
+          "
+                                  >
+                                    {tag.label}
+                                  </LinkReveal>
+
+                                  <motion.span
+                                    aria-hidden="true"
+                                    initial={{
+                                      scaleX: 0,
+                                      opacity: 0,
+                                    }}
+                                    animate={{
+                                      scaleX: isActive ? 1 : 0,
+                                      opacity: isActive ? 1 : 0,
+                                    }}
+                                    transition={{
+                                      delay: 0.3 + tagIndex * 0.06,
+                                      duration: 0.65,
+                                      ease: [0.22, 1, 0.36, 1],
+                                    }}
+                                    className="
+            absolute
+            bottom-1.5
+            left-0
+            h-[1px]
+            w-full
+            bg-white/50
+          "
+                                    style={{
+                                      transformOrigin:
+                                        panelPosition === "leftOfCard"
+                                          ? "right center"
+                                          : "left center",
+                                    }}
+                                  />
+                                </div>
                               </TransitionLink>
                             ))}
                           </div>

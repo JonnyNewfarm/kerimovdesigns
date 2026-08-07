@@ -63,10 +63,38 @@ export default function Index({ href, title }: IndexProps) {
   const [introDone, setIntroDone] = useState(false);
   const [cubeReady, setCubeReady] = useState(false);
   const [allowCanvasMount, setAllowCanvasMount] = useState(false);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
 
   const { isTransitioning } = usePageTransition();
   const { introExited, setIntroExited } = useHeroIntro();
+
   const canRevealBottomLine = introExited && cubeReady;
+  const isCanvasActive = isHeroVisible && !isTransitioning;
+
+  useEffect(() => {
+    const element = container.current;
+
+    if (!element) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting);
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0,
+      },
+    );
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (isTransitioning) {
@@ -135,7 +163,7 @@ export default function Index({ href, title }: IndexProps) {
   return (
     <motion.div
       ref={container}
-      className="min-h-[230vh] md:min-h-[230dvh]"
+      className="min-h-[230vh] border-white md:min-h-[230dvh]"
       initial={false}
       animate={{
         opacity: 1,
@@ -285,7 +313,7 @@ export default function Index({ href, title }: IndexProps) {
               <Canvas
                 className="h-3/4 w-full"
                 dpr={isMdUp ? [1, 1.5] : 1.35}
-                frameloop="always"
+                frameloop={isCanvasActive ? "always" : "never"}
                 gl={{
                   antialias: false,
                   powerPreference: "high-performance",
@@ -313,6 +341,7 @@ export default function Index({ href, title }: IndexProps) {
 
                 <Suspense fallback={null}>
                   <Cube
+                    isActive={isCanvasActive}
                     scrollProgress={cubeScrollProgress}
                     introDone={introDone}
                     isDraggingCubeRef={isDraggingCubeRef}

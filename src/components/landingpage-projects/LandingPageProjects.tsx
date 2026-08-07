@@ -27,8 +27,7 @@ export default function LandingPageProjects({
         bg-dark
         text-color
         lg:mt-10
-        xl:mt-10
-      "
+    "
     >
       <div className="lg:hidden">
         <MobileProjects projects={projects} />

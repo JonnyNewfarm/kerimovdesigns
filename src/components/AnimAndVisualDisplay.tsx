@@ -124,7 +124,7 @@ const CustomCursor = memo(function CustomCursor({
       style={{
         x: cursorX,
         y: cursorY,
-        willChange: "transform",
+        willChange: "transform, opacity",
       }}
       animate={{
         opacity: cursorState.visible ? 1 : 0,
@@ -177,7 +177,6 @@ type ProjectMediaProps = {
     event: ReactPointerEvent<HTMLAnchorElement>,
     item: AnimationProject,
   ) => void;
-  onPointerMove: (event: ReactPointerEvent<HTMLAnchorElement>) => void;
   onPointerLeave: () => void;
 };
 
@@ -185,7 +184,6 @@ const ProjectMedia = memo(function ProjectMedia({
   item,
   index,
   onPointerEnter,
-  onPointerMove,
   onPointerLeave,
 }: ProjectMediaProps) {
   const sharedProps = {
@@ -193,10 +191,11 @@ const ProjectMedia = memo(function ProjectMedia({
     transitionLabel: item.title,
     "aria-label": `View ${item.title}`,
     "data-project-index": index,
+
     onPointerEnter: (event: ReactPointerEvent<HTMLAnchorElement>) => {
       onPointerEnter(event, item);
     },
-    onPointerMove,
+
     onPointerLeave,
   };
 
@@ -313,7 +312,6 @@ type ProjectArticleProps = {
     event: ReactPointerEvent<HTMLAnchorElement>,
     item: AnimationProject,
   ) => void;
-  onPointerMove: (event: ReactPointerEvent<HTMLAnchorElement>) => void;
   onPointerLeave: () => void;
 };
 
@@ -323,12 +321,18 @@ const ProjectArticle = memo(function ProjectArticle({
   projectY,
   isDesktop,
   onPointerEnter,
-  onPointerMove,
   onPointerLeave,
 }: ProjectArticleProps) {
   return (
     <motion.article
-      style={isDesktop ? { y: projectY } : undefined}
+      style={
+        isDesktop
+          ? {
+              y: projectY,
+              willChange: "transform",
+            }
+          : undefined
+      }
       className={`
         grid
         grid-cols-1
@@ -359,7 +363,6 @@ const ProjectArticle = memo(function ProjectArticle({
         item={item}
         index={index}
         onPointerEnter={onPointerEnter}
-        onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
       />
 
@@ -509,7 +512,7 @@ export default function AnimAndVisualDisplay() {
 
     const { x, y } = latestPointerRef.current;
 
-    if (x < 0 || y < 0) {
+    if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) {
       hideCursor();
       return;
     }
@@ -599,7 +602,6 @@ export default function AnimAndVisualDisplay() {
 
     return () => {
       window.removeEventListener("pointermove", handleWindowPointerMove);
-
       window.removeEventListener("scroll", handleWindowScroll);
       window.removeEventListener("blur", handleWindowBlur);
 
@@ -625,17 +627,6 @@ export default function AnimAndVisualDisplay() {
     updateHoveredProjectAtPointer,
     updatePointerPosition,
   ]);
-
-  const handleProjectPointerMove = useCallback(
-    (event: ReactPointerEvent<HTMLAnchorElement>) => {
-      if (!isDesktop || event.pointerType !== "mouse") {
-        return;
-      }
-
-      updatePointerPosition(event.clientX, event.clientY);
-    },
-    [isDesktop, updatePointerPosition],
-  );
 
   const handleProjectPointerEnter = useCallback(
     (event: ReactPointerEvent<HTMLAnchorElement>, item: AnimationProject) => {
@@ -679,7 +670,6 @@ export default function AnimAndVisualDisplay() {
               projectY={index === 0 ? firstY : secondY}
               isDesktop={isDesktop}
               onPointerEnter={handleProjectPointerEnter}
-              onPointerMove={handleProjectPointerMove}
               onPointerLeave={hideCursor}
             />
           ))}
@@ -688,7 +678,7 @@ export default function AnimAndVisualDisplay() {
         <div className="mt-24 md:mt-32 lg:mt-40">
           <TextReveal
             as="h2"
-            mode="lines"
+            mode="words"
             delay={0.01}
             className="
               max-w-[1300px]

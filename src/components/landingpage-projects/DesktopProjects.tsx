@@ -42,7 +42,10 @@ export default function DesktopProjects({
     w-fit
   "
       >
-        <span
+        <TextReveal
+          as="span"
+          mode="chars"
+          delay={0.1}
           className="
       absolute
       bottom-full
@@ -54,8 +57,8 @@ export default function DesktopProjects({
       text-color/45
     "
         >
-          {String(projects.length).padStart(2, "0")}
-        </span>
+          05
+        </TextReveal>
 
         <TextReveal
           as="h2"
