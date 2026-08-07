@@ -426,10 +426,8 @@ export default function Cube({
         return;
       }
 
-      generatedVisualIdentityTexture = createVisualIdentityTexture(
-        visualTextures,
-        logoTextures[3],
-      );
+      generatedVisualIdentityTexture =
+        createVisualIdentityTexture(visualTextures);
 
       if (cancelled) {
         generatedVisualIdentityTexture?.dispose();
