@@ -11,15 +11,18 @@ import { useFrame, useLoader, type ThreeEvent } from "@react-three/fiber";
 import {
   CanvasTexture,
   Color,
+  Euler,
   Group,
   MathUtils,
   Mesh,
   MeshBasicMaterial,
+  Quaternion,
   ShaderMaterial,
   SRGBColorSpace,
   Texture,
   TextureLoader,
   Vector2,
+  Vector3,
   VideoTexture,
 } from "three";
 import type { MotionValue } from "framer-motion";
@@ -34,10 +37,10 @@ import {
   ANIMATION_LINK_PLANE_HEIGHT,
   ANIMATION_LINK_PLANE_WIDTH,
   BOX_FACE_PROJECT_INDEXES,
-  CLIENT_WORK_LINK_CENTER_X,
-  CLIENT_WORK_LINK_CENTER_Y,
-  CLIENT_WORK_LINK_PLANE_HEIGHT,
-  CLIENT_WORK_LINK_PLANE_WIDTH,
+  POSTER_LINK_CENTER_X,
+  POSTER_LINK_CENTER_Y,
+  POSTER_LINK_PLANE_HEIGHT,
+  POSTER_LINK_PLANE_WIDTH,
   CUBE_SIZE,
   FACE_OVERLAY_POSITION,
   FACE_OVERLAY_SIZE,
@@ -54,7 +57,7 @@ import {
   VISUAL_LINK_CENTER_Y,
   VISUAL_LINK_PLANE_HEIGHT,
   VISUAL_LINK_PLANE_WIDTH,
-  clientWorkImagePaths,
+  posterImagePaths,
   cubeProjects,
   faceCollageLayout,
   logoImagePaths,
@@ -66,7 +69,7 @@ import {
   gradientVertexShader,
 } from "./cubeShaders";
 import {
-  createClientWorkTexture,
+  createPosterTexture,
   createCollageTexture,
   createLogoInspirationTexture,
   createMovingGraphicsTextTexture,
@@ -196,8 +199,8 @@ export type CubeProps = {
   animationTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
   logoTransitionRef: React.MutableRefObject<HTMLAnchorElement | null>;
   onReady: () => void;
+  alignTrigger: number;
 };
-
 export default function Cube({
   isActive,
   scrollProgress,
@@ -209,9 +212,19 @@ export default function Cube({
   animationTransitionRef,
   logoTransitionRef,
   onReady,
+  alignTrigger,
 }: CubeProps) {
   const group = useRef<Group>(null);
   const mesh = useRef<Mesh>(null);
+  const rotationOffsetRef = useRef(new Quaternion());
+
+  const alignFromRef = useRef(new Quaternion());
+  const alignToRef = useRef(new Quaternion());
+
+  const alignProgressRef = useRef(1);
+  const isAligningRef = useRef(false);
+
+  const previousAlignTriggerRef = useRef(alignTrigger);
 
   const rustamMaterialRef = useRef<MeshBasicMaterial | null>(null);
 
@@ -225,6 +238,46 @@ export default function Cube({
 
   const movingVideoTextureRef = useRef<VideoTexture | null>(null);
   const movingVideoElementRef = useRef<HTMLVideoElement | null>(null);
+
+  const FACE_NORMALS = [
+    new Vector3(1, 0, 0), // right
+    new Vector3(-1, 0, 0), // left
+    new Vector3(0, 1, 0), // top
+    new Vector3(0, -1, 0), // bottom
+    new Vector3(0, 0, 1), // front / KERIMOV
+    new Vector3(0, 0, -1), // back
+  ];
+
+  const faceOrientationQuaternions = useMemo(() => {
+    const topBase = new Quaternion().setFromEuler(
+      new Euler(-Math.PI / 2, 0, 0),
+    );
+
+    const topCorrection = new Quaternion().setFromAxisAngle(
+      new Vector3(0, 0, 1),
+      -Math.PI / 2,
+    );
+
+    return [
+      // RIGHT
+      new Quaternion().setFromEuler(new Euler(0, Math.PI / 2, Math.PI / 2)),
+
+      // LEFT
+      new Quaternion().setFromEuler(new Euler(0, -Math.PI / 2, -Math.PI)),
+
+      // TOP / ABOUT
+      topBase.multiply(topCorrection),
+
+      // BOTTOM
+      new Quaternion().setFromEuler(new Euler(Math.PI / 2, 0, 0)),
+
+      // FRONT
+      new Quaternion().setFromEuler(new Euler(0, 0, 0)),
+
+      // BACK
+      new Quaternion().setFromEuler(new Euler(0, Math.PI, 0)),
+    ];
+  }, []);
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -245,8 +298,9 @@ export default function Cube({
   const [movingGraphicsVideoTexture, setMovingGraphicsVideoTexture] =
     useState<VideoTexture | null>(null);
 
-  const [clientWorkTexture, setClientWorkTexture] =
-    useState<CanvasTexture | null>(null);
+  const [posterTexture, setPosterTexture] = useState<CanvasTexture | null>(
+    null,
+  );
 
   const [logoInspirationTexture, setLogoInspirationTexture] =
     useState<CanvasTexture | null>(null);
@@ -265,9 +319,9 @@ export default function Cube({
 
   const logoTextures = useLoader(TextureLoader, logoImagePaths) as Texture[];
 
-  const clientWorkTextures = useLoader(
+  const posterTextures = useLoader(
     TextureLoader,
-    clientWorkImagePaths,
+    posterImagePaths,
   ) as Texture[];
 
   useEffect(() => {
@@ -397,10 +451,10 @@ export default function Cube({
     let cancelled = false;
 
     let generatedMovingTexture: CanvasTexture | null = null;
-    let generatedClientWorkTexture: CanvasTexture | null = null;
+    let generatedPosterTexture: CanvasTexture | null = null;
 
     async function buildCanvasTextures() {
-      clientWorkTextures.forEach((texture) => {
+      posterTextures.forEach((texture) => {
         texture.colorSpace = SRGBColorSpace;
         texture.needsUpdate = true;
       });
@@ -408,7 +462,7 @@ export default function Cube({
       await loadSatoshiFont();
 
       await Promise.all(
-        clientWorkTextures.map((texture) => waitForTextureImage(texture)),
+        posterTextures.map((texture) => waitForTextureImage(texture)),
       );
 
       if (cancelled) {
@@ -417,17 +471,18 @@ export default function Cube({
 
       generatedMovingTexture = createMovingGraphicsTextTexture();
 
-      generatedClientWorkTexture = createClientWorkTexture(clientWorkTextures);
+      generatedPosterTexture = createPosterTexture(posterTextures);
 
       if (cancelled) {
         generatedMovingTexture?.dispose();
-        generatedClientWorkTexture?.dispose();
+        generatedPosterTexture?.dispose();
+
         return;
       }
 
       setMovingGraphicsTextTexture(generatedMovingTexture);
 
-      setClientWorkTexture(generatedClientWorkTexture);
+      setPosterTexture(generatedPosterTexture);
     }
 
     buildCanvasTextures();
@@ -436,9 +491,9 @@ export default function Cube({
       cancelled = true;
 
       generatedMovingTexture?.dispose();
-      generatedClientWorkTexture?.dispose();
+      generatedPosterTexture?.dispose();
     };
-  }, [clientWorkTextures]);
+  }, [posterTextures]);
 
   useEffect(() => {
     let cancelled = false;
@@ -714,20 +769,118 @@ export default function Cube({
     document.body.style.cursor = "pointer";
   }
 
-  useFrame(() => {
+  useFrame((state, delta) => {
     if (!group.current) {
       return;
     }
 
     const value = scrollProgress.get();
 
-    if (!isDraggingCubeRef.current) {
-      group.current.rotation.x = value;
-      group.current.rotation.y = value * 1.4;
+    const scrollQuaternion = new Quaternion().setFromEuler(
+      new Euler(value, value * 1.4, 0, "XYZ"),
+    );
+
+    /*
+     * ALIGN BUTTON PRESSED
+     */
+    if (alignTrigger !== previousAlignTriggerRef.current) {
+      previousAlignTriggerRef.current = alignTrigger;
+
+      clearCubeHover();
+
+      const currentQuaternion = group.current.quaternion.clone();
+
+      const cameraDirection = new Vector3();
+      state.camera.getWorldDirection(cameraDirection);
+
+      const towardCamera = cameraDirection.negate();
+
+      let closestFaceIndex = 0;
+      let highestDot = -Infinity;
+
+      FACE_NORMALS.forEach((normal, index) => {
+        const worldNormal = normal
+          .clone()
+          .applyQuaternion(currentQuaternion)
+          .normalize();
+
+        const dot = worldNormal.dot(towardCamera);
+
+        if (dot > highestDot) {
+          highestDot = dot;
+          closestFaceIndex = index;
+        }
+      });
+
+      const faceQuaternion = faceOrientationQuaternions[closestFaceIndex];
+
+      const targetQuaternion = state.camera.quaternion
+        .clone()
+        .multiply(faceQuaternion.clone().invert())
+        .normalize();
+
+      alignFromRef.current.copy(currentQuaternion);
+      alignToRef.current.copy(targetQuaternion);
+
+      alignProgressRef.current = 0;
+      isAligningRef.current = true;
     }
 
+    /*
+     * SMOOTH ALIGN ANIMATION
+     */
+    if (isAligningRef.current) {
+      const ALIGN_DURATION = 0.9;
+
+      alignProgressRef.current = Math.min(
+        alignProgressRef.current + delta / ALIGN_DURATION,
+        1,
+      );
+
+      const t = alignProgressRef.current;
+
+      /*
+       * Smooth ease-in-out.
+       */
+      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      group.current.quaternion.slerpQuaternions(
+        alignFromRef.current,
+        alignToRef.current,
+        eased,
+      );
+
+      if (t >= 1) {
+        isAligningRef.current = false;
+
+        /*
+         * Save an offset from the scroll rotation.
+         *
+         * This is what prevents the cube from jumping
+         * straight back to the old scroll orientation
+         * after the alignment finishes.
+         */
+        rotationOffsetRef.current
+          .copy(scrollQuaternion)
+          .invert()
+          .multiply(alignToRef.current);
+      }
+    } else if (!isDraggingCubeRef.current) {
+      /*
+       * Normal scroll rotation + whatever offset
+       * the align button created.
+       */
+      group.current.quaternion
+        .copy(scrollQuaternion)
+        .multiply(rotationOffsetRef.current);
+    }
+
+    /*
+     * SCALE
+     */
     if (isMobile) {
       group.current.scale.set(1.05, 1.05, 1.05);
+
       return;
     }
 
@@ -748,7 +901,7 @@ export default function Cube({
       visualIdentityTexture &&
       movingGraphicsTextTexture &&
       movingGraphicsVideoTexture &&
-      clientWorkTexture &&
+      posterTexture &&
       logoInspirationTexture,
   );
 
@@ -784,7 +937,8 @@ export default function Cube({
             polygonOffsetUnits={-2}
           />
         </mesh>
-
+      </group>
+      <group>
         <mesh
           position={[ABOUT_LINK_CENTER_X, ABOUT_LINK_CENTER_Y, 0.012]}
           renderOrder={40}
@@ -920,9 +1074,8 @@ export default function Cube({
       >
         <mesh renderOrder={30} raycast={() => null}>
           <planeGeometry args={[FACE_OVERLAY_SIZE, FACE_OVERLAY_SIZE]} />
-
           <meshBasicMaterial
-            map={clientWorkTexture}
+            map={posterTexture}
             transparent
             depthWrite={false}
             depthTest
@@ -934,11 +1087,7 @@ export default function Cube({
         </mesh>
 
         <mesh
-          position={[
-            CLIENT_WORK_LINK_CENTER_X,
-            CLIENT_WORK_LINK_CENTER_Y,
-            0.012,
-          ]}
+          position={[POSTER_LINK_CENTER_X, POSTER_LINK_CENTER_Y, 0.012]}
           renderOrder={40}
           onClick={handleClientWorkClick}
           onPointerOver={handleContactPointerOver}
@@ -947,9 +1096,8 @@ export default function Cube({
           onPointerUp={handleContactPointerUp}
         >
           <planeGeometry
-            args={[CLIENT_WORK_LINK_PLANE_WIDTH, CLIENT_WORK_LINK_PLANE_HEIGHT]}
+            args={[POSTER_LINK_PLANE_WIDTH, POSTER_LINK_PLANE_HEIGHT]}
           />
-
           <meshBasicMaterial
             transparent
             opacity={0}

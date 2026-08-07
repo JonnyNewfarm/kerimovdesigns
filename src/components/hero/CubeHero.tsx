@@ -64,6 +64,7 @@ export default function Index({ href, title }: IndexProps) {
   const [cubeReady, setCubeReady] = useState(false);
   const [allowCanvasMount, setAllowCanvasMount] = useState(false);
   const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const [alignCubeTrigger, setAlignCubeTrigger] = useState(0);
 
   const { isTransitioning } = usePageTransition();
   const { introExited, setIntroExited } = useHeroIntro();
@@ -72,27 +73,47 @@ export default function Index({ href, title }: IndexProps) {
   const isCanvasActive = isHeroVisible && !isTransitioning;
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== "Space") {
+        return;
+      }
+
+      event.preventDefault();
+
+      setAlignCubeTrigger((value) => value + 1);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
     const element = container.current;
 
     if (!element) {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsHeroVisible(entry.isIntersecting);
-      },
-      {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0,
-      },
-    );
+    const handleScroll = () => {
+      const rect = element.getBoundingClientRect();
+      const scrolledIntoHero = -rect.top;
 
-    observer.observe(element);
+      const stopAt = window.innerHeight * 1.9;
+
+      setIsHeroVisible(scrolledIntoHero < stopAt);
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
 
     return () => {
-      observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -197,18 +218,18 @@ export default function Index({ href, title }: IndexProps) {
 
         <TransitionLink
           ref={clientWorkTransitionRef}
-          href="/projects?tags=client-work"
-          transitionLabel="Client Work"
+          href="/projects?tags=poster"
+          transitionLabel="Posters"
           tabIndex={-1}
           aria-hidden="true"
           className="
-            fixed
-            -left-[9999px]
-            top-0
-            opacity-0
-          "
+    fixed
+    -left-[9999px]
+    top-0
+    opacity-0
+  "
         >
-          Client Work
+          Posters
         </TransitionLink>
 
         <TransitionLink
@@ -351,10 +372,130 @@ export default function Index({ href, title }: IndexProps) {
                     animationTransitionRef={animationTransitionRef}
                     logoTransitionRef={logoTransitionRef}
                     onReady={handleCubeReady}
+                    alignTrigger={alignCubeTrigger}
                   />
                 </Suspense>
               </Canvas>
             )}
+
+            <div
+              className="
+    absolute
+    right-[20vw]
+    top-1/2
+    z-20
+    hidden
+    -translate-y-1/2
+    lg:block
+  "
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  setAlignCubeTrigger((value) => value + 1);
+                }}
+                className="
+      group
+      flex
+      cursor-pointer
+      items-center
+      gap-x-3
+      font-semibold
+      text-[12px]
+      uppercase
+      xl:text-lg
+      focus:outline-none
+focus-visible:outline-none
+focus-visible:ring-0
+    "
+              >
+                <span
+                  className="
+        relative
+        overflow-hidden
+        px-3
+        py-1.5
+      "
+                >
+                  <span
+                    aria-hidden="true"
+                    className="
+          absolute
+          inset-0
+          origin-bottom
+          scale-y-0
+          bg-[#ecdfcc]
+          transition-transform
+          duration-500
+          ease-[cubic-bezier(0.76,0,0.24,1)]
+          group-hover:scale-y-100
+        "
+                  />
+
+                  <span
+                    className="
+          relative
+          z-10
+          transition-colors
+          duration-300
+          group-hover:text-[#181c14]
+        "
+                  >
+                    Align cube
+                  </span>
+                </span>
+
+                <span
+                  className="
+        pointer-events-none
+        opacity-0
+        transition-opacity
+        duration-300
+        group-hover:opacity-100
+      "
+                >
+                  <TextReveal
+                    as="span"
+                    mode="words"
+                    viewport={false}
+                    active
+                    duration={0.5}
+                    y="110%"
+                    className="
+          whitespace-nowrap
+          font-normal
+          text-[10px]
+          normal-case
+          xl:text-[12px]
+        "
+                  >
+                    or use space bar
+                  </TextReveal>
+                </span>
+              </button>
+
+              <div
+                className="
+      mt-2
+      h-px
+      w-full
+      overflow-hidden
+      bg-white/20
+    "
+              >
+                <motion.div
+                  className="
+        h-full
+        w-full
+        origin-left
+        bg-[#ecdfcc]
+      "
+                  style={{
+                    scaleX: scrollYProgress,
+                  }}
+                />
+              </div>
+            </div>
           </motion.div>
         </div>
 

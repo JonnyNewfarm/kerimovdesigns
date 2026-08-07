@@ -9,6 +9,8 @@ import {
   SATOSHI_FONT_FAMILY,
   type CollageTile,
   visualCollageLayout,
+    posterCollageLayout,
+
 } from "./cubeConstants";
 
 export function drawImageCover(
@@ -380,7 +382,6 @@ export function createTopTextTexture() {
 
 export function createVisualIdentityTexture(
   textures: Texture[],
-  logoTexture?: Texture,
 ) {
   const size = 1024;
 
@@ -699,13 +700,12 @@ export function createMovingGraphicsTextTexture() {
   return texture;
 }
 
-export function createClientWorkTexture(
+export function createPosterTexture(
   textures: Texture[],
 ) {
   const size = 1024;
 
-  const canvas =
-    document.createElement("canvas");
+  const canvas = document.createElement("canvas");
 
   canvas.width = size;
   canvas.height = size;
@@ -718,8 +718,31 @@ export function createClientWorkTexture(
 
   ctx.clearRect(0, 0, size, size);
 
-  const padding = 68;
-  const gap = 24;
+  const padding = 70;
+  const gap = 20;
+
+  /*
+   * TEXT OVER
+   */
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+
+  ctx.fillStyle = "#f2eee8";
+
+  ctx.font = `900 68px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+
+  ctx.fillText(
+    "POSTER DESIGN",
+    padding,
+    120,
+  );
+
+const imageY = 190;
+const imageHeight = 660;
+const imageWidth = 450;
+const firstImageX = 52;
+const secondImageX =
+  firstImageX + imageWidth + 20;
 
   const firstTexture = textures[0];
   const secondTexture = textures[1];
@@ -729,80 +752,42 @@ export function createClientWorkTexture(
     | HTMLCanvasElement
     | undefined;
 
-  const secondImage =
-    secondTexture?.image as
-      | HTMLImageElement
-      | HTMLCanvasElement
-      | undefined;
+  const secondImage = secondTexture?.image as
+    | HTMLImageElement
+    | HTMLCanvasElement
+    | undefined;
 
+if (firstImage) {
+ drawImageContain(
+  ctx,
+  firstImage,
+  firstImageX,
+  imageY,
+  imageWidth,
+  imageHeight,
+);
+}
+
+if (secondImage) {
+drawImageContain(
+  ctx,
+  secondImage,
+  secondImageX,
+  imageY,
+  imageWidth,
+  imageHeight,
+);
+}
   /*
-   * Første bilde er nesten kvadratisk og får derfor
-   * den største flaten til venstre.
+   * LINK UNDER
    */
-  const firstImageX = padding;
-  const firstImageY = padding;
-  const firstImageWidth = 575;
-  const firstImageHeight = 575;
-
-  /*
-   * Andre bilde er portrettformat.
-   * Boksen følger omtrent bildets originale ratio.
-   */
-  const secondImageX =
-    firstImageX +
-    firstImageWidth +
-    gap;
-
-  const secondImageY = padding;
-
-  const secondImageWidth =
-    size - secondImageX - padding;
-
-  const secondImageHeight = 405;
-
-  if (firstImage) {
-    drawImageCover(
-      ctx,
-      firstImage,
-      firstImageX,
-      firstImageY,
-      firstImageWidth,
-      firstImageHeight,
-    );
-  }
-
-  if (secondImage) {
-    drawImageCover(
-      ctx,
-      secondImage,
-      secondImageX,
-      secondImageY,
-      secondImageWidth,
-      secondImageHeight,
-    );
-  }
-
-  ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-
-  ctx.fillStyle =
-    "rgba(255, 255, 255, 0.72)";
-
-  ctx.font = `900 30px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-
-  ctx.fillText(
-    "SELECTED COMMERCIAL PROJECTS",
-    padding,
-    700,
-  );
-
+  const linkText = "VIEW POSTERS";
   const linkX = padding;
-  const linkY = 835;
-  const linkText = "CLIENT WORK";
+  const linkY = 925;
 
   ctx.fillStyle = "#ffffff";
 
-  ctx.font = `900 64px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.font = `900 62px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
@@ -817,23 +802,30 @@ export function createClientWorkTexture(
     ctx.measureText(linkText).width;
 
   const arrowStartX =
-    linkX + textWidth + 28;
+    linkX + textWidth + 24;
 
   const arrowEndX =
-    arrowStartX + 105;
+    arrowStartX + 90;
 
   ctx.beginPath();
 
-  ctx.moveTo(arrowStartX, linkY);
-  ctx.lineTo(arrowEndX, linkY);
+  ctx.moveTo(
+    arrowStartX,
+    linkY,
+  );
 
   ctx.lineTo(
-    arrowEndX - 28,
-    linkY - 23,
+    arrowEndX,
+    linkY,
+  );
+
+  ctx.lineTo(
+    arrowEndX - 24,
+    linkY - 20,
   );
 
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 10;
+  ctx.lineWidth = 9;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
 
@@ -842,7 +834,9 @@ export function createClientWorkTexture(
   const texture =
     new CanvasTexture(canvas);
 
-  texture.colorSpace = SRGBColorSpace;
+  texture.colorSpace =
+    SRGBColorSpace;
+
   texture.needsUpdate = true;
 
   return texture;

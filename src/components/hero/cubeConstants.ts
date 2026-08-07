@@ -18,10 +18,7 @@ export const VIDEO_OVERLAY_POSITION =
 
 export const FACE_OVERLAY_SIZE = 2.08;
 
-/*
- * Klikkbart ABOUT-område på top face.
- * Verdiene følger plasseringen i createTopTextTexture.
- */
+
 export const ABOUT_LINK_CANVAS_SIZE = 1024;
 
 export const ABOUT_LINK_X = 105;
@@ -49,37 +46,32 @@ export const ABOUT_LINK_CENTER_Y =
       ABOUT_LINK_CANVAS_SIZE) *
   FACE_OVERLAY_SIZE;
 
-export const CLIENT_WORK_LINK_CANVAS_SIZE = 1024;
+export const POSTER_LINK_CANVAS_SIZE = 1024;
 
-export const CLIENT_WORK_LINK_X = 65;
-export const CLIENT_WORK_LINK_Y = 775;
-export const CLIENT_WORK_LINK_WIDTH = 670;
-export const CLIENT_WORK_LINK_HEIGHT = 150;
+export const POSTER_LINK_X = 245;
+export const POSTER_LINK_Y = 865;
+export const POSTER_LINK_WIDTH = 440;
+export const POSTER_LINK_HEIGHT = 105;
 
-export const CLIENT_WORK_LINK_PLANE_WIDTH =
-  (CLIENT_WORK_LINK_WIDTH /
-    CLIENT_WORK_LINK_CANVAS_SIZE) *
+export const POSTER_LINK_PLANE_WIDTH =
+  (POSTER_LINK_WIDTH / POSTER_LINK_CANVAS_SIZE) *
   FACE_OVERLAY_SIZE;
 
-export const CLIENT_WORK_LINK_PLANE_HEIGHT =
-  (CLIENT_WORK_LINK_HEIGHT /
-    CLIENT_WORK_LINK_CANVAS_SIZE) *
+export const POSTER_LINK_PLANE_HEIGHT =
+  (POSTER_LINK_HEIGHT / POSTER_LINK_CANVAS_SIZE) *
   FACE_OVERLAY_SIZE;
 
-export const CLIENT_WORK_LINK_CENTER_X =
-  ((CLIENT_WORK_LINK_X +
-    CLIENT_WORK_LINK_WIDTH / 2) /
-    CLIENT_WORK_LINK_CANVAS_SIZE -
+export const POSTER_LINK_CENTER_X =
+  ((POSTER_LINK_X + POSTER_LINK_WIDTH / 2) /
+    POSTER_LINK_CANVAS_SIZE -
     0.5) *
   FACE_OVERLAY_SIZE;
 
-export const CLIENT_WORK_LINK_CENTER_Y =
+export const POSTER_LINK_CENTER_Y =
   (0.5 -
-    (CLIENT_WORK_LINK_Y +
-      CLIENT_WORK_LINK_HEIGHT / 2) /
-      CLIENT_WORK_LINK_CANVAS_SIZE) *
+    (POSTER_LINK_Y + POSTER_LINK_HEIGHT / 2) /
+      POSTER_LINK_CANVAS_SIZE) *
   FACE_OVERLAY_SIZE;
-
 export const VISUAL_LINK_CANVAS_SIZE = 1024;
 
 export const VISUAL_LINK_X = 245;
@@ -216,9 +208,9 @@ export const visualImagePaths = [
   "/cube-img/cc-05.jpeg",
 ];
 
-export const clientWorkImagePaths = [
-  "/cube-img/client-work5.jpg",
-  "/cube-img/client-work3.jpg",
+export const posterImagePaths = [
+  "/cube-img/poster-6.jpg",
+  "/cube-img/poster-8.jpg",
 ];
 
 export type CollageTile = {
@@ -263,5 +255,56 @@ export const visualCollageLayout: CollageTile[] = [
     y: -0.35,
     width: 0.5,
     height: 1.29,
+  },
+];
+
+export const posterCollageLayout: CollageTile[] = [
+  {
+    imageSlot: 0,
+    x: 0,
+    y: -0.54,
+    width: 0.5,
+    height: 1.36,
+  },
+  {
+    imageSlot: 1,
+    x: 0.5,
+    y: -0.35,
+    width: 0.5,
+    height: 1.29,
+  },
+];
+
+
+
+export type CubeFaceAlignment = {
+  name: string;
+  top: 0 | 1 | 2 | 3;
+};
+
+export const CUBE_FACE_ALIGNMENTS: CubeFaceAlignment[] = [
+  {
+    name: "right",
+    top: 0,
+  },
+  {
+    name: "left",
+    top: 0,
+  },
+  {
+    name: "top",
+    top: 0,
+  },
+  {
+    name: "bottom",
+    top: 0,
+  },
+  {
+    name: "front",
+    top: 0,
+  },
+  {
+    name: "back",
+    top: 0,
   },
 ];
