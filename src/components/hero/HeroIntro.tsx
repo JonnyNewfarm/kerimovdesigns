@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type HeroIntroProps = {
   isDone: boolean;
@@ -18,98 +18,49 @@ const cubeTransforms = [
   "rotateX(-90deg) rotateY(-270deg)",
 ];
 
+const LAST_FACE_INDEX = cubeTransforms.length - 1;
+
 export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
   const [activeFaceIndex, setActiveFaceIndex] = useState(0);
 
+  const sequenceStartedRef = useRef(false);
+
   useEffect(() => {
-    if (isDone) {
+    sequenceStartedRef.current = false;
+    setActiveFaceIndex(0);
+
+    const startTimer = window.setTimeout(() => {
+      sequenceStartedRef.current = true;
+      setActiveFaceIndex(1);
+    }, 520);
+
+    return () => {
+      window.clearTimeout(startTimer);
+      sequenceStartedRef.current = false;
+    };
+  }, []);
+
+  const handleCubeAnimationComplete = () => {
+    if (!sequenceStartedRef.current) {
       return;
     }
 
-    let cancelled = false;
-
-    let frame1 = 0;
-    let frame2 = 0;
-
-    const timers: number[] = [];
-
-    const startAnimation = () => {
-      if (cancelled) {
-        return;
+    setActiveFaceIndex((currentIndex) => {
+      if (currentIndex >= LAST_FACE_INDEX) {
+        return currentIndex;
       }
 
-      setActiveFaceIndex(0);
+      return currentIndex + 1;
+    });
+  };
 
-      timers.push(
-        window.setTimeout(() => {
-          if (!cancelled) {
-            setActiveFaceIndex(1);
-          }
-        }, 520),
-
-        window.setTimeout(() => {
-          if (!cancelled) {
-            setActiveFaceIndex(2);
-          }
-        }, 1040),
-
-        window.setTimeout(() => {
-          if (!cancelled) {
-            setActiveFaceIndex(3);
-          }
-        }, 1560),
-
-        window.setTimeout(() => {
-          if (!cancelled) {
-            setActiveFaceIndex(4);
-          }
-        }, 2080),
-      );
-    };
-
-    const prepareAnimation = async () => {
-      /*
-       * Vent til fonts er klare.
-       * Dette hindrer font/layout-work samtidig som kuben starter.
-       */
-      try {
-        await document.fonts?.ready;
-      } catch {
-        // Ignorer hvis browseren ikke støtter dette ordentlig.
-      }
-
-      if (cancelled) {
-        return;
-      }
-
-      /*
-       * Første RAF:
-       * React/layout får sette seg.
-       */
-      frame1 = window.requestAnimationFrame(() => {
-        /*
-         * Andre RAF:
-         * browseren har fått faktisk paintet loaderen.
-         */
-        frame2 = window.requestAnimationFrame(() => {
-          startAnimation();
-        });
-      });
-    };
-
-    void prepareAnimation();
-
-    return () => {
-      cancelled = true;
-
-      window.cancelAnimationFrame(frame1);
-      window.cancelAnimationFrame(frame2);
-
-      timers.forEach((timer) => {
-        window.clearTimeout(timer);
-      });
-    };
-  }, [isDone]);
+  /*
+   * Ikke la introen forsvinne før:
+   *
+   * 1. resten av siden sier den er ferdig
+   * 2. kuben faktisk har nådd 100
+   */
+  const shouldExit = isDone && activeFaceIndex === LAST_FACE_INDEX;
 
   return (
     <motion.div
@@ -117,7 +68,7 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
         y: "0%",
       }}
       animate={
-        isDone
+        shouldExit
           ? {
               y: "-100%",
             }
@@ -126,12 +77,12 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
             }
       }
       transition={{
-        delay: isDone ? 0.45 : 0,
-        duration: isDone ? 0.95 : 0,
+        delay: shouldExit ? 0.45 : 0,
+        duration: shouldExit ? 0.95 : 0,
         ease,
       }}
       onAnimationComplete={() => {
-        if (!isDone) {
+        if (!shouldExit) {
           return;
         }
 
@@ -139,7 +90,7 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
       }}
       className="fixed inset-0 z-[999] bg-[#181c14]"
       style={{
-        pointerEvents: isDone ? "none" : "auto",
+        pointerEvents: shouldExit ? "none" : "auto",
       }}
     >
       <div className="relative h-full w-full overflow-hidden">
@@ -182,9 +133,15 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
                   transform: cubeTransforms[activeFaceIndex],
                 }}
                 transition={{
-                  duration: 0.62,
+                  /*
+                   * Den gamle koden sendte et nytt target hvert 520ms.
+                   * Derfor bruker vi 0.52 her slik at hvert steg faktisk
+                   * fullføres før neste begynner.
+                   */
+                  duration: 0.52,
                   ease,
                 }}
+                onAnimationComplete={handleCubeAnimationComplete}
                 className="relative h-full w-full"
                 style={{
                   transformStyle: "preserve-3d",
@@ -233,9 +190,6 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
                   ease,
                 }}
                 className="h-full w-full origin-left bg-[#ecdfcc]/70"
-                style={{
-                  willChange: "transform",
-                }}
               />
             </div>
           </motion.div>
@@ -250,7 +204,7 @@ function CubeFace({
   transform,
   muted = false,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
   transform: string;
   muted?: boolean;
 }) {
@@ -266,7 +220,6 @@ function CubeFace({
       style={{
         transform,
         backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
       }}
     >
       {children}
