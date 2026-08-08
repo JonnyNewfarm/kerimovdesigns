@@ -381,7 +381,9 @@ export default function Index({ href, title }: IndexProps) {
             <div
               className="
     absolute
-    right-[20vw]
+    right-[14vw]
+    xl:right-[16vw]
+    
     top-1/2
     z-20
     hidden
@@ -466,10 +468,10 @@ focus-visible:ring-0
           font-normal
           text-[10px]
           normal-case
-          xl:text-[12px]
+          xl:text-[16px]
         "
                   >
-                    or use space bar
+                    or press Spacebar{" "}
                   </TextReveal>
                 </span>
               </button>

@@ -128,7 +128,7 @@ export default function DesktopProjects({
             className="
               text-4xl
               uppercase
-              leading-[0.8]
+              leading-[0.95]
               tracking-[-0.04em]
               text-color/70
               transition-colors

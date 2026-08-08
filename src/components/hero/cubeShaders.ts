@@ -1,290 +1,302 @@
 export const gradientVertexShader = `
-  varying vec2 vUv;
-  varying vec3 vPosition;
+varying vec2 vUv;
+varying vec3 vPosition;
 
-  uniform float uTime;
-  uniform float uHover;
-  uniform float uDisplacement;
+uniform float uTime;
+uniform float uHover;
+uniform float uDisplacement;
 
-  void main() {
-    vUv = uv;
-    vPosition = position;
+void main() {
+  vUv = uv;
+  vPosition = position;
 
-    vec3 transformed = position;
+  vec3 transformed = position;
 
-    float slowWave =
-      sin(position.x * 3.1 + uTime * 0.95) *
-      cos(position.y * 2.8 + uTime * 0.82);
+  float slowWave =
+    sin(position.x * 3.1 + uTime * 0.95) *
+    cos(position.y * 2.8 + uTime * 0.82);
 
-    float fabricWave =
-      sin(
-        (position.x * 1.4 - position.y * 1.8) * 5.0 +
-        uTime * 1.15
-      );
+  float fabricWave =
+    sin(
+      (position.x * 1.4 - position.y * 1.8) * 5.0 +
+      uTime * 1.15
+    );
 
-    float detailWave =
-      sin(
-        (position.x + position.y) * 6.5 +
-        uTime * 1.35
-      );
+  float detailWave =
+    sin(
+      (position.x + position.y) * 6.5 +
+      uTime * 1.35
+    );
 
-    float displacement =
-      (
-        slowWave * uDisplacement +
-        fabricWave * 0.005 +
-        detailWave * 0.004
-      ) * (0.45 + uHover * 0.45);
+  float displacement =
+    (
+      slowWave * uDisplacement +
+      fabricWave * 0.005 +
+      detailWave * 0.004
+    ) * (0.45 + uHover * 0.45);
 
-    transformed += normal * displacement;
+  transformed += normal * displacement;
 
-    gl_Position =
-      projectionMatrix *
-      modelViewMatrix *
-      vec4(transformed, 1.0);
-  }
+  gl_Position =
+    projectionMatrix *
+    modelViewMatrix *
+    vec4(transformed, 1.0);
+}
 `;
 
 export const gradientFragmentShader = `
-  varying vec2 vUv;
-  varying vec3 vPosition;
+varying vec2 vUv;
+varying vec3 vPosition;
 
-  uniform vec3 uColorA;
-  uniform vec3 uColorB;
-  uniform vec3 uColorC;
-  uniform vec3 uColorD;
+uniform vec3 uColorA;
+uniform vec3 uColorB;
+uniform vec3 uColorC;
+uniform vec3 uColorD;
 
-  uniform float uTime;
-  uniform float uHover;
-  uniform float uSpeed;
-  uniform float uMovement;
-  uniform float uWarp;
-  uniform vec2 uMouse;
+uniform float uTime;
+uniform float uHover;
+uniform float uSpeed;
+uniform float uMovement;
+uniform float uWarp;
+uniform vec2 uMouse;
 
-  float random(vec2 st) {
-    return fract(
-      sin(dot(st.xy, vec2(12.9898, 78.233))) *
-      43758.5453123
-    );
+float random(vec2 st) {
+  return fract(
+    sin(dot(st.xy, vec2(12.9898, 78.233))) *
+    43758.5453123
+  );
+}
+
+float noise(vec2 st) {
+  vec2 i = floor(st);
+  vec2 f = fract(st);
+
+  float a = random(i);
+  float b = random(i + vec2(1.0, 0.0));
+  float c = random(i + vec2(0.0, 1.0));
+  float d = random(i + vec2(1.0, 1.0));
+
+  vec2 u = f * f * (3.0 - 2.0 * f);
+
+  return mix(a, b, u.x) +
+    (c - a) * u.y * (1.0 - u.x) +
+    (d - b) * u.x * u.y;
+}
+
+float fbm(vec2 st) {
+  float value = 0.0;
+  float amplitude = 0.55;
+
+  for (int i = 0; i < 4; i++) {
+    value += amplitude * noise(st);
+    st *= 1.92;
+    amplitude *= 0.5;
   }
 
-  float noise(vec2 st) {
-    vec2 i = floor(st);
-    vec2 f = fract(st);
+  return value;
+}
 
-    float a = random(i);
-    float b = random(i + vec2(1.0, 0.0));
-    float c = random(i + vec2(0.0, 1.0));
-    float d = random(i + vec2(1.0, 1.0));
+void main() {
+  vec2 uv = vUv;
 
-    vec2 u = f * f * (3.0 - 2.0 * f);
+  float time = uTime * uSpeed;
 
-    return mix(a, b, u.x) +
-      (c - a) * u.y * (1.0 - u.x) +
-      (d - b) * u.x * u.y;
-  }
+  vec2 mouseOffset =
+    (uMouse - vec2(0.5)) * uHover;
 
-  float fbm(vec2 st) {
-    float value = 0.0;
-    float amplitude = 0.55;
+  vec2 animatedUv = uv;
 
-    for (int i = 0; i < 4; i++) {
-      value += amplitude * noise(st);
-      st *= 1.92;
-      amplitude *= 0.5;
-    }
+  animatedUv -= mouseOffset * 0.42;
 
-    return value;
-  }
+  animatedUv.x += sin(
+    (uv.y + mouseOffset.y * 1.8) * 4.8 +
+    time * 0.95
+  ) * uWarp;
 
-  void main() {
-    vec2 uv = vUv;
+  animatedUv.y += cos(
+    (uv.x + mouseOffset.x * 1.8) * 4.4 +
+    time * 0.82
+  ) * uWarp;
 
-    float time = uTime * uSpeed;
+  vec2 silkUv = animatedUv;
 
-    vec2 mouseOffset =
-      (uMouse - vec2(0.5)) * uHover;
+  silkUv.x += sin(
+    (
+      animatedUv.y +
+      animatedUv.x * 0.35 +
+      mouseOffset.x * 0.85
+    ) * 7.0 +
+    time * 0.75
+  ) * 0.045;
 
-    vec2 animatedUv = uv;
+  silkUv.y += cos(
+    (
+      animatedUv.x -
+      animatedUv.y * 0.25 +
+      mouseOffset.y * 0.85
+    ) * 6.5 -
+    time * 0.62
+  ) * 0.038;
 
-    animatedUv -= mouseOffset * 0.42;
+  vec2 flowUv = silkUv * 1.75;
 
-    animatedUv.x += sin(
-      (uv.y + mouseOffset.y * 1.8) * 4.8 +
-      time * 0.95
-    ) * uWarp;
+  flowUv += mouseOffset * 1.35;
 
-    animatedUv.y += cos(
-      (uv.x + mouseOffset.x * 1.8) * 4.4 +
-      time * 0.82
-    ) * uWarp;
+  flowUv += vec2(
+    sin(time * 0.42),
+    cos(time * 0.36)
+  ) * uMovement;
 
-    vec2 silkUv = animatedUv;
+  float n1 = fbm(
+    flowUv +
+    vec2(time * 0.08, -time * 0.04)
+  );
 
-    silkUv.x += sin(
-      (
-        animatedUv.y +
-        animatedUv.x * 0.35 +
-        mouseOffset.x * 0.85
-      ) * 7.0 +
-      time * 0.75
-    ) * 0.045;
+  float n2 = fbm(
+    flowUv * 1.65 -
+    vec2(time * 0.12, time * 0.08)
+  );
 
-    silkUv.y += cos(
-      (
-        animatedUv.x -
-        animatedUv.y * 0.25 +
-        mouseOffset.y * 0.85
-      ) * 6.5 -
-      time * 0.62
-    ) * 0.038;
+  float n3 = fbm(
+    flowUv * 2.45 +
+    vec2(n1, n2) +
+    time * 0.12
+  );
 
-    vec2 flowUv = silkUv * 1.75;
+  float sweepOne = smoothstep(
+    0.02,
+    0.95,
+    silkUv.x + n1 * 0.42
+  );
 
-    flowUv += mouseOffset * 1.35;
+  float sweepTwo = smoothstep(
+    0.04,
+    0.98,
+    silkUv.y + n2 * 0.38
+  );
 
-    flowUv += vec2(
-      sin(time * 0.42),
-      cos(time * 0.36)
-    ) * uMovement;
+  float diagonalSweep = smoothstep(
+    0.0,
+    1.0,
+    silkUv.x * 0.58 +
+    silkUv.y * 0.42 +
+    n3 * 0.28
+  );
 
-    float n1 = fbm(
-      flowUv +
-      vec2(time * 0.08, -time * 0.04)
-    );
+  float movingLight =
+    sin(
+      silkUv.x * 3.2 +
+      silkUv.y * 2.4 +
+      time * 1.15 +
+      n3 * 2.2
+    ) * 0.5 + 0.5;
 
-    float n2 = fbm(
-      flowUv * 1.65 -
-      vec2(time * 0.12, time * 0.08)
-    );
+  movingLight = smoothstep(
+    0.25,
+    0.95,
+    movingLight
+  );
 
-    float n3 = fbm(
-      flowUv * 2.45 +
-      vec2(n1, n2) +
-      time * 0.12
-    );
+  vec3 color = mix(
+    uColorA,
+    uColorB,
+    sweepOne
+  );
 
-    float sweepOne = smoothstep(
-      0.02,
-      0.95,
-      silkUv.x + n1 * 0.42
-    );
+  color = mix(
+    color,
+    uColorC,
+    sweepTwo * 0.5
+  );
 
-    float sweepTwo = smoothstep(
-      0.04,
-      0.98,
-      silkUv.y + n2 * 0.38
-    );
+  color = mix(
+    color,
+    uColorD,
+    diagonalSweep * 0.42
+  );
 
-    float diagonalSweep = smoothstep(
-      0.0,
-      1.0,
-      silkUv.x * 0.58 +
-      silkUv.y * 0.42 +
-      n3 * 0.28
-    );
+  /*
+   * Softer highlight.
+   * Previously uColorC was added directly to the color,
+   * which could push bright areas close to white.
+   */
+  vec3 liftedColor = mix(
+    color,
+    uColorC,
+    0.10
+  );
 
-    float movingLight =
-      sin(
-        silkUv.x * 3.2 +
-        silkUv.y * 2.4 +
-        time * 1.15 +
-        n3 * 2.2
-      ) * 0.5 + 0.5;
+  color = mix(
+    color,
+    liftedColor,
+    movingLight * 0.18
+  );
 
-    movingLight = smoothstep(
-      0.25,
-      0.95,
-      movingLight
-    );
+  float shadowVeil = fbm(
+    silkUv * 3.4 -
+    time * 0.08
+  );
 
-    vec3 color = mix(
-      uColorA,
-      uColorB,
-      sweepOne
-    );
+  color = mix(
+    color * 0.90,
+    color * 1.04,
+    shadowVeil * 0.55
+  );
 
-    color = mix(
-      color,
-      uColorC,
-      sweepTwo * 0.5
-    );
+  float centerGlow =
+    1.0 -
+    distance(uv, vec2(0.5));
 
-    color = mix(
-      color,
-      uColorD,
-      diagonalSweep * 0.42
-    );
+  centerGlow = smoothstep(
+    0.12,
+    0.86,
+    centerGlow
+  );
 
-    vec3 liftedColor =
-      color + uColorC * 0.16;
+  color = mix(
+    color * 0.84,
+    color * 1.04,
+    centerGlow
+  );
 
-    color = mix(
-      color,
-      liftedColor,
-      movingLight * 0.22
-    );
+  float vignette =
+    smoothstep(0.0, 0.22, uv.x) *
+    smoothstep(0.0, 0.22, uv.y) *
+    smoothstep(0.0, 0.22, 1.0 - uv.x) *
+    smoothstep(0.0, 0.22, 1.0 - uv.y);
 
-    float shadowVeil = fbm(
-      silkUv * 3.4 -
-      time * 0.08
-    );
+  color *= mix(
+    0.74,
+    1.04,
+    vignette
+  );
 
-    color = mix(
-      color * 0.88,
-      color * 1.08,
-      shadowVeil * 0.55
-    );
+  float grain = random(
+    uv * 2.2 +
+    time * 0.025
+  );
 
-    float centerGlow =
-      1.0 -
-      distance(uv, vec2(0.5));
+  color +=
+    (grain - 0.5) * 0.012;
 
-    centerGlow = smoothstep(
-      0.12,
-      0.86,
-      centerGlow
-    );
+  color = mix(
+    color,
+    color * 1.07,
+    uHover * 0.18
+  );
 
-    color = mix(
-      color * 0.82,
-      color * 1.08,
-      centerGlow
-    );
+  /*
+   * 0.94 made the midtones slightly brighter.
+   * 1.02 keeps the highlights calmer.
+   */
+  color = pow(
+    color,
+    vec3(1.02)
+  );
 
-    float vignette =
-      smoothstep(0.0, 0.22, uv.x) *
-      smoothstep(0.0, 0.22, uv.y) *
-      smoothstep(0.0, 0.22, 1.0 - uv.x) *
-      smoothstep(0.0, 0.22, 1.0 - uv.y);
-
-    color *= mix(
-      0.72,
-      1.08,
-      vignette
-    );
-
-    float grain = random(
-      uv * 2.2 +
-      time * 0.025
-    );
-
-    color +=
-      (grain - 0.5) * 0.012;
-
-    color = mix(
-      color,
-      color * 1.12,
-      uHover * 0.18
-    );
-
-    color = pow(
-      color,
-      vec3(0.94)
-    );
-
-    gl_FragColor =
-      vec4(color, 1.0);
-  }
+  gl_FragColor =
+    vec4(color, 1.0);
+}
 `;
 
 export const gradientPalettes: Record<

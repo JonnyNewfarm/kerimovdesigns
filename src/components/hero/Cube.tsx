@@ -917,6 +917,7 @@ export default function Cube({
 
   return (
     <group ref={group}>
+      {/* TOP / ABOUT FACE */}
       <group
         position={[0, FACE_OVERLAY_POSITION, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -935,8 +936,8 @@ export default function Cube({
             polygonOffsetUnits={-2}
           />
         </mesh>
-      </group>
-      <group>
+
+        {/* CONTACT LINK */}
         <mesh
           position={[ABOUT_LINK_CENTER_X, ABOUT_LINK_CENTER_Y, 0.012]}
           renderOrder={40}
@@ -956,6 +957,30 @@ export default function Cube({
             depthWrite={false}
             depthTest={false}
             toneMapped={false}
+          />
+        </mesh>
+      </group>
+      <group>
+        <mesh
+          position={[0, 0, 0.04]}
+          renderOrder={100}
+          onClick={handleContactClick}
+          onPointerEnter={(event) => {
+            event.stopPropagation();
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerLeave={(event) => {
+            event.stopPropagation();
+            document.body.style.cursor = "";
+          }}
+        >
+          <planeGeometry args={[1.7, 0.45]} />
+
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthTest={false}
+            depthWrite={false}
           />
         </mesh>
       </group>

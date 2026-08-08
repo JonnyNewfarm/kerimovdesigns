@@ -293,21 +293,21 @@ export function createTopTextTexture() {
   ctx.translate(size / 2, size / 2);
   ctx.rotate(Math.PI / 2);
 
+  /*
+   * MAIN TEXT
+   */
   const lines = [
     "RUSTAM KERIMOV",
     "GRAPHIC DESIGNER",
     "OSLO / NORWAY",
   ];
 
-  const bottomLine =
-    "VISUAL IDENTITY / LOGOS / ANIMATION";
-
   const x = -size / 2 + 56;
   const startY = -110;
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#e8e3dc";
 
   ctx.font = `900 86px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
@@ -319,46 +319,119 @@ export function createTopTextTexture() {
     );
   });
 
-  const aboutY = size / 2 - 145;
+  /*
+   * CONTACT BUTTON
+   * samme styling som VISUAL IDENTITIES
+   */
+  const contactText = "CONTACT";
+  const contactY = size / 2 - 145;
 
+  ctx.font = `900 64px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#ffffff";
-
-  ctx.font = `900 60px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-
-  ctx.fillText("CONTACT", x, aboutY);
 
   const contactTextWidth =
-    ctx.measureText("CONTACT").width;
+    ctx.measureText(contactText).width;
 
+  const buttonPaddingLeft = 40;
+  const buttonPaddingRight = 40;
+  const buttonHeight = 135;
+
+  const arrowGap = 26;
+  const arrowWidth = 82;
+
+  const buttonWidth =
+    buttonPaddingLeft +
+    contactTextWidth +
+    arrowGap +
+    arrowWidth +
+    buttonPaddingRight;
+
+  const buttonX = x;
+
+  const buttonY =
+    contactY - buttonHeight / 2;
+
+    
+
+  /*
+   * BUTTON BACKGROUND
+   */
+  ctx.fillStyle = "#343a31";
+
+  ctx.fillRect(
+    buttonX,
+    buttonY,
+    buttonWidth,
+    buttonHeight,
+  );
+
+    ctx.strokeStyle = "#ecdfcc";
+ctx.lineWidth = 3;
+
+ctx.strokeRect(
+  buttonX,
+  buttonY,
+  buttonWidth,
+  buttonHeight,
+);
+  /*
+   * BUTTON TEXT
+   */
+  ctx.fillStyle = "#ecdfcc";
+
+  ctx.fillText(
+    contactText,
+    buttonX + buttonPaddingLeft,
+    contactY,
+  );
+
+  /*
+   * BUTTON ARROW
+   */
   const arrowStartX =
-    x + contactTextWidth + 42;
+    buttonX +
+    buttonPaddingLeft +
+    contactTextWidth +
+    arrowGap;
 
-  const arrowEndX = arrowStartX + 105;
+  const arrowY = contactY;
+
+  const arrowEndX =
+    arrowStartX + arrowWidth;
 
   ctx.beginPath();
 
-  ctx.moveTo(arrowStartX, aboutY);
-  ctx.lineTo(arrowEndX, aboutY);
-  ctx.lineTo(
-    arrowEndX - 28,
-    aboutY - 23,
+  ctx.moveTo(
+    arrowStartX,
+    arrowY,
   );
 
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 10;
+  ctx.lineTo(
+    arrowEndX,
+    arrowY,
+  );
+
+  ctx.lineTo(
+    arrowEndX - 24,
+    arrowY - 20,
+  );
+
+  ctx.strokeStyle = "#ecdfcc";
+  ctx.lineWidth = 8;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
 
   ctx.stroke();
 
-  ctx.textBaseline = "bottom";
-
+  /*
+   * CORNER LABEL
+   */
   const cornerOffset = 42;
 
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
+
   ctx.fillStyle =
     "rgba(255, 255, 255, 0.82)";
 
@@ -372,6 +445,9 @@ export function createTopTextTexture() {
 
   ctx.restore();
 
+  /*
+   * TEXTURE
+   */
   const texture = new CanvasTexture(canvas);
 
   texture.colorSpace = SRGBColorSpace;
@@ -400,65 +476,28 @@ export function createVisualIdentityTexture(
 
   const padding = 78;
 
+  /*
+   * TOP LABEL: I DESIGN
+   * ingen bg / ingen border
+   */
+  const topLabelText = "I DESIGN";
+  const topLabelX = padding;
+  const topLabelY = 100;
+
+  ctx.font = `900 67px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-
-  ctx.fillStyle = "#f2eee8";
-
-  ctx.font = `900 57px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-
-  ctx.fillText("I DESIGN", padding, 74);
-
-  ctx.fillStyle = "#ffffff";
-
-  ctx.font = `900 63px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-
-  const visualLinkX = 250;
-  const visualLinkY = 898;
-  const visualLinkText =
-    "VISUAL IDENTITIES";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#e8e3dc";
 
   ctx.fillText(
-    visualLinkText,
-    visualLinkX,
-    visualLinkY,
+    topLabelText,
+    topLabelX,
+    topLabelY,
   );
 
-  const visualTextWidth =
-    ctx.measureText(visualLinkText).width;
-
-  const visualArrowStartX =
-    visualLinkX + visualTextWidth + 24;
-
-  const visualArrowY = visualLinkY + 32;
-
-  const visualArrowEndX =
-    visualArrowStartX + 82;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    visualArrowStartX,
-    visualArrowY,
-  );
-
-  ctx.lineTo(
-    visualArrowEndX,
-    visualArrowY,
-  );
-
-  ctx.lineTo(
-    visualArrowEndX - 24,
-    visualArrowY - 20,
-  );
-
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 10;
-  ctx.lineCap = "square";
-  ctx.lineJoin = "miter";
-
-  ctx.stroke();
-
+  /*
+   * COLLAGE
+   */
   const collageX = padding;
   const collageY = 410;
 
@@ -469,7 +508,8 @@ export function createVisualIdentityTexture(
   const gap = 22;
 
   visualCollageLayout.forEach((tile) => {
-    const texture = textures[tile.imageSlot];
+    const texture =
+      textures[tile.imageSlot];
 
     const image = texture?.image as
       | HTMLImageElement
@@ -494,10 +534,14 @@ export function createVisualIdentityTexture(
       tile.height * collageHeight;
 
     const insetLeft =
-      tile.x === 0 ? 0 : gap / 2;
+      tile.x === 0
+        ? 0
+        : gap / 2;
 
     const insetTop =
-      tile.y === 0 ? 0 : gap / 2;
+      tile.y === 0
+        ? 0
+        : gap / 2;
 
     const insetRight =
       tile.x + tile.width >= 1
@@ -509,14 +553,21 @@ export function createVisualIdentityTexture(
         ? 0
         : gap / 2;
 
-    const drawX = x + insetLeft;
-    const drawY = y + insetTop;
+    const drawX =
+      x + insetLeft;
+
+    const drawY =
+      y + insetTop;
 
     const drawWidth =
-      width - insetLeft - insetRight;
+      width -
+      insetLeft -
+      insetRight;
 
     const drawHeight =
-      height - insetTop - insetBottom;
+      height -
+      insetTop -
+      insetBottom;
 
     drawImageCover(
       ctx,
@@ -529,17 +580,130 @@ export function createVisualIdentityTexture(
     );
   });
 
+  /*
+   * VISUAL IDENTITIES BUTTON
+   */
+  const visualLinkText =
+    "VISUAL IDENTITIES";
+
+  const visualLinkY = 940;
+
+  ctx.font = `900 61px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+
+  const visualTextWidth =
+    ctx.measureText(visualLinkText).width;
+
+  const buttonPaddingLeft = 38;
+  const buttonPaddingRight = 38;
+  const buttonHeight = 125;
+
+  const arrowGap = 26;
+  const arrowWidth = 82;
+
+  const buttonWidth =
+    buttonPaddingLeft +
+    visualTextWidth +
+    arrowGap +
+    arrowWidth +
+    buttonPaddingRight;
+
+  const visualLinkX =
+    (size - buttonWidth) / 2 + 60;
+
+  const buttonY =
+    visualLinkY -
+    buttonHeight / 2;
+
+  /*
+   * BUTTON BG
+   */
+  ctx.fillStyle = "#343a31";
+
+  ctx.fillRect(
+    visualLinkX,
+    buttonY,
+    buttonWidth,
+    buttonHeight,
+  );
+
+  /*
+   * BUTTON BORDER
+   */
+  ctx.strokeStyle = "#ecdfcc";
+  ctx.lineWidth = 3;
+
+  ctx.strokeRect(
+    visualLinkX,
+    buttonY,
+    buttonWidth,
+    buttonHeight,
+  );
+
+  /*
+   * BUTTON TEXT
+   */
+  ctx.fillStyle = "#ecdfcc";
+
+  ctx.fillText(
+    visualLinkText,
+    visualLinkX + buttonPaddingLeft,
+    visualLinkY,
+  );
+
+  /*
+   * BUTTON ARROW
+   */
+  const arrowStartX =
+    visualLinkX +
+    buttonPaddingLeft +
+    visualTextWidth +
+    arrowGap;
+
+  const arrowY = visualLinkY;
+
+  const arrowEndX =
+    arrowStartX + arrowWidth;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    arrowStartX,
+    arrowY,
+  );
+
+  ctx.lineTo(
+    arrowEndX,
+    arrowY,
+  );
+
+  ctx.lineTo(
+    arrowEndX - 24,
+    arrowY - 20,
+  );
+
+  ctx.strokeStyle = "#ecdfcc";
+  ctx.lineWidth = 8;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+
+  ctx.stroke();
+
+  /*
+   * TEXTURE
+   */
   const visualIdentityTexture =
     new CanvasTexture(canvas);
 
   visualIdentityTexture.colorSpace =
     SRGBColorSpace;
 
-  visualIdentityTexture.needsUpdate = true;
+  visualIdentityTexture.needsUpdate =
+    true;
 
   return visualIdentityTexture;
 }
-
 export function createMovingGraphicsTextTexture() {
   const size = 1024;
 
@@ -558,9 +722,12 @@ export function createMovingGraphicsTextTexture() {
 
   const padding = 48;
 
+  /*
+   * MAIN TEXT
+   */
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#e8e3dc";
 
   ctx.font = `900 85px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
@@ -576,7 +743,10 @@ export function createMovingGraphicsTextTexture() {
     525,
   );
 
-  ctx.fillStyle = "#ffffff";
+  /*
+   * SMALL LABEL
+   */
+  ctx.fillStyle = "#e8e3dc";
 
   ctx.font = `700 45px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
@@ -588,113 +758,121 @@ export function createMovingGraphicsTextTexture() {
     418,
   );
 
-  const animationTextX = 60;
-  const animationArrowY = 130;
+  /*
+   * ANIMATIONS BUTTON
+   * samme styling som VISUAL IDENTITIES
+   */
+  const animationText = "ANIMATIONS";
 
+  const animationButtonX = 60;
+  const animationButtonY = 130;
+
+  ctx.font = `900 64px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#ffffff";
-
-  ctx.font = `900 60px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-
-  ctx.fillText(
-    "ANIMATIONS",
-    animationTextX,
-    animationArrowY,
-  );
 
   const animationTextWidth =
-    ctx.measureText("ANIMATIONS").width;
+    ctx.measureText(animationText).width;
 
-  const animationArrowStartX =
-    animationTextX +
+  const buttonPaddingLeft = 40;
+  const buttonPaddingRight = 40;
+
+  const buttonHeight = 130;
+
+  const arrowGap = 26;
+  const arrowWidth = 82;
+
+  const buttonWidth =
+    buttonPaddingLeft +
     animationTextWidth +
-    28;
+    arrowGap +
+    arrowWidth +
+    buttonPaddingRight;
+
+  const buttonTop =
+    animationButtonY -
+    buttonHeight / 2;
+
+  /*
+   * BUTTON BG
+   */
+  ctx.fillStyle = "#343a31";
+
+  ctx.fillRect(
+    animationButtonX,
+    buttonTop,
+    buttonWidth,
+    buttonHeight,
+  );
+
+  ctx.strokeStyle = "#ecdfcc";
+ctx.lineWidth = 3;
+
+ctx.strokeRect(
+  animationButtonX,
+  buttonTop,
+  buttonWidth,
+  buttonHeight,
+);
+
+  /*
+   * BUTTON TEXT
+   */
+  ctx.fillStyle = "#ecdfcc";
+
+  ctx.fillText(
+    animationText,
+    animationButtonX +
+      buttonPaddingLeft,
+    animationButtonY,
+  );
+
+  /*
+   * BUTTON ARROW
+   */
+  const animationArrowStartX =
+    animationButtonX +
+    buttonPaddingLeft +
+    animationTextWidth +
+    arrowGap;
 
   const animationArrowEndX =
-    animationArrowStartX + 105;
+    animationArrowStartX +
+    arrowWidth;
 
   ctx.beginPath();
 
   ctx.moveTo(
     animationArrowStartX,
-    animationArrowY,
+    animationButtonY,
   );
 
   ctx.lineTo(
     animationArrowEndX,
-    animationArrowY,
+    animationButtonY,
   );
 
   ctx.lineTo(
-    animationArrowEndX - 28,
-    animationArrowY - 23,
+    animationArrowEndX - 24,
+    animationButtonY - 20,
   );
 
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 10;
+  ctx.strokeStyle = "#ecdfcc";
+  ctx.lineWidth = 8;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
 
   ctx.stroke();
 
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "#ffffff";
+  /*
+   * TEXTURE
+   */
+  const texture =
+    new CanvasTexture(canvas);
 
-  ctx.font = `900 60px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  texture.colorSpace =
+    SRGBColorSpace;
 
-  ctx.beginPath();
-
-  ctx.moveTo(
-    animationArrowStartX,
-    animationArrowY,
-  );
-
-  ctx.lineTo(
-    animationArrowEndX,
-    animationArrowY,
-  );
-
-  ctx.lineTo(
-    animationArrowEndX - 28,
-    animationArrowY - 23,
-  );
-
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 10;
-  ctx.lineCap = "square";
-  ctx.lineJoin = "miter";
-
-  ctx.stroke();
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    animationArrowStartX,
-    animationArrowY,
-  );
-
-  ctx.lineTo(
-    animationArrowEndX,
-    animationArrowY,
-  );
-
-  ctx.lineTo(
-    animationArrowEndX - 28,
-    animationArrowY - 23,
-  );
-
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 12;
-  ctx.lineCap = "square";
-  ctx.lineJoin = "miter";
-
-  ctx.stroke();
-
-  const texture = new CanvasTexture(canvas);
-
-  texture.colorSpace = SRGBColorSpace;
   texture.needsUpdate = true;
 
   return texture;
@@ -722,115 +900,181 @@ export function createPosterTexture(
   const gap = 20;
 
   /*
-   * TEXT OVER
+   * POSTER DESIGN LABEL
+   * ingen bg / ingen border
    */
+  const titleText = "POSTER DESIGN";
+  const titleX = padding;
+  const titleY = 165;
+
+  ctx.font = `900 75px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-
-  ctx.fillStyle = "#f2eee8";
-
-  ctx.font = `900 68px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#e8e3dc";
 
   ctx.fillText(
-    "POSTER DESIGN",
-    padding,
-    120,
+    titleText,
+    titleX,
+    titleY,
   );
 
-const imageY = 190;
-const imageHeight = 660;
-const imageWidth = 450;
-const firstImageX = 52;
-const secondImageX =
-  firstImageX + imageWidth + 20;
+  /*
+   * POSTERS
+   */
+  const imageY = 190;
+  const imageHeight = 660;
+  const imageWidth = 450;
+
+  const firstImageX = 52;
+
+  const secondImageX =
+    firstImageX +
+    imageWidth +
+    gap;
 
   const firstTexture = textures[0];
   const secondTexture = textures[1];
 
-  const firstImage = firstTexture?.image as
-    | HTMLImageElement
-    | HTMLCanvasElement
-    | undefined;
+  const firstImage =
+    firstTexture?.image as
+      | HTMLImageElement
+      | HTMLCanvasElement
+      | undefined;
 
-  const secondImage = secondTexture?.image as
-    | HTMLImageElement
-    | HTMLCanvasElement
-    | undefined;
+  const secondImage =
+    secondTexture?.image as
+      | HTMLImageElement
+      | HTMLCanvasElement
+      | undefined;
 
-if (firstImage) {
- drawImageContain(
-  ctx,
-  firstImage,
-  firstImageX,
-  imageY,
-  imageWidth,
-  imageHeight,
-);
-}
+  if (firstImage) {
+    drawImageContain(
+      ctx,
+      firstImage,
+      firstImageX,
+      imageY,
+      imageWidth,
+      imageHeight,
+    );
+  }
 
-if (secondImage) {
-drawImageContain(
-  ctx,
-  secondImage,
-  secondImageX,
-  imageY,
-  imageWidth,
-  imageHeight,
-);
-}
+  if (secondImage) {
+    drawImageContain(
+      ctx,
+      secondImage,
+      secondImageX,
+      imageY,
+      imageWidth,
+      imageHeight,
+    );
+  }
+
   /*
-   * LINK UNDER
+   * VIEW POSTERS BUTTON
    */
   const linkText = "VIEW POSTERS";
-  const linkX = padding;
-  const linkY = 925;
 
-  ctx.fillStyle = "#ffffff";
+  const buttonX = padding;
+  const buttonY = 920;
 
-  ctx.font = `900 62px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-
+  ctx.font = `900 60px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-
-  ctx.fillText(
-    linkText,
-    linkX,
-    linkY,
-  );
 
   const textWidth =
     ctx.measureText(linkText).width;
 
+  const buttonPaddingLeft = 48;
+  const buttonPaddingRight = 48;
+  const buttonHeight = 150;
+  const arrowGap = 26;
+  const arrowWidth = 82;
+
+  const buttonWidth =
+    buttonPaddingLeft +
+    textWidth +
+    arrowGap +
+    arrowWidth +
+    buttonPaddingRight;
+
+  const buttonTop =
+    buttonY - buttonHeight / 2;
+
+  /*
+   * BUTTON BG
+   */
+  ctx.fillStyle = "#343a31";
+
+  ctx.fillRect(
+    buttonX,
+    buttonTop,
+    buttonWidth,
+    buttonHeight,
+  );
+
+  /*
+   * BUTTON BORDER
+   */
+  ctx.strokeStyle = "#ecdfcc";
+  ctx.lineWidth = 3;
+
+  ctx.strokeRect(
+    buttonX,
+    buttonTop,
+    buttonWidth,
+    buttonHeight,
+  );
+
+  /*
+   * BUTTON TEXT
+   */
+  ctx.fillStyle = "#ecdfcc";
+
+  ctx.fillText(
+    linkText,
+    buttonX + buttonPaddingLeft,
+    buttonY,
+  );
+
+  /*
+   * BUTTON ARROW
+   */
   const arrowStartX =
-    linkX + textWidth + 24;
+    buttonX +
+    buttonPaddingLeft +
+    textWidth +
+    arrowGap;
 
   const arrowEndX =
-    arrowStartX + 90;
+    arrowStartX + arrowWidth;
 
   ctx.beginPath();
 
   ctx.moveTo(
     arrowStartX,
-    linkY,
+    buttonY,
   );
 
   ctx.lineTo(
     arrowEndX,
-    linkY,
+    buttonY,
   );
 
   ctx.lineTo(
     arrowEndX - 24,
-    linkY - 20,
+    buttonY - 20,
   );
 
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 9;
+  ctx.strokeStyle = "#ecdfcc";
+  ctx.lineWidth = 8;
   ctx.lineCap = "square";
   ctx.lineJoin = "miter";
 
   ctx.stroke();
 
+  /*
+   * TEXTURE
+   */
   const texture =
     new CanvasTexture(canvas);
 
@@ -863,73 +1107,118 @@ export function createLogoInspirationTexture(
 
   const padding = 78;
 
+  /*
+   * BUTTON
+   * flyttet høyere opp + samme stil som de andre
+   */
+  const logoButtonText = "LOGO DESIGN";
+  const logoButtonX = padding;
+  const logoButtonY = 155;
+
+  ctx.font = `900 64px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+
+  const logoButtonTextWidth =
+    ctx.measureText(logoButtonText).width;
+
+  const buttonPaddingLeft = 40;
+  const buttonPaddingRight = 40;
+  const buttonHeight = 130;
+  const arrowGap = 26;
+  const arrowWidth = 82;
+
+  const buttonWidth =
+    buttonPaddingLeft +
+    logoButtonTextWidth +
+    arrowGap +
+    arrowWidth +
+    buttonPaddingRight;
+
+  const buttonTop =
+    logoButtonY - buttonHeight / 2;
+
+  ctx.fillStyle = "#343a31";
+  ctx.fillRect(
+    logoButtonX,
+    buttonTop,
+    buttonWidth,
+    buttonHeight,
+  );
+
+  ctx.strokeStyle = "#ecdfcc";
+ctx.lineWidth = 3;
+
+ctx.strokeRect(
+  logoButtonX,
+  buttonTop,
+  buttonWidth,
+  buttonHeight,
+);
+
+  ctx.fillStyle = "#ecdfcc";
+  ctx.fillText(
+    logoButtonText,
+    logoButtonX + buttonPaddingLeft,
+    logoButtonY,
+  );
+
+  const logoArrowStartX =
+    logoButtonX +
+    buttonPaddingLeft +
+    logoButtonTextWidth +
+    arrowGap;
+
+  const logoArrowEndX =
+    logoArrowStartX + arrowWidth;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    logoArrowStartX,
+    logoButtonY,
+  );
+
+  ctx.lineTo(
+    logoArrowEndX,
+    logoButtonY,
+  );
+
+  ctx.lineTo(
+    logoArrowEndX - 24,
+    logoButtonY - 20,
+  );
+
+  ctx.strokeStyle = "#ecdfcc";
+  ctx.lineWidth = 8;
+  ctx.lineCap = "square";
+  ctx.lineJoin = "miter";
+
+  ctx.stroke();
+
+  /*
+   * BIG TITLE
+   * flyttet nærmere logo-griden
+   */
+  const titleY = 345;
+
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-
-  ctx.fillStyle = "#f2eee8";
+  ctx.fillStyle = "#e8e3dc";
 
   ctx.font = `900 96px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
 
   ctx.fillText(
     "VISUAL MARKS",
     padding,
-    260,
+    titleY,
   );
 
-  const logoLinkX = padding;
-  const logoLinkY = 420;
-  const logoLinkText = "LOGO DESIGN";
-
-  ctx.fillStyle = "#ffffff";
-
-  ctx.font = `900 58px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-
-  ctx.fillText(
-    logoLinkText,
-    logoLinkX,
-    logoLinkY,
-  );
-
-  const logoLinkTextWidth =
-    ctx.measureText(logoLinkText).width;
-
-  const logoArrowStartX =
-    logoLinkX +
-    logoLinkTextWidth +
-    28;
-
-  const logoArrowEndX =
-    logoArrowStartX + 100;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    logoArrowStartX,
-    logoLinkY,
-  );
-
-  ctx.lineTo(
-    logoArrowEndX,
-    logoLinkY,
-  );
-
-  ctx.lineTo(
-    logoArrowEndX - 28,
-    logoLinkY - 23,
-  );
-
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 10;
-  ctx.lineCap = "square";
-  ctx.lineJoin = "miter";
-
-  ctx.stroke();
-
+  /*
+   * LOGO AREA
+   */
   const logoAreaX = padding;
-  const logoAreaY = 500;
+  const logoAreaY = 470;
 
   const logoAreaWidth =
     size - padding * 2;

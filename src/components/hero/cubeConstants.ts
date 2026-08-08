@@ -9,7 +9,7 @@ export const SHADER_DISPLACEMENT = 0.018;
 export const CUBE_SIZE = 2.3;
 export const CUBE_HALF = CUBE_SIZE / 2;
 
-export const FACE_OVERLAY_OFFSET = 0.016;
+export const FACE_OVERLAY_OFFSET = 0.024;
 export const FACE_OVERLAY_POSITION =
   CUBE_HALF + FACE_OVERLAY_OFFSET;
 
@@ -19,12 +19,14 @@ export const VIDEO_OVERLAY_POSITION =
 export const FACE_OVERLAY_SIZE = 2.08;
 
 
+
 export const ABOUT_LINK_CANVAS_SIZE = 1024;
 
-export const ABOUT_LINK_X = 105;
+// CONTACT etter 90deg-rotasjonen i createTopTextTexture
+export const ABOUT_LINK_X = 90;
 export const ABOUT_LINK_Y = 45;
-export const ABOUT_LINK_WIDTH = 95;
-export const ABOUT_LINK_HEIGHT = 390;
+export const ABOUT_LINK_WIDTH = 120;
+export const ABOUT_LINK_HEIGHT = 450;
 
 export const ABOUT_LINK_PLANE_WIDTH =
   (ABOUT_LINK_WIDTH / ABOUT_LINK_CANVAS_SIZE) *
@@ -35,16 +37,57 @@ export const ABOUT_LINK_PLANE_HEIGHT =
   FACE_OVERLAY_SIZE;
 
 export const ABOUT_LINK_CENTER_X =
-  ((ABOUT_LINK_X + ABOUT_LINK_WIDTH / 2) /
-    ABOUT_LINK_CANVAS_SIZE -
-    0.5) *
-  FACE_OVERLAY_SIZE;
+  (
+    (ABOUT_LINK_X + ABOUT_LINK_WIDTH / 2) /
+      ABOUT_LINK_CANVAS_SIZE -
+    0.5
+  ) * FACE_OVERLAY_SIZE;
 
 export const ABOUT_LINK_CENTER_Y =
-  (0.5 -
+  (
+    0.5 -
     (ABOUT_LINK_Y + ABOUT_LINK_HEIGHT / 2) /
-      ABOUT_LINK_CANVAS_SIZE) *
+      ABOUT_LINK_CANVAS_SIZE
+  ) * FACE_OVERLAY_SIZE;
+
+/*
+ * LOGO DESIGN
+ *
+ * Knappen tegnes nå med:
+ * X = 78
+ * center Y = 155
+ * height = 92
+ *
+ * Altså top Y = 109.
+ */
+export const LOGO_LINK_CANVAS_SIZE = 1024;
+
+export const LOGO_LINK_X = 78;
+export const LOGO_LINK_Y = 109;
+export const LOGO_LINK_WIDTH = 500;
+export const LOGO_LINK_HEIGHT = 92;
+
+export const LOGO_LINK_PLANE_WIDTH =
+  (LOGO_LINK_WIDTH / LOGO_LINK_CANVAS_SIZE) *
   FACE_OVERLAY_SIZE;
+
+export const LOGO_LINK_PLANE_HEIGHT =
+  (LOGO_LINK_HEIGHT / LOGO_LINK_CANVAS_SIZE) *
+  FACE_OVERLAY_SIZE;
+
+export const LOGO_LINK_CENTER_X =
+  (
+    (LOGO_LINK_X + LOGO_LINK_WIDTH / 2) /
+      LOGO_LINK_CANVAS_SIZE -
+    0.5
+  ) * FACE_OVERLAY_SIZE;
+
+export const LOGO_LINK_CENTER_Y =
+  (
+    0.5 -
+    (LOGO_LINK_Y + LOGO_LINK_HEIGHT / 2) /
+      LOGO_LINK_CANVAS_SIZE
+  ) * FACE_OVERLAY_SIZE;
 
 export const POSTER_LINK_CANVAS_SIZE = 1024;
 
@@ -131,32 +174,7 @@ export const ANIMATION_LINK_CENTER_Y =
       ANIMATION_LINK_CANVAS_SIZE) *
   FACE_OVERLAY_SIZE;
 
-export const LOGO_LINK_CANVAS_SIZE = 1024;
 
-export const LOGO_LINK_X = 65;
-export const LOGO_LINK_Y = 360;
-export const LOGO_LINK_WIDTH = 500;
-export const LOGO_LINK_HEIGHT = 125;
-
-export const LOGO_LINK_PLANE_WIDTH =
-  (LOGO_LINK_WIDTH / LOGO_LINK_CANVAS_SIZE) *
-  FACE_OVERLAY_SIZE;
-
-export const LOGO_LINK_PLANE_HEIGHT =
-  (LOGO_LINK_HEIGHT / LOGO_LINK_CANVAS_SIZE) *
-  FACE_OVERLAY_SIZE;
-
-export const LOGO_LINK_CENTER_X =
-  ((LOGO_LINK_X + LOGO_LINK_WIDTH / 2) /
-    LOGO_LINK_CANVAS_SIZE -
-    0.5) *
-  FACE_OVERLAY_SIZE;
-
-export const LOGO_LINK_CENTER_Y =
-  (0.5 -
-    (LOGO_LINK_Y + LOGO_LINK_HEIGHT / 2) /
-      LOGO_LINK_CANVAS_SIZE) *
-  FACE_OVERLAY_SIZE;
 
 export const cubeProjects: {
   title: string;
@@ -209,8 +227,8 @@ export const visualImagePaths = [
 ];
 
 export const posterImagePaths = [
-  "/cube-img/poster-6.jpg",
-  "/cube-img/poster-8.jpg",
+  "/poster-9.jpg",
+  "/poster-2.jpg",
 ];
 
 export type CollageTile = {

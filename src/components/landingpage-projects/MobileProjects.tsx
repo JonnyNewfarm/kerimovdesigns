@@ -77,7 +77,7 @@ export default function MobileProjects({ projects }: MobileProjectsProps) {
         </h2>
       </header>
 
-      <div className="mt-8 flex flex-col gap-y-14">
+      <div className="mt-8 flex flex-col gap-y-20">
         {projects.map((project, index) => {
           const item = mobileLayout[index];
 
@@ -116,7 +116,7 @@ export default function MobileProjects({ projects }: MobileProjectsProps) {
             className="
               text-4xl
               uppercase
-              leading-[0.8]
+              leading-[0.95]
               tracking-[-0.04em]
               text-color/70
               transition-colors
