@@ -269,7 +269,7 @@ export default function Index({ href, title }: IndexProps) {
 
         <TransitionLink
           ref={clientWorkTransitionRef}
-          href="/projects?tags=poster"
+          href="/projects?tags=posters"
           transitionLabel="Posters"
           tabIndex={-1}
           aria-hidden="true"
