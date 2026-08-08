@@ -173,7 +173,7 @@ export default function Index({ href, title }: IndexProps) {
    * SHOW ALIGN CONTROL AFTER USER SCROLLS
    */
   useEffect(() => {
-    const unsubscribe = scrollYProgress.on("change", (value) => {
+    const unsubscribe = scrollYProgress.on("change", (value: number) => {
       if (value > 0.005) {
         setHasInteractedWithCube(true);
       }
