@@ -227,8 +227,8 @@ export const visualImagePaths = [
 ];
 
 export const posterImagePaths = [
-  "/poster-9.jpg",
-  "/poster-2.jpg",
+  "/cube-img/poster-6.jpg",
+  "/cube-img/poster-8.jpg",
 ];
 
 export type CollageTile = {

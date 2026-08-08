@@ -357,7 +357,7 @@ export function createTopTextTexture() {
   /*
    * BUTTON BACKGROUND
    */
-  ctx.fillStyle = "#343a31";
+  ctx.fillStyle = "#232622";
 
   ctx.fillRect(
     buttonX,
@@ -619,7 +619,7 @@ export function createVisualIdentityTexture(
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#343a31";
+  ctx.fillStyle = "#232622";
 
   ctx.fillRect(
     visualLinkX,
@@ -796,7 +796,7 @@ export function createMovingGraphicsTextTexture() {
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#343a31";
+  ctx.fillStyle = "#232622";
 
   ctx.fillRect(
     animationButtonX,
@@ -905,9 +905,9 @@ export function createPosterTexture(
    */
   const titleText = "POSTER DESIGN";
   const titleX = padding;
-  const titleY = 165;
+  const titleY = 169;
 
-  ctx.font = `900 75px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.font = `900 70px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#e8e3dc";
@@ -1003,7 +1003,7 @@ export function createPosterTexture(
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#343a31";
+  ctx.fillStyle = "#232622";
 
   ctx.fillRect(
     buttonX,
@@ -1138,7 +1138,7 @@ export function createLogoInspirationTexture(
   const buttonTop =
     logoButtonY - buttonHeight / 2;
 
-  ctx.fillStyle = "#343a31";
+  ctx.fillStyle = "#232622";
   ctx.fillRect(
     logoButtonX,
     buttonTop,
