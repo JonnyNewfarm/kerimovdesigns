@@ -340,10 +340,7 @@ const ProjectArticle = memo(function ProjectArticle({
         ${index === 1 ? "lg:ml-auto lg:w-[75%]" : "lg:w-[78%]"}
       `}
     >
-      <TextReveal
-        as="h2"
-        mode="words"
-        delay={0.12}
+      <h1
         className="
           max-w-[1100px]
           text-wrap
@@ -357,7 +354,7 @@ const ProjectArticle = memo(function ProjectArticle({
         "
       >
         {item.heading}
-      </TextReveal>
+      </h1>
 
       <ProjectMedia
         item={item}

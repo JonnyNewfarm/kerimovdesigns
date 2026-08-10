@@ -486,70 +486,76 @@ export default function Index({ href, title }: IndexProps) {
     xl:right-[16vw]
   "
             >
-              <button
-                type="button"
-                onClick={() => {
-                  setAlignCubeTrigger((value) => value + 1);
-                }}
-                className="
-                  group
-                  flex
-                  cursor-pointer
-                  items-center
-                  gap-x-3
-                  font-semibold
-                  text-[12px]
-                  uppercase
-                  focus:outline-none
-                  focus-visible:outline-none
-                  focus-visible:ring-0
-                  xl:text-lg
-                "
-              >
-                <span
+              <div className="flex items-center gap-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAlignCubeTrigger((value) => value + 1);
+                  }}
                   className="
-                    relative
-                    overflow-hidden
-                    px-3
-                    py-1.5
-                  "
+        peer
+        group
+        flex
+        border-[1px]
+        border-white/40
+        
+        cursor-pointer
+        items-center
+        font-semibold
+        text-[12px]
+        uppercase
+        focus:outline-none
+        focus-visible:outline-none
+        focus-visible:ring-0
+        xl:text-lg
+      "
                 >
                   <span
-                    aria-hidden="true"
                     className="
-                      absolute
-                      inset-0
-                      origin-bottom
-                      scale-y-0
-                      bg-[#ecdfcc]
-                      transition-transform
-                      duration-500
-                      ease-[cubic-bezier(0.76,0,0.24,1)]
-                      group-hover:scale-y-100
-                    "
-                  />
-
-                  <span
-                    className="
-                      relative
-                      z-10
-                      transition-colors
-                      duration-300
-                      group-hover:text-[#181c14]
-                    "
+          relative
+          overflow-hidden
+          px-3
+          py-1.5
+        "
                   >
-                    Align cube
-                  </span>
-                </span>
+                    <span
+                      aria-hidden="true"
+                      className="
+            absolute
+            inset-0
+            origin-bottom
+            scale-y-0
+            bg-[#ecdfcc]
 
-                <span
+            transition-transform
+            duration-500
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+            group-hover:scale-y-100
+          "
+                    />
+
+                    <span
+                      className="
+            relative
+            z-10
+            transition-colors
+            duration-300
+            group-hover:text-[#181c14]
+          "
+                    >
+                      Align cube
+                    </span>
+                  </span>
+                </button>
+
+                <div
                   className="
-                    pointer-events-none
-                    opacity-0
-                    transition-opacity
-                    duration-300
-                    group-hover:opacity-100
-                  "
+        pointer-events-none
+        opacity-0
+        transition-opacity
+        duration-300
+        peer-hover:opacity-100
+      "
                 >
                   <TextReveal
                     as="span"
@@ -559,38 +565,60 @@ export default function Index({ href, title }: IndexProps) {
                     duration={0.5}
                     y="110%"
                     className="
-                      whitespace-nowrap
-                      font-normal
-                      text-[10px]
-                      normal-case
-                      xl:text-[16px]
-                    "
+          whitespace-nowrap
+          text-[10px]
+          font-normal
+          normal-case
+          xl:text-[16px]
+        "
                   >
-                    or press Spacebar{" "}
+                    or use Spacebar
                   </TextReveal>
-                </span>
-              </button>
+                </div>
+              </div>
 
-              <div
-                className="
-                  mt-2
-                  h-px
-                  w-full
-                  overflow-hidden
-                  bg-white/20
-                "
-              >
-                <motion.div
+              <div className="relative">
+                <div
                   className="
-                    h-full
-                    w-full
-                    origin-left
-                    bg-[#ecdfcc]
-                  "
-                  style={{
-                    scaleX: scrollYProgress,
-                  }}
-                />
+      mt-2
+      h-px
+      w-full
+      overflow-hidden
+      bg-white/20
+    "
+                >
+                  <motion.div
+                    className="
+        h-full
+        w-full
+        origin-left
+        bg-[#ecdfcc]
+      "
+                    style={{
+                      scaleX: scrollYProgress,
+                    }}
+                  />
+                </div>
+
+                <p
+                  className={`
+      pointer-events-none
+      absolute
+      left-0
+      top-full
+      mt-2
+      whitespace-nowrap
+      text-[10px]
+      normal-case
+      text-color
+      transition-opacity
+      duration-300
+      xl:text-[14px]
+      opacity-80
+    `}
+                >
+                  Drag or scroll to rotate{" "}
+                </p>
               </div>
             </motion.div>
           </motion.div>

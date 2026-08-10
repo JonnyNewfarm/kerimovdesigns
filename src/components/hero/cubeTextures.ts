@@ -357,7 +357,7 @@ export function createTopTextTexture() {
   /*
    * BUTTON BACKGROUND
    */
-  ctx.fillStyle = "#232622";
+  ctx.fillStyle = "#1e211d";
 
   ctx.fillRect(
     buttonX,
@@ -619,7 +619,7 @@ export function createVisualIdentityTexture(
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#232622";
+  ctx.fillStyle = "#1e211d";
 
   ctx.fillRect(
     visualLinkX,
@@ -796,7 +796,7 @@ export function createMovingGraphicsTextTexture() {
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#232622";
+  ctx.fillStyle = "#1e211d";
 
   ctx.fillRect(
     animationButtonX,
@@ -897,96 +897,130 @@ export function createPosterTexture(
   ctx.clearRect(0, 0, size, size);
 
   const padding = 70;
-  const gap = 20;
+  const paddingTitle = 53;
 
-  /*
-   * POSTER DESIGN LABEL
-   * ingen bg / ingen border
-   */
-  const titleText = "POSTER DESIGN";
-  const titleX = padding;
-  const titleY = 169;
+ 
+  const topLabelText = "POSTER DESIGN";
+  const topLabelX = paddingTitle;
+  const topLabelY = 145;
 
-  ctx.font = `900 70px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.font = `900 68px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#e8e3dc";
 
   ctx.fillText(
-    titleText,
-    titleX,
-    titleY,
+    topLabelText,
+    topLabelX,
+    topLabelY,
   );
 
-  /*
-   * POSTERS
-   */
-  const imageY = 190;
-  const imageHeight = 660;
-  const imageWidth = 450;
+ 
+  const collageX = padding;
+  const collageY = 410;
 
-  const firstImageX = 52;
+  const collageWidth = size - padding * 2;
+  const collageHeight = 480;
+  const gap = 65;
 
-  const secondImageX =
-    firstImageX +
-    imageWidth +
-    gap;
+  posterCollageLayout.forEach((tile) => {
+    const texture = textures[tile.imageSlot];
 
-  const firstTexture = textures[0];
-  const secondTexture = textures[1];
-
-  const firstImage =
-    firstTexture?.image as
+    const image = texture?.image as
       | HTMLImageElement
       | HTMLCanvasElement
       | undefined;
 
-  const secondImage =
-    secondTexture?.image as
-      | HTMLImageElement
-      | HTMLCanvasElement
-      | undefined;
+    if (!image) {
+      return;
+    }
 
-  if (firstImage) {
+    const x =
+      collageX +
+      tile.x * collageWidth;
+
+    const y =
+      collageY +
+      tile.y * collageHeight;
+
+    const width =
+      tile.width * collageWidth;
+
+    const height =
+      tile.height * collageHeight;
+
+    const insetLeft =
+      tile.x === 0 ? 0 : gap / 2;
+
+    const insetTop =
+      tile.y === 0 ? 0 : gap / 2;
+
+    const insetRight =
+      tile.x + tile.width >= 1 ? 0 : gap / 2;
+
+    const insetBottom =
+      tile.y + tile.height >= 1 ? 0 : gap / 2;
+
+const scale = 1.1;
+
+const originalDrawWidth =
+  width - insetLeft - insetRight;
+
+const originalDrawHeight =
+  height - insetTop - insetBottom;
+
+const drawWidth =
+  originalDrawWidth * scale;
+
+const drawHeight =
+  originalDrawHeight * scale;
+
+const drawX =
+  x +
+  insetLeft +
+  (originalDrawWidth - drawWidth) / 2;
+
+const drawY =
+  y +
+  insetTop +
+  (originalDrawHeight - drawHeight) / 2;
+
+drawImageContain(
+  ctx,
+  image,
+  drawX,
+  drawY,
+  drawWidth,
+  drawHeight,
+);
+
+ 
+
     drawImageContain(
       ctx,
-      firstImage,
-      firstImageX,
-      imageY,
-      imageWidth,
-      imageHeight,
+      image,
+      drawX,
+      drawY,
+      drawWidth,
+      drawHeight,
     );
-  }
+  });
 
-  if (secondImage) {
-    drawImageContain(
-      ctx,
-      secondImage,
-      secondImageX,
-      imageY,
-      imageWidth,
-      imageHeight,
-    );
-  }
 
-  /*
-   * VIEW POSTERS BUTTON
-   */
   const linkText = "VIEW POSTERS";
+  const linkY = 930;
 
-  const buttonX = padding;
-  const buttonY = 920;
-
-  ctx.font = `900 60px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.font = `900 61px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
 
   const textWidth =
     ctx.measureText(linkText).width;
 
-  const buttonPaddingLeft = 48;
-  const buttonPaddingRight = 48;
-  const buttonHeight = 150;
+  const buttonPaddingLeft = 38;
+  const buttonPaddingRight = 38;
+  const buttonHeight = 125;
+
   const arrowGap = 26;
   const arrowWidth = 82;
 
@@ -997,17 +1031,20 @@ export function createPosterTexture(
     arrowWidth +
     buttonPaddingRight;
 
-  const buttonTop =
-    buttonY - buttonHeight / 2;
+  const linkX =
+    (size - buttonWidth) / 2 + 133;
+
+  const buttonY =
+    linkY - buttonHeight / 2;
 
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#232622";
+  ctx.fillStyle = "#1e211d";
 
   ctx.fillRect(
-    buttonX,
-    buttonTop,
+    linkX,
+    buttonY,
     buttonWidth,
     buttonHeight,
   );
@@ -1019,8 +1056,8 @@ export function createPosterTexture(
   ctx.lineWidth = 3;
 
   ctx.strokeRect(
-    buttonX,
-    buttonTop,
+    linkX,
+    buttonY,
     buttonWidth,
     buttonHeight,
   );
@@ -1032,19 +1069,20 @@ export function createPosterTexture(
 
   ctx.fillText(
     linkText,
-    buttonX + buttonPaddingLeft,
-    buttonY,
+    linkX + buttonPaddingLeft,
+    linkY,
   );
 
   /*
    * BUTTON ARROW
    */
   const arrowStartX =
-    buttonX +
+    linkX +
     buttonPaddingLeft +
     textWidth +
     arrowGap;
 
+  const arrowY = linkY;
   const arrowEndX =
     arrowStartX + arrowWidth;
 
@@ -1052,17 +1090,17 @@ export function createPosterTexture(
 
   ctx.moveTo(
     arrowStartX,
-    buttonY,
+    arrowY,
   );
 
   ctx.lineTo(
     arrowEndX,
-    buttonY,
+    arrowY,
   );
 
   ctx.lineTo(
     arrowEndX - 24,
-    buttonY - 20,
+    arrowY - 20,
   );
 
   ctx.strokeStyle = "#ecdfcc";
@@ -1075,15 +1113,15 @@ export function createPosterTexture(
   /*
    * TEXTURE
    */
-  const texture =
+  const posterTexture =
     new CanvasTexture(canvas);
 
-  texture.colorSpace =
+  posterTexture.colorSpace =
     SRGBColorSpace;
 
-  texture.needsUpdate = true;
+  posterTexture.needsUpdate = true;
 
-  return texture;
+  return posterTexture;
 }
 
 export function createLogoInspirationTexture(

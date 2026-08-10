@@ -16,51 +16,141 @@ const cubeTransforms = [
   "rotateX(0deg) rotateY(-180deg)",
   "rotateX(0deg) rotateY(-270deg)",
   "rotateX(-90deg) rotateY(-270deg)",
-];
+] as const;
 
-const LAST_FACE_INDEX = cubeTransforms.length - 1;
+const STEP_DURATION = 520;
+const START_DELAY = 520;
+
+const CUBE_EASING = "cubic-bezier(0.76, 0, 0.24, 1)";
 
 export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
-  const [activeFaceIndex, setActiveFaceIndex] = useState(0);
+  const cubeRef = useRef<HTMLDivElement | null>(null);
 
-  const sequenceStartedRef = useRef(false);
+  const [cubeFinished, setCubeFinished] = useState(false);
 
   useEffect(() => {
-    sequenceStartedRef.current = false;
-    setActiveFaceIndex(0);
+    const cube = cubeRef.current;
 
-    const startTimer = window.setTimeout(() => {
-      sequenceStartedRef.current = true;
-      setActiveFaceIndex(1);
-    }, 520);
-
-    return () => {
-      window.clearTimeout(startTimer);
-      sequenceStartedRef.current = false;
-    };
-  }, []);
-
-  const handleCubeAnimationComplete = () => {
-    if (!sequenceStartedRef.current) {
+    if (!cube) {
       return;
     }
 
-    setActiveFaceIndex((currentIndex) => {
-      if (currentIndex >= LAST_FACE_INDEX) {
-        return currentIndex;
+    let cancelled = false;
+    let currentAnimation: Animation | null = null;
+
+    const wait = (duration: number) =>
+      new Promise<void>((resolve) => {
+        window.setTimeout(resolve, duration);
+      });
+
+    const waitForPaint = () =>
+      new Promise<void>((resolve) => {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            resolve();
+          });
+        });
+      });
+
+    const runSequence = async () => {
+      setCubeFinished(false);
+
+      /*
+       * Alltid start helt eksakt på 00.
+       */
+      cube.style.transform = cubeTransforms[0];
+
+      await wait(START_DELAY);
+
+      if (cancelled) {
+        return;
       }
 
-      return currentIndex + 1;
-    });
-  };
+      /*
+       * 00 -> 019
+       * 019 -> 045
+       * 045 -> 072
+       * 072 -> 100
+       *
+       * Neste steg eksisterer ikke før
+       * currentAnimation.finished har resolved.
+       */
+      for (let index = 1; index < cubeTransforms.length; index += 1) {
+        if (cancelled) {
+          return;
+        }
+
+        const from = cubeTransforms[index - 1];
+        const to = cubeTransforms[index];
+
+        currentAnimation = cube.animate(
+          [
+            {
+              transform: from,
+            },
+            {
+              transform: to,
+            },
+          ],
+          {
+            duration: STEP_DURATION,
+            easing: CUBE_EASING,
+            fill: "forwards",
+          },
+        );
+
+        try {
+          await currentAnimation.finished;
+        } catch {
+          return;
+        }
+
+        if (cancelled) {
+          return;
+        }
+
+        /*
+         * Commit sluttposisjonen til selve elementet.
+         * Dermed er vi ikke avhengige av animation fill
+         * når neste steg begynner.
+         */
+        cube.style.transform = to;
+
+        currentAnimation.cancel();
+        currentAnimation = null;
+
+        /*
+         * La browseren faktisk tegne ferdig siden
+         * før neste rotasjon får starte.
+         */
+        await waitForPaint();
+
+        if (cancelled) {
+          return;
+        }
+      }
+
+      setCubeFinished(true);
+    };
+
+    void runSequence();
+
+    return () => {
+      cancelled = true;
+
+      if (currentAnimation) {
+        currentAnimation.cancel();
+      }
+    };
+  }, []);
 
   /*
-   * Ikke la introen forsvinne før:
+   * Introen går først ut når:
    *
-   * 1. resten av siden sier den er ferdig
-   * 2. kuben faktisk har nådd 100
+   * 1. siden er ferdig
+   * 2. 100-steget fysisk er ferdig
    */
-  const shouldExit = isDone && activeFaceIndex === LAST_FACE_INDEX;
+  const shouldExit = isDone && cubeFinished;
 
   return (
     <motion.div
@@ -128,22 +218,11 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
                 md:[--cube-depth:59px]
               "
             >
-              <motion.div
-                animate={{
-                  transform: cubeTransforms[activeFaceIndex],
-                }}
-                transition={{
-                  /*
-                   * Den gamle koden sendte et nytt target hvert 520ms.
-                   * Derfor bruker vi 0.52 her slik at hvert steg faktisk
-                   * fullføres før neste begynner.
-                   */
-                  duration: 0.52,
-                  ease,
-                }}
-                onAnimationComplete={handleCubeAnimationComplete}
+              <div
+                ref={cubeRef}
                 className="relative h-full w-full"
                 style={{
+                  transform: cubeTransforms[0],
                   transformStyle: "preserve-3d",
                   willChange: "transform",
                 }}
@@ -174,7 +253,7 @@ export default function HeroIntro({ isDone, onExitComplete }: HeroIntroProps) {
                 >
                   %
                 </CubeFace>
-              </motion.div>
+              </div>
             </div>
 
             <div className="h-px w-[160px] overflow-hidden bg-[#ecdfcc]/20 md:w-[210px]">
