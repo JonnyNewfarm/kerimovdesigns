@@ -33,8 +33,7 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
 
   const panelPosition = PANEL_POSITIONS[index] ?? "rightOfCard";
 
-  const panelTop = baseScale < 0.7 ? 105 : baseScale < 0.8 ? 54 : 12;
-
+  const panelTop = (BASE_HEIGHT * (1 - baseScale)) / 2;
   const panelGap = baseScale < 0.7 ? 10 : baseScale < 0.8 ? 18 : 32;
 
   const visualImageEdge = (BASE_WIDTH * (1 + baseScale)) / 2;
@@ -196,7 +195,7 @@ const DesktopProjectItem = memo(function DesktopProjectItem({
                       panelPosition === "rightOfCard" ? panelOffset : "auto",
                   }}
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-1">
                     <TextReveal
                       as="p"
                       mode="words"

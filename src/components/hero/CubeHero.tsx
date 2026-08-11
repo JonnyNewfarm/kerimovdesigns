@@ -50,34 +50,26 @@ export default function Index({ href, title }: IndexProps) {
   const isDraggingCubeRef = useRef(false);
 
   const clientWorkTransitionRef = useRef<HTMLAnchorElement | null>(null);
-
   const contactTransitionRef = useRef<HTMLAnchorElement | null>(null);
-
   const visualIdentityTransitionRef = useRef<HTMLAnchorElement | null>(null);
-
   const animationTransitionRef = useRef<HTMLAnchorElement | null>(null);
-
   const logoTransitionRef = useRef<HTMLAnchorElement | null>(null);
 
   const isMdUp = useIsMdUp();
 
   const [hasMounted, setHasMounted] = useState(false);
-
   const [introChecked, setIntroChecked] = useState(false);
-
   const [shouldUseIntro, setShouldUseIntro] = useState(false);
-
   const [introDone, setIntroDone] = useState(false);
-
   const [cubeReady, setCubeReady] = useState(false);
-
   const [allowCanvasMount, setAllowCanvasMount] = useState(false);
-
   const [isHeroVisible, setIsHeroVisible] = useState(true);
 
   const [alignCubeTrigger, setAlignCubeTrigger] = useState(0);
 
   const [hasInteractedWithCube, setHasInteractedWithCube] = useState(false);
+
+  const [mobileOrbitEnabled, setMobileOrbitEnabled] = useState(false);
 
   const { isTransitioning } = usePageTransition();
 
@@ -170,7 +162,7 @@ export default function Index({ href, title }: IndexProps) {
   });
 
   /*
-   * SHOW ALIGN CONTROL AFTER USER SCROLLS
+   * SHOW CONTROLS AFTER USER SCROLLS
    */
   useEffect(() => {
     const unsubscribe = scrollYProgress.on("change", (value: number) => {
@@ -388,9 +380,9 @@ export default function Index({ href, title }: IndexProps) {
             {hasMounted && allowCanvasMount && (
               <Canvas
                 className="
-                    h-3/4
-                    w-full
-                  "
+                  h-3/4
+                  w-full
+                "
                 dpr={isMdUp ? [1, 1.5] : 1.35}
                 frameloop={isCanvasActive ? "always" : "never"}
                 gl={{
@@ -398,24 +390,23 @@ export default function Index({ href, title }: IndexProps) {
                   powerPreference: "high-performance",
                 }}
               >
-                {isMdUp && (
-                  <OrbitControls
-                    enableZoom={false}
-                    enablePan={false}
-                    enableRotate
-                    enableDamping
-                    dampingFactor={0.06}
-                    rotateSpeed={0.65}
-                    onStart={() => {
-                      isDraggingCubeRef.current = true;
+                <OrbitControls
+                  enabled={isMdUp || mobileOrbitEnabled}
+                  enableZoom={false}
+                  enablePan={false}
+                  enableRotate
+                  enableDamping
+                  dampingFactor={0.06}
+                  rotateSpeed={0.65}
+                  onStart={() => {
+                    isDraggingCubeRef.current = true;
 
-                      setHasInteractedWithCube(true);
-                    }}
-                    onEnd={() => {
-                      isDraggingCubeRef.current = false;
-                    }}
-                  />
-                )}
+                    setHasInteractedWithCube(true);
+                  }}
+                  onEnd={() => {
+                    isDraggingCubeRef.current = false;
+                  }}
+                />
 
                 <ambientLight intensity={2} />
 
@@ -440,7 +431,140 @@ export default function Index({ href, title }: IndexProps) {
             )}
 
             {/*
-             * ALIGN CUBE CONTROL
+             * MOBILE CUBE CONTROLS
+             *
+             * Hidden until the user has scrolled.
+             */}
+            <motion.div
+              initial={false}
+              animate={
+                canRevealBottomLine && hasInteractedWithCube
+                  ? {
+                      opacity: 1,
+                      x: 0,
+                      y: 0,
+                      filter: "blur(0px)",
+                    }
+                  : {
+                      opacity: 0,
+                      x: -8,
+                      y: 6,
+                      filter: "blur(5px)",
+                    }
+              }
+              transition={{
+                duration: 0.75,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              style={{
+                pointerEvents:
+                  canRevealBottomLine && hasInteractedWithCube
+                    ? "auto"
+                    : "none",
+              }}
+              className="
+                absolute
+                bottom-6
+                left-6
+                z-30
+                flex
+                flex-col
+                items-start
+                md:hidden
+              "
+            >
+              {/*
+               * MOBILE ROTATE HINT
+               */}
+              <div className="mb-2  overflow-hidden">
+                <motion.p
+                  initial={false}
+                  animate={
+                    mobileOrbitEnabled
+                      ? {
+                          opacity: 0.8,
+                          y: 0,
+                        }
+                      : {
+                          opacity: 0,
+                          y: 8,
+                        }
+                  }
+                  transition={{
+                    duration: 0.4,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className="
+                    whitespace-nowrap
+                    text-[13px]
+                    font-normal
+                    normal-case
+                    text-color
+                  "
+                >
+                  Swipe cube to rotate
+                </motion.p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  aria-pressed={mobileOrbitEnabled}
+                  onClick={() => {
+                    setMobileOrbitEnabled((current) => !current);
+                  }}
+                  className={`
+  flex
+  min-w-[92px]
+  cursor-pointer
+  items-center
+  justify-center
+  whitespace-nowrap
+  border
+  px-3
+  py-1.5
+  text-[10px]
+  font-semibold
+  uppercase
+  transition-colors
+  duration-300
+  ${
+    mobileOrbitEnabled
+      ? "border-[#ecdfcc] bg-[#ecdfcc] text-[#181c14]"
+      : "border-white/40 text-color"
+  }
+`}
+                >
+                  {mobileOrbitEnabled ? "Lock cube" : "Rotate cube"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAlignCubeTrigger((value) => value + 1);
+                  }}
+                  className="
+                    flex
+                    cursor-pointer
+                    items-center
+                    whitespace-nowrap
+                    border
+                    border-white/40
+                    px-3
+                    py-1.5
+                    text-[10px]
+                    font-semibold
+                    uppercase
+                    text-color
+                  "
+                >
+                  Align cube
+                </button>
+              </div>
+            </motion.div>
+
+            {/*
+             * DESKTOP ALIGN CUBE CONTROL
              */}
             <motion.div
               initial={false}
@@ -477,14 +601,14 @@ export default function Index({ href, title }: IndexProps) {
                 pointerEvents: hasInteractedWithCube ? "auto" : "none",
               }}
               className="
-    absolute
-    right-[14vw]
-    top-1/2
-    z-20
-    hidden
-    lg:block
-    xl:right-[16vw]
-  "
+                absolute
+                right-[14vw]
+                top-1/2
+                z-20
+                hidden
+                lg:block
+                xl:right-[16vw]
+              "
             >
               <div className="flex items-center gap-x-3">
                 <button
@@ -493,55 +617,53 @@ export default function Index({ href, title }: IndexProps) {
                     setAlignCubeTrigger((value) => value + 1);
                   }}
                   className="
-        peer
-        group
-        flex
-        border-[1px]
-        border-white/40
-        
-        cursor-pointer
-        items-center
-        font-semibold
-        text-[12px]
-        uppercase
-        focus:outline-none
-        focus-visible:outline-none
-        focus-visible:ring-0
-        xl:text-lg
-      "
+                    peer
+                    group
+                    flex
+                    cursor-pointer
+                    items-center
+                    border-[1px]
+                    border-white/40
+                    font-semibold
+                    text-[12px]
+                    uppercase
+                    focus:outline-none
+                    focus-visible:outline-none
+                    focus-visible:ring-0
+                    xl:text-lg
+                  "
                 >
                   <span
                     className="
-          relative
-          overflow-hidden
-          px-3
-          py-1.5
-        "
+                      relative
+                      overflow-hidden
+                      px-3
+                      py-1.5
+                    "
                   >
                     <span
                       aria-hidden="true"
                       className="
-            absolute
-            inset-0
-            origin-bottom
-            scale-y-0
-            bg-[#ecdfcc]
-
-            transition-transform
-            duration-500
-            ease-[cubic-bezier(0.76,0,0.24,1)]
-            group-hover:scale-y-100
-          "
+                        absolute
+                        inset-0
+                        origin-bottom
+                        scale-y-0
+                        bg-[#ecdfcc]
+                        transition-transform
+                        duration-500
+                        ease-[cubic-bezier(0.76,0,0.24,1)]
+                        group-hover:scale-y-100
+                      "
                     />
 
                     <span
                       className="
-            relative
-            z-10
-            transition-colors
-            duration-300
-            group-hover:text-[#181c14]
-          "
+                        relative
+                        z-10
+                        transition-colors
+                        duration-300
+                        group-hover:text-[#181c14]
+                      "
                     >
                       Align cube
                     </span>
@@ -550,12 +672,12 @@ export default function Index({ href, title }: IndexProps) {
 
                 <div
                   className="
-        pointer-events-none
-        opacity-0
-        transition-opacity
-        duration-300
-        peer-hover:opacity-100
-      "
+                    pointer-events-none
+                    opacity-0
+                    transition-opacity
+                    duration-300
+                    peer-hover:opacity-100
+                  "
                 >
                   <TextReveal
                     as="span"
@@ -565,12 +687,12 @@ export default function Index({ href, title }: IndexProps) {
                     duration={0.5}
                     y="110%"
                     className="
-          whitespace-nowrap
-          text-[10px]
-          font-normal
-          normal-case
-          xl:text-[16px]
-        "
+                      whitespace-nowrap
+                      text-[10px]
+                      font-normal
+                      normal-case
+                      xl:text-[16px]
+                    "
                   >
                     or use Spacebar
                   </TextReveal>
@@ -580,20 +702,20 @@ export default function Index({ href, title }: IndexProps) {
               <div className="relative">
                 <div
                   className="
-      mt-2
-      h-px
-      w-full
-      overflow-hidden
-      bg-white/20
-    "
+                    mt-2
+                    h-px
+                    w-full
+                    overflow-hidden
+                    bg-white/20
+                  "
                 >
                   <motion.div
                     className="
-        h-full
-        w-full
-        origin-left
-        bg-[#ecdfcc]
-      "
+                      h-full
+                      w-full
+                      origin-left
+                      bg-[#ecdfcc]
+                    "
                     style={{
                       scaleX: scrollYProgress,
                     }}
@@ -601,23 +723,23 @@ export default function Index({ href, title }: IndexProps) {
                 </div>
 
                 <p
-                  className={`
-      pointer-events-none
-      absolute
-      left-0
-      top-full
-      mt-2
-      whitespace-nowrap
-      text-[10px]
-      normal-case
-      text-color
-      transition-opacity
-      duration-300
-      xl:text-[14px]
-      opacity-80
-    `}
+                  className="
+                    pointer-events-none
+                    absolute
+                    left-0
+                    top-full
+                    mt-2
+                    whitespace-nowrap
+                    text-[10px]
+                    normal-case
+                    text-color
+                    opacity-80
+                    transition-opacity
+                    duration-300
+                    xl:text-[14px]
+                  "
                 >
-                  Drag or scroll to rotate{" "}
+                  Drag or scroll to rotate
                 </p>
               </div>
             </motion.div>
@@ -626,6 +748,8 @@ export default function Index({ href, title }: IndexProps) {
 
         {/*
          * BOTTOM INFO
+         *
+         * Hidden completely on mobile.
          */}
         <motion.div
           initial={false}
@@ -651,13 +775,13 @@ export default function Index({ href, title }: IndexProps) {
           }}
           className="
             absolute
-            bottom-6
+            bottom-10
             left-0
             right-0
             z-10
-            px-6
-            md:bottom-10
-            md:px-10
+            hidden
+            px-10
+            md:block
             lg:px-20
           "
         >
@@ -716,8 +840,7 @@ export default function Index({ href, title }: IndexProps) {
                   items-center
                   gap-x-1
                   whitespace-nowrap
-                  text-[12px]
-                  md:text-[10px]
+                  text-[10px]
                   xl:text-[14px]
                 "
               >
