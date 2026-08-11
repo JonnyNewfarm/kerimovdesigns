@@ -357,7 +357,7 @@ export function createTopTextTexture() {
   /*
    * BUTTON BACKGROUND
    */
-  ctx.fillStyle = "#1e211d";
+  ctx.fillStyle = "#181c14";
 
   ctx.fillRect(
     buttonX,
@@ -619,7 +619,7 @@ export function createVisualIdentityTexture(
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#1e211d";
+  ctx.fillStyle = "#181c14";
 
   ctx.fillRect(
     visualLinkX,
@@ -796,7 +796,7 @@ export function createMovingGraphicsTextTexture() {
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#1e211d";
+  ctx.fillStyle = "#181c14";
 
   ctx.fillRect(
     animationButtonX,
@@ -896,15 +896,17 @@ export function createPosterTexture(
 
   ctx.clearRect(0, 0, size, size);
 
-  const padding = 70;
-  const paddingTitle = 53;
+  const paddingTitle = 70;
 
- 
+  /*
+   * TOP LABEL
+   */
+
   const topLabelText = "POSTER DESIGN";
   const topLabelX = paddingTitle;
-  const topLabelY = 145;
+  const topLabelY = 178;
 
-  ctx.font = `900 68px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.font = `900 70px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#e8e3dc";
@@ -915,100 +917,54 @@ export function createPosterTexture(
     topLabelY,
   );
 
- 
-  const collageX = padding;
-  const collageY = 410;
+  /*
+   * POSTERS
+   */
 
-  const collageWidth = size - padding * 2;
-  const collageHeight = 480;
-  const gap = 65;
+  const collageX = 70;
+  const collageY = 270; // flyttet opp
+  const collageWidth = size - collageX * 2;
+  const gap = 26;
 
-  posterCollageLayout.forEach((tile) => {
-    const texture = textures[tile.imageSlot];
+  const imageWidth =
+    (collageWidth - gap) / 2;
 
-    const image = texture?.image as
-      | HTMLImageElement
-      | HTMLCanvasElement
-      | undefined;
+  const imageHeight = 530;
 
-    if (!image) {
-      return;
-    }
+  textures
+    .slice(0, 2)
+    .forEach((texture, index) => {
+      const image = texture?.image as
+        | HTMLImageElement
+        | HTMLCanvasElement
+        | undefined;
 
-    const x =
-      collageX +
-      tile.x * collageWidth;
+      if (!image) {
+        return;
+      }
 
-    const y =
-      collageY +
-      tile.y * collageHeight;
+      const drawX =
+        collageX +
+        index * (imageWidth + gap);
 
-    const width =
-      tile.width * collageWidth;
+      const drawY = collageY;
 
-    const height =
-      tile.height * collageHeight;
+      drawImageContain(
+        ctx,
+        image,
+        drawX,
+        drawY,
+        imageWidth,
+        imageHeight,
+      );
+    });
 
-    const insetLeft =
-      tile.x === 0 ? 0 : gap / 2;
-
-    const insetTop =
-      tile.y === 0 ? 0 : gap / 2;
-
-    const insetRight =
-      tile.x + tile.width >= 1 ? 0 : gap / 2;
-
-    const insetBottom =
-      tile.y + tile.height >= 1 ? 0 : gap / 2;
-
-const scale = 1.1;
-
-const originalDrawWidth =
-  width - insetLeft - insetRight;
-
-const originalDrawHeight =
-  height - insetTop - insetBottom;
-
-const drawWidth =
-  originalDrawWidth * scale;
-
-const drawHeight =
-  originalDrawHeight * scale;
-
-const drawX =
-  x +
-  insetLeft +
-  (originalDrawWidth - drawWidth) / 2;
-
-const drawY =
-  y +
-  insetTop +
-  (originalDrawHeight - drawHeight) / 2;
-
-drawImageContain(
-  ctx,
-  image,
-  drawX,
-  drawY,
-  drawWidth,
-  drawHeight,
-);
-
- 
-
-    drawImageContain(
-      ctx,
-      image,
-      drawX,
-      drawY,
-      drawWidth,
-      drawHeight,
-    );
-  });
-
+  /*
+   * LINK BUTTON
+   */
 
   const linkText = "VIEW POSTERS";
-  const linkY = 930;
+  const linkY = 905;
 
   ctx.font = `900 61px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
@@ -1040,7 +996,8 @@ drawImageContain(
   /*
    * BUTTON BG
    */
-  ctx.fillStyle = "#1e211d";
+
+  ctx.fillStyle = "#181c14";
 
   ctx.fillRect(
     linkX,
@@ -1052,6 +1009,7 @@ drawImageContain(
   /*
    * BUTTON BORDER
    */
+
   ctx.strokeStyle = "#ecdfcc";
   ctx.lineWidth = 3;
 
@@ -1065,6 +1023,7 @@ drawImageContain(
   /*
    * BUTTON TEXT
    */
+
   ctx.fillStyle = "#ecdfcc";
 
   ctx.fillText(
@@ -1076,6 +1035,7 @@ drawImageContain(
   /*
    * BUTTON ARROW
    */
+
   const arrowStartX =
     linkX +
     buttonPaddingLeft +
@@ -1113,6 +1073,7 @@ drawImageContain(
   /*
    * TEXTURE
    */
+
   const posterTexture =
     new CanvasTexture(canvas);
 
