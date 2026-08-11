@@ -896,75 +896,78 @@ export function createPosterTexture(
 
   ctx.clearRect(0, 0, size, size);
 
-  const paddingTitle = 70;
-
-  /*
-   * TOP LABEL
-   */
-
-  const topLabelText = "POSTER DESIGN";
-  const topLabelX = paddingTitle;
-  const topLabelY = 178;
-
-  ctx.font = `900 70px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "#e8e3dc";
-
-  ctx.fillText(
-    topLabelText,
-    topLabelX,
-    topLabelY,
-  );
-
   /*
    * POSTERS
    */
 
-  const collageX = 70;
-  const collageY = 270; // flyttet opp
-  const collageWidth = size - collageX * 2;
-  const gap = 26;
+  const firstWidth = 470;
+  const firstHeight = 660;
 
-  const imageWidth =
-    (collageWidth - gap) / 2;
+  const secondWidth = 470;
+  const secondHeight = 660;
 
-  const imageHeight = 530;
+  const gap = 20;
 
-  textures
-    .slice(0, 2)
-    .forEach((texture, index) => {
-      const image = texture?.image as
-        | HTMLImageElement
-        | HTMLCanvasElement
-        | undefined;
+  const totalWidth =
+    firstWidth + gap + secondWidth;
 
-      if (!image) {
-        return;
-      }
+  const startX =
+    (size - totalWidth) / 2;
 
-      const drawX =
-        collageX +
-        index * (imageWidth + gap);
+  const firstX = startX;
+  const firstY = 158;
 
-      const drawY = collageY;
+  const secondX =
+    firstX + firstWidth + gap;
 
-      drawImageContain(
-        ctx,
-        image,
-        drawX,
-        drawY,
-        imageWidth,
-        imageHeight,
-      );
-    });
+  const secondY = 160;
+
+  const firstTexture =
+    textures[0];
+
+  const secondTexture =
+    textures[1];
+
+  const firstImage =
+    firstTexture?.image as
+      | HTMLImageElement
+      | HTMLCanvasElement
+      | undefined;
+
+  const secondImage =
+    secondTexture?.image as
+      | HTMLImageElement
+      | HTMLCanvasElement
+      | undefined;
+
+  if (firstImage) {
+    drawImageContain(
+      ctx,
+      firstImage,
+      firstX,
+      firstY,
+      firstWidth,
+      firstHeight,
+    );
+  }
+
+  if (secondImage) {
+    drawImageContain(
+      ctx,
+      secondImage,
+      secondX,
+      secondY,
+      secondWidth,
+      secondHeight,
+    );
+  }
 
   /*
    * LINK BUTTON
    */
 
   const linkText = "VIEW POSTERS";
-  const linkY = 905;
+  const linkY = 900;
 
   ctx.font = `900 61px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
   ctx.textAlign = "left";
@@ -988,7 +991,9 @@ export function createPosterTexture(
     buttonPaddingRight;
 
   const linkX =
-    (size - buttonWidth) / 2 + 133;
+    size -
+    buttonWidth -
+    70;
 
   const buttonY =
     linkY - buttonHeight / 2;
@@ -997,7 +1002,7 @@ export function createPosterTexture(
    * BUTTON BG
    */
 
-  ctx.fillStyle = "#181c14";
+  ctx.fillStyle = "#1e211d";
 
   ctx.fillRect(
     linkX,
@@ -1043,6 +1048,7 @@ export function createPosterTexture(
     arrowGap;
 
   const arrowY = linkY;
+
   const arrowEndX =
     arrowStartX + arrowWidth;
 
