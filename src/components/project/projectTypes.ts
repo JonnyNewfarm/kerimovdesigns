@@ -1,9 +1,14 @@
 export type Project = {
   id: string;
+
   title: string;
-  description?: string | null;
+
+  description?:
+    | string
+    | null;
 
   src: string;
+
   src2?: string | null;
   src3?: string | null;
   src4?: string | null;
@@ -13,13 +18,25 @@ export type Project = {
   src8?: string | null;
   src9?: string | null;
 
-  srcVideo?: string | null;
+  srcVideo?:
+    | string
+    | null;
 
-  tags?: string | string[] | null;
-  type?: string | null;
-  tools?: string | null;
+  tags?:
+    | string
+    | string[]
+    | null;
+
+  type?:
+    | string
+    | null;
+
+  tools?:
+    | string
+    | null;
 
   createdAt: Date;
+
   updatedAt: Date;
 };
 
@@ -34,6 +51,8 @@ export type ImageLayout = {
   size: string;
 };
 
-export type LoadedImages = Record<number, boolean>;
-
-export type ImageDimensionsMap = Record<number, ImageDimensions>;
+export type ImageDimensionsMap =
+  Record<
+    number,
+    ImageDimensions
+  >;

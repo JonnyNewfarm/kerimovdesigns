@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+
 import { useRef, useState } from "react";
 
 import ProjectDescription from "./ProjectDescription";
@@ -9,7 +10,6 @@ import ProjectGalleryItem from "./ProjectGalleryItem";
 import type {
   ImageDimensions,
   ImageDimensionsMap,
-  LoadedImages,
   Project,
 } from "./projectTypes";
 
@@ -18,12 +18,16 @@ import { imageLayouts } from "./projectUtils";
 type ProjectGalleryProps = {
   project: Project;
   images: string[];
+
   activeIndex: number | null;
   hoveredIndex: number | null;
-  loadedImages: LoadedImages;
+
   imageDimensions: ImageDimensionsMap;
+
   onHoverAction: (index: number | null) => void;
+
   onOpenImageAction: (index: number) => void;
+
   onImageLoadAction: (index: number, dimensions: ImageDimensions) => void;
 };
 
@@ -34,7 +38,6 @@ export default function ProjectGallery({
   images,
   activeIndex,
   hoveredIndex,
-  loadedImages,
   imageDimensions,
   onHoverAction,
   onOpenImageAction,
@@ -42,8 +45,9 @@ export default function ProjectGallery({
 }: ProjectGalleryProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number>(16 / 9);
+
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isVideoHovered, setIsVideoHovered] = useState(false);
 
   const toggleVideo = async () => {
     const video = videoRef.current;
@@ -64,7 +68,6 @@ export default function ProjectGallery({
     }
   };
 
-  const showPauseIcon = isVideoPlaying;
   return (
     <div
       className="
@@ -85,17 +88,20 @@ export default function ProjectGallery({
           flex-col
           gap-y-20
           px-4
+
           sm:mt-28
           sm:gap-y-32
           sm:px-8
+
           lg:mt-32
         "
       >
         {images.map((src, index) => {
           const isActive = activeIndex === index;
-          const isLoaded = Boolean(loadedImages[index]);
 
-          const shouldBlur =
+          const isLoaded = Boolean(imageDimensions[index]);
+
+          const shouldFade =
             (hoveredIndex !== null && hoveredIndex !== index) ||
             (activeIndex !== null && activeIndex !== index);
 
@@ -111,7 +117,7 @@ export default function ProjectGallery({
                 dimensions={imageDimensions[index]}
                 isActive={isActive}
                 isLoaded={isLoaded}
-                shouldBlur={shouldBlur}
+                shouldFade={shouldFade}
                 onHoverAction={onHoverAction}
                 onOpenAction={onOpenImageAction}
                 onLoadAction={onImageLoadAction}
@@ -133,6 +139,7 @@ export default function ProjectGallery({
               flex
               w-full
               justify-center
+
               lg:justify-start
             "
           >
@@ -140,6 +147,7 @@ export default function ProjectGallery({
               className="
                 w-full
                 max-w-[520px]
+
                 lg:max-w-[680px]
                 lg:translate-x-20
               "
@@ -159,35 +167,42 @@ export default function ProjectGallery({
                 type="button"
                 aria-label={isVideoPlaying ? "Pause video" : "Play video"}
                 onClick={toggleVideo}
-                onMouseEnter={() => {
-                  setIsVideoHovered(true);
-                }}
-                onMouseLeave={() => {
-                  setIsVideoHovered(false);
-                }}
                 className="
-                  relative
-                  block
-                  w-full
-                  cursor-pointer
-                  overflow-hidden
-                  text-left
-                "
+    relative
+    block
+    w-full
+    cursor-pointer
+    overflow-hidden
+    text-left
+  "
+                style={{
+                  aspectRatio: videoAspectRatio,
+                }}
               >
                 <video
                   ref={videoRef}
-                  className="
-                    pointer-events-none
-                    block
-                    h-auto
-                    w-full
-                    select-none
-                  "
+                  src={project.srcVideo}
+                  poster={project.src}
                   muted
                   loop
                   playsInline
                   preload="metadata"
-                  src={project.srcVideo}
+                  className="
+      pointer-events-none
+      absolute
+      inset-0
+      h-full
+      w-full
+      select-none
+      object-cover
+    "
+                  onLoadedMetadata={(event) => {
+                    const video = event.currentTarget;
+
+                    if (video.videoWidth && video.videoHeight) {
+                      setVideoAspectRatio(video.videoWidth / video.videoHeight);
+                    }
+                  }}
                   onPlay={() => {
                     setIsVideoPlaying(true);
                   }}
@@ -202,33 +217,38 @@ export default function ProjectGallery({
                 <span
                   aria-hidden="true"
                   className="
-                    pointer-events-none
-                    absolute
-                    bottom-4
-                    right-4
-                    z-10
-                    flex
-                    h-12
-                    w-12
-                    items-center
-                    justify-center
-                    text-white
-                    bg-black/40
+      pointer-events-none
+      absolute
+      bottom-4
+      right-4
+      z-10
+      flex
+      h-12
+      w-12
+      items-center
+      justify-center
+      bg-black/40
+      text-white
 
-                    sm:bottom-6
-                    sm:right-6
-                    sm:h-20
-                    sm:w-20
-                  "
+      sm:bottom-6
+      sm:right-6
+      sm:h-20
+      sm:w-20
+    "
                 >
                   <AnimatePresence initial={false} mode="wait">
-                    {showPauseIcon ? (
+                    {isVideoPlaying ? (
                       <motion.svg
                         key="pause"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-18 w-18 "
+                        className="
+            h-12
+            w-12
+            sm:h-16
+            sm:w-16
+          "
                         initial={{
                           opacity: 0,
                           scale: 0.65,
@@ -267,7 +287,12 @@ export default function ProjectGallery({
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-18 w-18"
+                        className="
+            h-12
+            w-12
+            sm:h-16
+            sm:w-16
+          "
                         initial={{
                           opacity: 0,
                           scale: 0.65,

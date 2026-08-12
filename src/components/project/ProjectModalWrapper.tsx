@@ -1,6 +1,7 @@
 "use client";
 
 import { LayoutGroup } from "framer-motion";
+
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 import ProjectGallery from "./ProjectGallery";
@@ -10,7 +11,6 @@ import ProjectImageModal from "./ProjectImageModal";
 import type {
   ImageDimensions,
   ImageDimensionsMap,
-  LoadedImages,
   Project,
 } from "./projectTypes";
 
@@ -26,9 +26,8 @@ export default function ProjectModalWrapper({
   project,
 }: ProjectModalWrapperProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const [loadedImages, setLoadedImages] = useState<LoadedImages>({});
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const [imageDimensions, setImageDimensions] = useState<ImageDimensionsMap>(
     {},
@@ -43,6 +42,7 @@ export default function ProjectModalWrapper({
   }, [project.tags]);
 
   const imageCount = images.length;
+
   const videoCount = project.srcVideo ? 1 : 0;
 
   const activeImage =
@@ -51,6 +51,43 @@ export default function ProjectModalWrapper({
   const activeDimensions =
     activeIndex !== null ? imageDimensions[activeIndex] : undefined;
 
+  /*
+   * Preload alle resterende bilder.
+   *
+   * Første to bilder håndteres allerede
+   * som eager i ProjectGalleryItem.
+   *
+   * Resten lastes lavt prioritert inn i
+   * browser-cache med en gang.
+   */
+  useEffect(() => {
+    if (images.length <= 2) {
+      return;
+    }
+
+    const preloaders = images.slice(2).map((src) => {
+      const image = new window.Image();
+
+      image.decoding = "async";
+
+      image.fetchPriority = "low";
+
+      image.src = src;
+
+      return image;
+    });
+
+    return () => {
+      preloaders.forEach((image) => {
+        image.onload = null;
+        image.onerror = null;
+      });
+    };
+  }, [images]);
+
+  /*
+   * Escape lukker fullscreen.
+   */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") {
@@ -68,27 +105,38 @@ export default function ProjectModalWrapper({
     };
   }, []);
 
+  /*
+   * Scroll lock når fullscreen
+   * er åpen.
+   */
   useLayoutEffect(() => {
     if (activeIndex === null) {
       return;
     }
 
     const html = document.documentElement;
+
     const body = document.body;
 
     const previousHtmlOverflow = html.style.overflow;
-    const previousHtmlOverscrollBehavior = html.style.overscrollBehavior;
+
+    const previousHtmlOverscroll = html.style.overscrollBehavior;
 
     const previousBodyOverflow = body.style.overflow;
-    const previousBodyOverscrollBehavior = body.style.overscrollBehavior;
+
+    const previousBodyOverscroll = body.style.overscrollBehavior;
+
+    const previousPaddingRight = body.style.paddingRight;
 
     const scrollbarWidth =
       window.innerWidth - document.documentElement.clientWidth;
 
     html.style.overflow = "hidden";
+
     html.style.overscrollBehavior = "none";
 
     body.style.overflow = "hidden";
+
     body.style.overscrollBehavior = "none";
 
     if (scrollbarWidth > 0) {
@@ -97,20 +145,23 @@ export default function ProjectModalWrapper({
 
     return () => {
       html.style.overflow = previousHtmlOverflow;
-      html.style.overscrollBehavior = previousHtmlOverscrollBehavior;
+
+      html.style.overscrollBehavior = previousHtmlOverscroll;
 
       body.style.overflow = previousBodyOverflow;
-      body.style.overscrollBehavior = previousBodyOverscrollBehavior;
 
-      body.style.paddingRight = "";
+      body.style.overscrollBehavior = previousBodyOverscroll;
+
+      body.style.paddingRight = previousPaddingRight;
     };
   }, [activeIndex]);
 
   const openImage = (index: number) => {
-    const isLoaded = loadedImages[index];
-    const dimensions = imageDimensions[index];
-
-    if (!isLoaded || !dimensions) {
+    /*
+     * Dimensions betyr at bildet
+     * faktisk har lastet.
+     */
+    if (!imageDimensions[index]) {
       return;
     }
 
@@ -136,18 +187,8 @@ export default function ProjectModalWrapper({
 
       return {
         ...previous,
+
         [index]: dimensions,
-      };
-    });
-
-    setLoadedImages((previous) => {
-      if (previous[index]) {
-        return previous;
-      }
-
-      return {
-        ...previous,
-        [index]: true,
       };
     });
   };
@@ -168,7 +209,6 @@ export default function ProjectModalWrapper({
         images={images}
         activeIndex={activeIndex}
         hoveredIndex={hoveredIndex}
-        loadedImages={loadedImages}
         imageDimensions={imageDimensions}
         onHoverAction={setHoveredIndex}
         onOpenImageAction={openImage}

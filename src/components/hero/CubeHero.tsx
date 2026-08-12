@@ -383,7 +383,7 @@ export default function Index({ href, title }: IndexProps) {
                   h-3/4
                   w-full
                 "
-                dpr={isMdUp ? [1, 1.5] : 1.35}
+                dpr={isMdUp ? [1, 1.5] : 1.45}
                 frameloop={isCanvasActive ? "always" : "never"}
                 gl={{
                   antialias: false,

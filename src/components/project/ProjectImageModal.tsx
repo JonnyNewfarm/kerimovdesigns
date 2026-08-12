@@ -1,8 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+
 import Image from "next/image";
+
 import {
+  useCallback,
   useEffect,
   useRef,
   type MouseEvent,
@@ -10,6 +13,7 @@ import {
 } from "react";
 
 import { projectLayoutEase } from "./projectAnimations";
+
 import type { ImageDimensions } from "./projectTypes";
 
 type ProjectImageModalProps = {
@@ -30,9 +34,28 @@ export default function ProjectImageModal({
   onCloseAction,
 }: ProjectImageModalProps) {
   const isClosingRef = useRef(false);
+
   const scrollBlockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+
+  const wheelBlockerRef = useRef<((event: WheelEvent) => void) | null>(null);
+
+  const removeWheelBlocker = useCallback(() => {
+    if (wheelBlockerRef.current) {
+      window.removeEventListener("wheel", wheelBlockerRef.current, {
+        capture: true,
+      });
+
+      wheelBlockerRef.current = null;
+    }
+
+    if (scrollBlockTimeoutRef.current) {
+      clearTimeout(scrollBlockTimeoutRef.current);
+
+      scrollBlockTimeoutRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (activeIndex !== null) {
@@ -42,11 +65,9 @@ export default function ProjectImageModal({
 
   useEffect(() => {
     return () => {
-      if (scrollBlockTimeoutRef.current) {
-        clearTimeout(scrollBlockTimeoutRef.current);
-      }
+      removeWheelBlocker();
     };
-  }, []);
+  }, [removeWheelBlocker]);
 
   const closeImage = () => {
     if (isClosingRef.current) {
@@ -54,6 +75,7 @@ export default function ProjectImageModal({
     }
 
     isClosingRef.current = true;
+
     onCloseAction();
   };
 
@@ -67,9 +89,13 @@ export default function ProjectImageModal({
 
     isClosingRef.current = true;
 
+    removeWheelBlocker();
+
     const blockMomentumScroll = (wheelEvent: WheelEvent) => {
       wheelEvent.preventDefault();
     };
+
+    wheelBlockerRef.current = blockMomentumScroll;
 
     window.addEventListener("wheel", blockMomentumScroll, {
       passive: false,
@@ -79,16 +105,13 @@ export default function ProjectImageModal({
     onCloseAction();
 
     scrollBlockTimeoutRef.current = setTimeout(() => {
-      window.removeEventListener("wheel", blockMomentumScroll, {
-        capture: true,
-      });
-
-      scrollBlockTimeoutRef.current = null;
+      removeWheelBlocker();
     }, CLOSE_ANIMATION_DURATION);
   };
 
   const handleImageClick = (event: MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
+
     closeImage();
   };
 
@@ -110,9 +133,15 @@ export default function ProjectImageModal({
             overflow-hidden
             overscroll-none
           "
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 1 }}
+          initial={{
+            opacity: 1,
+          }}
+          animate={{
+            opacity: 1,
+          }}
+          exit={{
+            opacity: 1,
+          }}
           onClick={closeImage}
           onWheel={closeFromScroll}
         >
@@ -124,8 +153,8 @@ export default function ProjectImageModal({
             "
             onClick={handleImageClick}
             style={{
-              willChange: "transform",
               transform: "translateZ(0)",
+
               backfaceVisibility: "hidden",
             }}
             transition={{
@@ -139,10 +168,15 @@ export default function ProjectImageModal({
               unoptimized
               src={src}
               alt={title || `Project Image ${activeIndex + 1}`}
-              width={dimensions?.width || 850}
-              height={dimensions?.height || 450}
-              sizes="(max-width: 768px) 90vw, 850px"
-              priority
+              width={dimensions?.width ?? 850}
+              height={dimensions?.height ?? 450}
+              sizes="
+                (max-width: 768px) 90vw,
+                850px
+              "
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
               draggable={false}
               className="
                 block
