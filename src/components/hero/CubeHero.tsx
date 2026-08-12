@@ -390,23 +390,23 @@ export default function Index({ href, title }: IndexProps) {
                   powerPreference: "high-performance",
                 }}
               >
-                <OrbitControls
-                  enabled={isMdUp || mobileOrbitEnabled}
-                  enableZoom={false}
-                  enablePan={false}
-                  enableRotate
-                  enableDamping
-                  dampingFactor={0.06}
-                  rotateSpeed={0.65}
-                  onStart={() => {
-                    isDraggingCubeRef.current = true;
-
-                    setHasInteractedWithCube(true);
-                  }}
-                  onEnd={() => {
-                    isDraggingCubeRef.current = false;
-                  }}
-                />
+                {(isMdUp || mobileOrbitEnabled) && (
+                  <OrbitControls
+                    enableZoom={false}
+                    enablePan={false}
+                    enableRotate
+                    enableDamping
+                    dampingFactor={0.06}
+                    rotateSpeed={0.65}
+                    onStart={() => {
+                      isDraggingCubeRef.current = true;
+                      setHasInteractedWithCube(true);
+                    }}
+                    onEnd={() => {
+                      isDraggingCubeRef.current = false;
+                    }}
+                  />
+                )}
 
                 <ambientLight intensity={2} />
 
