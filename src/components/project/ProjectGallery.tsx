@@ -49,6 +49,10 @@ export default function ProjectGallery({
 
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
+  const [videoDuration, setVideoDuration] = useState<number | null>(null);
+
+  const [currentTime, setCurrentTime] = useState(0);
+
   const toggleVideo = async () => {
     const video = videoRef.current;
 
@@ -152,6 +156,10 @@ export default function ProjectGallery({
                 lg:translate-x-20
               "
             >
+              <h1 className="text-white">
+                {currentTime} /{videoDuration}
+              </h1>
+
               <h2
                 className="
                   mb-2
@@ -198,10 +206,14 @@ export default function ProjectGallery({
     "
                   onLoadedMetadata={(event) => {
                     const video = event.currentTarget;
+                    setVideoDuration(video.duration);
 
                     if (video.videoWidth && video.videoHeight) {
                       setVideoAspectRatio(video.videoWidth / video.videoHeight);
                     }
+                  }}
+                  onTimeUpdate={(event) => {
+                    setCurrentTime(event.currentTarget.currentTime);
                   }}
                   onPlay={() => {
                     setIsVideoPlaying(true);

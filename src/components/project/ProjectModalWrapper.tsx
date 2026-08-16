@@ -51,15 +51,6 @@ export default function ProjectModalWrapper({
   const activeDimensions =
     activeIndex !== null ? imageDimensions[activeIndex] : undefined;
 
-  /*
-   * Preload alle resterende bilder.
-   *
-   * Første to bilder håndteres allerede
-   * som eager i ProjectGalleryItem.
-   *
-   * Resten lastes lavt prioritert inn i
-   * browser-cache med en gang.
-   */
   useEffect(() => {
     if (images.length <= 2) {
       return;
@@ -85,9 +76,6 @@ export default function ProjectModalWrapper({
     };
   }, [images]);
 
-  /*
-   * Escape lukker fullscreen.
-   */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") {
