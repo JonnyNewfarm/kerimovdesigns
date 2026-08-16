@@ -151,7 +151,7 @@ function GradientFaceMaterial({
   useFrame((_, delta) => {
     elapsedRef.current += Math.min(delta, 0.1);
     uniforms.uTime.value = elapsedRef.current;
-
+    //comment
     const isActiveFace =
       !isMobile &&
       hoveredRef.current &&
