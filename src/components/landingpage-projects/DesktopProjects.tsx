@@ -44,8 +44,8 @@ export default function DesktopProjects({
       >
         <TextReveal
           as="span"
-          mode="chars"
-          delay={0.1}
+          mode="lines"
+          delay={0.2}
           className="
       absolute
       bottom-full

@@ -53,7 +53,7 @@ export default function ProjectDescription({
       className="
         mt-14
         w-full
-        px-4
+        
         py-10
         sm:mt-20
         sm:px-8

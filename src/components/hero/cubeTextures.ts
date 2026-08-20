@@ -365,15 +365,7 @@ export function createTopTextTexture() {
     buttonHeight,
   );
 
-    ctx.strokeStyle = "#ecdfcc";
-ctx.lineWidth = 3;
 
-ctx.strokeRect(
-  buttonX,
-  buttonY,
-  buttonWidth,
-  buttonHeight,
-);
   /*
    * BUTTON TEXT
    */
@@ -630,15 +622,7 @@ export function createVisualIdentityTexture(
   /*
    * BUTTON BORDER
    */
-  ctx.strokeStyle = "#ecdfcc";
-  ctx.lineWidth = 3;
 
-  ctx.strokeRect(
-    visualLinkX,
-    buttonY,
-    buttonWidth,
-    buttonHeight,
-  );
 
   /*
    * BUTTON TEXT
@@ -804,15 +788,6 @@ export function createMovingGraphicsTextTexture() {
     buttonHeight,
   );
 
-  ctx.strokeStyle = "#ecdfcc";
-ctx.lineWidth = 3;
-
-ctx.strokeRect(
-  animationButtonX,
-  buttonTop,
-  buttonWidth,
-  buttonHeight,
-);
 
   /*
    * BUTTON TEXT
@@ -1025,19 +1000,6 @@ export function createPosterTexture(
     buttonHeight,
   );
 
-  /*
-   * BUTTON BORDER
-   */
-
-  ctx.strokeStyle = "#ecdfcc";
-  ctx.lineWidth = 3;
-
-  ctx.strokeRect(
-    linkX,
-    buttonY,
-    buttonWidth,
-    buttonHeight,
-  );
 
   /*
    * BUTTON TEXT
@@ -1165,15 +1127,7 @@ export function createLogoInspirationTexture(
     buttonHeight,
   );
 
-  ctx.strokeStyle = "#ecdfcc";
-ctx.lineWidth = 3;
 
-ctx.strokeRect(
-  logoButtonX,
-  buttonTop,
-  buttonWidth,
-  buttonHeight,
-);
 
   ctx.fillStyle = "#ecdfcc";
   ctx.fillText(

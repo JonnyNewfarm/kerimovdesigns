@@ -141,13 +141,13 @@ ideas into visuals.`}
           </div>
         </div>
 
-        <div className="mt-20 grid grid-cols-1 gap-6 border-t border-stone-400/20 pt-6 text-sm font-black uppercase tracking-[0.14em] text-color/70 md:grid-cols-4">
+        <div className="mt-20 flex flex-col gap-6 border-t border-stone-400/20 pt-6 text-sm font-black uppercase tracking-[0.14em] text-color/70 md:flex-row md:items-end md:justify-between md:gap-0">
           <div>
             <TextReveal
               as="p"
               mode="words"
               delay={0.05}
-              className="mb-1 text-color opacity-85 text-xs"
+              className="mb-1 text-xs text-color opacity-85"
             >
               Design / Code
             </TextReveal>
@@ -167,17 +167,12 @@ ideas into visuals.`}
               as="p"
               mode="words"
               delay={0.08}
-              className="mb-1 opacity-85 text-xs "
+              className="mb-1 text-xs opacity-85"
             >
-              Email
+              Copyright
             </TextReveal>
 
-            <a
-              href="mailto:rustam-98@hotmail.com"
-              className="normal-case tracking-normal transition hover:text-color"
-            >
-              rustam-98@hotmail.com
-            </a>
+            <p>© 2026 Rights reserved</p>
           </div>
 
           <div>
@@ -185,7 +180,7 @@ ideas into visuals.`}
               as="p"
               mode="words"
               delay={0.11}
-              className="mb-1 opacity-85 text-xs"
+              className="mb-1 text-xs opacity-85"
             >
               Local time
             </TextReveal>
@@ -193,12 +188,12 @@ ideas into visuals.`}
             <LocalTime />
           </div>
 
-          <div className="md:text-right">
+          <div>
             <TextReveal
               as="p"
               mode="words"
               delay={0.14}
-              className="mb-1 opacity-85 text-xs"
+              className="mb-1 text-xs opacity-85"
             >
               Location
             </TextReveal>

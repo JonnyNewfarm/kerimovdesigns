@@ -548,8 +548,9 @@ export default function Index({ href, title }: IndexProps) {
                     cursor-pointer
                     items-center
                     whitespace-nowrap
+                    bg-[#515b4f]
                     border
-                    border-white/40
+                    border-[#515b4f]
                     px-3
                     py-1.5
                     text-[10px]
