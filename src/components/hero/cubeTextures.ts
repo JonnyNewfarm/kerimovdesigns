@@ -9,7 +9,6 @@ import {
   SATOSHI_FONT_FAMILY,
   type CollageTile,
   visualCollageLayout,
-    posterCollageLayout,
 
 } from "./cubeConstants";
 
@@ -895,6 +894,21 @@ export function createPosterTexture(
   }
 
   ctx.clearRect(0, 0, size, size);
+
+  /*
+   * TITLE
+   */
+
+  ctx.font = `900 78px ${SATOSHI_FONT_FAMILY}, Arial, Helvetica, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  ctx.fillStyle = "#e8e3dc";
+
+  ctx.fillText(
+    "POSTER DESIGN",
+    42,
+    80,
+  );
 
   /*
    * POSTERS
