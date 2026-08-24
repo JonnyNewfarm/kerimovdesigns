@@ -9,21 +9,13 @@ export default function UploadProject() {
   const [isPending, startTransition] = useTransition();
 
   const [imageUrl, setImageUrl] = useState("");
-
   const [imageUrl2, setImageUrl2] = useState("");
-
   const [imageUrl3, setImageUrl3] = useState("");
-
   const [imageUrl4, setImageUrl4] = useState("");
-
   const [imageUrl5, setImageUrl5] = useState("");
-
   const [imageUrl6, setImageUrl6] = useState("");
-
   const [imageUrl7, setImageUrl7] = useState("");
-
   const [imageUrl8, setImageUrl8] = useState("");
-
   const [imageUrl9, setImageUrl9] = useState("");
 
   const [srcVideo, setSrcVideo] = useState("");
@@ -41,6 +33,8 @@ export default function UploadProject() {
     const title = String(formData.get("title") ?? "").trim();
 
     const description = String(formData.get("description") ?? "").trim();
+
+    const hoverText = String(formData.get("hoverText") ?? "").trim();
 
     const type = String(formData.get("type") ?? "").trim();
 
@@ -73,6 +67,7 @@ export default function UploadProject() {
       const result = await createProject({
         title,
         description,
+        hoverText,
         src: imageUrl,
         src2: imageUrl2,
         src3: imageUrl3,
@@ -108,6 +103,7 @@ export default function UploadProject() {
       setImageUrl8("");
       setImageUrl9("");
       setSrcVideo("");
+
       setShowModal(false);
     });
   };
@@ -138,6 +134,13 @@ export default function UploadProject() {
 
         <input
           className="w-full border border-stone-600 bg-transparent px-3 py-2 text-white outline-none transition-colors placeholder:text-white/40 focus:border-white"
+          name="hoverText"
+          placeholder="Hover text"
+          required
+        />
+
+        <input
+          className="w-full border border-stone-600 bg-transparent px-3 py-2 text-white outline-none transition-colors placeholder:text-white/40 focus:border-white"
           name="tags"
           placeholder="Tags, separated by commas"
           required
@@ -162,23 +165,14 @@ export default function UploadProject() {
         />
 
         <input type="hidden" name="src" value={imageUrl} />
-
         <input type="hidden" name="src2" value={imageUrl2} />
-
         <input type="hidden" name="src3" value={imageUrl3} />
-
         <input type="hidden" name="src4" value={imageUrl4} />
-
         <input type="hidden" name="src5" value={imageUrl5} />
-
         <input type="hidden" name="src6" value={imageUrl6} />
-
         <input type="hidden" name="src7" value={imageUrl7} />
-
         <input type="hidden" name="src8" value={imageUrl8} />
-
         <input type="hidden" name="src9" value={imageUrl9} />
-
         <input type="hidden" name="srcVideo" value={srcVideo} />
 
         <button

@@ -1,11 +1,16 @@
 "use server";
 
 import prisma from "../../lib/prisma";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import {
+  revalidatePath,
+  revalidateTag,
+  unstable_cache,
+} from "next/cache";
 
 type ProjectData = {
   title: string;
   description?: string;
+  hoverText?: string;
   src: string;
   src2?: string;
   src3?: string;
@@ -24,6 +29,7 @@ type ProjectData = {
 type UpdateProjectData = {
   title?: string;
   description?: string;
+  hoverText?: string;
   src?: string;
   src2?: string;
   src3?: string;
@@ -43,6 +49,7 @@ const projectListSelect = {
   id: true,
   title: true,
   description: true,
+  hoverText: true,
   src: true,
   type: true,
   tools: true,
@@ -54,6 +61,7 @@ const projectDetailSelect = {
   id: true,
   title: true,
   description: true,
+  hoverText: true,
   src: true,
   src2: true,
   src3: true,
@@ -139,6 +147,7 @@ export async function createProject(data: ProjectData) {
       data: {
         title: data.title.trim(),
         description: data.description?.trim() || "",
+        hoverText: data.hoverText?.trim() || "",
         src: data.src,
         src2: data.src2 || "",
         src3: data.src3 || "",
@@ -200,6 +209,7 @@ export async function updateProject(
       where: {
         id,
       },
+
       data: {
         ...(data.title !== undefined && {
           title: data.title.trim(),
@@ -207,6 +217,10 @@ export async function updateProject(
 
         ...(data.description !== undefined && {
           description: data.description.trim(),
+        }),
+
+        ...(data.hoverText !== undefined && {
+          hoverText: data.hoverText.trim(),
         }),
 
         ...(data.src !== undefined && {
@@ -287,13 +301,17 @@ const getCachedLandingProjects = unstable_cache(
   async () => {
     return prisma.project.findMany({
       take: 5,
+
       orderBy: {
         createdAt: "desc",
       },
+
       select: projectListSelect,
     });
   },
+
   ["landing-projects"],
+
   {
     tags: ["projects"],
   },
@@ -315,20 +333,22 @@ const getCachedProjects = unstable_cache(
 
     return prisma.project.findMany({
       where,
+
       orderBy: {
         createdAt: "desc",
       },
+
       select: projectListSelect,
     });
   },
+
   ["projects-all"],
+
   {
     revalidate: 60,
     tags: ["projects"],
   },
 );
-
-
 
 export async function getProjects(tag?: string) {
   try {
@@ -347,13 +367,17 @@ const getCachedProjectsMobile = unstable_cache(
     return prisma.project.findMany({
       where,
       take: 3,
+
       orderBy: {
         createdAt: "desc",
       },
+
       select: projectListSelect,
     });
   },
+
   ["projects-mobile"],
+
   {
     revalidate: 60,
     tags: ["projects"],
@@ -376,10 +400,13 @@ const getCachedProjectById = unstable_cache(
       where: {
         id,
       },
+
       select: projectDetailSelect,
     });
   },
+
   ["project-by-id"],
+
   {
     revalidate: 60,
     tags: ["projects"],
@@ -435,13 +462,17 @@ const getCachedLatestProject = unstable_cache(
 
     return prisma.project.findFirst({
       where,
+
       orderBy: {
         createdAt: "desc",
       },
+
       select: projectListSelect,
     });
   },
+
   ["latest-project"],
+
   {
     revalidate: 60,
     tags: ["projects"],
@@ -466,6 +497,7 @@ const getCachedProjectsPagination = unstable_cache(
   ) => {
     const safePage = Math.max(page, 1);
     const safeLimit = Math.max(limit, 1);
+
     const skip = (safePage - 1) * safeLimit;
 
     const where = createTagFilter(tag);
@@ -475,9 +507,11 @@ const getCachedProjectsPagination = unstable_cache(
         where,
         skip,
         take: safeLimit,
+
         orderBy: {
           createdAt: "desc",
         },
+
         select: projectListSelect,
       }),
 
@@ -491,7 +525,9 @@ const getCachedProjectsPagination = unstable_cache(
       total,
     };
   },
+
   ["projects-pagination"],
+
   {
     revalidate: 60,
     tags: ["projects"],

@@ -46,17 +46,19 @@ export default function ProjectsPagination({
         className="
           flex
           w-full
-          flex-col
+          flex-row
           items-center
           justify-between
           pr-5
-          2xl:flex-row
         "
       >
         <p
           className="
             text-[10px]
             uppercase
+            flex
+            flex-row
+            whitespace-nowrap
             tracking-[0.25em]
             text-white/50
             sm:text-xs

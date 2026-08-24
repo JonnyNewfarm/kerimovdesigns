@@ -38,43 +38,13 @@ export default function ProjectGalleryItem({
 }: ProjectGalleryItemProps) {
   const loadImmediately = index <= 1;
 
-  const handleOpen = () => {
-    if (!isLoaded) {
-      return;
-    }
-
-    // Ingen fullscreen/open på mobil.
-    if (window.matchMedia("(max-width: 639px)").matches) {
-      return;
-    }
-
-    onOpenAction(index);
-  };
-
   return (
-    <div
-      className={`
-        flex
-        w-full
-
-        max-sm:!justify-start
-
-        ${layout.row}
-      `}
-    >
+    <div className={`flex w-full ${layout.row}`}>
       <motion.div
         layoutId={`project-image-${index}`}
         className={`
           relative
           w-full
-
-          max-sm:!ml-0
-          max-sm:!mr-0
-          max-sm:!max-w-none
-          max-sm:!translate-x-0
-          max-sm:!translate-y-0
-          max-sm:!w-full
-
           ${layout.size}
           ${layout.offset}
         `}
@@ -86,7 +56,6 @@ export default function ProjectGalleryItem({
             duration: 0.25,
             ease: projectEase,
           },
-
           layout: {
             duration: 0.75,
             ease: projectLayoutEase,
@@ -104,20 +73,8 @@ export default function ProjectGalleryItem({
               relative
               w-full
             "
-            onMouseEnter={() => {
-              if (isActive) {
-                return;
-              }
-
-              onHoverAction(index);
-            }}
-            onMouseLeave={() => {
-              if (isActive) {
-                return;
-              }
-
-              onHoverAction(null);
-            }}
+            onMouseEnter={() => onHoverAction(index)}
+            onMouseLeave={() => onHoverAction(null)}
           >
             <Image
               unoptimized
@@ -126,7 +83,6 @@ export default function ProjectGalleryItem({
               width={dimensions?.width ?? 850}
               height={dimensions?.height ?? 450}
               sizes="
-                (max-width: 640px) 100vw,
                 (max-width: 1024px) 520px,
                 680px
               "
@@ -147,7 +103,7 @@ export default function ProjectGalleryItem({
 
                 ${
                   isLoaded
-                    ? "cursor-default opacity-100 sm:cursor-pointer"
+                    ? "cursor-pointer opacity-100"
                     : "cursor-wait opacity-0"
                 }
               `}
@@ -159,7 +115,13 @@ export default function ProjectGalleryItem({
                   height: image.naturalHeight || 450,
                 });
               }}
-              onClick={handleOpen}
+              onClick={() => {
+                if (!isLoaded) {
+                  return;
+                }
+
+                onOpenAction(index);
+              }}
             />
 
             {!isLoaded ? (

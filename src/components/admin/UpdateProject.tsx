@@ -8,6 +8,7 @@ type Project = {
   id: string;
   title?: string | null;
   description?: string | null;
+  hoverText?: string | null;
   type?: string | null;
   tools?: string | null;
   tags?: string[];
@@ -26,6 +27,7 @@ type Project = {
 type ProjectFormData = {
   title: string;
   description: string;
+  hoverText: string;
   type: string;
   tools: string;
   tags: string;
@@ -44,6 +46,7 @@ type ProjectFormData = {
 const emptyFormData: ProjectFormData = {
   title: "",
   description: "",
+  hoverText: "",
   type: "",
   tools: "",
   tags: "",
@@ -63,6 +66,7 @@ function normalizeProjectData(project: Project): ProjectFormData {
   return {
     title: project.title || "",
     description: project.description || "",
+    hoverText: project.hoverText || "",
     type: project.type || "",
     tools: project.tools || "",
     tags: project.tags?.join(", ") || "",
@@ -208,6 +212,7 @@ export default function UpdateProject() {
       const result = await updateProject(selectedProjectId, {
         title: formData.title,
         description: formData.description,
+        hoverText: formData.hoverText,
         type: formData.type,
         tools: formData.tools,
         tags,
@@ -236,6 +241,7 @@ export default function UpdateProject() {
                 ...project,
                 title: formData.title,
                 description: formData.description,
+                hoverText: formData.hoverText,
                 type: formData.type,
                 tools: formData.tools,
                 tags,
@@ -362,6 +368,15 @@ export default function UpdateProject() {
               name="description"
               placeholder="Project description"
               value={formData.description}
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              className="w-full border bg-transparent px-3 py-2 text-white outline-none"
+              name="hoverText"
+              placeholder="add hex # for the hovertext "
+              value={formData.hoverText}
               onChange={handleChange}
               required
             />

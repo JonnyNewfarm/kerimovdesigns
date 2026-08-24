@@ -6,6 +6,8 @@ export type ProjectListItem = {
   src: string;
   type: string | null;
   tools: string | null;
+  hoverText: string | null;
+  
   tags: string[];
   createdAt?: Date;
   description?: string | null;

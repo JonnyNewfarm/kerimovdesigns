@@ -23,8 +23,9 @@ model Project {
   src9     String? @db.String
   srcVideo String? @db.String
 
-  type  String?
-  tools String?
+  type      String?
+  tools     String?
+  hoverText String?
 
   tags String[] @default([])
 
