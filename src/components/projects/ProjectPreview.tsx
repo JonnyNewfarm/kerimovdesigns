@@ -180,7 +180,7 @@ export default function ProjectPreview({
                   style={{
                     x: cursorX,
                     y: cursorY,
-                    background: project.hoverText,
+                    background: project.hoverText ?? undefined,
                   }}
                   animate={{
                     opacity: isHoveringImage ? 0.95 : 0,
