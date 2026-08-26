@@ -1,156 +1,367 @@
 "use client";
 
-import Image from "next/image";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useRef, useState } from "react";
 
-import MagneticComp from "../MagneticComp";
-
-import { projectEase, projectLayoutEase } from "./projectAnimations";
-
-import type { ImageDimensions, ImageLayout } from "./projectTypes";
-
-type ProjectGalleryItemProps = {
+type ProjectVideoProps = {
   src: string;
-  index: number;
-  title: string;
-  layout: ImageLayout;
-  dimensions?: ImageDimensions;
-  isActive: boolean;
-  isLoaded: boolean;
-  shouldFade: boolean;
-  onHoverAction: (index: number | null) => void;
-  onOpenAction: (index: number) => void;
-  onLoadAction: (index: number, dimensions: ImageDimensions) => void;
+  poster?: string | null;
+  variant: "mobile" | "desktop";
 };
 
-export default function ProjectGalleryItem({
+const videoEase = [0.76, 0, 0.24, 1] as const;
+
+export default function ProjectVideo({
   src,
-  index,
-  title,
-  layout,
-  dimensions,
-  isActive,
-  isLoaded,
-  shouldFade,
-  onHoverAction,
-  onOpenAction,
-  onLoadAction,
-}: ProjectGalleryItemProps) {
-  const loadImmediately = index <= 1;
+  poster,
+  variant,
+}: ProjectVideoProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const [videoAspectRatio, setVideoAspectRatio] = useState(16 / 9);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
+
+  const toggleVideo = async () => {
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    if (video.paused) {
+      setIsVideoLoading(true);
+
+      try {
+        await video.play();
+      } catch {
+        setIsVideoPlaying(false);
+        setIsVideoLoading(false);
+      }
+
+      return;
+    }
+
+    video.pause();
+  };
+
+  const outerClassName =
+    variant === "mobile"
+      ? "w-full"
+      : "flex w-full justify-center lg:justify-start";
+
+  const innerClassName =
+    variant === "mobile"
+      ? "w-full"
+      : "w-full max-w-[520px] lg:max-w-[680px] lg:translate-x-20";
+
+  const controlClassName =
+    variant === "mobile"
+      ? `
+          pointer-events-none
+          absolute
+          bottom-4
+          right-4
+          z-30
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          bg-black/40
+          text-white
+        `
+      : `
+          pointer-events-none
+          absolute
+          bottom-6
+          right-6
+          z-30
+          flex
+          h-20
+          w-20
+          items-center
+          justify-center
+          bg-black/40
+          text-white
+        `;
+
+  const loadingClassName =
+    variant === "mobile"
+      ? `
+          pointer-events-none
+          absolute
+          bottom-4
+          left-4
+          z-30
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          bg-black/40
+          text-white
+        `
+      : `
+          pointer-events-none
+          absolute
+          bottom-6
+          left-6
+          z-30
+          flex
+          h-20
+          w-20
+          items-center
+          justify-center
+          bg-black/40
+          text-white
+        `;
+
+  const iconClassName = variant === "mobile" ? "h-7 w-7" : "h-10 w-10";
+
+  const spinnerClassName =
+    variant === "mobile"
+      ? `
+          h-5
+          w-5
+          animate-spin
+          rounded-full
+          border-2
+          border-white/30
+          border-t-white
+        `
+      : `
+          h-8
+          w-8
+          animate-spin
+          rounded-full
+          border-[3px]
+          border-white/30
+          border-t-white
+        `;
 
   return (
-    <div className={`flex w-full ${layout.row}`}>
-      <motion.div
-        layoutId={`project-image-${index}`}
-        className={`
-          relative
-          w-full
-          ${layout.size}
-          ${layout.offset}
-        `}
-        animate={{
-          opacity: shouldFade && !isActive ? 0.42 : 1,
-        }}
-        transition={{
-          opacity: {
-            duration: 0.25,
-            ease: projectEase,
-          },
-          layout: {
-            duration: 0.75,
-            ease: projectLayoutEase,
-          },
-        }}
-        style={{
-          pointerEvents: isActive ? "none" : "auto",
-          visibility: isActive ? "hidden" : "visible",
-        }}
-      >
-        <MagneticComp>
-          <div
+    <div className={outerClassName}>
+      <div className={innerClassName}>
+        <h2
+          className="
+            mb-2
+            text-xl
+            font-black
+            uppercase
+          "
+        >
+          Video
+        </h2>
+
+        <button
+          type="button"
+          aria-label={isVideoPlaying ? "Pause video" : "Play video"}
+          onClick={toggleVideo}
+          className="
+            relative
+            block
+            w-full
+            cursor-pointer
+            overflow-hidden
+            text-left
+          "
+          style={{
+            aspectRatio: videoAspectRatio,
+          }}
+        >
+          <video
+            ref={videoRef}
+            src={src}
+            muted
+            loop
+            playsInline
+            preload="metadata"
             className="
-              group
-              relative
+              pointer-events-none
+              absolute
+              inset-0
+              h-full
               w-full
+              select-none
+              object-cover
             "
-            onMouseEnter={() => onHoverAction(index)}
-            onMouseLeave={() => onHoverAction(null)}
-          >
-            <Image
-              unoptimized
-              src={src}
-              alt={title || `Project Image ${index + 1}`}
-              width={dimensions?.width ?? 850}
-              height={dimensions?.height ?? 450}
-              sizes="
-                (max-width: 1024px) 520px,
-                680px
-              "
-              loading={loadImmediately ? "eager" : "lazy"}
-              fetchPriority={index === 0 ? "high" : "auto"}
-              decoding="async"
-              draggable={false}
-              aria-busy={!isLoaded}
-              className={`
-                block
-                h-auto
-                w-full
-                select-none
+            onLoadedMetadata={(event) => {
+              const video = event.currentTarget;
 
-                transition-opacity
-                duration-200
-                ease-[cubic-bezier(0.22,1,0.36,1)]
+              if (video.videoWidth && video.videoHeight) {
+                setVideoAspectRatio(video.videoWidth / video.videoHeight);
+              }
+            }}
+            onPlay={() => {
+              // Videoen er nå i PLAY-state.
+              // Pauseikonet skal vises med én gang.
+              setIsVideoPlaying(true);
+              setIsVideoLoading(true);
+            }}
+            onPlaying={() => {
+              // Videoen har faktisk begynt å levere frames.
+              // Ikke endre play/pause-state her.
+              setHasStartedPlaying(true);
+              setIsVideoLoading(false);
+            }}
+            onWaiting={(event) => {
+              // Vis bare loading dersom videoen fortsatt prøver å spille.
+              if (!event.currentTarget.paused) {
+                setIsVideoLoading(true);
+              }
+            }}
+            onCanPlay={(event) => {
+              if (!event.currentTarget.paused) {
+                setIsVideoLoading(false);
+              }
+            }}
+            onPause={() => {
+              // Videoen er nå i PAUSE-state.
+              // Playikonet skal vises med én gang.
+              setIsVideoPlaying(false);
+              setIsVideoLoading(false);
+            }}
+            onEnded={() => {
+              setIsVideoPlaying(false);
+              setIsVideoLoading(false);
+            }}
+          />
 
-                ${
-                  isLoaded
-                    ? "cursor-pointer opacity-100"
-                    : "cursor-wait opacity-0"
-                }
-              `}
-              onLoad={(event) => {
-                const image = event.currentTarget;
-
-                onLoadAction(index, {
-                  width: image.naturalWidth || 850,
-                  height: image.naturalHeight || 450,
-                });
-              }}
-              onClick={() => {
-                if (!isLoaded) {
-                  return;
-                }
-
-                onOpenAction(index);
-              }}
-            />
-
-            {!isLoaded ? (
-              <div
+          {/* Poster */}
+          <AnimatePresence>
+            {!hasStartedPlaying && poster ? (
+              <motion.img
+                key="poster"
+                src={poster}
+                alt=""
                 aria-hidden="true"
+                draggable={false}
                 className="
                   pointer-events-none
                   absolute
                   inset-0
-                  overflow-hidden
-                  bg-white/[0.035]
+                  z-10
+                  h-full
+                  w-full
+                  select-none
+                  object-cover
                 "
-              >
-                <div
-                  className="
-                    absolute
-                    inset-0
-                    animate-pulse
-                    bg-gradient-to-br
-                    from-white/[0.02]
-                    via-white/[0.07]
-                    to-white/[0.02]
-                  "
-                />
-              </div>
+                initial={false}
+                animate={{
+                  opacity: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                }}
+                transition={{
+                  duration: 0.2,
+                  ease: videoEase,
+                }}
+              />
             ) : null}
-          </div>
-        </MagneticComp>
-      </motion.div>
+          </AnimatePresence>
+
+          {/* Loading spinner */}
+          <AnimatePresence>
+            {isVideoLoading ? (
+              <motion.span
+                key="loader"
+                aria-hidden="true"
+                className={loadingClassName}
+                initial={{
+                  opacity: 0,
+                  scale: 0.8,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.8,
+                }}
+                transition={{
+                  duration: 0.25,
+                  ease: videoEase,
+                }}
+              >
+                <span className={spinnerClassName} />
+              </motion.span>
+            ) : null}
+          </AnimatePresence>
+
+          {/* Play / pause */}
+          <span aria-hidden="true" className={controlClassName}>
+            <AnimatePresence initial={false} mode="wait">
+              {isVideoPlaying ? (
+                <motion.svg
+                  key="pause"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={iconClassName}
+                  initial={{
+                    opacity: 0,
+                    scale: 0.65,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    scale: 0.65,
+                  }}
+                  transition={{
+                    duration: 0.25,
+                    ease: videoEase,
+                  }}
+                >
+                  <rect
+                    x="6.5"
+                    y="4.5"
+                    width="4"
+                    height="15"
+                    fill="currentColor"
+                  />
+
+                  <rect
+                    x="13.5"
+                    y="4.5"
+                    width="4"
+                    height="15"
+                    fill="currentColor"
+                  />
+                </motion.svg>
+              ) : (
+                <motion.svg
+                  key="play"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={iconClassName}
+                  initial={{
+                    opacity: 0,
+                    scale: 0.65,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    scale: 0.65,
+                  }}
+                  transition={{
+                    duration: 0.25,
+                    ease: videoEase,
+                  }}
+                >
+                  <path d="M7 4L18 12L7 20V4Z" fill="currentColor" />
+                </motion.svg>
+              )}
+            </AnimatePresence>
+          </span>
+        </button>
+      </div>
     </div>
   );
 }
