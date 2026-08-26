@@ -20,6 +20,10 @@ export default function ProjectVideo({
 
   const [videoAspectRatio, setVideoAspectRatio] = useState(16 / 9);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+
+  // Poster beholdes helt til videoen faktisk spiller.
+  const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
 
   const toggleVideo = async () => {
     const video = videoRef.current;
@@ -33,10 +37,13 @@ export default function ProjectVideo({
       return;
     }
 
+    setIsVideoLoading(true);
+
     try {
       await video.play();
     } catch {
       setIsVideoPlaying(false);
+      setIsVideoLoading(false);
     }
   };
 
@@ -57,7 +64,7 @@ export default function ProjectVideo({
           absolute
           bottom-4
           right-4
-          z-10
+          z-30
           flex
           h-12
           w-12
@@ -71,7 +78,38 @@ export default function ProjectVideo({
           absolute
           bottom-6
           right-6
-          z-10
+          z-30
+          flex
+          h-20
+          w-20
+          items-center
+          justify-center
+          bg-black/40
+          text-white
+        `;
+
+  const loadingClassName =
+    variant === "mobile"
+      ? `
+          pointer-events-none
+          absolute
+          bottom-4
+          left-4
+          z-30
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          bg-black/40
+          text-white
+        `
+      : `
+          pointer-events-none
+          absolute
+          bottom-6
+          left-6
+          z-30
           flex
           h-20
           w-20
@@ -82,6 +120,27 @@ export default function ProjectVideo({
         `;
 
   const iconClassName = variant === "mobile" ? "h-12 w-12" : "h-16 w-16";
+
+  const spinnerClassName =
+    variant === "mobile"
+      ? `
+          h-5
+          w-5
+          animate-spin
+          rounded-full
+          border-2
+          border-white/30
+          border-t-white
+        `
+      : `
+          h-8
+          w-8
+          animate-spin
+          rounded-full
+          border-[3px]
+          border-white/30
+          border-t-white
+        `;
 
   return (
     <div className={outerClassName}>
@@ -116,7 +175,6 @@ export default function ProjectVideo({
           <video
             ref={videoRef}
             src={src}
-            poster={poster ?? undefined}
             muted
             loop
             playsInline
@@ -137,11 +195,91 @@ export default function ProjectVideo({
                 setVideoAspectRatio(video.videoWidth / video.videoHeight);
               }
             }}
-            onPlay={() => setIsVideoPlaying(true)}
-            onPause={() => setIsVideoPlaying(false)}
-            onEnded={() => setIsVideoPlaying(false)}
+            onPlay={() => {
+              setIsVideoLoading(true);
+            }}
+            onPlaying={() => {
+              setHasStartedPlaying(true);
+              setIsVideoPlaying(true);
+              setIsVideoLoading(false);
+            }}
+            onWaiting={() => {
+              setIsVideoLoading(true);
+            }}
+            onPause={() => {
+              setIsVideoPlaying(false);
+              setIsVideoLoading(false);
+            }}
+            onEnded={() => {
+              setIsVideoPlaying(false);
+              setIsVideoLoading(false);
+            }}
           />
 
+          {/* Eget poster-lag som blir liggende mens videoen laster */}
+          <AnimatePresence>
+            {!hasStartedPlaying && poster ? (
+              <motion.img
+                key="poster"
+                src={poster}
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                className="
+                  pointer-events-none
+                  absolute
+                  inset-0
+                  z-10
+                  h-full
+                  w-full
+                  select-none
+                  object-cover
+                "
+                initial={false}
+                animate={{
+                  opacity: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                }}
+                transition={{
+                  duration: 0.2,
+                  ease: videoEase,
+                }}
+              />
+            ) : null}
+          </AnimatePresence>
+
+          {/* Spinner over poster/video */}
+          <AnimatePresence>
+            {isVideoLoading ? (
+              <motion.span
+                key="loader"
+                aria-hidden="true"
+                className={loadingClassName}
+                initial={{
+                  opacity: 0,
+                  scale: 0.8,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.8,
+                }}
+                transition={{
+                  duration: 0.25,
+                  ease: videoEase,
+                }}
+              >
+                <span className={spinnerClassName} />
+              </motion.span>
+            ) : null}
+          </AnimatePresence>
+
+          {/* Play / pause */}
           <span aria-hidden="true" className={controlClassName}>
             <AnimatePresence initial={false} mode="wait">
               {isVideoPlaying ? (

@@ -44,7 +44,7 @@ const animations: AnimationProject[] = [
     images: ["/visual-01.jpeg", "/visual-02.jpeg"],
     href: "/project/69300cd7a94f6af6c6b7d9d8",
     hoverText: "View case",
-    cursorClass: "text-[#34294a]",
+    cursorClass: "bg-[#34294a] ",
   },
   {
     title: "Poster collection",
@@ -55,7 +55,7 @@ const animations: AnimationProject[] = [
     images: ["/poster-2.jpg", "/poster-9.jpg"],
     href: "/project/6a738fe5c50ff327148b02f9",
     hoverText: "View posters",
-    cursorClass: "text-[#d7deda]",
+    cursorClass: "bg-[#4e6356] ",
   },
 ];
 
@@ -127,7 +127,7 @@ const CustomCursor = memo(function CustomCursor({
         willChange: "transform, opacity",
       }}
       animate={{
-        opacity: cursorState.visible ? 1 : 0,
+        opacity: cursorState.visible ? 0.95 : 0,
         scale: cursorState.visible ? 1 : 0.35,
       }}
       transition={{
@@ -140,28 +140,31 @@ const CustomCursor = memo(function CustomCursor({
           ease: [0.22, 1, 0.36, 1],
         },
       }}
-      className="
+      className={`
         pointer-events-none
         fixed
         left-0
         top-0
         z-[9999]
+        p-5
         flex
         -translate-x-1/2
         -translate-y-1/2
-      "
+                  ${cursorState.className}
+
+      `}
     >
       <div
         className={`
           relative
           overflow-hidden
           text-center
-          text-[4.8vw]
+          text-white
+          text-[2.8vw]
           font-black
           uppercase
           leading-[0.78]
           tracking-[-0.035em]
-          ${cursorState.className}
         `}
       >
         {cursorState.text}

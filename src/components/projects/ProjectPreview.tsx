@@ -15,6 +15,7 @@ import TransitionLink from "@/components/TransitionLink";
 
 import type { ProjectListItem } from "./projectsTypes";
 import { formatProjectTag, projectsEase } from "./projectUtils";
+import { Color } from "three";
 
 type ProjectPreviewProps = {
   project: ProjectListItem | null;
@@ -179,9 +180,10 @@ export default function ProjectPreview({
                   style={{
                     x: cursorX,
                     y: cursorY,
+                    background: project.hoverText,
                   }}
                   animate={{
-                    opacity: isHoveringImage ? 1 : 0,
+                    opacity: isHoveringImage ? 0.95 : 0,
                     scale: isHoveringImage ? 1 : 0.35,
                   }}
                   transition={{
@@ -201,9 +203,10 @@ export default function ProjectPreview({
                     top-0
                     z-20
                     hidden
-                    -translate-x-1/2
+                    
+                    
+p-5                    -translate-x-1/2
                     -translate-y-1/2
-                    mix-blend-difference
                     lg:flex
                   "
                 >
@@ -214,10 +217,11 @@ export default function ProjectPreview({
                       font-black
                       uppercase
                       leading-[0.78]
+
                       tracking-[-0.035em]
-                      text-white
-                      md:text-[5.8vw]
-                      lg:text-[4.8vw]
+                      text-[#eae9e1]
+                      md:text-[3.4vw]
+                      lg:text-[2.4vw]
                     "
                   >
                     View case

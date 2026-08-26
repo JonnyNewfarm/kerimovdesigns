@@ -408,14 +408,27 @@ const Navbar = () => {
                               initial={false}
                               animate={{
                                 opacity: isProjectTitleHovered ? 1 : 0,
-                                x: isProjectTitleHovered ? -2 : 0,
-                                scale: isProjectTitleHovered ? 1 : 0.8,
+                                scale: isProjectTitleHovered ? 1 : 0,
+                                rotate: isProjectTitleHovered ? 0 : -90,
                               }}
                               transition={{
                                 duration: 0.35,
                                 ease: PROJECT_EASE,
                               }}
-                              className="absolute -left-5 -top-[2px] flex h-5 w-5 -translate-y-1/2 items-center justify-center"
+                              style={{
+                                transformOrigin: "50% 50%",
+                              }}
+                              className="
+    absolute
+    -left-5
+    -top-[2px]
+    flex
+    h-5
+    w-5
+    -translate-y-1/2
+    items-center
+    justify-center
+  "
                             >
                               <span className="absolute h-[1.5px] w-[10px] rotate-45 bg-current" />
                               <span className="absolute h-[1.5px] w-[10px] -rotate-45 bg-current" />

@@ -232,23 +232,22 @@ const ProjectCard = ({
             ease: revealEase,
           }}
           className="
-            relative
-            aspect-[4/3]
-            w-full
-            overflow-hidden
-            border
-            border-white/15
-            bg-white/5
-          "
+      w-full
+      overflow-hidden
+      border
+      border-white/15
+      bg-white/5
+    "
         >
           <Image
             src={project.src}
             alt={project.title}
-            fill
+            width={1600}
+            height={1200}
             priority={priority}
             loading={priority ? "eager" : "lazy"}
             sizes="(max-width: 767px) 100vw, 0px"
-            className="object-cover"
+            className="block h-auto w-full"
           />
         </motion.div>
       </TransitionLink>
