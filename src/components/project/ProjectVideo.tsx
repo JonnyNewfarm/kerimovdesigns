@@ -21,8 +21,6 @@ export default function ProjectVideo({
   const [videoAspectRatio, setVideoAspectRatio] = useState(16 / 9);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
-
-  // Poster beholdes helt til videoen faktisk spiller.
   const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
 
   const toggleVideo = async () => {
@@ -119,7 +117,7 @@ export default function ProjectVideo({
           text-white
         `;
 
-  const iconClassName = variant === "mobile" ? "h-12 w-12" : "h-16 w-16";
+  const iconClassName = variant === "mobile" ? "h-7 w-7" : "h-10 w-10";
 
   const spinnerClassName =
     variant === "mobile"
@@ -216,7 +214,7 @@ export default function ProjectVideo({
             }}
           />
 
-          {/* Eget poster-lag som blir liggende mens videoen laster */}
+          {/* Poster */}
           <AnimatePresence>
             {!hasStartedPlaying && poster ? (
               <motion.img
@@ -250,7 +248,7 @@ export default function ProjectVideo({
             ) : null}
           </AnimatePresence>
 
-          {/* Spinner over poster/video */}
+          {/* Loading spinner */}
           <AnimatePresence>
             {isVideoLoading ? (
               <motion.span
@@ -286,7 +284,6 @@ export default function ProjectVideo({
                 <motion.svg
                   key="pause"
                   viewBox="0 0 24 24"
-                  fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   className={iconClassName}
                   initial={{
@@ -309,15 +306,28 @@ export default function ProjectVideo({
                     ease: videoEase,
                   }}
                 >
-                  <path d="M8 5V19" stroke="currentColor" strokeWidth="2" />
+                  <rect
+                    x="6.5"
+                    y="4.5"
+                    width="4"
+                    height="15"
+                    rx="0.5"
+                    fill="currentColor"
+                  />
 
-                  <path d="M16 5V19" stroke="currentColor" strokeWidth="2" />
+                  <rect
+                    x="13.5"
+                    y="4.5"
+                    width="4"
+                    height="15"
+                    rx="0.5"
+                    fill="currentColor"
+                  />
                 </motion.svg>
               ) : (
                 <motion.svg
                   key="play"
                   viewBox="0 0 24 24"
-                  fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   className={iconClassName}
                   initial={{
@@ -340,12 +350,7 @@ export default function ProjectVideo({
                     ease: videoEase,
                   }}
                 >
-                  <path
-                    d="M7 4L18 12L7 20V4Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinejoin="miter"
-                  />
+                  <path d="M7 4L18 12L7 20V4Z" fill="currentColor" />
                 </motion.svg>
               )}
             </AnimatePresence>
