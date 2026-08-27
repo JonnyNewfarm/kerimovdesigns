@@ -30,16 +30,27 @@ export default function ProjectVideo({
       return;
     }
 
+    // PAUSE
     if (!video.paused) {
+      // Oppdater UI med én gang.
+      setIsVideoPlaying(false);
+      setIsVideoLoading(false);
+
       video.pause();
+
       return;
     }
 
+    // PLAY
+    // Oppdater UI med én gang, ikke vent på onPlaying.
+    setIsVideoPlaying(true);
     setIsVideoLoading(true);
 
     try {
       await video.play();
-    } catch {
+    } catch (error) {
+      console.error("Failed to play video:", error);
+
       setIsVideoPlaying(false);
       setIsVideoLoading(false);
     }
@@ -193,22 +204,54 @@ export default function ProjectVideo({
                 setVideoAspectRatio(video.videoWidth / video.videoHeight);
               }
             }}
-            onPlay={() => {
+            onPlay={(event) => {
+              const video = event.currentTarget;
+
+              if (video.paused) {
+                return;
+              }
+
+              setIsVideoPlaying(true);
               setIsVideoLoading(true);
             }}
-            onPlaying={() => {
+            onPlaying={(event) => {
+              const video = event.currentTarget;
+
+              // Viktig:
+              // et forsinket onPlaying-event skal IKKE
+              // få lov til å sette pauseikon dersom
+              // videoen allerede er pauset.
+              if (video.paused) {
+                return;
+              }
+
               setHasStartedPlaying(true);
               setIsVideoPlaying(true);
               setIsVideoLoading(false);
             }}
-            onWaiting={() => {
-              setIsVideoLoading(true);
+            onWaiting={(event) => {
+              const video = event.currentTarget;
+
+              if (!video.paused) {
+                setIsVideoLoading(true);
+              }
+            }}
+            onCanPlay={(event) => {
+              const video = event.currentTarget;
+
+              if (!video.paused) {
+                setIsVideoLoading(false);
+              }
             }}
             onPause={() => {
               setIsVideoPlaying(false);
               setIsVideoLoading(false);
             }}
             onEnded={() => {
+              setIsVideoPlaying(false);
+              setIsVideoLoading(false);
+            }}
+            onError={() => {
               setIsVideoPlaying(false);
               setIsVideoLoading(false);
             }}
@@ -279,81 +322,69 @@ export default function ProjectVideo({
 
           {/* Play / pause */}
           <span aria-hidden="true" className={controlClassName}>
-            <AnimatePresence initial={false} mode="wait">
-              {isVideoPlaying ? (
-                <motion.svg
-                  key="pause"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={iconClassName}
-                  initial={{
-                    opacity: 0,
-                    scale: 0.65,
-                    rotate: -12,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    rotate: 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.65,
-                    rotate: 12,
-                  }}
-                  transition={{
-                    duration: 0.3,
-                    ease: videoEase,
-                  }}
-                >
-                  <rect
-                    x="6.5"
-                    y="4.5"
-                    width="4"
-                    height="15"
-                    rx="0.5"
-                    fill="currentColor"
-                  />
+            {isVideoPlaying ? (
+              <motion.svg
+                key="pause"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                className={iconClassName}
+                initial={{
+                  opacity: 0,
+                  scale: 0.65,
+                  rotate: -12,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  rotate: 0,
+                }}
+                transition={{
+                  duration: 0.3,
+                  ease: videoEase,
+                }}
+              >
+                <rect
+                  x="6.5"
+                  y="4.5"
+                  width="4"
+                  height="15"
+                  rx="0.5"
+                  fill="currentColor"
+                />
 
-                  <rect
-                    x="13.5"
-                    y="4.5"
-                    width="4"
-                    height="15"
-                    rx="0.5"
-                    fill="currentColor"
-                  />
-                </motion.svg>
-              ) : (
-                <motion.svg
-                  key="play"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={iconClassName}
-                  initial={{
-                    opacity: 0,
-                    scale: 0.65,
-                    rotate: -12,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    rotate: 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.65,
-                    rotate: 12,
-                  }}
-                  transition={{
-                    duration: 0.3,
-                    ease: videoEase,
-                  }}
-                >
-                  <path d="M7 4L18 12L7 20V4Z" fill="currentColor" />
-                </motion.svg>
-              )}
-            </AnimatePresence>
+                <rect
+                  x="13.5"
+                  y="4.5"
+                  width="4"
+                  height="15"
+                  rx="0.5"
+                  fill="currentColor"
+                />
+              </motion.svg>
+            ) : (
+              <motion.svg
+                key="play"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                className={iconClassName}
+                initial={{
+                  opacity: 0,
+                  scale: 0.65,
+                  rotate: -12,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  rotate: 0,
+                }}
+                transition={{
+                  duration: 0.3,
+                  ease: videoEase,
+                }}
+              >
+                <path d="M7 4L18 12L7 20V4Z" fill="currentColor" />
+              </motion.svg>
+            )}
           </span>
         </button>
       </div>
