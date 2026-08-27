@@ -33,6 +33,17 @@ model Project {
   createdAt DateTime @default(now())
 }
 
+model LandingpageProjects {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+
+  backgroundHex String?
+  projectTitle  String?
+  description   String  @default("")
+  src           String
+  src2          String
+}
+
 model User {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   email    String  @unique

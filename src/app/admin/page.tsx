@@ -6,6 +6,10 @@ import { redirect } from "next/navigation";
 import SignOut from "../../components/admin/SignOut";
 import UpdateProject from "@/components/admin/UpdateProject";
 import { Metadata } from "next";
+import UploadLandingpageProject from "@/components/admin/UploadLandingpageProject";
+import UpdateLandingpageProject from "@/components/admin/UpdateLandingpageProject";
+import DeleteLandingpageProject from "@/components/admin/DeleteLandingpageProject";
+import ScrollSection from "@/components/SmoothScroll";
 export const metadata: Metadata = {
   title: "Rustam Kerimov | Projects",
   description:
@@ -23,18 +27,24 @@ const AdminPage = async () => {
   }
 
   return (
-    <div className="bg-[#181c14]  z-[99999] text-white border-b ">
-      <div className="bg-[#181c14] sticky w-full z-50 h-12 top-0 left-0">
-        <SignOut />
-      </div>
+    <ScrollSection>
+      <div className="bg-[#181c14]  z-[99999]  ">
+        <div className="bg-[#181c14] sticky w-full z-50 h-12 top-0 left-0">
+          <SignOut />
+        </div>
 
-      <div className="flex flex-col items-center justify-center w-full min-h-screen gap-y-20">
-        <UploadProject />
-        <UpdateProject />
+        <div className="flex flex-col items-center justify-center w-full min-h-screen gap-y-20">
+          <UploadProject />
+          <UpdateProject />
 
-        <DeleteProject />
+          <DeleteProject />
+
+          <UploadLandingpageProject />
+          <UpdateLandingpageProject />
+          <DeleteLandingpageProject />
+        </div>
       </div>
-    </div>
+    </ScrollSection>
   );
 };
 

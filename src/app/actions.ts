@@ -79,6 +79,217 @@ const projectDetailSelect = {
   updatedAt: true,
 };
 
+type LandingpageProjectData = {
+  title: string;
+  backgroundHex?: string;
+  projectTitle?: string;
+  description?: string;
+  src: string;
+  src2: string;
+};
+
+type UpdateLandingpageProjectData = {
+  title?: string;
+  backgroundHex?: string;
+  projectTitle?: string;
+  description?: string;
+  src?: string;
+  src2?: string;
+};
+
+function revalidateLandingpageProjects() {
+  revalidateTag("landingpage-projects");
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+}
+
+export async function createLandingpageProject(
+  data: LandingpageProjectData,
+) {
+  try {
+    if (!data.title?.trim()) {
+      throw new Error("Title is required");
+    }
+
+    if (!data.src) {
+      throw new Error("Image 1 is required");
+    }
+
+    if (!data.src2) {
+      throw new Error("Image 2 is required");
+    }
+
+    const project = await prisma.landingpageProjects.create({
+      data: {
+        title: data.title.trim(),
+        backgroundHex: data.backgroundHex?.trim() || "",
+        projectTitle: data.projectTitle?.trim() || "",
+        description: data.description?.trim() || "",
+        src: data.src,
+        src2: data.src2,
+      },
+    });
+
+    revalidateLandingpageProjects();
+
+    return {
+      success: true,
+      project,
+    };
+  } catch (error) {
+    console.error(
+      "Error creating landingpage project:",
+      error,
+    );
+
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Could not create landingpage project",
+    };
+  }
+}
+
+export async function updateLandingpageProject(
+  id: string,
+  data: UpdateLandingpageProjectData,
+) {
+  try {
+    if (!id) {
+      throw new Error("Project ID is required");
+    }
+
+    const updatedProject =
+      await prisma.landingpageProjects.update({
+        where: {
+          id,
+        },
+
+        data: {
+          ...(data.title !== undefined && {
+            title: data.title.trim(),
+          }),
+
+          ...(data.backgroundHex !== undefined && {
+            backgroundHex: data.backgroundHex.trim(),
+          }),
+
+          ...(data.projectTitle !== undefined && {
+            projectTitle: data.projectTitle.trim(),
+          }),
+
+          ...(data.description !== undefined && {
+            description: data.description.trim(),
+          }),
+
+          ...(data.src !== undefined && {
+            src: data.src,
+          }),
+
+          ...(data.src2 !== undefined && {
+            src2: data.src2,
+          }),
+        },
+      });
+
+    revalidateLandingpageProjects();
+
+    return {
+      success: true,
+      updatedProject,
+    };
+  } catch (error) {
+    console.error(
+      "Error updating landingpage project:",
+      error,
+    );
+
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Could not update landingpage project",
+    };
+  }
+}
+
+export async function deleteLandingpageProject(
+  id: string,
+) {
+  try {
+    if (!id) {
+      throw new Error("Project ID is required");
+    }
+
+    const deleted =
+      await prisma.landingpageProjects.delete({
+        where: {
+          id,
+        },
+      });
+
+    revalidateLandingpageProjects();
+
+    return {
+      success: true,
+      deleted,
+    };
+  } catch (error) {
+    console.error(
+      "Error deleting landingpage project:",
+      error,
+    );
+
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Could not delete landingpage project",
+    };
+  }
+}
+
+const getCachedLandingpageProjects = unstable_cache(
+  async () => {
+    return prisma.landingpageProjects.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        backgroundHex: true,
+        projectTitle: true,
+        src: true,
+        src2: true,
+      },
+    });
+  },
+  ["landingpage-projects"],
+  {
+    tags: ["landingpage-projects"],
+  },
+);
+
+export async function getLandingpageProjects() {
+  try {
+    return await getCachedLandingpageProjects();
+  } catch (error) {
+    console.error(
+      "Error fetching landingpage projects:",
+      error,
+    );
+
+    throw new Error(
+      "Failed to fetch landingpage projects",
+    );
+  }
+}
+
+
 const normalizeTag = (tag?: string) => {
   if (!tag) {
     return undefined;
@@ -478,6 +689,9 @@ const getCachedLatestProject = unstable_cache(
     tags: ["projects"],
   },
 );
+
+  
+
 
 export async function getLatestProject(tag?: string) {
   try {

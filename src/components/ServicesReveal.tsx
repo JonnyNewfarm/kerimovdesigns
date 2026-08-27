@@ -90,15 +90,6 @@ export default function ServicesReveal() {
             <span className="mr-4">07</span>
             About
           </p>
-
-          <TextReveal
-            as="p"
-            mode="words"
-            delay={0.05}
-            className="hidden text-right md:block"
-          >
-            Visual Identity / Animation / Logos
-          </TextReveal>
         </div>
 
         <h2 className="select-none font-black uppercase">

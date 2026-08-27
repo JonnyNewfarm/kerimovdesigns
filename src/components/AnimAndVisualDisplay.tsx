@@ -376,19 +376,6 @@ const ProjectArticle = memo(function ProjectArticle({
         "
       >
         <div>
-          <p
-            className="
-              mb-2
-              text-[12px]
-              font-black
-              uppercase
-              tracking-[0.22em]
-              text-color/40
-            "
-          >
-            {String(index + 1).padStart(2, "0")} / {item.type}
-          </p>
-
           <h3
             className="
               text-[6vw]
