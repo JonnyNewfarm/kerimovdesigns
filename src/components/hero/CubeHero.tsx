@@ -697,7 +697,7 @@ export default function Index({ href, title }: IndexProps) {
               inset-0
               origin-bottom
               scale-y-0
-              bg-[#ecdfcc]
+              bg-[#d8cdbd]
               transition-transform
               duration-500
               ease-[cubic-bezier(0.76,0,0.24,1)]
@@ -759,46 +759,6 @@ export default function Index({ href, title }: IndexProps) {
                     </TextReveal>
                   </motion.div>
                 </div>
-
-                <motion.div
-                  initial={false}
-                  animate={
-                    isAlignCubeHovered
-                      ? {
-                          opacity: 1,
-                          y: 0,
-                          filter: "blur(0px)",
-                        }
-                      : {
-                          opacity: 0,
-                          y: 6,
-                          filter: "blur(5px)",
-                        }
-                  }
-                  transition={{
-                    duration: 0.5,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className="pointer-events-none"
-                >
-                  <TextReveal
-                    as="span"
-                    mode="words"
-                    viewport={false}
-                    active={isAlignCubeHovered}
-                    duration={0.5}
-                    y="110%"
-                    className="
-          whitespace-nowrap
-          text-[10px]
-          font-semibold
-          normal-case
-          xl:text-[16px]
-        "
-                  >
-                    Scroll or drag to rotate
-                  </TextReveal>
-                </motion.div>
               </div>
             </motion.div>
           </motion.div>
