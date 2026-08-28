@@ -64,6 +64,7 @@ export default function Index({ href, title }: IndexProps) {
   const [cubeReady, setCubeReady] = useState(false);
   const [allowCanvasMount, setAllowCanvasMount] = useState(false);
   const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const [isAlignCubeHovered, setIsAlignCubeHovered] = useState(false);
 
   const [alignCubeTrigger, setAlignCubeTrigger] = useState(0);
 
@@ -431,9 +432,57 @@ export default function Index({ href, title }: IndexProps) {
             )}
 
             {/*
+             * VERTICAL DESKTOP SCROLL PROGRESS
+             */}
+            <motion.div
+              initial={false}
+              animate={
+                hasInteractedWithCube
+                  ? {
+                      opacity: 1,
+                      x: 0,
+                      filter: "blur(0px)",
+                    }
+                  : {
+                      opacity: 0,
+                      x: 6,
+                      filter: "blur(5px)",
+                    }
+              }
+              transition={{
+                duration: 0.75,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="
+                pointer-events-none
+                absolute
+                right-5
+                top-1/2
+                z-20
+                hidden
+                h-[30vh]
+                w-px
+                -translate-y-1/2
+                overflow-hidden
+                bg-white/20
+                lg:block
+              "
+            >
+              <motion.div
+                className="
+                  h-full
+                  w-full
+                  origin-top
+                  bg-[#ecdfcc]
+                "
+                style={{
+                  scaleY: scrollYProgress,
+                }}
+              />
+            </motion.div>
+
+            {/*
              * MOBILE CUBE CONTROLS
-             *
-             * Hidden until the user has scrolled.
              */}
             <motion.div
               initial={false}
@@ -470,13 +519,10 @@ export default function Index({ href, title }: IndexProps) {
                 flex
                 flex-col
                 items-start
-                md:hidden
+                lg:hidden
               "
             >
-              {/*
-               * MOBILE ROTATE HINT
-               */}
-              <div className="mb-2  overflow-hidden">
+              <div className="mb-2 overflow-hidden">
                 <motion.p
                   initial={false}
                   animate={
@@ -514,26 +560,27 @@ export default function Index({ href, title }: IndexProps) {
                     setMobileOrbitEnabled((current) => !current);
                   }}
                   className={`
-  flex
-  min-w-[92px]
-  cursor-pointer
-  items-center
-  justify-center
-  whitespace-nowrap
-  border
-  px-3
-  py-1.5
-  text-[10px]
-  font-semibold
-  uppercase
-  transition-colors
-  duration-300
-  ${
-    mobileOrbitEnabled
-      ? "border-[#ecdfcc] bg-[#ecdfcc] text-[#181c14]"
-      : "border-white/40 text-color"
-  }
-`}
+                    flex
+                    min-w-[92px]
+                    cursor-pointer
+                    items-center
+                    justify-center
+                    whitespace-nowrap
+                    border-2
+                    px-3
+                    py-1.5
+                   text-[12px]
+                    sm:text-[13px]
+                    font-semibold
+                    uppercase
+                    transition-colors
+                    duration-300
+                    ${
+                      mobileOrbitEnabled
+                        ? "border-[#ecdfcc] bg-[#ecdfcc] text-[#181c14]"
+                        : "border-white/40 text-color"
+                    }
+                  `}
                 >
                   {mobileOrbitEnabled ? "Lock cube" : "Rotate cube"}
                 </button>
@@ -548,12 +595,13 @@ export default function Index({ href, title }: IndexProps) {
                     cursor-pointer
                     items-center
                     whitespace-nowrap
-                    bg-[#515b4f]
                     border
                     border-[#515b4f]
+                    bg-[#515b4f]
                     px-3
                     py-1.5
-                    text-[10px]
+                    text-[12px]
+                    sm:text-[13px]
                     font-semibold
                     uppercase
                     text-color
@@ -564,9 +612,7 @@ export default function Index({ href, title }: IndexProps) {
               </div>
             </motion.div>
 
-            {/*
-             * DESKTOP ALIGN CUBE CONTROL
-             */}
+            {/* DESKTOP ALIGN CUBE CONTROL */}
             <motion.div
               initial={false}
               animate={
@@ -602,146 +648,157 @@ export default function Index({ href, title }: IndexProps) {
                 pointerEvents: hasInteractedWithCube ? "auto" : "none",
               }}
               className="
-                absolute
-                right-[14vw]
-                top-1/2
-                z-20
-                hidden
-                lg:block
-                xl:right-[16vw]
-              "
+    absolute
+    right-[14vw]
+    top-1/2
+    z-20
+    hidden
+    lg:block
+    xl:right-[16vw]
+  "
             >
-              <div className="flex items-center gap-x-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAlignCubeTrigger((value) => value + 1);
-                  }}
-                  className="
-                    peer
-                    group
-                    flex
-                    cursor-pointer
-                    items-center
-                    border-[1px]
-                    border-white/40
-                    font-semibold
-                    text-[12px]
-                    uppercase
-                    focus:outline-none
-                    focus-visible:outline-none
-                    focus-visible:ring-0
-                    xl:text-lg
-                  "
-                >
-                  <span
+              <div className="flex flex-col items-start gap-y-4">
+                <div className="flex items-center gap-x-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAlignCubeTrigger((value) => value + 1);
+                    }}
+                    onMouseEnter={() => setIsAlignCubeHovered(true)}
+                    onMouseLeave={() => setIsAlignCubeHovered(false)}
                     className="
-                      relative
-                      overflow-hidden
-                      px-3
-                      py-1.5
-                    "
+          group
+          flex
+          cursor-pointer
+          items-center
+          border-[1px]
+          border-white/40
+          text-[12px]
+          font-semibold
+          uppercase
+          focus:outline-none
+          focus-visible:outline-none
+          focus-visible:ring-0
+          xl:text-lg
+        "
                   >
                     <span
-                      aria-hidden="true"
                       className="
-                        absolute
-                        inset-0
-                        origin-bottom
-                        scale-y-0
-                        bg-[#ecdfcc]
-                        transition-transform
-                        duration-500
-                        ease-[cubic-bezier(0.76,0,0.24,1)]
-                        group-hover:scale-y-100
-                      "
-                    />
-
-                    <span
-                      className="
-                        relative
-                        z-10
-                        transition-colors
-                        duration-300
-                        group-hover:text-[#181c14]
-                      "
+            relative
+            overflow-hidden
+            px-3
+            py-1.5
+          "
                     >
-                      Align cube
-                    </span>
-                  </span>
-                </button>
+                      <span
+                        aria-hidden="true"
+                        className="
+              absolute
+              inset-0
+              origin-bottom
+              scale-y-0
+              bg-[#ecdfcc]
+              transition-transform
+              duration-500
+              ease-[cubic-bezier(0.76,0,0.24,1)]
+              group-hover:scale-y-100
+            "
+                      />
 
-                <div
-                  className="
-                    pointer-events-none
-                    opacity-0
-                    transition-opacity
-                    duration-300
-                    peer-hover:opacity-100
-                  "
+                      <span
+                        className="
+              relative
+              z-10
+              transition-colors
+              duration-300
+              group-hover:text-[#181c14]
+            "
+                      >
+                        Align cube
+                      </span>
+                    </span>
+                  </button>
+
+                  <motion.div
+                    initial={false}
+                    animate={
+                      isAlignCubeHovered
+                        ? {
+                            opacity: 1,
+                            x: 0,
+                            filter: "blur(0px)",
+                          }
+                        : {
+                            opacity: 0,
+                            x: -6,
+                            filter: "blur(4px)",
+                          }
+                    }
+                    transition={{
+                      duration: 0.4,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className="pointer-events-none"
+                  >
+                    <TextReveal
+                      as="span"
+                      mode="words"
+                      viewport={false}
+                      active={isAlignCubeHovered}
+                      duration={0.5}
+                      y="110%"
+                      className="
+            whitespace-nowrap
+            text-[10px]
+            font-semibold
+            normal-case
+            xl:text-[16px]
+          "
+                    >
+                      or use Spacebar
+                    </TextReveal>
+                  </motion.div>
+                </div>
+
+                <motion.div
+                  initial={false}
+                  animate={
+                    isAlignCubeHovered
+                      ? {
+                          opacity: 1,
+                          y: 0,
+                          filter: "blur(0px)",
+                        }
+                      : {
+                          opacity: 0,
+                          y: 6,
+                          filter: "blur(5px)",
+                        }
+                  }
+                  transition={{
+                    duration: 0.5,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className="pointer-events-none"
                 >
                   <TextReveal
                     as="span"
                     mode="words"
                     viewport={false}
-                    active
+                    active={isAlignCubeHovered}
                     duration={0.5}
                     y="110%"
                     className="
-                      whitespace-nowrap
-                      text-[10px]
-                      font-normal
-                      normal-case
-                      xl:text-[16px]
-                    "
+          whitespace-nowrap
+          text-[10px]
+          font-semibold
+          normal-case
+          xl:text-[16px]
+        "
                   >
-                    or use Spacebar
+                    Scroll or drag to rotate
                   </TextReveal>
-                </div>
-              </div>
-
-              <div className="relative">
-                <div
-                  className="
-                    mt-2
-                    h-px
-                    w-full
-                    overflow-hidden
-                    bg-white/20
-                  "
-                >
-                  <motion.div
-                    className="
-                      h-full
-                      w-full
-                      origin-left
-                      bg-[#ecdfcc]
-                    "
-                    style={{
-                      scaleX: scrollYProgress,
-                    }}
-                  />
-                </div>
-
-                <p
-                  className="
-                    pointer-events-none
-                    absolute
-                    left-0
-                    top-full
-                    mt-2
-                    whitespace-nowrap
-                    text-[10px]
-                    normal-case
-                    text-color
-                    opacity-80
-                    transition-opacity
-                    duration-300
-                    xl:text-[14px]
-                  "
-                >
-                  Drag or scroll to rotate
-                </p>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>
@@ -749,8 +806,6 @@ export default function Index({ href, title }: IndexProps) {
 
         {/*
          * BOTTOM INFO
-         *
-         * Hidden completely on mobile.
          */}
         <motion.div
           initial={false}
@@ -782,7 +837,7 @@ export default function Index({ href, title }: IndexProps) {
             z-10
             hidden
             px-10
-            md:block
+            lg:block
             lg:px-20
           "
         >
