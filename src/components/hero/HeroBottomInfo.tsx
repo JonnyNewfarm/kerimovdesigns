@@ -92,7 +92,6 @@ export default function HeroBottomInfo({
           }}
           transition={{
             duration: isBottomInfoClosing || !isBottomInfoOpen ? 0.9 : 0.75,
-
             ease: [0.76, 0, 0.24, 1],
           }}
           style={{
@@ -133,6 +132,7 @@ export default function HeroBottomInfo({
             justify-end
           "
         >
+          {/* MOBILE */}
           <div
             className="
               flex
@@ -151,14 +151,59 @@ export default function HeroBottomInfo({
               href={`/project/${href}`}
               transitionLabel={title}
               className="
-                underline
-                underline-offset-2
+                group
+                relative
+                w-fit
+                whitespace-nowrap
               "
             >
-              {title}
+              <span>{title}</span>
+
+              <span
+                className="
+                  pointer-events-none
+                  absolute
+                  bottom-0
+                  left-0
+                  h-px
+                  w-full
+                  overflow-hidden
+                "
+              >
+                <span
+                  className="
+                    absolute
+                    inset-0
+                    origin-right
+                    scale-x-100
+                    bg-current
+                    transition-transform
+                    duration-500
+                    ease-[cubic-bezier(0.76,0,0.24,1)]
+                    group-hover:scale-x-0
+                  "
+                />
+
+                <span
+                  className="
+                    absolute
+                    inset-0
+                    origin-left
+                    scale-x-0
+                    bg-current
+                    transition-transform
+                    duration-500
+                    delay-0
+                    ease-[cubic-bezier(0.76,0,0.24,1)]
+                    group-hover:scale-x-100
+                    group-hover:delay-[180ms]
+                  "
+                />
+              </span>
             </TransitionLink>
           </div>
 
+          {/* DESKTOP */}
           <div className="hidden flex-1 lg:block">
             <AnimatePresence initial={false} mode="wait">
               {isBottomInfoOpen ? (
@@ -198,6 +243,7 @@ export default function HeroBottomInfo({
                     pl-20
                   "
                 >
+                  {/* LATEST PROJECT */}
                   <motion.div
                     variants={{
                       ...infoVariants,
@@ -245,8 +291,7 @@ export default function HeroBottomInfo({
                           items-center
                           gap-x-1
                           whitespace-nowrap
-                          text-[12px]
-                          xl:text-[14px]
+                          text-[14px]
                         "
                       >
                         <span className="satoshi-black text-color">
@@ -259,17 +304,63 @@ export default function HeroBottomInfo({
                           href={`/project/${href}`}
                           transitionLabel={title}
                           className="
-                            underline
-                            underline-offset-2
+                            group
+                            relative
+                            w-fit
+                            whitespace-nowrap
                           "
                         >
-                          {title}
+                          <span>{title}</span>
+
+                          <span
+                            className="
+                              pointer-events-none
+                              absolute
+                              bottom-0
+                              left-0
+                              h-px
+                              w-full
+                              overflow-hidden
+                            "
+                          >
+                            <span
+                              className="
+                                absolute
+                                inset-0
+                                origin-right
+                                scale-x-100
+                                bg-current
+                                transition-transform
+                                duration-500
+                                ease-[cubic-bezier(0.76,0,0.24,1)]
+                                group-hover:scale-x-0
+                              "
+                            />
+
+                            <span
+                              className="
+                                absolute
+                                inset-0
+                                origin-left
+                                scale-x-0
+                                bg-current
+                                transition-transform
+                                duration-500
+                                delay-0
+                                ease-[cubic-bezier(0.76,0,0.24,1)]
+                                group-hover:scale-x-100
+                                group-hover:delay-[180ms]
+                              "
+                            />
+                          </span>
                         </TransitionLink>
                       </div>
                     </LinkReveal>
                   </motion.div>
 
+                  {/* STATUS - ONLY XL AND UP */}
                   <motion.div
+                    className="hidden xl:block"
                     variants={{
                       ...infoVariants,
 
@@ -316,15 +407,15 @@ export default function HeroBottomInfo({
                       className="
                         satoshi-black
                         whitespace-nowrap
-                        text-[10px]
+                        text-[14px]
                         text-color
-                        xl:text-[14px]
                       "
                     >
                       Status / Open for work
                     </TextReveal>
                   </motion.div>
 
+                  {/* LOCAL TIME */}
                   <motion.div
                     variants={{
                       ...infoVariants,
@@ -370,9 +461,8 @@ export default function HeroBottomInfo({
                         className="
                           satoshi-black
                           whitespace-nowrap
-                          text-[10px]
+                          text-[14px]
                           text-color
-                          xl:text-[14px]
                         "
                       >
                         <LocalTime />
@@ -412,10 +502,9 @@ export default function HeroBottomInfo({
                     right-0
                     cursor-pointer
                     whitespace-nowrap
-                    text-[10px]
                     uppercase
                     text-color
-                    xl:text-[14px]
+                    text-[14px]
                   "
                 >
                   Open info

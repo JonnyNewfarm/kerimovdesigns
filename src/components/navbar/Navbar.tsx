@@ -230,9 +230,10 @@ const Navbar = () => {
         lg:block
       "
     >
-      <div className="text-color z-50 flex w-full items-start justify-between px-20 py-3 text-[10px] font-extrabold xl:text-[14px]">
+      <div className="text-color z-50 flex w-full items-start justify-between px-20 py-3 text-[14px] font-extrabold">
         <div className="h-full w-full">
           <div className="flex items-start justify-between">
+            {/* NAME */}
             <motion.div
               initial={false}
               animate={secondaryInfoAnimation}
@@ -258,6 +259,7 @@ const Navbar = () => {
               </TextReveal>
             </motion.div>
 
+            {/* OCCUPATION - ONLY XL AND UP */}
             <motion.div
               initial={false}
               animate={secondaryInfoAnimation}
@@ -266,7 +268,7 @@ const Navbar = () => {
                 delay: showSecondaryInfo ? 0.05 : 0,
                 ease: PROJECT_EASE,
               }}
-              className={secondaryInfoClassName}
+              className={`${secondaryInfoClassName} hidden xl:block`}
             >
               <TextReveal
                 as="p"
@@ -284,6 +286,7 @@ const Navbar = () => {
               </TextReveal>
             </motion.div>
 
+            {/* LOCATION */}
             <motion.div
               initial={false}
               animate={secondaryInfoAnimation}
@@ -310,6 +313,7 @@ const Navbar = () => {
               </TextReveal>
             </motion.div>
 
+            {/* NAVIGATION */}
             <div className="tracking-tighter">
               <div className="m-0 flex items-center gap-x-4 leading-tight">
                 <LinkReveal
@@ -363,6 +367,7 @@ const Navbar = () => {
                               delayChildren: 0.05,
                             },
                           },
+
                           hidden: {
                             opacity: 1,
                             transition: {
@@ -384,16 +389,19 @@ const Navbar = () => {
                                 opacity: 1,
                                 y: 0,
                                 filter: "blur(0px)",
+
                                 transition: {
                                   duration: 0.42,
                                   delay: 0.15,
                                   ease: PROJECT_EASE,
                                 },
                               },
+
                               hidden: {
                                 opacity: 0,
                                 y: -8,
                                 filter: "blur(4px)",
+
                                 transition: {
                                   duration: 0.3,
                                   delay: 0.25,
@@ -419,16 +427,16 @@ const Navbar = () => {
                                 transformOrigin: "50% 50%",
                               }}
                               className="
-    absolute
-    -left-5
-    -top-[2px]
-    flex
-    h-5
-    w-5
-    -translate-y-1/2
-    items-center
-    justify-center
-  "
+                                absolute
+                                -left-5
+                                -top-[2px]
+                                flex
+                                h-5
+                                w-5
+                                -translate-y-1/2
+                                items-center
+                                justify-center
+                              "
                             >
                               <span className="absolute h-[1.5px] w-[10px] rotate-45 bg-current" />
                               <span className="absolute h-[1.5px] w-[10px] -rotate-45 bg-current" />
@@ -470,33 +478,40 @@ const Navbar = () => {
                                   pathLength: 1,
                                   pathOffset: 0,
                                   opacity: 0.65,
+
                                   transition: {
                                     pathLength: {
                                       duration: 0.7,
                                       ease: PROJECT_EASE,
                                     },
+
                                     pathOffset: {
                                       duration: 0.7,
                                       ease: PROJECT_EASE,
                                     },
+
                                     opacity: {
                                       duration: 0.12,
                                     },
                                   },
                                 },
+
                                 hidden: {
                                   pathLength: 0,
                                   pathOffset: 1,
                                   opacity: 0,
+
                                   transition: {
                                     pathLength: {
                                       duration: 0.55,
                                       ease: PROJECT_EASE,
                                     },
+
                                     pathOffset: {
                                       duration: 0.55,
                                       ease: PROJECT_EASE,
                                     },
+
                                     opacity: {
                                       duration: 0.1,
                                       delay: 0.45,

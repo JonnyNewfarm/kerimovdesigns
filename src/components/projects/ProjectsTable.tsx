@@ -276,8 +276,9 @@ export default function ProjectsTable({
             md:pt-32
 
             lg:px-8
+            xl:px-12
 
-            xl:px-18
+            2xl:px-18
           "
         >
           <ProjectsSidebar
