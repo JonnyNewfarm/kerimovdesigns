@@ -1,8 +1,13 @@
 "use client";
 
+import { useCallback, useMemo, useRef } from "react";
+
 import ProjectDescription from "./ProjectDescription";
 import ProjectGalleryItem from "./ProjectGalleryItem";
-import ProjectVideo from "./ProjectVideo";
+import ProjectGalleryThreeCanvas, {
+  type ProjectGalleryVideoBridge,
+} from "./ProjectGalleryThreeCanvas";
+import ProjectVideoDesktop from "./ProjectVideoDesktop";
 
 import type {
   ImageDimensions,
@@ -14,96 +19,178 @@ import { imageLayouts } from "./projectUtils";
 
 type ProjectGalleryDesktopProps = {
   project: Project;
-  images: string[];
 
-  activeIndex: number | null;
-  hoveredIndex: number | null;
+  images: string[];
 
   imageDimensions: ImageDimensionsMap;
 
-  onHoverAction: (index: number | null) => void;
-  onOpenImageAction: (index: number) => void;
   onImageLoadAction: (index: number, dimensions: ImageDimensions) => void;
 };
 
 export default function ProjectGalleryDesktop({
   project,
   images,
-  activeIndex,
-  hoveredIndex,
   imageDimensions,
-  onHoverAction,
-  onOpenImageAction,
   onImageLoadAction,
 }: ProjectGalleryDesktopProps) {
+  /*
+   * =====================================================
+   * IMAGE ANCHORS
+   * =====================================================
+   */
+
+  const anchorsRef = useRef<Array<HTMLDivElement | null>>([]);
+
+  /*
+   * =====================================================
+   * VIDEO
+   * =====================================================
+   */
+
+  const videoAnchorRef = useRef<HTMLDivElement | null>(null);
+
+  const videoElementRef = useRef<HTMLVideoElement | null>(null);
+
+  const videoHasStartedRef = useRef(false);
+
+  /*
+   * =====================================================
+   * REGISTER IMAGE ANCHOR
+   * =====================================================
+   */
+
+  const handleRegister = useCallback(
+    (
+      index: number,
+
+      element: HTMLDivElement | null,
+    ) => {
+      anchorsRef.current[index] = element;
+    },
+    [],
+  );
+
+  /*
+   * =====================================================
+   * VIDEO BRIDGE
+   * =====================================================
+   */
+
+  const videoBridge = useMemo<ProjectGalleryVideoBridge | null>(() => {
+    if (!project.srcVideo) {
+      return null;
+    }
+
+    return {
+      anchorRef: videoAnchorRef,
+
+      videoRef: videoElementRef,
+
+      hasStartedRef: videoHasStartedRef,
+
+      poster: project.src,
+    };
+  }, [project.srcVideo, project.src]);
+
+  /*
+   * =====================================================
+   * RENDER
+   * =====================================================
+   */
+
   return (
-    <div
-      className="
-        relative
-        left-1/2
-        w-screen
-        -translate-x-1/2
-        overflow-hidden
-      "
-    >
+    <>
+      {/*
+       * Én Three canvas for:
+       *
+       * - alle bilder
+       * - autoplay-video
+       */}
+      <ProjectGalleryThreeCanvas
+        images={images}
+        anchorsRef={anchorsRef}
+        video={videoBridge}
+      />
+
       <div
         className="
-          mb-20
-          mt-28
-          flex
-          min-h-[70vh]
-          w-full
-          flex-col
-          gap-y-32
-          px-8
+          relative
+          left-1/2
+          z-[10]
 
-          lg:mt-32
+          w-screen
+          -translate-x-1/2
+
+          overflow-hidden
         "
       >
-        {images.map((src, index) => {
-          const isActive = activeIndex === index;
-          const isLoaded = Boolean(imageDimensions[index]);
+        <div
+          className="
+            mb-20
+            mt-28
 
-          const shouldFade =
-            (hoveredIndex !== null && hoveredIndex !== index) ||
-            (activeIndex !== null && activeIndex !== index);
+            flex
+            min-h-[70vh]
+            w-full
+            flex-col
 
-          const layout = imageLayouts[index % imageLayouts.length];
+            gap-y-32
 
-          return (
-            <div key={`${src}-${index}`}>
-              <ProjectGalleryItem
-                src={src}
-                index={index}
-                title={project.title}
-                layout={layout}
-                dimensions={imageDimensions[index]}
-                isActive={isActive}
-                isLoaded={isLoaded}
-                shouldFade={shouldFade}
-                onHoverAction={onHoverAction}
-                onOpenAction={onOpenImageAction}
-                onLoadAction={onImageLoadAction}
-              />
+            px-8
 
-              {index === 0 ? (
-                <ProjectDescription
+            lg:mt-32
+          "
+        >
+          {images.map((src, index) => {
+            const isLoaded = Boolean(imageDimensions[index]);
+
+            const layout = imageLayouts[index % imageLayouts.length];
+
+            return (
+              <div key={`${src}-${index}`}>
+                <ProjectGalleryItem
+                  src={src}
+                  index={index}
                   title={project.title}
-                  description={project.description}
+                  layout={layout}
+                  dimensions={imageDimensions[index]}
+                  isLoaded={isLoaded}
+                  onLoadAction={onImageLoadAction}
+                  onRegisterAction={handleRegister}
                 />
-              ) : null}
-            </div>
-          );
-        })}
 
-        {project.srcVideo ? (
-          <ProjectVideo
-            src={project.srcVideo}
-            poster={project.src}
-            variant="desktop"
-          />
-        ) : null}
+                {index === 0 ? (
+                  <ProjectDescription
+                    title={project.title}
+                    description={project.description}
+                  />
+                ) : null}
+              </div>
+            );
+          })}
+
+          {/*
+           * =================================================
+           * DESKTOP VIDEO
+           *
+           * Ingen Video-heading.
+           * Ingen play/pause.
+           * Ingen spinner.
+           *
+           * Bare autoplay media-plane.
+           * =================================================
+           */}
+
+          {project.srcVideo && videoBridge ? (
+            <ProjectVideoDesktop
+              src={project.srcVideo}
+              anchorRef={videoAnchorRef}
+              videoRef={videoElementRef}
+              hasStartedRef={videoHasStartedRef}
+            />
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

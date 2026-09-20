@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+
 import WaveLinkText from "./WaveLink";
 import TextReveal from "@/components/TextReveal";
 import TransitionLink from "./TransitionLink";
@@ -45,6 +47,12 @@ function LocalTime() {
 }
 
 const Footer = () => {
+  const pathname = usePathname();
+
+  if (pathname === "/") {
+    return null;
+  }
+
   return (
     <footer className="relative overflow-hidden bg-dark px-4 py-10 text-color md:px-10 lg:px-16">
       <div className="mx-auto flex min-h-[520px] w-full max-w-[1800px] flex-col justify-between pt-8">

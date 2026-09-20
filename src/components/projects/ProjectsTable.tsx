@@ -2,11 +2,17 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useLoader } from "@react-three/fiber";
+
+import { TextureLoader } from "three";
+
 import ProjectPreview from "./ProjectPreview";
 import ProjectsSidebar from "./ProjectsSidebar";
-import type { ProjectListItem, ProjectsTableProps } from "./projectsTypes";
-import { PROJECTS_PER_VIEW } from "./projectUtils";
 import PageTransitionGate from "./PageTransitionGate";
+
+import type { ProjectListItem, ProjectsTableProps } from "./projectsTypes";
+
+import { PROJECTS_PER_VIEW } from "./projectUtils";
 
 export default function ProjectsTable({
   projects,
@@ -16,13 +22,44 @@ export default function ProjectsTable({
   activeTags = [],
 }: ProjectsTableProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+
   const [pageIndex, setPageIndex] = useState(0);
+
   const [direction, setDirection] = useState<1 | -1>(1);
 
   const queuedProjectIndex = useRef<number | null>(null);
+
   const animationFrame = useRef<number | null>(null);
 
   const activeTagsKey = activeTags.join("|");
+
+  /*
+   * =====================================================
+   * PRELOAD ALL PROJECT PREVIEW TEXTURES
+   * =====================================================
+   *
+   * ProjectPreviewThreeImage bruker:
+   *
+   * useLoader(TextureLoader, src)
+   *
+   * Derfor bruker vi useLoader.preload her.
+   *
+   * De havner i samme R3F-cache.
+   * Når brukeren bytter prosjekt trenger
+   * Three-komponenten normalt ikke vente
+   * på nettverket på nytt.
+   * =====================================================
+   */
+
+  useEffect(() => {
+    projects.forEach((project) => {
+      if (!project.src) {
+        return;
+      }
+
+      useLoader.preload(TextureLoader, project.src);
+    });
+  }, [projects]);
 
   const totalPages = Math.max(
     Math.ceil(projects.length / PROJECTS_PER_VIEW),
@@ -31,6 +68,7 @@ export default function ProjectsTable({
 
   const visibleProjects = useMemo(() => {
     const firstProjectIndex = pageIndex * PROJECTS_PER_VIEW;
+
     const lastProjectIndex = firstProjectIndex + PROJECTS_PER_VIEW;
 
     return projects.slice(firstProjectIndex, lastProjectIndex);
@@ -44,13 +82,23 @@ export default function ProjectsTable({
 
   const canGoNextPage = hasProjects && pageIndex < totalPages - 1;
 
+  /*
+   * =====================================================
+   * SET PROJECT
+   * =====================================================
+   */
+
   const setProjectIndex = useCallback(
     (index: number) => {
       if (!projects.length) {
         return;
       }
 
-      const safeIndex = Math.min(Math.max(index, 0), projects.length - 1);
+      const safeIndex = Math.min(
+        Math.max(index, 0),
+
+        projects.length - 1,
+      );
 
       queuedProjectIndex.current = safeIndex;
 
@@ -72,11 +120,18 @@ export default function ProjectsTable({
         }
 
         queuedProjectIndex.current = null;
+
         animationFrame.current = null;
       });
     },
     [projects.length],
   );
+
+  /*
+   * =====================================================
+   * CLEANUP RAF
+   * =====================================================
+   */
 
   useEffect(() => {
     return () => {
@@ -86,16 +141,32 @@ export default function ProjectsTable({
     };
   }, []);
 
+  /*
+   * =====================================================
+   * RESET WHEN FILTER CHANGES
+   * =====================================================
+   */
+
   useEffect(() => {
     setPageIndex(0);
+
     setActiveIndex(0);
+
     setDirection(1);
   }, [activeTagsKey]);
+
+  /*
+   * =====================================================
+   * KEEP ACTIVE INDEX SAFE
+   * =====================================================
+   */
 
   useEffect(() => {
     if (!projects.length) {
       setActiveIndex(0);
+
       setPageIndex(0);
+
       return;
     }
 
@@ -108,17 +179,31 @@ export default function ProjectsTable({
     });
   }, [projects.length]);
 
+  /*
+   * =====================================================
+   * KEEP PAGE SAFE
+   * =====================================================
+   */
+
   useEffect(() => {
     if (pageIndex <= totalPages - 1) {
       return;
     }
 
     const safePageIndex = Math.max(totalPages - 1, 0);
+
     const nextActiveIndex = safePageIndex * PROJECTS_PER_VIEW;
 
     setPageIndex(safePageIndex);
+
     setActiveIndex(nextActiveIndex);
   }, [pageIndex, totalPages]);
+
+  /*
+   * =====================================================
+   * PAGINATION
+   * =====================================================
+   */
 
   const goToPrevPage = () => {
     if (!canGoPrevPage) {
@@ -126,10 +211,13 @@ export default function ProjectsTable({
     }
 
     const nextPageIndex = pageIndex - 1;
+
     const nextActiveIndex = nextPageIndex * PROJECTS_PER_VIEW;
 
     setDirection(-1);
+
     setPageIndex(nextPageIndex);
+
     setActiveIndex(nextActiveIndex);
   };
 
@@ -139,33 +227,58 @@ export default function ProjectsTable({
     }
 
     const nextPageIndex = pageIndex + 1;
+
     const nextActiveIndex = nextPageIndex * PROJECTS_PER_VIEW;
 
     setDirection(1);
+
     setPageIndex(nextPageIndex);
+
     setActiveIndex(nextActiveIndex);
   };
+
+  /*
+   * =====================================================
+   * RENDER
+   * =====================================================
+   */
+
   return (
-    <section className="min-h-screen w-full bg-dark text-color">
-      <PageTransitionGate className="min-h-screen">
+    <section
+      className="
+        min-h-screen
+        w-full
+        bg-dark
+        text-color
+      "
+    >
+      <PageTransitionGate
+        className="
+          min-h-screen
+        "
+      >
         <div
           className="
-          mx-auto
-          grid
-          min-h-screen
-          w-full
-          max-w-[1800px]
-          grid-cols-1
-          gap-10
-          px-7
-          pb-12
-          pt-28
-          sm:px-8
-          md:grid-cols-12
-          md:pt-32
-          lg:px-8
-          xl:px-18
-        "
+            mx-auto
+            grid
+            min-h-screen
+            w-full
+            max-w-[1800px]
+            grid-cols-1
+            gap-10
+            px-7
+            pb-12
+            pt-28
+
+            sm:px-8
+
+            md:grid-cols-12
+            md:pt-32
+
+            lg:px-8
+
+            xl:px-18
+          "
         >
           <ProjectsSidebar
             visibleProjects={visibleProjects}

@@ -15,24 +15,15 @@ type ProjectGalleryProps = {
   project: Project;
   images: string[];
 
-  activeIndex: number | null;
-  hoveredIndex: number | null;
-
   imageDimensions: ImageDimensionsMap;
 
-  onHoverAction: (index: number | null) => void;
-  onOpenImageAction: (index: number) => void;
   onImageLoadAction: (index: number, dimensions: ImageDimensions) => void;
 };
 
 export default function ProjectGallery({
   project,
   images,
-  activeIndex,
-  hoveredIndex,
   imageDimensions,
-  onHoverAction,
-  onOpenImageAction,
   onImageLoadAction,
 }: ProjectGalleryProps) {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -72,11 +63,7 @@ export default function ProjectGallery({
     <ProjectGalleryDesktop
       project={project}
       images={images}
-      activeIndex={activeIndex}
-      hoveredIndex={hoveredIndex}
       imageDimensions={imageDimensions}
-      onHoverAction={onHoverAction}
-      onOpenImageAction={onOpenImageAction}
       onImageLoadAction={onImageLoadAction}
     />
   );
