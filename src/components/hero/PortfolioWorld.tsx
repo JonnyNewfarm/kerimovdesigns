@@ -1,9 +1,7 @@
 "use client";
 
 import { useLoader } from "@react-three/fiber";
-
 import { useMemo } from "react";
-
 import { Texture, TextureLoader } from "three";
 
 import AllProjectsScene from "./AllProjectsScene";
@@ -31,19 +29,29 @@ import { CameraRig, RingMotionProvider } from "./RingMotionContext";
 
 export default function PortfolioWorld({
   virtualScroll,
+
   isActive,
+
   isMobile,
 
   contactTransitionRef,
+
   posterTransitionRef,
+
   visualIdentityTransitionRef,
+
   animationTransitionRef,
+
   typographyTransitionRef,
 
   dreamProjectTransitionRef,
+
   postersBundleTransitionRef,
+
   kistefossTransitionRef,
+
   aurelisTransitionRef,
+
   artExhibitionTransitionRef,
 }: PortfolioWorldProps) {
   /*
@@ -76,7 +84,7 @@ export default function PortfolioWorld({
 
   /*
    * =======================================================
-   * COLOR SPACE
+   * COLOR SPACE / TEXTURE PREP
    * =======================================================
    */
 
@@ -97,6 +105,12 @@ export default function PortfolioWorld({
     typographyTextures,
     allProjectTextures,
   ]);
+
+  /*
+   * =======================================================
+   * WORLD SCALE
+   * =======================================================
+   */
 
   const scale = isMobile ? 1.1 : 0.82;
 
@@ -149,6 +163,7 @@ export default function PortfolioWorld({
         <AllProjectsScene
           scale={scale}
           textures={allProjectTextures}
+          isMobile={isMobile}
           onOpen={() => {
             contactTransitionRef.current?.click();
           }}
