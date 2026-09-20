@@ -54,7 +54,9 @@ export default function ProjectsSidebar({
         flex-col
         md:col-span-5
         md:h-[calc(100vh-9rem)]
-        md:pr-6
+        md:pr-1
+        lg:pr-2
+        xl:pr-4
         xl:col-span-4
       "
     >
