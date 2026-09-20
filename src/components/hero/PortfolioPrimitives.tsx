@@ -81,6 +81,17 @@ type TextPlaneProps = {
 export function prepareTexture(texture: Texture) {
   texture.colorSpace = SRGBColorSpace;
 
+  // Sharp når bildet vises stort / nær kamera.
+  texture.magFilter = THREE.LinearFilter;
+
+  // Bedre sampling når bildet blir mindre eller står skrått.
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+
+  texture.generateMipmaps = true;
+
+  // Viktig for planes som beveger seg rundt ringen / står på skrå.
+  texture.anisotropy = 8;
+
   texture.needsUpdate = true;
 
   return texture;
@@ -121,7 +132,24 @@ function createTextTexture({
 }) {
   const canvas = document.createElement("canvas");
 
-  const textureHeight = 512;
+  /*
+   * =========================================================
+   * TEXTURE QUALITY
+   * =========================================================
+   *
+   * Før:
+   * 512px uansett device.
+   *
+   * Nå:
+   * Retina får høyere oppløsning, men vi capper på 2x
+   * så det ikke blir unødvendig tungt.
+   */
+
+  const deviceScale = Math.min(window.devicePixelRatio || 1, 2);
+
+  const baseTextureHeight = 512;
+
+  const textureHeight = Math.round(baseTextureHeight * deviceScale);
 
   const textureWidth = Math.max(
     1,
@@ -129,7 +157,6 @@ function createTextTexture({
   );
 
   canvas.width = textureWidth;
-
   canvas.height = textureHeight;
 
   const ctx = canvas.getContext("2d");
@@ -140,20 +167,44 @@ function createTextTexture({
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  /*
+   * Fordi canvas-oppløsningen nå kan være 2x,
+   * må font / padding også skaleres.
+   */
+
+  const scaledFontSize = fontSize * deviceScale;
+
+  const scaledLineHeight = lineHeight * deviceScale;
+
+  const scaledPadding = textPadding * deviceScale;
+
   ctx.fillStyle = color;
 
   ctx.textAlign = align;
 
   ctx.textBaseline = "middle";
 
+  /*
+   * Litt bedre tekst-rendering.
+   */
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
   const lines = text.split("\n");
 
-  let finalFontSize = fontSize;
+  let finalFontSize = scaledFontSize;
 
   ctx.font = `900 ${finalFontSize}px Satoshi, Arial, Helvetica, sans-serif`;
 
+  /*
+   * =========================================================
+   * FIT TEXT
+   * =========================================================
+   */
+
   if (fitText) {
-    const maxTextWidth = canvas.width - textPadding * 2;
+    const maxTextWidth = canvas.width - scaledPadding * 2;
 
     const widestLine = Math.max(
       ...lines.map((line) => ctx.measureText(line).width),
@@ -166,7 +217,13 @@ function createTextTexture({
     }
   }
 
-  const adjustedLineHeight = lineHeight * (finalFontSize / fontSize);
+  /*
+   * Behold samme visuelle line-height selv om
+   * fonten eventuelt har blitt skalert ned av fitText.
+   */
+
+  const adjustedLineHeight =
+    scaledLineHeight * (finalFontSize / scaledFontSize);
 
   const totalHeight = (lines.length - 1) * adjustedLineHeight;
 
@@ -175,20 +232,34 @@ function createTextTexture({
   let x = canvas.width / 2;
 
   if (align === "left") {
-    x = textPadding;
+    x = scaledPadding;
   }
 
   if (align === "right") {
-    x = canvas.width - textPadding;
+    x = canvas.width - scaledPadding;
   }
 
   lines.forEach((line, index) => {
     ctx.fillText(line, x, startY + index * adjustedLineHeight);
   });
 
+  /*
+   * =========================================================
+   * THREE TEXTURE
+   * =========================================================
+   */
+
   const texture = new CanvasTexture(canvas);
 
   texture.colorSpace = SRGBColorSpace;
+
+  texture.magFilter = THREE.LinearFilter;
+
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+
+  texture.generateMipmaps = true;
+
+  texture.anisotropy = 8;
 
   texture.needsUpdate = true;
 

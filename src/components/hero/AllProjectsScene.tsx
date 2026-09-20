@@ -1,11 +1,8 @@
 "use client";
 
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-
 import React, { useMemo, useRef, useState } from "react";
-
 import { Color, Group, ShaderMaterial, Texture, Vector2 } from "three";
-
 import * as THREE from "three";
 
 import {
@@ -116,11 +113,7 @@ function ProjectLabel({
     }
   });
 
-  const actualLabelWidth = Math.min(
-    labelWidth,
-
-    width - labelInsetX * 2,
-  );
+  const actualLabelWidth = Math.min(labelWidth, width - labelInsetX * 2);
 
   const x = -width / 2 + labelInsetX + actualLabelWidth / 2;
 
@@ -216,6 +209,8 @@ function ProjectHoverImage({
 
   renderOrder = 0,
 
+  isMobile,
+
   isActive,
   isDimmed,
 
@@ -258,6 +253,8 @@ function ProjectHoverImage({
 
   renderOrder?: number;
 
+  isMobile: boolean;
+
   isActive: boolean;
 
   isDimmed: boolean;
@@ -275,6 +272,7 @@ function ProjectHoverImage({
   /*
    * POINTER
    */
+
   const pointerTarget = useRef(new Vector2(0.5, 0.5));
 
   const smoothPointer = useRef(new Vector2(0.5, 0.5));
@@ -282,6 +280,7 @@ function ProjectHoverImage({
   /*
    * BEND
    */
+
   const hoverBend = useRef(new Vector2(0, 0));
 
   const hoverBendVelocity = useRef(new Vector2(0, 0));
@@ -289,6 +288,7 @@ function ProjectHoverImage({
   /*
    * POSITION
    */
+
   const positionTarget = useRef(new Vector2(0, 0));
 
   const positionCurrent = useRef(new Vector2(0, 0));
@@ -298,6 +298,7 @@ function ProjectHoverImage({
   /*
    * SCALE
    */
+
   const scaleCurrent = useRef(1);
 
   const scaleVelocity = useRef(0);
@@ -305,6 +306,7 @@ function ProjectHoverImage({
   /*
    * Z
    */
+
   const zCurrent = useRef(0);
 
   const zVelocity = useRef(0);
@@ -312,6 +314,7 @@ function ProjectHoverImage({
   /*
    * LABEL
    */
+
   const labelScale = useRef(0);
 
   const labelVelocity = useRef(0);
@@ -360,8 +363,11 @@ function ProjectHoverImage({
     const delta = Math.min(rawDelta, 1 / 30);
 
     /*
+     * =====================================================
      * POINTER LAG
+     * =====================================================
      */
+
     const pointerFollow = 1 - Math.exp(-delta * 8);
 
     smoothPointer.current.lerp(pointerTarget.current, pointerFollow);
@@ -371,8 +377,11 @@ function ProjectHoverImage({
     const diffY = pointerTarget.current.y - smoothPointer.current.y;
 
     /*
+     * =====================================================
      * HOVER BEND
+     * =====================================================
      */
+
     const targetHoverBendX = hovered.current ? diffX * 90 : 0;
 
     const targetHoverBendY = hovered.current ? diffY * 65 : 0;
@@ -392,8 +401,11 @@ function ProjectHoverImage({
     hoverBend.current.addScaledVector(hoverBendVelocity.current, delta);
 
     /*
+     * =====================================================
      * SCROLL BEND
+     * =====================================================
      */
+
     const scrollX = THREE.MathUtils.clamp(-difference.current * 3.15, -78, 78);
 
     const scrollY = THREE.MathUtils.clamp(difference.current * 0.58, -42, 42);
@@ -405,8 +417,11 @@ function ProjectHoverImage({
     );
 
     /*
+     * =====================================================
      * MAGNETIC FOLLOW
+     * =====================================================
      */
+
     const maxFollowX = width * 0.055;
 
     const maxFollowY = height * 0.035;
@@ -436,9 +451,24 @@ function ProjectHoverImage({
     positionCurrent.current.addScaledVector(positionVelocity.current, delta);
 
     /*
+     * =====================================================
      * SCALE
+     * =====================================================
+     *
+     * DESKTOP:
+     * aktivt bilde scaler som før.
+     *
+     * MOBILE:
+     * ALDRI scale på hover/touch.
      */
-    const scaleTarget = isActive ? hoverScale : isDimmed ? 0.985 : 1;
+
+    const scaleTarget = isMobile
+      ? 1
+      : isActive
+        ? hoverScale
+        : isDimmed
+          ? 0.985
+          : 1;
 
     scaleVelocity.current += (scaleTarget - scaleCurrent.current) * 70 * delta;
 
@@ -449,8 +479,11 @@ function ProjectHoverImage({
     group.scale.setScalar(scaleCurrent.current);
 
     /*
+     * =====================================================
      * Z
+     * =====================================================
      */
+
     const zTarget = isActive ? hoverZ : isDimmed ? -0.35 : 0;
 
     zVelocity.current += (zTarget - zCurrent.current) * 60 * delta;
@@ -460,8 +493,11 @@ function ProjectHoverImage({
     zCurrent.current += zVelocity.current * delta;
 
     /*
+     * =====================================================
      * FINAL POSITION
+     * =====================================================
      */
+
     group.position.set(
       position[0] + positionCurrent.current.x,
 
@@ -471,8 +507,11 @@ function ProjectHoverImage({
     );
 
     /*
+     * =====================================================
      * LABEL
+     * =====================================================
      */
+
     const labelTarget = hovered.current ? 1 : 0;
 
     labelVelocity.current += (labelTarget - labelScale.current) * 85 * delta;
@@ -495,7 +534,14 @@ function ProjectHoverImage({
       smoothPointer.current.copy(event.uv);
     }
 
-    document.body.style.cursor = "pointer";
+    /*
+     * Ingen cursor-greie nødvendig på touch,
+     * men dette skader ikke desktop.
+     */
+
+    if (!isMobile) {
+      document.body.style.cursor = "pointer";
+    }
   }
 
   function handleMove(event: ThreeEvent<PointerEvent>) {
@@ -517,7 +563,9 @@ function ProjectHoverImage({
 
     pointerTarget.current.set(0.5, 0.5);
 
-    document.body.style.cursor = "";
+    if (!isMobile) {
+      document.body.style.cursor = "";
+    }
   }
 
   function handleClick(event: ThreeEvent<MouseEvent>) {
@@ -579,8 +627,12 @@ function ProjectHoverImage({
 
 export default function AllProjectsScene({
   scale,
+
   textures,
+
   onOpen,
+
+  isMobile,
 
   dreamProjectTransitionRef,
 
@@ -597,6 +649,8 @@ export default function AllProjectsScene({
   textures: Texture[];
 
   onOpen: () => void;
+
+  isMobile: boolean;
 
   dreamProjectTransitionRef: React.RefObject<HTMLAnchorElement | null>;
 
@@ -616,6 +670,7 @@ export default function AllProjectsScene({
     <SceneShell angle={angle} scale={scale}>
       <group position={[-0.45, 0, 0]} scale={0.9}>
         {/* LEFT / LOW */}
+
         <ProjectHoverImage
           title="DRØMMENES MELODI"
           texture={textures[0]}
@@ -633,6 +688,7 @@ export default function AllProjectsScene({
           labelTextColor="#ffffff"
           bendStrength={0.92}
           rotationZ={-0.035}
+          isMobile={isMobile}
           isActive={activeIndex === 0}
           isDimmed={activeIndex !== null && activeIndex !== 0}
           onHoverChange={(hovered) => {
@@ -644,6 +700,7 @@ export default function AllProjectsScene({
         />
 
         {/* UPPER LEFT */}
+
         <ProjectHoverImage
           title="POSTERS BUNDLE #1"
           texture={textures[2]}
@@ -659,6 +716,7 @@ export default function AllProjectsScene({
           labelTextColor="#ffffff"
           bendStrength={0.86}
           rotationZ={0.025}
+          isMobile={isMobile}
           isActive={activeIndex === 2}
           isDimmed={activeIndex !== null && activeIndex !== 2}
           onHoverChange={(hovered) => {
@@ -670,6 +728,7 @@ export default function AllProjectsScene({
         />
 
         {/* MAIN / CENTER */}
+
         <ProjectHoverImage
           title="KISTEFOSS MUSEUM"
           texture={textures[1]}
@@ -685,6 +744,7 @@ export default function AllProjectsScene({
           labelTextColor="#ffffff"
           bendStrength={0.82}
           rotationZ={-0.018}
+          isMobile={isMobile}
           isActive={activeIndex === 1}
           isDimmed={activeIndex !== null && activeIndex !== 1}
           onHoverChange={(hovered) => {
@@ -696,6 +756,7 @@ export default function AllProjectsScene({
         />
 
         {/* RIGHT / HIGH */}
+
         <ProjectHoverImage
           title="AURELIS CAPITAL"
           texture={textures[3]}
@@ -711,6 +772,7 @@ export default function AllProjectsScene({
           labelTextColor="#ffffff"
           bendStrength={0.95}
           rotationZ={0.028}
+          isMobile={isMobile}
           isActive={activeIndex === 3}
           isDimmed={activeIndex !== null && activeIndex !== 3}
           onHoverChange={(hovered) => {
@@ -722,6 +784,7 @@ export default function AllProjectsScene({
         />
 
         {/* LOWER FRONT */}
+
         <ProjectHoverImage
           title="ART EXHIBITION"
           texture={textures[4]}
@@ -740,6 +803,7 @@ export default function AllProjectsScene({
           labelTextColor="#ffffff"
           bendStrength={0.88}
           rotationZ={-0.045}
+          isMobile={isMobile}
           isActive={activeIndex === 4}
           isDimmed={activeIndex !== null && activeIndex !== 4}
           onHoverChange={(hovered) => {

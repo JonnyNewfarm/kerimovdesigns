@@ -69,6 +69,8 @@ export default function HeroCanvas({
       className="
         absolute
         inset-0
+        touch-none
+        overflow-hidden
       "
     >
       {hasMounted && allowCanvasMount && (
@@ -76,6 +78,7 @@ export default function HeroCanvas({
           className="
             h-full
             w-full
+            touch-none
           "
           camera={{
             position: [0, 0, 0],
@@ -83,11 +86,31 @@ export default function HeroCanvas({
             near: 0.01,
             far: 100,
           }}
-          dpr={isMdUp ? [1, 1.5] : 1}
+          /*
+           * MOBILE:
+           *
+           * Var tidligere 1.
+           *
+           * 1.75 gir en ENORM visuell forskjell på
+           * Retina uten å gå helt opp til device DPR 2/3.
+           */
+          dpr={isMdUp ? [1, 1.5] : [1.25, 1.75]}
           frameloop={isCanvasActive ? "always" : "never"}
           gl={{
             antialias: false,
             powerPreference: "high-performance",
+
+            /*
+             * Du har full canvas-bakgrunn uansett.
+             *
+             * Ingen grunn til å betale for alpha-buffer.
+             */
+            alpha: false,
+
+            /*
+             * Du bruker sannsynligvis ikke stencil her.
+             */
+            stencil: false,
           }}
         >
           <color attach="background" args={["#181c14"]} />

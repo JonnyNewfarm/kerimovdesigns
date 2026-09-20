@@ -160,12 +160,13 @@ export default function RingHero({ title, href }: RingHeroProps) {
     <div
       ref={container}
       className="
-        relative
-        h-screen
-        w-full
-        overflow-hidden
-        md:h-[100dvh]
-      "
+      relative
+      h-[100dvh]
+      w-full
+      touch-none
+      overscroll-none
+      overflow-hidden
+    "
     >
       <HeroTransitionLinks
         contactTransitionRef={contactTransitionRef}
@@ -182,12 +183,13 @@ export default function RingHero({ title, href }: RingHeroProps) {
 
       <div
         className="
-          relative
-          h-screen
-          overflow-hidden
-          uppercase
-          md:h-[100dvh]
-        "
+    relative
+    h-[100dvh]
+    touch-none
+    overscroll-none
+    overflow-hidden
+    uppercase
+  "
       >
         <HeroCanvas
           hasMounted={hasMounted}
