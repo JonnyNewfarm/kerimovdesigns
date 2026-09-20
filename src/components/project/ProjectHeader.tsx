@@ -27,11 +27,18 @@ export default function ProjectHeader({
   return (
     <section
       className="
+        relative
+        z-20
+
         mx-auto
         w-full
         max-w-[1600px]
+
         px-7
         pt-[24vh]
+
+        pointer-events-auto
+
         sm:px-14
       "
     >
@@ -41,6 +48,7 @@ export default function ProjectHeader({
             flex
             flex-col
             gap-4
+
             xl:flex-row
             xl:items-end
             xl:justify-between
@@ -59,6 +67,7 @@ export default function ProjectHeader({
                 leading-[0.9]
                 tracking-[-0.020em]
                 text-color
+
                 sm:text-7xl
                 md:text-7xl
                 xl:text-[5.8rem]
@@ -92,6 +101,7 @@ export default function ProjectHeader({
               flex
               items-center
               gap-8
+
               sm:justify-end
               sm:pb-4
             "
@@ -104,6 +114,7 @@ export default function ProjectHeader({
                   uppercase
                   tracking-[0.22em]
                   text-white/45
+
                   sm:text-xs
                 "
               >
@@ -121,6 +132,7 @@ export default function ProjectHeader({
                   uppercase
                   tracking-[0.22em]
                   text-white/45
+
                   sm:text-xs
                 "
               >
