@@ -318,29 +318,6 @@ export default function BurgerMenu() {
               );
             })}
           </nav>
-
-          <motion.div
-            initial={false}
-            animate={{
-              opacity: isOpen ? 1 : 0,
-              y: isOpen ? 0 : 18,
-            }}
-            transition={{
-              duration: instantClose ? 0 : 0.55,
-              delay: isOpen ? 0.5 : 0,
-              ease: REVEAL_EASE,
-            }}
-            className="mt-auto border-t border-white/10 pt-6"
-          >
-            <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-[#ecdfcc]/35">
-              Studio
-            </p>
-
-            <p className="max-w-[290px] text-sm leading-[1.55] text-[#ecdfcc]/60">
-              Graphic design, digital experiences and selected creative
-              development.
-            </p>
-          </motion.div>
         </div>
       </motion.div>
     </>
