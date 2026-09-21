@@ -212,6 +212,7 @@ function ProjectHoverImage({
   isMobile,
 
   isActive,
+
   isDimmed,
 
   onHoverChange,
@@ -267,10 +268,18 @@ function ProjectHoverImage({
 
   const materialRef = useRef<ShaderMaterial | null>(null);
 
+  /*
+   * =========================================================
+   * HOVER
+   * =========================================================
+   */
+
   const hovered = useRef(false);
 
   /*
+   * =========================================================
    * POINTER
+   * =========================================================
    */
 
   const pointerTarget = useRef(new Vector2(0.5, 0.5));
@@ -278,7 +287,9 @@ function ProjectHoverImage({
   const smoothPointer = useRef(new Vector2(0.5, 0.5));
 
   /*
-   * BEND
+   * =========================================================
+   * HOVER BEND
+   * =========================================================
    */
 
   const hoverBend = useRef(new Vector2(0, 0));
@@ -286,7 +297,9 @@ function ProjectHoverImage({
   const hoverBendVelocity = useRef(new Vector2(0, 0));
 
   /*
-   * POSITION
+   * =========================================================
+   * MAGNETIC POSITION
+   * =========================================================
    */
 
   const positionTarget = useRef(new Vector2(0, 0));
@@ -296,7 +309,9 @@ function ProjectHoverImage({
   const positionVelocity = useRef(new Vector2(0, 0));
 
   /*
+   * =========================================================
    * SCALE
+   * =========================================================
    */
 
   const scaleCurrent = useRef(1);
@@ -304,7 +319,9 @@ function ProjectHoverImage({
   const scaleVelocity = useRef(0);
 
   /*
+   * =========================================================
    * Z
+   * =========================================================
    */
 
   const zCurrent = useRef(0);
@@ -312,19 +329,57 @@ function ProjectHoverImage({
   const zVelocity = useRef(0);
 
   /*
+   * =========================================================
    * LABEL
+   * =========================================================
    */
 
   const labelScale = useRef(0);
 
   const labelVelocity = useRef(0);
 
+  /*
+   * =========================================================
+   * MOBILE TAP
+   * =========================================================
+   *
+   * Vi skiller tap fra swipe.
+   *
+   * Hvis fingeren har beveget seg mer enn threshold,
+   * åpner vi IKKE prosjektet.
+   */
+
+  const mobilePointerStart = useRef({
+    x: 0,
+    y: 0,
+  });
+
+  const mobilePointerMoved = useRef(false);
+
+  /*
+   * =========================================================
+   * RING MOTION
+   * =========================================================
+   */
+
   const { difference } = useRingMotion();
+
+  /*
+   * =========================================================
+   * COVER
+   * =========================================================
+   */
 
   const cover = useMemo(
     () => getCoverUv(texture, width, height),
     [texture, width, height],
   );
+
+  /*
+   * =========================================================
+   * UNIFORMS
+   * =========================================================
+   */
 
   const uniforms = useMemo(
     () => ({
@@ -351,6 +406,12 @@ function ProjectHoverImage({
     [texture, cover],
   );
 
+  /*
+   * =========================================================
+   * FRAME
+   * =========================================================
+   */
+
   useFrame((_, rawDelta) => {
     const group = groupRef.current;
 
@@ -364,7 +425,108 @@ function ProjectHoverImage({
 
     /*
      * =====================================================
-     * POINTER LAG
+     * MOBILE
+     * =====================================================
+     *
+     * Mobil bruker IKKE hover-systemet.
+     *
+     * Vi setter alle hover-relaterte verdier hardt
+     * tilbake til default.
+     *
+     * Det eneste som fortsatt animeres er scroll-bend.
+     */
+
+    if (isMobile) {
+      /*
+       * Hover state.
+       */
+
+      hovered.current = false;
+
+      /*
+       * Pointer.
+       */
+
+      pointerTarget.current.set(0.5, 0.5);
+
+      smoothPointer.current.set(0.5, 0.5);
+
+      /*
+       * Hover bend.
+       */
+
+      hoverBend.current.set(0, 0);
+
+      hoverBendVelocity.current.set(0, 0);
+
+      /*
+       * Magnetic follow.
+       */
+
+      positionTarget.current.set(0, 0);
+
+      positionCurrent.current.set(0, 0);
+
+      positionVelocity.current.set(0, 0);
+
+      /*
+       * Scale.
+       */
+
+      scaleCurrent.current = 1;
+
+      scaleVelocity.current = 0;
+
+      group.scale.set(1, 1, 1);
+
+      /*
+       * Z.
+       */
+
+      zCurrent.current = 0;
+
+      zVelocity.current = 0;
+
+      /*
+       * Label.
+       */
+
+      labelScale.current = 0;
+
+      labelVelocity.current = 0;
+
+      /*
+       * Original position.
+       */
+
+      group.position.set(position[0], position[1], position[2]);
+
+      /*
+       * Scroll bend.
+       *
+       * Dette beholdes.
+       */
+
+      const scrollX = THREE.MathUtils.clamp(
+        -difference.current * 3.15,
+        -78,
+        78,
+      );
+
+      const scrollY = THREE.MathUtils.clamp(difference.current * 0.58, -42, 42);
+
+      material.uniforms.uDelta.value.set(
+        scrollX * bendStrength,
+
+        scrollY * bendStrength,
+      );
+
+      return;
+    }
+
+    /*
+     * =====================================================
+     * DESKTOP POINTER LAG
      * =====================================================
      */
 
@@ -378,7 +540,7 @@ function ProjectHoverImage({
 
     /*
      * =====================================================
-     * HOVER BEND
+     * DESKTOP HOVER BEND
      * =====================================================
      */
 
@@ -454,21 +616,9 @@ function ProjectHoverImage({
      * =====================================================
      * SCALE
      * =====================================================
-     *
-     * DESKTOP:
-     * aktivt bilde scaler som før.
-     *
-     * MOBILE:
-     * ALDRI scale på hover/touch.
      */
 
-    const scaleTarget = isMobile
-      ? 1
-      : isActive
-        ? hoverScale
-        : isDimmed
-          ? 0.985
-          : 1;
+    const scaleTarget = isActive ? hoverScale : isDimmed ? 0.985 : 1;
 
     scaleVelocity.current += (scaleTarget - scaleCurrent.current) * 70 * delta;
 
@@ -521,6 +671,12 @@ function ProjectHoverImage({
     labelScale.current += labelVelocity.current * delta;
   });
 
+  /*
+   * =========================================================
+   * DESKTOP POINTER ENTER
+   * =========================================================
+   */
+
   function handleEnter(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
 
@@ -534,15 +690,14 @@ function ProjectHoverImage({
       smoothPointer.current.copy(event.uv);
     }
 
-    /*
-     * Ingen cursor-greie nødvendig på touch,
-     * men dette skader ikke desktop.
-     */
-
-    if (!isMobile) {
-      document.body.style.cursor = "pointer";
-    }
+    document.body.style.cursor = "pointer";
   }
+
+  /*
+   * =========================================================
+   * DESKTOP POINTER MOVE
+   * =========================================================
+   */
 
   function handleMove(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
@@ -554,6 +709,12 @@ function ProjectHoverImage({
     pointerTarget.current.copy(event.uv);
   }
 
+  /*
+   * =========================================================
+   * DESKTOP POINTER LEAVE
+   * =========================================================
+   */
+
   function handleLeave(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
 
@@ -563,12 +724,16 @@ function ProjectHoverImage({
 
     pointerTarget.current.set(0.5, 0.5);
 
-    if (!isMobile) {
-      document.body.style.cursor = "";
-    }
+    document.body.style.cursor = "";
   }
 
-  function handleClick(event: ThreeEvent<MouseEvent>) {
+  /*
+   * =========================================================
+   * DESKTOP CLICK
+   * =========================================================
+   */
+
+  function handleDesktopClick(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
 
     document.body.style.cursor = "";
@@ -576,17 +741,133 @@ function ProjectHoverImage({
     onClick();
   }
 
+  /*
+   * =========================================================
+   * MOBILE POINTER DOWN
+   * =========================================================
+   */
+
+  function handleMobilePointerDown(event: ThreeEvent<PointerEvent>) {
+    if (!isMobile) {
+      return;
+    }
+
+    mobilePointerStart.current = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+
+    mobilePointerMoved.current = false;
+  }
+
+  /*
+   * =========================================================
+   * MOBILE POINTER MOVE
+   * =========================================================
+   *
+   * Dette brukes KUN for å avgjøre om det er swipe
+   * eller et faktisk tap.
+   *
+   * Ingen visuell effekt skjer.
+   */
+
+  function handleMobilePointerMove(event: ThreeEvent<PointerEvent>) {
+    if (!isMobile) {
+      return;
+    }
+
+    const dx = event.clientX - mobilePointerStart.current.x;
+
+    const dy = event.clientY - mobilePointerStart.current.y;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > 8) {
+      mobilePointerMoved.current = true;
+    }
+  }
+
+  /*
+   * =========================================================
+   * MOBILE POINTER UP
+   * =========================================================
+   */
+
+  function handleMobilePointerUp(event: ThreeEvent<PointerEvent>) {
+    if (!isMobile) {
+      return;
+    }
+
+    /*
+     * Hvis fingeren faktisk har dratt/scrollet:
+     *
+     * INGENTING skjer.
+     */
+
+    if (mobilePointerMoved.current) {
+      return;
+    }
+
+    /*
+     * Faktisk tap.
+     */
+
+    event.stopPropagation();
+
+    onClick();
+  }
+
+  /*
+   * =========================================================
+   * RENDER
+   * =========================================================
+   */
+
   return (
     <group
       ref={groupRef}
       position={position}
       rotation={[0, 0, rotationZ]}
-      onPointerEnter={handleEnter}
-      onPointerMove={handleMove}
-      onPointerLeave={handleLeave}
-      onClick={handleClick}
+      /*
+       * =====================================================
+       * DESKTOP HOVER
+       * =====================================================
+       *
+       * Disse eksisterer IKKE på mobil.
+       */
+
+      onPointerEnter={isMobile ? undefined : handleEnter}
+      onPointerLeave={isMobile ? undefined : handleLeave}
+      /*
+       * =====================================================
+       * POINTER MOVE
+       * =====================================================
+       *
+       * Desktop:
+       * magnetic hover.
+       *
+       * Mobile:
+       * brukes bare for å oppdage swipe.
+       */
+
+      onPointerMove={isMobile ? handleMobilePointerMove : handleMove}
+      /*
+       * =====================================================
+       * MOBILE TAP
+       * =====================================================
+       */
+
+      onPointerDown={isMobile ? handleMobilePointerDown : undefined}
+      onPointerUp={isMobile ? handleMobilePointerUp : undefined}
+      /*
+       * =====================================================
+       * DESKTOP CLICK
+       * =====================================================
+       */
+
+      onClick={isMobile ? undefined : handleDesktopClick}
     >
-      <mesh renderOrder={isActive ? 90 : renderOrder}>
+      <mesh renderOrder={!isMobile && isActive ? 90 : renderOrder}>
         <planeGeometry args={[width, height, 28, 32]} />
 
         <shaderMaterial
@@ -602,26 +883,41 @@ function ProjectHoverImage({
         />
       </mesh>
 
-      <ProjectLabel
-        title={title}
-        width={width}
-        height={height}
-        labelWidth={labelWidth}
-        labelHeight={labelHeight}
-        labelInsetX={labelInsetX}
-        labelInsetY={labelInsetY}
-        labelShaderColors={labelShaderColors}
-        labelShaderSpeed={labelShaderSpeed}
-        labelTextColor={labelTextColor}
-        scaleRef={labelScale}
-      />
+      {/*
+       * =====================================================
+       * LABEL
+       * =====================================================
+       *
+       * VIKTIG:
+       *
+       * Labelen rendres IKKE I DET HELE TATT på mobil.
+       *
+       * Så det finnes ingen mulighet for at title badge
+       * plutselig popper opp ved touch.
+       */}
+
+      {!isMobile && (
+        <ProjectLabel
+          title={title}
+          width={width}
+          height={height}
+          labelWidth={labelWidth}
+          labelHeight={labelHeight}
+          labelInsetX={labelInsetX}
+          labelInsetY={labelInsetY}
+          labelShaderColors={labelShaderColors}
+          labelShaderSpeed={labelShaderSpeed}
+          labelTextColor={labelTextColor}
+          scaleRef={labelScale}
+        />
+      )}
     </group>
   );
 }
 
 /*
  * =========================================================
- * ALL PROJECTS
+ * ALL PROJECTS SCENE
  * =========================================================
  */
 
@@ -666,10 +962,33 @@ export default function AllProjectsScene({
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
+  /*
+   * =========================================================
+   * HOVER CHANGE
+   * =========================================================
+   *
+   * Ekstra guard:
+   *
+   * Selv om noe skulle trigge callbacken på mobil,
+   * nekter vi å endre activeIndex.
+   */
+
+  function setProjectHover(index: number, hovered: boolean) {
+    if (isMobile) {
+      return;
+    }
+
+    setActiveIndex(hovered ? index : null);
+  }
+
   return (
     <SceneShell angle={angle} scale={scale}>
       <group position={[-0.45, 0, 0]} scale={0.9}>
-        {/* LEFT / LOW */}
+        {/*
+         * ===================================================
+         * LEFT / LOW
+         * ===================================================
+         */}
 
         <ProjectHoverImage
           title="DRØMMENES MELODI"
@@ -689,17 +1008,21 @@ export default function AllProjectsScene({
           bendStrength={0.92}
           rotationZ={-0.035}
           isMobile={isMobile}
-          isActive={activeIndex === 0}
-          isDimmed={activeIndex !== null && activeIndex !== 0}
+          isActive={!isMobile && activeIndex === 0}
+          isDimmed={!isMobile && activeIndex !== null && activeIndex !== 0}
           onHoverChange={(hovered) => {
-            setActiveIndex(hovered ? 0 : null);
+            setProjectHover(0, hovered);
           }}
           onClick={() => {
             dreamProjectTransitionRef.current?.click();
           }}
         />
 
-        {/* UPPER LEFT */}
+        {/*
+         * ===================================================
+         * UPPER LEFT
+         * ===================================================
+         */}
 
         <ProjectHoverImage
           title="POSTERS BUNDLE #1"
@@ -717,17 +1040,21 @@ export default function AllProjectsScene({
           bendStrength={0.86}
           rotationZ={0.025}
           isMobile={isMobile}
-          isActive={activeIndex === 2}
-          isDimmed={activeIndex !== null && activeIndex !== 2}
+          isActive={!isMobile && activeIndex === 2}
+          isDimmed={!isMobile && activeIndex !== null && activeIndex !== 2}
           onHoverChange={(hovered) => {
-            setActiveIndex(hovered ? 2 : null);
+            setProjectHover(2, hovered);
           }}
           onClick={() => {
             postersBundleTransitionRef.current?.click();
           }}
         />
 
-        {/* MAIN / CENTER */}
+        {/*
+         * ===================================================
+         * MAIN / CENTER
+         * ===================================================
+         */}
 
         <ProjectHoverImage
           title="KISTEFOSS MUSEUM"
@@ -745,17 +1072,21 @@ export default function AllProjectsScene({
           bendStrength={0.82}
           rotationZ={-0.018}
           isMobile={isMobile}
-          isActive={activeIndex === 1}
-          isDimmed={activeIndex !== null && activeIndex !== 1}
+          isActive={!isMobile && activeIndex === 1}
+          isDimmed={!isMobile && activeIndex !== null && activeIndex !== 1}
           onHoverChange={(hovered) => {
-            setActiveIndex(hovered ? 1 : null);
+            setProjectHover(1, hovered);
           }}
           onClick={() => {
             kistefossTransitionRef.current?.click();
           }}
         />
 
-        {/* RIGHT / HIGH */}
+        {/*
+         * ===================================================
+         * RIGHT / HIGH
+         * ===================================================
+         */}
 
         <ProjectHoverImage
           title="AURELIS CAPITAL"
@@ -773,17 +1104,21 @@ export default function AllProjectsScene({
           bendStrength={0.95}
           rotationZ={0.028}
           isMobile={isMobile}
-          isActive={activeIndex === 3}
-          isDimmed={activeIndex !== null && activeIndex !== 3}
+          isActive={!isMobile && activeIndex === 3}
+          isDimmed={!isMobile && activeIndex !== null && activeIndex !== 3}
           onHoverChange={(hovered) => {
-            setActiveIndex(hovered ? 3 : null);
+            setProjectHover(3, hovered);
           }}
           onClick={() => {
             aurelisTransitionRef.current?.click();
           }}
         />
 
-        {/* LOWER FRONT */}
+        {/*
+         * ===================================================
+         * LOWER FRONT
+         * ===================================================
+         */}
 
         <ProjectHoverImage
           title="ART EXHIBITION"
@@ -804,15 +1139,21 @@ export default function AllProjectsScene({
           bendStrength={0.88}
           rotationZ={-0.045}
           isMobile={isMobile}
-          isActive={activeIndex === 4}
-          isDimmed={activeIndex !== null && activeIndex !== 4}
+          isActive={!isMobile && activeIndex === 4}
+          isDimmed={!isMobile && activeIndex !== null && activeIndex !== 4}
           onHoverChange={(hovered) => {
-            setActiveIndex(hovered ? 4 : null);
+            setProjectHover(4, hovered);
           }}
           onClick={() => {
             artExhibitionTransitionRef.current?.click();
           }}
         />
+
+        {/*
+         * ===================================================
+         * ALL PROJECTS BUTTON
+         * ===================================================
+         */}
 
         <WorldButton
           label="ALL PROJECTS"
