@@ -1,9 +1,8 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef, useState } from "react";
-
-import { TextureLoader } from "three";
 import { useLoader } from "@react-three/fiber";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { TextureLoader } from "three";
 
 import HeroLoadingSpinner from "../hero/HeroLoadingSpinner";
 
@@ -14,14 +13,17 @@ import HeroLoadingSpinner from "../hero/HeroLoadingSpinner";
  */
 
 /*
- * Dette er KUN minimumstiden spinneren får være synlig.
+ * Kun minimumstid.
  *
- * Det betyr ikke at vi faker loading:
- *
- * - Hvis assets bruker 2 sekunder -> spinner varer 2 sekunder+
- * - Hvis assets ligger cached -> spinner varer minst 800ms
+ * Assets må fortsatt faktisk være ferdige før
+ * revealen kan starte.
  */
 const MIN_LOADER_VISIBLE_TIME = 800;
+
+/*
+ * Samme type timing som hero-backdropen.
+ */
+const BACKDROP_FADE_DURATION = 0.7;
 
 /*
  * =========================================================
@@ -32,14 +34,8 @@ const MIN_LOADER_VISIBLE_TIME = 800;
 type ProjectsLoadingGateProps = {
   children: ReactNode;
 
-  /*
-   * Første desktop preview.
-   */
   desktopSrc?: string | null;
 
-  /*
-   * Bildene på gjeldende mobile side.
-   */
   mobileSrcs?: string[];
 };
 
@@ -55,43 +51,45 @@ export default function ProjectsLoadingGate({
   mobileSrcs = [],
 }: ProjectsLoadingGateProps) {
   /*
-   * null = viewport ikke bestemt enda.
-   * true = lg+
-   * false = under lg
+   * null = viewport ikke funnet enda
+   * true = desktop
+   * false = mobile/tablet
    */
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
   /*
-   * Første loading-cycle.
+   * De faktiske initial-assetsene er ferdige.
    */
   const [assetsReady, setAssetsReady] = useState(false);
 
   /*
-   * Starter spinnerens slurp-exit.
+   * Når denne blir true:
+   *
+   * - Projects mountes
+   * - alle Framer Motion-animasjoner starter
+   * - spinneren starter slurp
+   * - dark backdrop begynner å fade ut
+   *
+   * ALT samtidig.
+   */
+  const [revealStarted, setRevealStarted] = useState(false);
+
+  /*
+   * Sendes til selve spinneren.
    */
   const [loaderComplete, setLoaderComplete] = useState(false);
 
   /*
-   * Når denne blir true:
-   *
-   * Projects mountes.
-   *
-   * Viktig:
-   * den går ALDRI tilbake til false ved filterendringer.
+   * Når spinneren er helt ferdig
+   * kan loader-lagene fjernes fra DOM.
    */
-  const [showContent, setShowContent] = useState(false);
+  const [loaderExited, setLoaderExited] = useState(false);
+
+  const loaderStartedAtRef = useRef(0);
 
   /*
-   * Holder tiden spinneren startet.
-   */
-  const loaderStartedAtRef = useRef<number>(0);
-
-  /*
-   * Vi skal bare gjøre initial loader én gang
-   * for denne mounted gaten.
-   *
-   * Filter/searchParams kan endre props senere,
-   * men da skal vi IKKE starte loader på nytt.
+   * Når første intro er ferdig skal filter,
+   * pagination osv. ALDRI starte spinneren igjen.
    */
   const initialLoadFinishedRef = useRef(false);
 
@@ -107,7 +105,7 @@ export default function ProjectsLoadingGate({
 
   /*
    * =====================================================
-   * DETECT DESKTOP / MOBILE
+   * VIEWPORT
    * =====================================================
    */
 
@@ -131,18 +129,10 @@ export default function ProjectsLoadingGate({
    * =====================================================
    * INITIAL ASSET PRELOAD
    * =====================================================
-   *
-   * Denne effekten kan teknisk få nye props etter filtering,
-   * fordi desktopSrc/mobileSrcs endres.
-   *
-   * MEN:
-   *
-   * initialLoadFinishedRef sørger for at vi aldri starter
-   * side-loaderen igjen etter første loading-cycle.
    */
 
   useEffect(() => {
-    if (isDesktop === null || initialLoadFinishedRef.current) {
+    if (isDesktop === null || initialLoadFinishedRef.current || revealStarted) {
       return;
     }
 
@@ -155,11 +145,6 @@ export default function ProjectsLoadingGate({
      */
 
     if (isDesktop) {
-      /*
-       * Ingen prosjekt?
-       *
-       * Da finnes ingenting å laste.
-       */
       if (!desktopSrc) {
         setAssetsReady(true);
 
@@ -168,15 +153,9 @@ export default function ProjectsLoadingGate({
 
       /*
        * Varm R3F-cachen.
-       *
-       * ProjectPreview bruker samme TextureLoader-cache.
        */
       useLoader.preload(TextureLoader, desktopSrc);
 
-      /*
-       * Vi bruker også TextureLoader direkte fordi vi
-       * trenger et faktisk completion callback.
-       */
       const loader = new TextureLoader();
 
       loader.load(
@@ -191,7 +170,7 @@ export default function ProjectsLoadingGate({
           }
 
           /*
-           * Gir browseren én frame før spinner-exiten.
+           * Én frame før vi melder ready.
            */
           window.requestAnimationFrame(() => {
             if (cancelled) {
@@ -207,8 +186,8 @@ export default function ProjectsLoadingGate({
         /*
          * ERROR
          *
-         * Et ødelagt bilde skal aldri kunne låse
-         * hele /projects permanent.
+         * Broken asset skal aldri kunne
+         * låse siden permanent.
          */
         () => {
           if (cancelled) {
@@ -258,12 +237,6 @@ export default function ProjectsLoadingGate({
       });
     };
 
-    /*
-     * Vanlig browser image preload.
-     *
-     * ProjectsTableMobile trenger dermed ikke
-     * være mounted mens spinneren vises.
-     */
     const images = mobileSrcs.map((src) => {
       const image = new window.Image();
 
@@ -285,19 +258,32 @@ export default function ProjectsLoadingGate({
         image.onerror = null;
       });
     };
-  }, [isDesktop, desktopSrc, mobileSrcs]);
+  }, [isDesktop, desktopSrc, mobileSrcs, revealStarted]);
 
   /*
    * =====================================================
-   * ASSETS READY
+   * START REVEAL
    * =====================================================
    *
-   * Først når assets faktisk er ferdige begynner
-   * vi å avslutte spinneren.
+   * DETTE er forskjellen.
+   *
+   * Vi venter IKKE til spinneren er helt borte
+   * før Projects mountes.
+   *
+   * Når assets er klare starter:
+   *
+   * 1. Projects mount
+   * 2. Framer Motion
+   * 3. spinner slurp
+   * 4. backdrop fade
+   *
+   * samtidig.
+   *
+   * Det er den hero-lignende overgangen.
    */
 
   useEffect(() => {
-    if (!assetsReady || loaderComplete || initialLoadFinishedRef.current) {
+    if (!assetsReady || revealStarted || initialLoadFinishedRef.current) {
       return;
     }
 
@@ -306,73 +292,134 @@ export default function ProjectsLoadingGate({
     const remaining = Math.max(MIN_LOADER_VISIBLE_TIME - elapsed, 0);
 
     const timeout = window.setTimeout(() => {
+      /*
+       * Mount Projects.
+       */
+      setRevealStarted(true);
+
+      /*
+       * Start spinner slurp samtidig.
+       */
       setLoaderComplete(true);
     }, remaining);
 
     return () => {
       window.clearTimeout(timeout);
     };
-  }, [assetsReady, loaderComplete]);
+  }, [assetsReady, revealStarted]);
 
   /*
    * =====================================================
-   * SPINNER EXIT COMPLETE
+   * SPINNER FULLY EXITED
    * =====================================================
    */
 
   const handleExitComplete = () => {
-    /*
-     * Nå er initial loading permanent ferdig
-     * for denne ProjectsLoadingGate-instansen.
-     */
     initialLoadFinishedRef.current = true;
 
-    /*
-     * Mount Projects.
-     *
-     * TextReveal / Framer Motion starter først NÅ.
-     */
-    setShowContent(true);
+    setLoaderExited(true);
   };
 
   /*
    * =====================================================
-   * PROJECTS
-   * =====================================================
-   *
-   * Etter første load returnerer vi children direkte.
-   *
-   * Filterendringer endrer children/props,
-   * men ProjectsLoadingGate remountes ikke.
-   *
-   * Derfor:
-   *
-   * showContent forblir true.
-   */
-
-  if (showContent) {
-    return children;
-  }
-
-  /*
-   * =====================================================
-   * INITIAL LOADER
+   * RENDER
    * =====================================================
    */
 
   return (
     <div
       className="
-        fixed
-        inset-0
-        z-[1199]
+        relative
+        min-h-screen
         bg-dark
       "
     >
-      <HeroLoadingSpinner
-        loaderComplete={loaderComplete}
-        onExitComplete={handleExitComplete}
-      />
+      {/*
+       * =================================================
+       * PROJECTS
+       * =================================================
+       *
+       * Ikke mounted under faktisk loading.
+       *
+       * Mountes akkurat idet loader-exiten starter.
+       *
+       * Dermed starter alle:
+       *
+       * - TextReveal
+       * - ProjectPreview
+       * - sidebar motion
+       * - PageTransitionGate
+       *
+       * mens den mørke loader-backdropen
+       * fader bort over dem.
+       */}
+
+      {revealStarted ? children : null}
+
+      {/*
+       * =================================================
+       * DARK HERO-STYLE BACKDROP
+       * =================================================
+       *
+       * Ingen lys overlay.
+       *
+       * Bare samme prinsipp som hero:
+       *
+       * mørk flate -> transparent
+       *
+       * mens innholdet allerede animerer under.
+       */}
+
+      {!loaderExited ? (
+        <div
+          className="
+            pointer-events-none
+            fixed
+            inset-0
+            z-[1198]
+          "
+        >
+          <div
+            className={`
+              absolute
+              inset-0
+              bg-[#181c14]
+
+              transition-opacity
+              ease-[cubic-bezier(0.22,1,0.36,1)]
+
+              ${revealStarted ? "opacity-0" : "opacity-100"}
+            `}
+            style={{
+              transitionDuration: `${BACKDROP_FADE_DURATION}s`,
+              transitionDelay: revealStarted ? "0.08s" : "0s",
+            }}
+          />
+
+          {/*
+           * =============================================
+           * SPINNER
+           * =============================================
+           *
+           * Eget lag så backdrop-opacity IKKE påvirker
+           * spinnerens egen slurp-animasjon.
+           */}
+
+          <div
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              z-[2]
+            "
+          >
+            <HeroLoadingSpinner
+              loaderComplete={loaderComplete}
+              onExitComplete={handleExitComplete}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
