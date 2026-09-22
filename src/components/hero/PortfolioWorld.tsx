@@ -123,12 +123,14 @@ export default function PortfolioWorld({
 
         <RustamScene
           isActive={isActive}
+          isMobile={isMobile}
           scale={scale}
           texture={rustamTexture}
         />
 
         <VisualScene
           scale={scale}
+          isMobile={isMobile}
           textures={visualTextures}
           onOpen={() => {
             visualIdentityTransitionRef.current?.click();
@@ -137,6 +139,7 @@ export default function PortfolioWorld({
 
         <PostersScene
           scale={scale}
+          isMobile={isMobile}
           textures={posterTextures}
           onOpen={() => {
             posterTransitionRef.current?.click();
@@ -155,6 +158,7 @@ export default function PortfolioWorld({
         <TypographyScene
           scale={scale}
           textures={typographyTextures}
+          isMobile={isMobile}
           onOpen={() => {
             typographyTransitionRef.current?.click();
           }}

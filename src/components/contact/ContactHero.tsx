@@ -7,6 +7,7 @@ import TextReveal from "@/components/TextReveal";
 
 import MagneticComp from "@/components/MagneticComp";
 import { contactEase } from "./contactAnimations";
+import ContactThreeButton from "./ContactThreeButton";
 
 type ContactHeroProps = {
   onOpenForm: () => void;
@@ -306,61 +307,18 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                 }}
                 className="shrink-0"
               >
-                <MagneticComp>
-                  <button
-                    type="button"
-                    onClick={onOpenForm}
-                    className="
-                      group
-                      relative
-                      flex
-                      cursor-pointer
-                      items-center
-                      justify-center
-                      overflow-hidden
-                      border
-                      border-[#ecdfcc]
-                      px-3
-                      py-3
-                      text-lg
-                      hover:border-[#667a6c]
-                      sm:px-4
-                      sm:text-sm
-                      md:px-5
-                      md:text-lg
-                    "
+                <ContactThreeButton onClick={onOpenForm}>
+                  <TextReveal
+                    className="font-normal text-color"
+                    as="span"
+                    viewport={false}
+                    delay={0.78}
+                    duration={0.7}
+                    y="100%"
                   >
-                    <span
-                      className="
-                        absolute
-                        inset-0
-                        origin-bottom
-                        scale-y-0
-                        bg-[#48544c]
-                        transition-transform
-                        duration-500
-                        ease-[cubic-bezier(0.76,0,0.24,1)]
-                        group-hover:scale-y-100
-                      "
-                    />
-
-                    <TextReveal
-                      as="span"
-                      viewport={false}
-                      delay={0.78}
-                      duration={0.7}
-                      y="100%"
-                      className="
-                        relative
-                        z-10
-                        whitespace-nowrap
-                        uppercase
-                      "
-                    >
-                      Send message
-                    </TextReveal>
-                  </button>
-                </MagneticComp>
+                    Send message
+                  </TextReveal>
+                </ContactThreeButton>
               </motion.div>
             </div>
           </div>

@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { type ChangeEvent, type FormEvent, useState } from "react";
 
 import TextReveal from "@/components/TextReveal";
-import MagneticComp from "@/components/MagneticComp";
 
+import ContactFormThreeButton from "./ContactFormThreeButton";
 import FormField from "./FormField";
 import { contactEase } from "./contactAnimations";
 
@@ -140,7 +140,9 @@ export default function ContactForm() {
         };
       }
 
-      const nextErrors = { ...previous };
+      const nextErrors = {
+        ...previous,
+      };
 
       delete nextErrors[name];
 
@@ -164,7 +166,9 @@ export default function ContactForm() {
         };
       }
 
-      const nextErrors = { ...previous };
+      const nextErrors = {
+        ...previous,
+      };
 
       delete nextErrors[name];
 
@@ -302,9 +306,9 @@ export default function ContactForm() {
             mb-4
             block
             text-[11px]
-            md:text-[16px]
             uppercase
             opacity-80
+            md:text-[16px]
           "
         >
           Tell me about the project
@@ -406,51 +410,17 @@ export default function ContactForm() {
           md:col-span-2
         "
       >
-        <MagneticComp>
-          <button
-            type="submit"
-            className="
-              group
-              relative
-              flex
-              cursor-pointer
-              items-center
-              justify-center
-              overflow-hidden
-              border
-              border-[#ecdfcc]
-              py-4
-              text-xl
-              uppercase
-              hover:border-[#4b503d]
-            "
+        <ContactFormThreeButton type="submit">
+          <TextReveal
+            as="span"
+            viewport={false}
+            delay={0.88}
+            duration={0.7}
+            y="100%"
           >
-            <span
-              className="
-                absolute
-                inset-0
-                origin-bottom
-                scale-y-0
-                bg-[#25221D]
-                transition-transform
-                duration-500
-                ease-[cubic-bezier(0.76,0,0.24,1)]
-                group-hover:scale-y-100
-              "
-            />
-
-            <TextReveal
-              as="span"
-              viewport={false}
-              delay={0.88}
-              duration={0.7}
-              y="100%"
-              className="relative z-10 px-4"
-            >
-              Submit inquiry
-            </TextReveal>
-          </button>
-        </MagneticComp>
+            Submit inquiry
+          </TextReveal>
+        </ContactFormThreeButton>
       </motion.div>
     </form>
   );

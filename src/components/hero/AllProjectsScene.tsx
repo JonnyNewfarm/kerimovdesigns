@@ -121,7 +121,7 @@ function ProjectLabel({
 
   return (
     <group ref={ref} position={[x, y, 0.12]} scale={0}>
-      <mesh renderOrder={100} raycast={() => null}>
+      <mesh renderOrder={100} raycast={() => {}}>
         <planeGeometry args={[actualLabelWidth, labelHeight]} />
 
         <shaderMaterial
@@ -340,24 +340,6 @@ function ProjectHoverImage({
 
   /*
    * =========================================================
-   * MOBILE TAP
-   * =========================================================
-   *
-   * Vi skiller tap fra swipe.
-   *
-   * Hvis fingeren har beveget seg mer enn threshold,
-   * åpner vi IKKE prosjektet.
-   */
-
-  const mobilePointerStart = useRef({
-    x: 0,
-    y: 0,
-  });
-
-  const mobilePointerMoved = useRef(false);
-
-  /*
-   * =========================================================
    * RING MOTION
    * =========================================================
    */
@@ -428,40 +410,26 @@ function ProjectHoverImage({
      * MOBILE
      * =====================================================
      *
-     * Mobil bruker IKKE hover-systemet.
+     * Ingen hover.
+     * Ingen magnetic.
+     * Ingen scale.
+     * Ingen Z.
+     * Ingen label.
+     * Ingen click.
      *
-     * Vi setter alle hover-relaterte verdier hardt
-     * tilbake til default.
-     *
-     * Det eneste som fortsatt animeres er scroll-bend.
+     * KUN scroll bend.
      */
 
     if (isMobile) {
-      /*
-       * Hover state.
-       */
-
       hovered.current = false;
-
-      /*
-       * Pointer.
-       */
 
       pointerTarget.current.set(0.5, 0.5);
 
       smoothPointer.current.set(0.5, 0.5);
 
-      /*
-       * Hover bend.
-       */
-
       hoverBend.current.set(0, 0);
 
       hoverBendVelocity.current.set(0, 0);
-
-      /*
-       * Magnetic follow.
-       */
 
       positionTarget.current.set(0, 0);
 
@@ -469,42 +437,24 @@ function ProjectHoverImage({
 
       positionVelocity.current.set(0, 0);
 
-      /*
-       * Scale.
-       */
-
       scaleCurrent.current = 1;
 
       scaleVelocity.current = 0;
 
       group.scale.set(1, 1, 1);
 
-      /*
-       * Z.
-       */
-
       zCurrent.current = 0;
 
       zVelocity.current = 0;
-
-      /*
-       * Label.
-       */
 
       labelScale.current = 0;
 
       labelVelocity.current = 0;
 
-      /*
-       * Original position.
-       */
-
       group.position.set(position[0], position[1], position[2]);
 
       /*
-       * Scroll bend.
-       *
-       * Dette beholdes.
+       * Scroll bend beholdes.
        */
 
       const scrollX = THREE.MathUtils.clamp(
@@ -743,82 +693,6 @@ function ProjectHoverImage({
 
   /*
    * =========================================================
-   * MOBILE POINTER DOWN
-   * =========================================================
-   */
-
-  function handleMobilePointerDown(event: ThreeEvent<PointerEvent>) {
-    if (!isMobile) {
-      return;
-    }
-
-    mobilePointerStart.current = {
-      x: event.clientX,
-      y: event.clientY,
-    };
-
-    mobilePointerMoved.current = false;
-  }
-
-  /*
-   * =========================================================
-   * MOBILE POINTER MOVE
-   * =========================================================
-   *
-   * Dette brukes KUN for å avgjøre om det er swipe
-   * eller et faktisk tap.
-   *
-   * Ingen visuell effekt skjer.
-   */
-
-  function handleMobilePointerMove(event: ThreeEvent<PointerEvent>) {
-    if (!isMobile) {
-      return;
-    }
-
-    const dx = event.clientX - mobilePointerStart.current.x;
-
-    const dy = event.clientY - mobilePointerStart.current.y;
-
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance > 8) {
-      mobilePointerMoved.current = true;
-    }
-  }
-
-  /*
-   * =========================================================
-   * MOBILE POINTER UP
-   * =========================================================
-   */
-
-  function handleMobilePointerUp(event: ThreeEvent<PointerEvent>) {
-    if (!isMobile) {
-      return;
-    }
-
-    /*
-     * Hvis fingeren faktisk har dratt/scrollet:
-     *
-     * INGENTING skjer.
-     */
-
-    if (mobilePointerMoved.current) {
-      return;
-    }
-
-    /*
-     * Faktisk tap.
-     */
-
-    event.stopPropagation();
-
-    onClick();
-  }
-
-  /*
-   * =========================================================
    * RENDER
    * =========================================================
    */
@@ -829,45 +703,25 @@ function ProjectHoverImage({
       position={position}
       rotation={[0, 0, rotationZ]}
       /*
-       * =====================================================
-       * DESKTOP HOVER
-       * =====================================================
-       *
-       * Disse eksisterer IKKE på mobil.
+       * Alle events er desktop-only.
        */
-
       onPointerEnter={isMobile ? undefined : handleEnter}
+      onPointerMove={isMobile ? undefined : handleMove}
       onPointerLeave={isMobile ? undefined : handleLeave}
-      /*
-       * =====================================================
-       * POINTER MOVE
-       * =====================================================
-       *
-       * Desktop:
-       * magnetic hover.
-       *
-       * Mobile:
-       * brukes bare for å oppdage swipe.
-       */
-
-      onPointerMove={isMobile ? handleMobilePointerMove : handleMove}
-      /*
-       * =====================================================
-       * MOBILE TAP
-       * =====================================================
-       */
-
-      onPointerDown={isMobile ? handleMobilePointerDown : undefined}
-      onPointerUp={isMobile ? handleMobilePointerUp : undefined}
-      /*
-       * =====================================================
-       * DESKTOP CLICK
-       * =====================================================
-       */
-
       onClick={isMobile ? undefined : handleDesktopClick}
     >
-      <mesh renderOrder={!isMobile && isActive ? 90 : renderOrder}>
+      <mesh
+        renderOrder={!isMobile && isActive ? 90 : renderOrder}
+        /*
+         * VIKTIG:
+         *
+         * På mobil deltar bildet ikke
+         * i raycasting i det hele tatt.
+         *
+         * Ingen tap / click / hover.
+         */
+        raycast={isMobile ? () => {} : undefined}
+      >
         <planeGeometry args={[width, height, 28, 32]} />
 
         <shaderMaterial
@@ -884,16 +738,7 @@ function ProjectHoverImage({
       </mesh>
 
       {/*
-       * =====================================================
-       * LABEL
-       * =====================================================
-       *
-       * VIKTIG:
-       *
-       * Labelen rendres IKKE I DET HELE TATT på mobil.
-       *
-       * Så det finnes ingen mulighet for at title badge
-       * plutselig popper opp ved touch.
+       * Label finnes kun på desktop.
        */}
 
       {!isMobile && (
@@ -966,11 +811,6 @@ export default function AllProjectsScene({
    * =========================================================
    * HOVER CHANGE
    * =========================================================
-   *
-   * Ekstra guard:
-   *
-   * Selv om noe skulle trigge callbacken på mobil,
-   * nekter vi å endre activeIndex.
    */
 
   function setProjectHover(index: number, hovered: boolean) {
@@ -993,7 +833,7 @@ export default function AllProjectsScene({
         <ProjectHoverImage
           title="DRØMMENES MELODI"
           texture={textures[0]}
-          position={[-2.15, -0.35, 0.4]}
+          position={[-2.14, -0.35, 0.4]}
           renderOrder={5}
           width={1.85}
           height={2.6}
@@ -1123,7 +963,7 @@ export default function AllProjectsScene({
         <ProjectHoverImage
           title="ART EXHIBITION"
           texture={textures[4]}
-          position={[0.95, -0.95, 3.6]}
+          position={[0.95, isMobile ? -0.6 : -0.75, 3.6]}
           renderOrder={25}
           width={1.3}
           height={1.63}
@@ -1153,6 +993,8 @@ export default function AllProjectsScene({
          * ===================================================
          * ALL PROJECTS BUTTON
          * ===================================================
+         *
+         * Denne er fortsatt klikkbar på mobil.
          */}
 
         <WorldButton
@@ -1160,7 +1002,7 @@ export default function AllProjectsScene({
           width={1.25}
           height={0.4}
           fontSize={210}
-          position={[1.6, -1.7, 3.8]}
+          position={[1.2, isMobile ? -1.35 : -1.55, 3.8]}
           onClick={onOpen}
         />
       </group>

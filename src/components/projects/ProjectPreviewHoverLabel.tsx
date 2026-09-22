@@ -137,12 +137,7 @@ export default function ProjectPreviewHoverLabel({
      * =================================================
      */
 
-    const labelWidth = THREE.MathUtils.clamp(
-      rect.width * 0.25,
-
-      190,
-      290,
-    );
+    const labelWidth = THREE.MathUtils.clamp(rect.width * 0.25, 190, 290);
 
     const labelHeight = labelWidth * 0.35;
 
@@ -225,29 +220,43 @@ export default function ProjectPreviewHoverLabel({
      * =================================================
      * BEND TARGET
      * =================================================
+     *
+     * Før:
+     *
+     * X = 0.30 / max 0.052
+     * Y = 0.17 / max 0.038
+     *
+     * Nå litt roligere:
+     *
+     * X = 0.22 / max 0.036
+     * Y = 0.12 / max 0.026
      */
 
     const targetBendX = isHovered
       ? THREE.MathUtils.clamp(
-          (differenceX / labelWidth) * 0.3,
+          (differenceX / labelWidth) * 0.22,
 
-          -0.052,
-          0.052,
+          -0.036,
+          0.036,
         )
       : 0;
 
     const targetBendY = isHovered
       ? THREE.MathUtils.clamp(
-          -(differenceY / labelHeight) * 0.17,
+          -(differenceY / labelHeight) * 0.12,
 
-          -0.038,
-          0.038,
+          -0.026,
+          0.026,
         )
       : 0;
 
-    const bendStiffness = isHovered ? 92 : 75;
+    /*
+     * Litt roligere spring.
+     */
 
-    const bendDamping = isHovered ? 17 : 14;
+    const bendStiffness = isHovered ? 88 : 72;
+
+    const bendDamping = isHovered ? 18 : 14;
 
     bendVelocity.current.x +=
       (targetBendX - bendCurrent.current.x) * bendStiffness * delta;

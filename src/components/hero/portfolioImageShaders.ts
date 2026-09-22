@@ -149,6 +149,22 @@ void main() {
     gradient
   );
 
+  /*
+   * DARK BIAS
+   *
+   * Samme eksakte farger som før.
+   *
+   * Vi presser bare gradienten kraftig
+   * ned mot 0, slik at colorA dekker
+   * mye mer av knappen.
+   */
+  gradient = pow(
+    gradient,
+    1.8
+  );
+
+ 
+
   vec3 colorA = vec3(
     0.29,
     0.32,
@@ -161,7 +177,6 @@ void main() {
     0.35
   );
 
-  // Litt mørkere lys tone
   vec3 colorC = vec3(
     0.46,
     0.46,
@@ -170,17 +185,17 @@ void main() {
 
   vec3 color;
 
-  if (gradient < 0.5) {
+  if (gradient < 0.82) {
     color = mix(
       colorA,
       colorB,
-      gradient * 2.0
+      gradient / 0.82
     );
   } else {
     color = mix(
       colorB,
       colorC,
-      (gradient - 0.5) * 2.0
+      (gradient - 0.82) / 0.18
     );
   }
 

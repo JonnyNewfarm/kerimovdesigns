@@ -23,6 +23,12 @@ import { useRingMotion } from "./RingMotionContext";
 
 import WorldButton from "./WorldButton";
 
+/*
+ * =========================================================
+ * ANIMATION VIDEO
+ * =========================================================
+ */
+
 function AnimationVideo({
   isActive,
   isMobile,
@@ -41,15 +47,39 @@ function AnimationVideo({
 
   const { difference } = useRingMotion();
 
+  /*
+   * =========================================================
+   * HOVER
+   * =========================================================
+   */
+
   const hovered = useRef(false);
+
+  /*
+   * =========================================================
+   * POINTER
+   * =========================================================
+   */
 
   const pointerTarget = useRef(new Vector2(0.5, 0.5));
 
   const smoothPointer = useRef(new Vector2(0.5, 0.5));
 
+  /*
+   * =========================================================
+   * HOVER BEND
+   * =========================================================
+   */
+
   const hoverBend = useRef(new Vector2(0, 0));
 
   const hoverBendVelocity = useRef(new Vector2(0, 0));
+
+  /*
+   * =========================================================
+   * MAGNETIC POSITION
+   * =========================================================
+   */
 
   const positionTarget = useRef(new Vector2(0, 0));
 
@@ -57,17 +87,32 @@ function AnimationVideo({
 
   const positionVelocity = useRef(new Vector2(0, 0));
 
+  /*
+   * =========================================================
+   * SCALE
+   * =========================================================
+   */
+
   const scaleCurrent = useRef(1);
 
   const scaleVelocity = useRef(0);
+
+  /*
+   * =========================================================
+   * SIZE
+   * =========================================================
+   */
 
   const videoWidth = isMobile ? 4.5 : 5.5;
 
   const videoHeight = isMobile ? 2.6 : 3;
 
   /*
+   * =========================================================
    * VIDEO SETUP
+   * =========================================================
    */
+
   useEffect(() => {
     const video = document.createElement("video");
 
@@ -123,8 +168,11 @@ function AnimationVideo({
   }, []);
 
   /*
-   * PLAY/PAUSE
+   * =========================================================
+   * PLAY / PAUSE
+   * =========================================================
    */
+
   useEffect(() => {
     const video = videoRef.current;
 
@@ -138,6 +186,12 @@ function AnimationVideo({
       video.pause();
     }
   }, [isActive]);
+
+  /*
+   * =========================================================
+   * UNIFORMS
+   * =========================================================
+   */
 
   const uniforms = useMemo(
     () => ({
@@ -160,6 +214,12 @@ function AnimationVideo({
     uniforms.uTexture.value = texture;
   }, [texture, uniforms]);
 
+  /*
+   * =========================================================
+   * FRAME
+   * =========================================================
+   */
+
   useFrame((_, rawDelta) => {
     const mesh = meshRef.current;
 
@@ -172,8 +232,95 @@ function AnimationVideo({
     const delta = Math.min(rawDelta, 1 / 30);
 
     /*
-     * POINTER
+     * =====================================================
+     * MOBILE
+     * =====================================================
+     *
+     * Ingen hover-effekter på mobil.
+     *
+     * Kun scroll bend.
      */
+
+    if (isMobile) {
+      /*
+       * Hover state.
+       */
+
+      hovered.current = false;
+
+      /*
+       * Pointer.
+       */
+
+      pointerTarget.current.set(0.5, 0.5);
+
+      smoothPointer.current.set(0.5, 0.5);
+
+      /*
+       * Hover bend.
+       */
+
+      hoverBend.current.set(0, 0);
+
+      hoverBendVelocity.current.set(0, 0);
+
+      /*
+       * Magnetic movement.
+       */
+
+      positionTarget.current.set(0, 0);
+
+      positionCurrent.current.set(0, 0);
+
+      positionVelocity.current.set(0, 0);
+
+      /*
+       * Hover scale.
+       */
+
+      scaleCurrent.current = 1;
+
+      scaleVelocity.current = 0;
+
+      /*
+       * Original position.
+       */
+
+      mesh.position.set(0.25, -0.2, 0.15);
+
+      /*
+       * Original scale.
+       */
+
+      mesh.scale.set(1, 1, 1);
+
+      /*
+       * Scroll bend ONLY.
+       */
+
+      const scrollX = THREE.MathUtils.clamp(
+        -difference.current * 3.15,
+        -78,
+        78,
+      );
+
+      const scrollY = THREE.MathUtils.clamp(difference.current * 0.58, -42, 42);
+
+      material.uniforms.uDelta.value.set(
+        scrollX * 0.95,
+
+        scrollY * 0.95,
+      );
+
+      return;
+    }
+
+    /*
+     * =====================================================
+     * DESKTOP POINTER
+     * =====================================================
+     */
+
     const pointerFollow = 1 - Math.exp(-delta * 7);
 
     smoothPointer.current.lerp(pointerTarget.current, pointerFollow);
@@ -183,8 +330,11 @@ function AnimationVideo({
     const diffY = pointerTarget.current.y - smoothPointer.current.y;
 
     /*
-     * BEND
+     * =====================================================
+     * DESKTOP HOVER BEND
+     * =====================================================
      */
+
     const hoverStrengthX = 120;
 
     const hoverStrengthY = 85;
@@ -212,8 +362,11 @@ function AnimationVideo({
     hoverBend.current.y = THREE.MathUtils.clamp(hoverBend.current.y, -22, 22);
 
     /*
+     * =====================================================
      * SCROLL BEND
+     * =====================================================
      */
+
     const scrollX = THREE.MathUtils.clamp(-difference.current * 3.15, -78, 78);
 
     const scrollY = THREE.MathUtils.clamp(difference.current * 0.58, -42, 42);
@@ -225,8 +378,11 @@ function AnimationVideo({
     );
 
     /*
-     * MAGNETIC
+     * =====================================================
+     * MAGNETIC FOLLOW
+     * =====================================================
      */
+
     const maxFollowX = 0.16;
 
     const maxFollowY = 0.1;
@@ -262,8 +418,11 @@ function AnimationVideo({
     mesh.position.z = 0.15;
 
     /*
-     * SCALE
+     * =====================================================
+     * HOVER SCALE
+     * =====================================================
      */
+
     const scaleTarget = hovered.current ? 1.08 : 1;
 
     const scaleStiffness = 68;
@@ -280,6 +439,12 @@ function AnimationVideo({
     mesh.scale.setScalar(scaleCurrent.current);
   });
 
+  /*
+   * =========================================================
+   * DESKTOP POINTER ENTER
+   * =========================================================
+   */
+
   function handleEnter(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
 
@@ -292,6 +457,12 @@ function AnimationVideo({
     }
   }
 
+  /*
+   * =========================================================
+   * DESKTOP POINTER MOVE
+   * =========================================================
+   */
+
   function handleMove(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
 
@@ -302,6 +473,12 @@ function AnimationVideo({
     pointerTarget.current.copy(event.uv);
   }
 
+  /*
+   * =========================================================
+   * DESKTOP POINTER LEAVE
+   * =========================================================
+   */
+
   function handleLeave(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
 
@@ -310,17 +487,30 @@ function AnimationVideo({
     pointerTarget.current.set(0.5, 0.5);
   }
 
+  /*
+   * =========================================================
+   * NO TEXTURE
+   * =========================================================
+   */
+
   if (!texture) {
     return null;
   }
+
+  /*
+   * =========================================================
+   * RENDER
+   * =========================================================
+   */
 
   return (
     <mesh
       ref={meshRef}
       position={[0.25, -0.2, 0.15]}
-      onPointerEnter={handleEnter}
-      onPointerMove={handleMove}
-      onPointerLeave={handleLeave}
+      raycast={isMobile ? () => null : undefined}
+      onPointerEnter={isMobile ? undefined : handleEnter}
+      onPointerMove={isMobile ? undefined : handleMove}
+      onPointerLeave={isMobile ? undefined : handleLeave}
     >
       <planeGeometry args={[videoWidth, videoHeight, 36, 24]} />
 
@@ -337,10 +527,19 @@ function AnimationVideo({
   );
 }
 
+/*
+ * =========================================================
+ * ANIMATION SCENE
+ * =========================================================
+ */
+
 export default function AnimationScene({
   scale,
+
   isActive,
+
   isMobile,
+
   onOpen,
 }: {
   scale: number;

@@ -11,11 +11,14 @@ import WorldButton from "./WorldButton";
 export default function VisualScene({
   scale,
   textures,
+  isMobile,
   onOpen,
 }: {
   scale: number;
 
   textures: Texture[];
+
+  isMobile: boolean;
 
   onOpen: () => void;
 }) {
@@ -27,9 +30,10 @@ export default function VisualScene({
         texture={textures[0]}
         position={[-1.35, -0.5, 0.28]}
         bendStrength={1}
-        rotationZ={-0.0}
+        rotationZ={-0}
         width={2}
         height={3}
+        isMobile={isMobile}
       />
 
       <ImagePlane
@@ -39,6 +43,7 @@ export default function VisualScene({
         rotationZ={0}
         width={2.3}
         height={3.3}
+        isMobile={isMobile}
       />
 
       <WorldButton

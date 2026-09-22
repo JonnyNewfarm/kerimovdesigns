@@ -115,7 +115,7 @@ export default function ContactFormPanel({
               touch-pan-y
               overflow-y-auto
               overscroll-contain
-              bg-[#4b4f47]
+              bg-[#191a18]
               px-5
               pb-8
               pt-5
@@ -225,7 +225,7 @@ export default function ContactFormPanel({
         origin-bottom
         scale-y-0
         
-        bg-[#25221d]
+        bg-[#2c2a28]
         transition-transform
         duration-500
         ease-[cubic-bezier(0.76,0,0.24,1)]

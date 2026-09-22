@@ -86,30 +86,14 @@ export default function HeroCanvas({
             near: 0.01,
             far: 100,
           }}
-          /*
-           * MOBILE:
-           *
-           * Var tidligere 1.
-           *
-           * 1.75 gir en ENORM visuell forskjell på
-           * Retina uten å gå helt opp til device DPR 2/3.
-           */
-          dpr={isMdUp ? [1, 1.5] : [1.25, 1.75]}
+          dpr={isMdUp ? [1, 1.5] : [1, 1.5]}
           frameloop={isCanvasActive ? "always" : "never"}
           gl={{
             antialias: false,
             powerPreference: "high-performance",
 
-            /*
-             * Du har full canvas-bakgrunn uansett.
-             *
-             * Ingen grunn til å betale for alpha-buffer.
-             */
             alpha: false,
 
-            /*
-             * Du bruker sannsynligvis ikke stencil her.
-             */
             stencil: false,
           }}
         >

@@ -10,12 +10,15 @@ export default function RustamScene({
   scale,
   texture,
   isActive,
+  isMobile,
 }: {
   scale: number;
 
   texture: Texture;
 
   isActive: boolean;
+
+  isMobile: boolean;
 }) {
   const angle = WORLD_SECTIONS[0].angle;
 
@@ -29,6 +32,7 @@ export default function RustamScene({
         bendStrength={0.92}
         intro
         introActive={isActive}
+        isMobile={isMobile}
       />
     </SceneShell>
   );

@@ -11,11 +11,14 @@ import WorldButton from "./WorldButton";
 export default function PostersScene({
   scale,
   textures,
+  isMobile,
   onOpen,
 }: {
   scale: number;
 
   textures: Texture[];
+
+  isMobile: boolean;
 
   onOpen: () => void;
 }) {
@@ -31,6 +34,7 @@ export default function PostersScene({
         width={2.95}
         height={3.7}
         rotationZ={-0.02}
+        isMobile={isMobile}
       />
 
       {/* RIGHT */}
@@ -40,6 +44,7 @@ export default function PostersScene({
         bendStrength={0.94}
         width={2.75}
         height={3.5}
+        isMobile={isMobile}
       />
 
       <WorldButton

@@ -42,6 +42,8 @@ type ImagePlaneProps = {
 
   intro?: boolean;
   introActive?: boolean;
+
+  isMobile?: boolean;
 };
 
 type TextPlaneProps = {
@@ -437,6 +439,8 @@ export function ImagePlane({
   intro = false,
 
   introActive = true,
+
+  isMobile = false,
 }: ImagePlaneProps) {
   /*
    * Outer group:
@@ -459,11 +463,13 @@ export function ImagePlane({
   /*
    * INTRO
    */
+
   const introProgress = useRef(intro ? 0 : 1);
 
   /*
    * POINTER
    */
+
   const pointerTarget = useRef(new Vector2(0.5, 0.5));
 
   const smoothPointer = useRef(new Vector2(0.5, 0.5));
@@ -471,6 +477,7 @@ export function ImagePlane({
   /*
    * HOVER BEND
    */
+
   const hoverBend = useRef(new Vector2(0, 0));
 
   const hoverBendVelocity = useRef(new Vector2(0, 0));
@@ -478,6 +485,7 @@ export function ImagePlane({
   /*
    * MAGNETIC POSITION
    */
+
   const positionTarget = useRef(new Vector2(0, 0));
 
   const positionCurrent = useRef(new Vector2(0, 0));
@@ -487,6 +495,7 @@ export function ImagePlane({
   /*
    * HOVER SCALE
    */
+
   const scaleCurrent = useRef(1);
 
   const scaleVelocity = useRef(0);
@@ -494,6 +503,7 @@ export function ImagePlane({
   /*
    * TEXTURE COVER
    */
+
   const cover = useMemo(
     () => getCoverUv(texture, width, height),
     [texture, width, height],
@@ -544,8 +554,11 @@ export function ImagePlane({
     const delta = Math.min(rawDelta, 1 / 30);
 
     /*
-     * INTRO PROGRESS
+     * ===================================================
+     * INTRO
+     * ===================================================
      */
+
     if (intro && introActive && introProgress.current < 1) {
       introProgress.current = Math.min(1, introProgress.current + delta / 1.45);
     }
@@ -555,6 +568,7 @@ export function ImagePlane({
     /*
      * INTRO MOVEMENT
      */
+
     const moveEase = 1 - Math.pow(1 - p, 3);
 
     const introStartX = 0.75;
@@ -573,7 +587,11 @@ export function ImagePlane({
 
     /*
      * INTRO SCALE
+     *
+     * Dette er intro-animation, ikke hover.
+     * Den beholdes også på mobil.
      */
+
     const scaleEase = 1 - Math.pow(1 - p, 4);
 
     const introScale = intro ? THREE.MathUtils.lerp(0.72, 1, scaleEase) : 1;
@@ -583,6 +601,7 @@ export function ImagePlane({
     /*
      * INTRO BEND
      */
+
     const bendRelease = THREE.MathUtils.smoothstep(p, 0.1, 1);
 
     const introBendX = intro ? THREE.MathUtils.lerp(-165, 0, bendRelease) : 0;
@@ -590,8 +609,68 @@ export function ImagePlane({
     const introBendY = intro ? THREE.MathUtils.lerp(12, 0, bendRelease) : 0;
 
     /*
-     * POINTER LAG
+     * ===================================================
+     * MOBILE
+     * ===================================================
+     *
+     * På mobil:
+     *
+     * - ingen hover
+     * - ingen magnetic
+     * - ingen hover scale
+     * - ingen hover bend
+     *
+     * Kun scroll bend + eventuell intro.
      */
+
+    if (isMobile) {
+      hovered.current = false;
+
+      pointerTarget.current.set(0.5, 0.5);
+
+      smoothPointer.current.set(0.5, 0.5);
+
+      hoverBend.current.set(0, 0);
+
+      hoverBendVelocity.current.set(0, 0);
+
+      positionTarget.current.set(0, 0);
+
+      positionCurrent.current.set(0, 0);
+
+      positionVelocity.current.set(0, 0);
+
+      scaleCurrent.current = 1;
+
+      scaleVelocity.current = 0;
+
+      mesh.position.set(0, 0, 0);
+
+      mesh.scale.set(1, 1, 1);
+
+      const scrollX = THREE.MathUtils.clamp(
+        -difference.current * 3.15,
+        -78,
+        78,
+      );
+
+      const scrollY = THREE.MathUtils.clamp(difference.current * 0.58, -42, 42);
+
+      material.uniforms.uDelta.value.set(
+        scrollX * bendStrength + introBendX,
+
+        scrollY * bendStrength + introBendY,
+      );
+
+      return;
+    }
+
+    /*
+     * ===================================================
+     * DESKTOP POINTER LAG
+     * ===================================================
+     */
+
     const pointerFollow = 1 - Math.exp(-delta * 7);
 
     smoothPointer.current.lerp(pointerTarget.current, pointerFollow);
@@ -601,8 +680,11 @@ export function ImagePlane({
     const rawDifferenceY = pointerTarget.current.y - smoothPointer.current.y;
 
     /*
-     * HOVER BEND
+     * ===================================================
+     * DESKTOP HOVER BEND
+     * ===================================================
      */
+
     const hoverStrengthX = 115;
 
     const hoverStrengthY = 80;
@@ -630,8 +712,11 @@ export function ImagePlane({
     hoverBend.current.y = THREE.MathUtils.clamp(hoverBend.current.y, -20, 20);
 
     /*
+     * ===================================================
      * SCROLL BEND
+     * ===================================================
      */
+
     const scrollX = THREE.MathUtils.clamp(-difference.current * 3.15, -78, 78);
 
     const scrollY = THREE.MathUtils.clamp(difference.current * 0.58, -42, 42);
@@ -643,8 +728,11 @@ export function ImagePlane({
     );
 
     /*
+     * ===================================================
      * MAGNETIC FOLLOW
+     * ===================================================
      */
+
     const maxFollowX = width * 0.065;
 
     const maxFollowY = height * 0.04;
@@ -676,8 +764,11 @@ export function ImagePlane({
     mesh.position.set(positionCurrent.current.x, positionCurrent.current.y, 0);
 
     /*
+     * ===================================================
      * HOVER SCALE
+     * ===================================================
      */
+
     const hoverScaleTarget = hovered.current ? 1.1 : 1;
 
     const scaleStiffness = 70;
@@ -693,6 +784,12 @@ export function ImagePlane({
 
     mesh.scale.setScalar(scaleCurrent.current);
   });
+
+  /*
+   * =========================================================
+   * DESKTOP EVENTS
+   * =========================================================
+   */
 
   function handleEnter(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
@@ -724,13 +821,20 @@ export function ImagePlane({
     pointerTarget.current.set(0.5, 0.5);
   }
 
+  /*
+   * =========================================================
+   * RENDER
+   * =========================================================
+   */
+
   return (
     <group ref={groupRef} position={position} rotation={[0, 0, rotationZ]}>
       <mesh
         ref={meshRef}
-        onPointerEnter={handleEnter}
-        onPointerMove={handleMove}
-        onPointerLeave={handleLeave}
+        raycast={isMobile ? () => null : undefined}
+        onPointerEnter={isMobile ? undefined : handleEnter}
+        onPointerMove={isMobile ? undefined : handleMove}
+        onPointerLeave={isMobile ? undefined : handleLeave}
       >
         <planeGeometry args={[width, height, 28, 32]} />
 

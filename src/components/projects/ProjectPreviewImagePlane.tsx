@@ -1,9 +1,7 @@
 "use client";
 
 import { useFrame, useLoader } from "@react-three/fiber";
-
 import { useEffect, useMemo, useRef } from "react";
-
 import * as THREE from "three";
 
 import {
@@ -220,29 +218,53 @@ export default function ProjectPreviewImagePlane({
      * =================================================
      * HOVER BEND
      * =================================================
+     *
+     * Før:
+     *
+     * X:
+     * differenceX * 0.23
+     * max 0.023
+     *
+     * Y:
+     * differenceY * 0.18
+     * max 0.018
+     *
+     * Nå:
+     *
+     * X:
+     * differenceX * 0.12
+     * max 0.012
+     *
+     * Y:
+     * differenceY * 0.09
+     * max 0.009
      */
 
     const targetHoverX = isHovered
       ? THREE.MathUtils.clamp(
-          differenceX * 0.23,
+          differenceX * 0.16,
 
-          -0.023,
-          0.023,
+          -0.016,
+          0.016,
         )
       : 0;
 
     const targetHoverY = isHovered
       ? THREE.MathUtils.clamp(
-          -differenceY * 0.18,
+          -differenceY * 0.12,
 
-          -0.018,
-          0.018,
+          -0.012,
+          0.012,
         )
       : 0;
 
-    const bendStiffness = isHovered ? 95 : 75;
+    /*
+     * Litt smoothere / mindre aggressiv spring.
+     */
 
-    const bendDamping = isHovered ? 16 : 13;
+    const bendStiffness = isHovered ? 82 : 70;
+
+    const bendDamping = isHovered ? 17 : 14;
 
     hoverBendVelocity.current.x +=
       (targetHoverX - hoverBend.current.x) * bendStiffness * delta;
@@ -258,6 +280,8 @@ export default function ProjectPreviewImagePlane({
      * =================================================
      * SCROLL BEND
      * =================================================
+     *
+     * UENDRET.
      */
 
     const currentScrollY = window.scrollY;

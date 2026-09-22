@@ -11,11 +11,14 @@ import WorldButton from "./WorldButton";
 export default function TypographyScene({
   scale,
   textures,
+  isMobile,
   onOpen,
 }: {
   scale: number;
 
   textures: Texture[];
+
+  isMobile: boolean;
 
   onOpen: () => void;
 }) {
@@ -31,6 +34,7 @@ export default function TypographyScene({
         width={2.75}
         height={3.45}
         rotationZ={0.025}
+        isMobile={isMobile}
       />
 
       {/* RIGHT / LOWER */}
@@ -41,6 +45,7 @@ export default function TypographyScene({
         width={2.6}
         height={3.25}
         rotationZ={-0.025}
+        isMobile={isMobile}
       />
 
       <WorldButton

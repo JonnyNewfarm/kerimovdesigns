@@ -69,7 +69,8 @@ export default function HeroBottomInfo({
       }}
       className="
         absolute
-        bottom-10
+        bottom-6
+        lg:bottom-10
         left-0
         right-0
         z-30
