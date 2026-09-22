@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useLoader } from "@react-three/fiber";
-
 import { TextureLoader } from "three";
 
 import ProjectPreview from "./ProjectPreview";
@@ -35,19 +34,7 @@ export default function ProjectsTable({
 
   /*
    * =====================================================
-   * PRELOAD ALL PROJECT PREVIEW TEXTURES
-   * =====================================================
-   *
-   * ProjectPreviewThreeImage bruker:
-   *
-   * useLoader(TextureLoader, src)
-   *
-   * Derfor bruker vi useLoader.preload her.
-   *
-   * De havner i samme R3F-cache.
-   * Når brukeren bytter prosjekt trenger
-   * Three-komponenten normalt ikke vente
-   * på nettverket på nytt.
+   * PRELOAD PROJECT TEXTURES
    * =====================================================
    */
 
@@ -60,6 +47,12 @@ export default function ProjectsTable({
       useLoader.preload(TextureLoader, project.src);
     });
   }, [projects]);
+
+  /*
+   * =====================================================
+   * DATA
+   * =====================================================
+   */
 
   const totalPages = Math.max(
     Math.ceil(projects.length / PROJECTS_PER_VIEW),
@@ -129,7 +122,7 @@ export default function ProjectsTable({
 
   /*
    * =====================================================
-   * CLEANUP RAF
+   * CLEANUP
    * =====================================================
    */
 
@@ -143,8 +136,12 @@ export default function ProjectsTable({
 
   /*
    * =====================================================
-   * RESET WHEN FILTER CHANGES
+   * FILTER CHANGED
    * =====================================================
+   *
+   * Bare projects-state resettes.
+   *
+   * Loader påvirkes IKKE.
    */
 
   useEffect(() => {
@@ -252,11 +249,7 @@ export default function ProjectsTable({
         text-color
       "
     >
-      <PageTransitionGate
-        className="
-          min-h-screen
-        "
-      >
+      <PageTransitionGate className="min-h-screen">
         <div
           className="
             mx-auto

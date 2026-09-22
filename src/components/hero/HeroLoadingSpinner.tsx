@@ -18,7 +18,26 @@ precision highp float;
 varying vec2 vUv;
 varying vec3 vNormalView;
 
+varying float vForwardDistance;
+varying float vSlurpEdge;
+
 uniform float uTime;
+uniform float uExit;
+
+const float PI = 3.141592653589793238;
+const float TAU = 6.283185307179586476;
+
+/*
+ * =========================================================
+ * HELPERS
+ * =========================================================
+ */
+
+float easeInOutCubic(float x) {
+  return x < 0.5
+    ? 4.0 * x * x * x
+    : 1.0 - pow(-2.0 * x + 2.0, 3.0) / 2.0;
+}
 
 void main() {
   vUv = uv;
@@ -26,27 +45,23 @@ void main() {
   vec3 p = position;
 
   /*
-   * vUv.x går rundt hele ringen.
-   * En pulse reiser rundt loopen.
+   * =====================================================
+   * NORMAL SPINNER PULSE
+   * =====================================================
    */
+
   float travel =
     fract(
       vUv.x -
       uTime * 0.33
     );
 
-  /*
-   * Wrapped distance til pulse-center.
-   */
   float dist =
     min(
       travel,
       1.0 - travel
     );
 
-  /*
-   * Brei myk pulse.
-   */
   float pulse =
     1.0 -
     smoothstep(
@@ -55,9 +70,6 @@ void main() {
       dist
     );
 
-  /*
-   * Mer konsentrert kjerne.
-   */
   float pulseCore =
     1.0 -
     smoothstep(
@@ -66,9 +78,6 @@ void main() {
       dist
     );
 
-  /*
-   * Retning utover fra sentrum av ringen.
-   */
   vec2 radialDir =
     normalize(
       max(
@@ -80,47 +89,408 @@ void main() {
       )
     );
 
-  radialDir.x *=
-    sign(p.x);
-
-  radialDir.y *=
-    sign(p.y);
+  radialDir.x *= sign(p.x);
+  radialDir.y *= sign(p.y);
 
   /*
-   * Svell litt utover akkurat der
-   * pulsen passerer.
+   * Normal pulse forsvinner når
+   * slurp-exiten starter.
    */
+  float loaderStrength =
+    1.0 -
+    smoothstep(
+      0.0,
+      0.3,
+      uExit
+    );
+
   p.xy +=
     radialDir *
     pulse *
-    0.13;
+    0.13 *
+    loaderStrength;
 
-  /*
-   * Løft pulsen frem i Z-rommet.
-   */
   p.z +=
     pulse *
-    0.18;
+    0.18 *
+    loaderStrength;
 
-  /*
-   * Litt ekstra volum i kjernen.
-   */
   p +=
     normal *
     pulseCore *
-    0.035;
+    0.035 *
+    loaderStrength;
 
-  /*
-   * Veldig subtil organisk bevegelse
-   * over hele ringen.
-   */
   p +=
     normal *
     sin(
-      vUv.x * 6.28318530718 +
+      vUv.x * TAU +
       uTime * 1.5
     ) *
-    0.008;
+    0.008 *
+    loaderStrength;
+
+  /*
+   * =====================================================
+   * ONE-WAY SLURP
+   * =====================================================
+   *
+   * VIKTIG:
+   *
+   * Dette er IKKE wrapped distance.
+   *
+   * Vi må vite hvilken vei rundt ringen
+   * et punkt ligger fra splitten.
+   *
+   * Dermed kan vi spise ringen i kun
+   * én retning.
+   */
+
+  float splitPoint = 0.72;
+
+  /*
+   * 0 = ved splitten.
+   * 1 = én hel runde senere.
+   *
+   * Dette følger stigende UV.x.
+   */
+  float forwardDistance =
+    fract(
+      vUv.x -
+      splitPoint +
+      1.0
+    );
+
+  vForwardDistance =
+    forwardDistance;
+
+  /*
+   * =====================================================
+   * EXIT PROGRESS
+   * =====================================================
+   */
+
+  float exitEase =
+    easeInOutCubic(
+      clamp(
+        uExit,
+        0.0,
+        1.0
+      )
+    );
+
+  /*
+   * Den ene slurp-kanten beveger seg
+   * hele veien rundt ringen.
+   */
+  float cutPosition =
+    mix(
+      0.0,
+      1.015,
+      exitEase
+    );
+
+  /*
+   * =====================================================
+   * SINGLE MOVING EDGE
+   * =====================================================
+   */
+
+  float edgeDistance =
+    forwardDistance -
+    cutPosition;
+
+  /*
+   * Et område rett foran den bevegende
+   * slurp-kanten.
+   */
+  float edgeWidth =
+    mix(
+      0.13,
+      0.07,
+      exitEase
+    );
+
+  float slurpEdge =
+    1.0 -
+    smoothstep(
+      0.0,
+      edgeWidth,
+      edgeDistance
+    );
+
+  /*
+   * Kun området FORAN kanten.
+   *
+   * Dermed påvirker vi ikke delen
+   * som allerede er borte.
+   */
+  slurpEdge *=
+    step(
+      0.0,
+      edgeDistance
+    );
+
+  slurpEdge *=
+    smoothstep(
+      0.015,
+      0.08,
+      uExit
+    );
+
+  float edgeCore =
+    pow(
+      slurpEdge,
+      1.65
+    );
+
+  vSlurpEdge =
+    slurpEdge;
+
+  /*
+   * =====================================================
+   * TANGENTIAL SLURP
+   * =====================================================
+   *
+   * Dette er selve "suges med rundt"
+   * følelsen.
+   *
+   * Den levende enden trekkes fremover
+   * i SAMME retning som cut-kanten beveger seg.
+   */
+
+  float angle =
+    atan(
+      p.y,
+      p.x
+    );
+
+  float radius =
+    length(
+      p.xy
+    );
+
+  /*
+   * Positiv rotasjon rundt ringen.
+   */
+  float tangentPull =
+    edgeCore *
+    mix(
+      0.12,
+      0.29,
+      exitEase
+    );
+
+  angle +=
+    tangentPull;
+
+  p.x =
+    cos(angle) *
+    radius;
+
+  p.y =
+    sin(angle) *
+    radius;
+
+  /*
+   * =====================================================
+   * STRETCH
+   * =====================================================
+   *
+   * Rett foran kanten strekkes loopen
+   * litt før den blir slurpet bort.
+   */
+
+  float stretch =
+    sin(
+      slurpEdge *
+      PI
+    );
+
+  p.xy *=
+    1.0 +
+    stretch *
+    0.055;
+
+  /*
+   * =====================================================
+   * PINCH THE END
+   * =====================================================
+   *
+   * Gjør den bevegende enden tynnere,
+   * nesten som elastisk materiale som
+   * blir trukket inn.
+   */
+
+  p +=
+    normal *
+    (
+      -0.073 *
+      edgeCore
+    );
+
+  /*
+   * =====================================================
+   * INWARD SUCTION
+   * =====================================================
+   *
+   * Enden dras svakt inn mot sentrum
+   * samtidig som den beveger seg rundt.
+   */
+
+  float inwardPull =
+    edgeCore *
+    mix(
+      0.12,
+      0.36,
+      exitEase
+    );
+
+  p.xy *=
+    1.0 -
+    inwardPull;
+
+  /*
+   * =====================================================
+   * DEPTH
+   * =====================================================
+   *
+   * Liten "snap" frem før enden
+   * blir sugd bakover.
+   */
+
+  p.z +=
+    stretch *
+    0.035;
+
+  p.z -=
+    edgeCore *
+    0.13;
+
+  /*
+   * =====================================================
+   * ELASTIC TRAIL
+   * =====================================================
+   *
+   * Litt deformation rett foran
+   * slurp-kanten.
+   */
+
+  float trail =
+    1.0 -
+    smoothstep(
+      0.0,
+      edgeWidth * 2.3,
+      max(
+        edgeDistance,
+        0.0
+      )
+    );
+
+  trail *=
+    smoothstep(
+      0.02,
+      0.12,
+      uExit
+    );
+
+  float wobble =
+    sin(
+      forwardDistance *
+      TAU * 2.0 -
+      uTime * 2.0
+    );
+
+  p +=
+    normal *
+    wobble *
+    trail *
+    0.012;
+
+  /*
+   * =====================================================
+   * FINAL TAIL
+   * =====================================================
+   *
+   * På slutten er det bare en liten
+   * bit av ringen igjen.
+   *
+   * Den skal også slurpes med samme
+   * bevegelse — ikke scale hele objektet.
+   */
+
+  float finalPhase =
+    smoothstep(
+      0.84,
+      1.0,
+      uExit
+    );
+
+  /*
+   * Kun den gjenværende enden påvirkes.
+   */
+  float remainingTail =
+    1.0 -
+    smoothstep(
+      cutPosition,
+      cutPosition + 0.17,
+      forwardDistance
+    );
+
+  remainingTail *=
+    step(
+      cutPosition,
+      forwardDistance
+    );
+
+  float finalPull =
+    finalPhase *
+    remainingTail;
+
+  /*
+   * Siste lille delen trekkes
+   * videre rundt.
+   */
+  float finalAngle =
+    finalPull *
+    0.38;
+
+  float finalRadius =
+    length(
+      p.xy
+    );
+
+  float currentAngle =
+    atan(
+      p.y,
+      p.x
+    );
+
+  currentAngle +=
+    finalAngle;
+
+  finalRadius *=
+    1.0 -
+    finalPull *
+    0.48;
+
+  p.x =
+    cos(currentAngle) *
+    finalRadius;
+
+  p.y =
+    sin(currentAngle) *
+    finalRadius;
+
+  p.z -=
+    finalPull *
+    0.12;
+
+  /*
+   * =====================================================
+   * OUTPUT
+   * =====================================================
+   */
 
   vec4 mvPosition =
     modelViewMatrix *
@@ -147,10 +517,83 @@ precision highp float;
 varying vec2 vUv;
 varying vec3 vNormalView;
 
+varying float vForwardDistance;
+varying float vSlurpEdge;
+
 uniform float uTime;
 uniform vec3 uColor;
+uniform float uExit;
+
+float easeInOutCubic(float x) {
+  return x < 0.5
+    ? 4.0 * x * x * x
+    : 1.0 - pow(-2.0 * x + 2.0, 3.0) / 2.0;
+}
 
 void main() {
+  /*
+   * =====================================================
+   * ONE-WAY CUT
+   * =====================================================
+   */
+
+  float exitEase =
+    easeInOutCubic(
+      clamp(
+        uExit,
+        0.0,
+        1.0
+      )
+    );
+
+  float cutPosition =
+    mix(
+      0.0,
+      1.015,
+      exitEase
+    );
+
+  /*
+   * Alt som slurp-kanten allerede
+   * har passert blir usynlig.
+   *
+   * Bare én side beveger seg.
+   */
+  float visible =
+    smoothstep(
+      cutPosition,
+      cutPosition + 0.012,
+      vForwardDistance
+    );
+
+  /*
+   * Før exit:
+   * full ring.
+   */
+  visible =
+    mix(
+      1.0,
+      visible,
+      smoothstep(
+        0.008,
+        0.045,
+        uExit
+      )
+    );
+
+  if (
+    visible <
+    0.004
+  ) {
+    discard;
+  }
+
+  /*
+   * =====================================================
+   * NORMAL PULSE
+   * =====================================================
+   */
+
   float travel =
     fract(
       vUv.x -
@@ -180,10 +623,15 @@ void main() {
     );
 
   /*
-   * Enkel view-space lighting.
+   * =====================================================
+   * LIGHTING
+   * =====================================================
    */
+
   vec3 normal =
-    normalize(vNormalView);
+    normalize(
+      vNormalView
+    );
 
   vec3 lightDir =
     normalize(
@@ -198,7 +646,9 @@ void main() {
     dot(
       normal,
       lightDir
-    ) * 0.5 + 0.5;
+    ) *
+    0.5 +
+    0.5;
 
   light =
     mix(
@@ -207,8 +657,11 @@ void main() {
       light
     );
 
-  vec3 baseColor =
-    uColor;
+  /*
+   * =====================================================
+   * COLOR
+   * =====================================================
+   */
 
   vec3 brightColor =
     vec3(
@@ -217,19 +670,59 @@ void main() {
       0.91
     );
 
-  vec3 color =
-    mix(
-      baseColor,
-      brightColor,
-      pulse * 0.35 +
-      pulseCore * 0.35
+  float pulseStrength =
+    1.0 -
+    smoothstep(
+      0.0,
+      0.28,
+      uExit
     );
 
-  color *= light;
+  vec3 color =
+    mix(
+      uColor,
+      brightColor,
+      (
+        pulse * 0.35 +
+        pulseCore * 0.35
+      ) *
+      pulseStrength
+    );
+
+  /*
+   * Liten highlight på akkurat
+   * den ene enden som blir slurpet.
+   */
+  color =
+    mix(
+      color,
+      brightColor,
+      vSlurpEdge *
+      0.24
+    );
+
+  color *=
+    light;
+
+  /*
+   * =====================================================
+   * ALPHA
+   * =====================================================
+   */
+
+  float finalFade =
+    1.0 -
+    smoothstep(
+      0.985,
+      1.0,
+      uExit
+    );
 
   gl_FragColor =
     vec4(
       color,
+      visible *
+      finalFade *
       0.96
     );
 
@@ -244,10 +737,12 @@ void main() {
  * =========================================================
  */
 
-function ElasticLoopSpinner() {
+function ElasticLoopSpinner({ exiting }: { exiting: boolean }) {
   const meshRef = useRef<THREE.Mesh | null>(null);
 
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+
+  const exitRef = useRef(0);
 
   const uniforms = useMemo(
     () => ({
@@ -257,6 +752,10 @@ function ElasticLoopSpinner() {
 
       uColor: {
         value: new THREE.Color("#ecdfcc"),
+      },
+
+      uExit: {
+        value: 0,
       },
     }),
     [],
@@ -275,16 +774,63 @@ function ElasticLoopSpinner() {
 
     const time = state.clock.elapsedTime;
 
+    /*
+     * =================================================
+     * TIME
+     * =================================================
+     */
+
     material.uniforms.uTime.value += delta;
 
     /*
-     * Rolig premium-rotasjon.
+     * =================================================
+     * EXIT
+     * =================================================
      */
-    mesh.rotation.z += delta * 0.95;
 
-    mesh.rotation.y += delta * 0.42;
+    if (exiting) {
+      exitRef.current = Math.min(1, exitRef.current + delta / 1.08);
+    } else {
+      exitRef.current = THREE.MathUtils.damp(exitRef.current, 0, 10, delta);
+    }
 
-    mesh.rotation.x = 0.78 + Math.sin(time * 0.55) * 0.08;
+    const exit = exitRef.current;
+
+    material.uniforms.uExit.value = exit;
+
+    /*
+     * =================================================
+     * ROTATION
+     * =================================================
+     *
+     * Viktig:
+     *
+     * Spinneren fortsetter å gå
+     * SAMME vei mens den slurpes.
+     *
+     * Den stopper ikke opp.
+     */
+
+    const rotationStrength = THREE.MathUtils.lerp(1, 0.72, exit);
+
+    mesh.rotation.z += delta * 0.95 * rotationStrength;
+
+    mesh.rotation.y += delta * 0.42 * rotationStrength;
+
+    /*
+     * Normal tilt.
+     */
+    mesh.rotation.x = 0.78 + Math.sin(time * 0.55) * 0.08 * (1 - exit * 0.7);
+
+    /*
+     * Veldig liten ekstra spin
+     * når slurpen er langt på vei.
+     *
+     * Holder momentumet i samme retning.
+     */
+    const finish = THREE.MathUtils.smoothstep(exit, 0.55, 1);
+
+    mesh.rotation.z += delta * finish * 0.35;
   });
 
   return (
@@ -298,19 +844,22 @@ function ElasticLoopSpinner() {
 
           /*
            * Thickness
-           * Litt chunky.
            */
           0.085,
 
           /*
            * Tube segments
            */
-          18,
+          20,
 
           /*
            * Circle segments
+           *
+           * Mange segmenter fordi den
+           * ene bevegende enden skal
+           * deformeres smooth.
            */
-          180,
+          280,
         ]}
       />
 
@@ -337,8 +886,10 @@ function ElasticLoopSpinner() {
 
 export default function HeroLoadingSpinner({
   loaderComplete,
+  onExitComplete,
 }: {
   loaderComplete: boolean;
+  onExitComplete?: () => void;
 }) {
   const [shouldRender, setShouldRender] = useState(!loaderComplete);
 
@@ -359,24 +910,37 @@ export default function HeroLoadingSpinner({
         scale: 0.88,
       }}
       animate={{
+        /*
+         * Ingen scale-down.
+         *
+         * Shaderen gjør hele exit.
+         */
         opacity: loaderComplete ? 0 : 1,
 
-        scale: loaderComplete ? 0.92 : 1,
+        scale: 1,
       }}
       transition={{
         opacity: {
-          duration: loaderComplete ? 0.65 : 0.35,
+          duration: loaderComplete ? 0.1 : 0.35,
+
+          /*
+           * Vent til slurpen er ferdig.
+           */
+          delay: loaderComplete ? 1.04 : 0,
+
           ease: [0.22, 1, 0.36, 1],
         },
 
         scale: {
-          duration: loaderComplete ? 0.75 : 0.5,
+          duration: 0.5,
+
           ease: [0.22, 1, 0.36, 1],
         },
       }}
       onAnimationComplete={() => {
         if (loaderComplete) {
           setShouldRender(false);
+          onExitComplete?.();
         }
       }}
       className="
@@ -402,21 +966,27 @@ export default function HeroLoadingSpinner({
         dpr={[1, 1.5]}
         camera={{
           position: [0, 0, 5.1],
+
           fov: 32,
+
           near: 0.1,
+
           far: 100,
         }}
         gl={{
           alpha: true,
+
           antialias: true,
+
           powerPreference: "high-performance",
+
           stencil: false,
         }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ElasticLoopSpinner />
+        <ElasticLoopSpinner exiting={loaderComplete} />
       </Canvas>
     </motion.div>
   );

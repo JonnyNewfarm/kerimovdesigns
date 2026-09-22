@@ -232,12 +232,12 @@ const ProjectCard = ({
             ease: revealEase,
           }}
           className="
-      w-full
-      overflow-hidden
-      border
-      border-white/15
-      bg-white/5
-    "
+            w-full
+            overflow-hidden
+            border
+            border-white/15
+            bg-white/5
+          "
         >
           <Image
             src={project.src}
