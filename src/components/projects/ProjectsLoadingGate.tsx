@@ -13,17 +13,25 @@ import HeroLoadingSpinner from "../hero/HeroLoadingSpinner";
  */
 
 /*
- * Kun minimumstid.
+ * Minimum tiden spinneren er synlig.
  *
- * Assets må fortsatt faktisk være ferdige før
- * revealen kan starte.
+ * Dette faker ikke loading.
+ * Assets må fortsatt faktisk være klare.
  */
 const MIN_LOADER_VISIBLE_TIME = 800;
 
 /*
- * Samme type timing som hero-backdropen.
+ * Samme type dark backdrop fade
+ * som heroen.
  */
 const BACKDROP_FADE_DURATION = 0.7;
+
+/*
+ * Navbar height.
+ *
+ * Loaderen starter UNDER denne.
+ */
+const NAVBAR_HEIGHT = 72;
 
 /*
  * =========================================================
@@ -34,8 +42,14 @@ const BACKDROP_FADE_DURATION = 0.7;
 type ProjectsLoadingGateProps = {
   children: ReactNode;
 
+  /*
+   * Første desktop preview.
+   */
   desktopSrc?: string | null;
 
+  /*
+   * Prosjektbildene på aktuell mobile side.
+   */
   mobileSrcs?: string[];
 };
 
@@ -51,51 +65,54 @@ export default function ProjectsLoadingGate({
   mobileSrcs = [],
 }: ProjectsLoadingGateProps) {
   /*
-   * null = viewport ikke funnet enda
+   * null = viewport ikke bestemt enda
    * true = desktop
    * false = mobile/tablet
    */
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
   /*
-   * De faktiske initial-assetsene er ferdige.
+   * Første nødvendige assets er ferdige.
    */
   const [assetsReady, setAssetsReady] = useState(false);
 
   /*
-   * Når denne blir true:
+   * Når revealStarter:
    *
    * - Projects mountes
-   * - alle Framer Motion-animasjoner starter
+   * - Framer Motion starter
    * - spinneren starter slurp
-   * - dark backdrop begynner å fade ut
-   *
-   * ALT samtidig.
+   * - mørk backdrop fader ut
    */
   const [revealStarted, setRevealStarted] = useState(false);
 
   /*
-   * Sendes til selve spinneren.
+   * Sendes inn i spinneren.
+   *
+   * true starter slurp-exiten.
    */
   const [loaderComplete, setLoaderComplete] = useState(false);
 
   /*
    * Når spinneren er helt ferdig
-   * kan loader-lagene fjernes fra DOM.
+   * kan hele loader-laget fjernes.
    */
   const [loaderExited, setLoaderExited] = useState(false);
 
-  const loaderStartedAtRef = useRef(0);
-
   /*
-   * Når første intro er ferdig skal filter,
-   * pagination osv. ALDRI starte spinneren igjen.
+   * Når første projects-loader er ferdig
+   * skal filtering aldri starte den igjen.
    */
   const initialLoadFinishedRef = useRef(false);
 
   /*
+   * Tidspunkt loaderen startet.
+   */
+  const loaderStartedAtRef = useRef(0);
+
+  /*
    * =====================================================
-   * START TIME
+   * INITIAL TIME
    * =====================================================
    */
 
@@ -105,7 +122,7 @@ export default function ProjectsLoadingGate({
 
   /*
    * =====================================================
-   * VIEWPORT
+   * DESKTOP / MOBILE
    * =====================================================
    */
 
@@ -127,7 +144,7 @@ export default function ProjectsLoadingGate({
 
   /*
    * =====================================================
-   * INITIAL ASSET PRELOAD
+   * PRELOAD INITIAL ASSETS
    * =====================================================
    */
 
@@ -145,6 +162,9 @@ export default function ProjectsLoadingGate({
      */
 
     if (isDesktop) {
+      /*
+       * Ingen prosjekt å vise.
+       */
       if (!desktopSrc) {
         setAssetsReady(true);
 
@@ -152,17 +172,25 @@ export default function ProjectsLoadingGate({
       }
 
       /*
-       * Varm R3F-cachen.
+       * Warm R3F cache.
+       *
+       * ProjectPreview bruker TextureLoader,
+       * så samme asset vil normalt være cached
+       * når Projects mountes.
        */
       useLoader.preload(TextureLoader, desktopSrc);
 
+      /*
+       * Vi trenger også et faktisk
+       * completion callback.
+       */
       const loader = new TextureLoader();
 
       loader.load(
         desktopSrc,
 
         /*
-         * LOADED
+         * LOAD COMPLETE
          */
         () => {
           if (cancelled) {
@@ -170,7 +198,8 @@ export default function ProjectsLoadingGate({
           }
 
           /*
-           * Én frame før vi melder ready.
+           * Gi browseren én frame før
+           * vi starter reveal.
            */
           window.requestAnimationFrame(() => {
             if (cancelled) {
@@ -186,8 +215,8 @@ export default function ProjectsLoadingGate({
         /*
          * ERROR
          *
-         * Broken asset skal aldri kunne
-         * låse siden permanent.
+         * Broken asset skal aldri
+         * låse /projects permanent.
          */
         () => {
           if (cancelled) {
@@ -209,6 +238,9 @@ export default function ProjectsLoadingGate({
      * ===================================================
      */
 
+    /*
+     * Ingen bilder.
+     */
     if (mobileSrcs.length === 0) {
       setAssetsReady(true);
 
@@ -224,10 +256,16 @@ export default function ProjectsLoadingGate({
 
       completed += 1;
 
+      /*
+       * Fortsatt bilder igjen.
+       */
       if (completed < mobileSrcs.length) {
         return;
       }
 
+      /*
+       * Alle ferdige.
+       */
       window.requestAnimationFrame(() => {
         if (cancelled) {
           return;
@@ -237,6 +275,10 @@ export default function ProjectsLoadingGate({
       });
     };
 
+    /*
+     * Preload alle bilder på
+     * den aktuelle mobile siden.
+     */
     const images = mobileSrcs.map((src) => {
       const image = new window.Image();
 
@@ -262,24 +304,17 @@ export default function ProjectsLoadingGate({
 
   /*
    * =====================================================
-   * START REVEAL
+   * ASSETS READY -> START HERO-STYLE REVEAL
    * =====================================================
    *
-   * DETTE er forskjellen.
+   * Når assets er klare:
    *
-   * Vi venter IKKE til spinneren er helt borte
-   * før Projects mountes.
+   * 1. Projects mountes.
+   * 2. Alle Framer Motion-animasjonene starter.
+   * 3. Spinneren starter slurp.
+   * 4. Dark backdrop fader bort.
    *
-   * Når assets er klare starter:
-   *
-   * 1. Projects mount
-   * 2. Framer Motion
-   * 3. spinner slurp
-   * 4. backdrop fade
-   *
-   * samtidig.
-   *
-   * Det er den hero-lignende overgangen.
+   * Det skjer samtidig.
    */
 
   useEffect(() => {
@@ -298,7 +333,7 @@ export default function ProjectsLoadingGate({
       setRevealStarted(true);
 
       /*
-       * Start spinner slurp samtidig.
+       * Start slurp.
        */
       setLoaderComplete(true);
     }, remaining);
@@ -310,13 +345,22 @@ export default function ProjectsLoadingGate({
 
   /*
    * =====================================================
-   * SPINNER FULLY EXITED
+   * SPINNER EXIT COMPLETE
    * =====================================================
    */
 
   const handleExitComplete = () => {
+    /*
+     * Initial projects intro er ferdig.
+     *
+     * Filter/tag changes skal aldri vise
+     * spinneren igjen.
+     */
     initialLoadFinishedRef.current = true;
 
+    /*
+     * Fjern loader-layeret helt.
+     */
     setLoaderExited(true);
   };
 
@@ -336,38 +380,36 @@ export default function ProjectsLoadingGate({
     >
       {/*
        * =================================================
-       * PROJECTS
+       * PROJECTS CONTENT
        * =================================================
        *
-       * Ikke mounted under faktisk loading.
+       * Mountes akkurat når reveal starter.
        *
-       * Mountes akkurat idet loader-exiten starter.
+       * Dermed starter:
        *
-       * Dermed starter alle:
-       *
-       * - TextReveal
-       * - ProjectPreview
-       * - sidebar motion
        * - PageTransitionGate
+       * - TextReveal
+       * - Framer Motion
+       * - ProjectPreview
+       * - ProjectsSidebar
        *
-       * mens den mørke loader-backdropen
-       * fader bort over dem.
+       * mens dark backdrop fortsatt ligger
+       * over innholdet og fader ut.
        */}
 
       {revealStarted ? children : null}
 
       {/*
        * =================================================
-       * DARK HERO-STYLE BACKDROP
+       * LOADER SECTION
        * =================================================
        *
-       * Ingen lys overlay.
+       * VIKTIG:
        *
-       * Bare samme prinsipp som hero:
+       * Loaderen starter fysisk UNDER navbaren.
        *
-       * mørk flate -> transparent
-       *
-       * mens innholdet allerede animerer under.
+       * Navbar blir derfor aldri dekket av
+       * projects-loaderen.
        */}
 
       {!loaderExited ? (
@@ -375,14 +417,33 @@ export default function ProjectsLoadingGate({
           className="
             pointer-events-none
             fixed
-            inset-0
+            bottom-0
+            left-0
+            right-0
             z-[1198]
+            overflow-hidden
           "
+          style={{
+            top: `${NAVBAR_HEIGHT}px`,
+          }}
         >
+          {/*
+           * =============================================
+           * DARK BACKDROP
+           * =============================================
+           *
+           * Samme prinsipp som hero:
+           *
+           * mørk seksjon ligger over content,
+           * så fader den bort og avslører
+           * Projects-animasjonene under.
+           */}
+
           <div
             className={`
               absolute
               inset-0
+
               bg-[#181c14]
 
               transition-opacity
@@ -392,6 +453,7 @@ export default function ProjectsLoadingGate({
             `}
             style={{
               transitionDuration: `${BACKDROP_FADE_DURATION}s`,
+
               transitionDelay: revealStarted ? "0.08s" : "0s",
             }}
           />
@@ -401,8 +463,16 @@ export default function ProjectsLoadingGate({
            * SPINNER
            * =============================================
            *
-           * Eget lag så backdrop-opacity IKKE påvirker
-           * spinnerens egen slurp-animasjon.
+           * Eget layer.
+           *
+           * Backdrop fade påvirker derfor ikke
+           * spinnerens egen opacity/slurp.
+           *
+           * HeroLoadingSpinner bruker absolute
+           * bottom/right, og siden parent nå bare
+           * dekker området UNDER navbaren blir
+           * spinneren fortsatt riktig plassert
+           * nederst til høyre.
            */}
 
           <div
