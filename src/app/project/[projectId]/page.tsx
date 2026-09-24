@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getProjectById } from "@/app/actions";
+
 import ProjectModalWrapper from "@/components/project/ProjectModalWrapper";
+import ProjectDetailsLoadingGate from "@/components/project/ProjectDetailsLoadingGate";
 import { ProjectNavTitleSetter } from "@/components/ProjectNavContext";
 import SmoothScroll from "@/components/SmoothScroll";
 
@@ -14,6 +16,12 @@ type Props = {
   params: ParamsType;
 };
 
+/*
+ * =========================================================
+ * METADATA
+ * =========================================================
+ */
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { projectId } = await params;
 
@@ -22,7 +30,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!project) {
     return {
       title: "Project Not Found | Rustam Kerimov",
+
       description: "The project you are looking for does not exist.",
+
       icons: {
         icon: "/favicon.ico",
       },
@@ -33,6 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${project.title} | Rustam Kerimov`,
+
     description,
 
     icons: {
@@ -41,12 +52,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     openGraph: {
       title: `${project.title} | Rustam Kerimov`,
+
       description,
 
       images: project.src
         ? [
             {
               url: project.src,
+
               alt: project.title,
             },
           ]
@@ -54,6 +67,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
 }
+
+/*
+ * =========================================================
+ * PAGE
+ * =========================================================
+ */
 
 export default async function Page({ params }: Props) {
   const { projectId } = await params;
@@ -64,13 +83,45 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  return (
-    <SmoothScroll>
-      <ProjectNavTitleSetter title={project.title} />
+  /*
+   * =====================================================
+   * INITIAL PROJECT ASSETS
+   * =====================================================
+   *
+   * Kun de første to.
+   *
+   * Det er nok til at starten på siden
+   * føles ferdig når reveal skjer.
+   *
+   * Resten blir preloadet videre av
+   * ProjectModalWrapper slik du allerede gjør.
+   */
 
-      <main className="min-h-screen bg-dark text-color">
-        <ProjectModalWrapper project={project} />
-      </main>
-    </SmoothScroll>
+  const initialImages = [project.src, project.src2].filter(
+    (src): src is string => Boolean(src),
+  );
+
+  /*
+   * =====================================================
+   * RENDER
+   * =====================================================
+   */
+
+  return (
+    <ProjectDetailsLoadingGate initialImages={initialImages}>
+      <SmoothScroll>
+        <ProjectNavTitleSetter title={project.title} />
+
+        <main
+          className="
+            min-h-screen
+            bg-dark
+            text-color
+          "
+        >
+          <ProjectModalWrapper project={project} />
+        </main>
+      </SmoothScroll>
+    </ProjectDetailsLoadingGate>
   );
 }

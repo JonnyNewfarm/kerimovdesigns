@@ -352,32 +352,54 @@ const Navbar = () => {
                   <AnimatePresence initial={false}>
                     {isProjectDetailPage && projectTitle && (
                       <motion.div
-                        className={`absolute left-1/2 top-full mt-[3px] whitespace-nowrap ${
-                          showProjectTitle
-                            ? "pointer-events-auto"
-                            : "pointer-events-none"
-                        }`}
-                        initial={false}
+                        className={`
+        absolute
+        left-1/2
+        top-full
+        mt-[3px]
+        whitespace-nowrap
+
+        ${showProjectTitle ? "pointer-events-auto" : "pointer-events-none"}
+      `}
+                        initial="hidden"
                         animate={showProjectTitle ? "visible" : "hidden"}
                         variants={{
                           visible: {
                             opacity: 1,
+                            y: 0,
+                            filter: "blur(0px)",
+
                             transition: {
-                              staggerChildren: 0.08,
-                              delayChildren: 0.05,
+                              duration: 0.55,
+                              ease: PROJECT_EASE,
+
+                              staggerChildren: 0.06,
+                              delayChildren: 0.06,
                             },
                           },
 
                           hidden: {
-                            opacity: 1,
+                            opacity: 0,
+                            y: -7,
+                            filter: "blur(4px)",
+
                             transition: {
-                              staggerChildren: 0.04,
+                              duration: 0.38,
+                              ease: PROJECT_EASE,
+
+                              staggerChildren: 0.035,
                               staggerDirection: -1,
                             },
                           },
                         }}
                       >
                         <div className="flex -translate-x-full items-end">
+                          {/*
+                           * =================================================
+                           * PROJECT TITLE
+                           * =================================================
+                           */}
+
                           <motion.button
                             type="button"
                             onClick={handleCloseProject}
@@ -387,30 +409,42 @@ const Navbar = () => {
                             variants={{
                               visible: {
                                 opacity: 1,
+                                x: 0,
                                 y: 0,
-                                filter: "blur(0px)",
 
                                 transition: {
-                                  duration: 0.42,
-                                  delay: 0.15,
+                                  duration: 0.5,
                                   ease: PROJECT_EASE,
                                 },
                               },
 
                               hidden: {
                                 opacity: 0,
-                                y: -8,
-                                filter: "blur(4px)",
+                                x: 6,
+                                y: -3,
 
                                 transition: {
-                                  duration: 0.3,
-                                  delay: 0.25,
+                                  duration: 0.32,
                                   ease: PROJECT_EASE,
                                 },
                               },
                             }}
-                            className="relative mr-2 flex cursor-pointer items-end border-0 bg-transparent p-0 text-current"
+                            className="
+            relative
+            mr-2
+            flex
+            cursor-pointer
+            items-end
+            border-0
+            bg-transparent
+            p-0
+            text-current
+          "
                           >
+                            {/*
+                             * HOVER CROSS
+                             */}
+
                             <motion.span
                               aria-hidden="true"
                               initial={false}
@@ -427,20 +461,26 @@ const Navbar = () => {
                                 transformOrigin: "50% 50%",
                               }}
                               className="
-                                absolute
-                                -left-5
-                                -top-[2px]
-                                flex
-                                h-5
-                                w-5
-                                -translate-y-1/2
-                                items-center
-                                justify-center
-                              "
+              absolute
+              -left-5
+              -top-[2px]
+
+              flex
+              h-5
+              w-5
+              -translate-y-1/2
+              items-center
+              justify-center
+            "
                             >
                               <span className="absolute h-[1.5px] w-[10px] rotate-45 bg-current" />
+
                               <span className="absolute h-[1.5px] w-[10px] -rotate-45 bg-current" />
                             </motion.span>
+
+                            {/*
+                             * TITLE
+                             */}
 
                             <motion.span
                               initial={false}
@@ -451,11 +491,27 @@ const Navbar = () => {
                                 duration: 0.4,
                                 ease: PROJECT_EASE,
                               }}
-                              className="mb-[-2px] block max-w-[240px] truncate text-[10px] font-black uppercase leading-none tracking-[0.18em]"
+                              className="
+              mb-[-2px]
+              block
+              max-w-[240px]
+              truncate
+              text-[10px]
+              font-black
+              uppercase
+              leading-none
+              tracking-[0.18em]
+            "
                             >
                               {projectTitle}
                             </motion.span>
                           </motion.button>
+
+                          {/*
+                           * =================================================
+                           * CONNECTOR LINE
+                           * =================================================
+                           */}
 
                           <motion.svg
                             aria-hidden="true"
@@ -463,9 +519,32 @@ const Navbar = () => {
                             height="28"
                             viewBox="0 0 42 28"
                             fill="none"
-                            className="block shrink-0 overflow-visible"
-                            initial={false}
-                            animate={showProjectTitle ? "visible" : "hidden"}
+                            className="
+            block
+            shrink-0
+            overflow-visible
+          "
+                            variants={{
+                              visible: {
+                                opacity: 1,
+                                x: 0,
+
+                                transition: {
+                                  duration: 0.45,
+                                  ease: PROJECT_EASE,
+                                },
+                              },
+
+                              hidden: {
+                                opacity: 0,
+                                x: 5,
+
+                                transition: {
+                                  duration: 0.28,
+                                  ease: PROJECT_EASE,
+                                },
+                              },
+                            }}
                           >
                             <motion.path
                               d="M41 1V27H1"
@@ -481,17 +560,17 @@ const Navbar = () => {
 
                                   transition: {
                                     pathLength: {
-                                      duration: 0.7,
+                                      duration: 0.65,
                                       ease: PROJECT_EASE,
                                     },
 
                                     pathOffset: {
-                                      duration: 0.7,
+                                      duration: 0.65,
                                       ease: PROJECT_EASE,
                                     },
 
                                     opacity: {
-                                      duration: 0.12,
+                                      duration: 0.2,
                                     },
                                   },
                                 },
@@ -503,18 +582,17 @@ const Navbar = () => {
 
                                   transition: {
                                     pathLength: {
-                                      duration: 0.55,
+                                      duration: 0.38,
                                       ease: PROJECT_EASE,
                                     },
 
                                     pathOffset: {
-                                      duration: 0.55,
+                                      duration: 0.38,
                                       ease: PROJECT_EASE,
                                     },
 
                                     opacity: {
-                                      duration: 0.1,
-                                      delay: 0.45,
+                                      duration: 0.22,
                                     },
                                   },
                                 },
