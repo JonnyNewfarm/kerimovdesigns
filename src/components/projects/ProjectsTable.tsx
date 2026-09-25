@@ -5,9 +5,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
 
+import PageTransitionGate from "./PageTransitionGate";
 import ProjectPreview from "./ProjectPreview";
 import ProjectsSidebar from "./ProjectsSidebar";
-import PageTransitionGate from "./PageTransitionGate";
 
 import type { ProjectListItem, ProjectsTableProps } from "./projectsTypes";
 
@@ -21,13 +21,10 @@ export default function ProjectsTable({
   activeTags = [],
 }: ProjectsTableProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-
   const [pageIndex, setPageIndex] = useState(0);
-
   const [direction, setDirection] = useState<1 | -1>(1);
 
   const queuedProjectIndex = useRef<number | null>(null);
-
   const animationFrame = useRef<number | null>(null);
 
   const activeTagsKey = activeTags.join("|");
@@ -87,11 +84,7 @@ export default function ProjectsTable({
         return;
       }
 
-      const safeIndex = Math.min(
-        Math.max(index, 0),
-
-        projects.length - 1,
-      );
+      const safeIndex = Math.min(Math.max(index, 0), projects.length - 1);
 
       queuedProjectIndex.current = safeIndex;
 
@@ -113,7 +106,6 @@ export default function ProjectsTable({
         }
 
         queuedProjectIndex.current = null;
-
         animationFrame.current = null;
       });
     },
@@ -138,17 +130,11 @@ export default function ProjectsTable({
    * =====================================================
    * FILTER CHANGED
    * =====================================================
-   *
-   * Bare projects-state resettes.
-   *
-   * Loader påvirkes IKKE.
    */
 
   useEffect(() => {
     setPageIndex(0);
-
     setActiveIndex(0);
-
     setDirection(1);
   }, [activeTagsKey]);
 
@@ -161,7 +147,6 @@ export default function ProjectsTable({
   useEffect(() => {
     if (!projects.length) {
       setActiveIndex(0);
-
       setPageIndex(0);
 
       return;
@@ -192,7 +177,6 @@ export default function ProjectsTable({
     const nextActiveIndex = safePageIndex * PROJECTS_PER_VIEW;
 
     setPageIndex(safePageIndex);
-
     setActiveIndex(nextActiveIndex);
   }, [pageIndex, totalPages]);
 
@@ -212,9 +196,7 @@ export default function ProjectsTable({
     const nextActiveIndex = nextPageIndex * PROJECTS_PER_VIEW;
 
     setDirection(-1);
-
     setPageIndex(nextPageIndex);
-
     setActiveIndex(nextActiveIndex);
   };
 
@@ -228,9 +210,7 @@ export default function ProjectsTable({
     const nextActiveIndex = nextPageIndex * PROJECTS_PER_VIEW;
 
     setDirection(1);
-
     setPageIndex(nextPageIndex);
-
     setActiveIndex(nextActiveIndex);
   };
 
@@ -258,20 +238,27 @@ export default function ProjectsTable({
             w-full
             max-w-[1800px]
             grid-cols-1
-            gap-10
+            gap-y-12
             px-7
             pb-12
             pt-28
 
             sm:px-8
 
-            md:grid-cols-12
             md:pt-32
 
+            lg:grid-cols-[minmax(360px,4fr)_minmax(0,8fr)]
+            lg:gap-x-10
+            lg:gap-y-0
             lg:px-8
+
+            xl:grid-cols-[minmax(390px,4fr)_minmax(0,8fr)]
+            xl:gap-x-12
             xl:px-12
 
-            2xl:px-18
+            2xl:grid-cols-[minmax(410px,4fr)_minmax(0,8fr)]
+            2xl:gap-x-14
+            2xl:px-16
           "
         >
           <ProjectsSidebar

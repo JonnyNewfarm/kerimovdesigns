@@ -171,8 +171,13 @@ export default function BurgerMenu() {
             }}
             className="flex flex-col"
           >
-            <span className="h-[1.2em] leading-[1.2em]">Menu</span>
-            <span className="h-[1.2em] leading-[1.2em]">Close</span>
+            <span className="h-[1.2em] font-semibold leading-[1.2em]">
+              Menu
+            </span>
+
+            <span className="h-[1.2em] font-semibold leading-[1.2em]">
+              Close
+            </span>
           </motion.span>
         </span>
       </motion.button>

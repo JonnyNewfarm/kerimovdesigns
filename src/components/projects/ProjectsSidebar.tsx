@@ -7,6 +7,7 @@ import TextReveal from "@/components/TextReveal";
 import ProjectsList from "./ProjectsList";
 import ProjectsPagination from "./ProjectsPagination";
 import ProjectsTagFilter from "./ProjectsTagFilter";
+
 import type { ProjectListItem } from "./projectsTypes";
 
 type ProjectsSidebarProps = {
@@ -51,13 +52,15 @@ export default function ProjectsSidebar({
       className="
         flex
         min-h-0
+        min-w-0
         flex-col
-        md:col-span-5
-        md:h-[calc(100vh-9rem)]
-        md:pr-1
-        lg:pr-2
-        xl:pr-4
-        xl:col-span-4
+
+        lg:h-[calc(100dvh-9rem)]
+        lg:pr-1
+
+        xl:pr-2
+
+        2xl:pr-4
       "
     >
       <div
@@ -78,6 +81,7 @@ export default function ProjectsSidebar({
           activeTags={activeTags}
         />
       </div>
+
       <TextReveal
         as="p"
         mode="words"
@@ -86,15 +90,16 @@ export default function ProjectsSidebar({
         duration={0.65}
         y="80%"
         className="
-    mb-2
-    mt-5
-    text-[10px]
-    font-black
-    uppercase
-    tracking-[0.35em]
-    text-white/80
-    sm:text-xs
-  "
+          mb-2
+          mt-5
+          text-[10px]
+          font-black
+          uppercase
+          tracking-[0.35em]
+          text-white/80
+
+          sm:text-xs
+        "
       >
         Selected Work
       </TextReveal>

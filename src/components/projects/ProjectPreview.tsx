@@ -15,9 +15,7 @@ import { formatProjectTag, projectsEase } from "./projectUtils";
 
 type ProjectPreviewProps = {
   project: ProjectListItem | null;
-
   hasProjects: boolean;
-
   activeTagsKey: string;
 };
 
@@ -36,10 +34,8 @@ export default function ProjectPreview({
         relative
         flex
         min-h-0
+        min-w-0
         flex-col
-
-        md:col-span-7
-        xl:col-span-8
       "
     >
       <AnimatePresence mode="wait">
@@ -63,14 +59,13 @@ export default function ProjectPreview({
             }}
             transition={{
               duration: 0.48,
-
               ease: projectsEase,
             }}
             className="
               ml-auto
               flex
               w-full
-              max-w-[1080px]
+              max-w-[1040px]
               flex-col
             "
           >
@@ -89,7 +84,6 @@ export default function ProjectPreview({
                 relative
                 isolate
                 z-10
-
                 block
 
                 h-[clamp(360px,56vh,640px)]
@@ -97,7 +91,6 @@ export default function ProjectPreview({
                 shrink-0
 
                 cursor-pointer
-
                 overflow-visible
               "
               aria-label={`Open project ${project.title}`}
@@ -106,21 +99,16 @@ export default function ProjectPreview({
                 key={`preview-image-${project.id}`}
                 initial={{
                   opacity: 0,
-
                   scale: 0.94,
-
                   filter: "blur(10px)",
                 }}
                 animate={{
                   opacity: 1,
-
                   scale: 1,
-
                   filter: "blur(0px)",
                 }}
                 transition={{
                   duration: 1.25,
-
                   ease: imageRevealEase,
                 }}
                 className="
@@ -161,9 +149,9 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
   return (
     <div
       className="
-        mt-7
+        mt-5
         min-h-0
-        pt-7
+        pt-5
       "
     >
       <AnimatePresence initial={false} mode="sync">
@@ -171,32 +159,23 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
           key={project.id}
           initial={{
             opacity: 0,
-
             y: 14,
-
             filter: "blur(6px)",
           }}
           animate={{
             opacity: 1,
-
             y: 0,
-
             filter: "blur(0px)",
           }}
           exit={{
             opacity: 0,
-
             y: -10,
-
             filter: "blur(6px)",
-
             position: "absolute",
-
             width: "100%",
           }}
           transition={{
             duration: 0.22,
-
             ease: projectsEase,
           }}
           className="
@@ -210,7 +189,6 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
             viewport={false}
             className="
               mb-3
-
               text-[10px]
               uppercase
               tracking-[0.3em]
@@ -227,6 +205,7 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
             transitionLabel={project.title}
             className="
               inline-block
+              max-w-full
             "
           >
             <TextReveal
@@ -237,8 +216,7 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
               viewport={false}
               className="
                 max-w-[980px]
-
-                text-[clamp(2.8rem,4.6vw,5.8rem)]
+                text-[clamp(2.6rem,4vw,5rem)]
                 font-black
                 uppercase
                 leading-[0.88]
@@ -257,10 +235,8 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
           <div
             className="
               mt-6
-
               grid
               grid-cols-1
-
               gap-6
               pt-6
 
@@ -285,11 +261,11 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
                       delay={0.06 + index * 0.025}
                       duration={0.6}
                       className="
-                          text-sm
-                          uppercase
-                          tracking-[0.12em]
-                          text-white/75
-                        "
+                        text-sm
+                        uppercase
+                        tracking-[0.12em]
+                        text-white/75
+                      "
                     >
                       {formatProjectTag(tag)}
                     </TextReveal>
@@ -350,7 +326,6 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
 
 type ProjectMetadataItemProps = {
   label: string;
-
   children: React.ReactNode;
 };
 
@@ -364,7 +339,6 @@ function ProjectMetadataItem({ label, children }: ProjectMetadataItemProps) {
         duration={0.6}
         className="
           mb-2
-
           text-[10px]
           font-black
           uppercase
@@ -398,38 +372,29 @@ function EmptyProjectPreview({ activeTagsKey }: EmptyProjectPreviewProps) {
       key={`empty-preview-${activeTagsKey || "all"}`}
       initial={{
         opacity: 0,
-
         scale: 0.985,
-
         filter: "blur(10px)",
       }}
       animate={{
         opacity: 1,
-
         scale: 1,
-
         filter: "blur(0px)",
       }}
       exit={{
         opacity: 0,
-
         scale: 0.99,
-
         filter: "blur(8px)",
       }}
       transition={{
         duration: 0.5,
-
         ease: projectsEase,
       }}
       className="
         ml-auto
-
         flex
         min-h-[clamp(360px,56vh,640px)]
         w-full
-        max-w-[1080px]
-
+        max-w-[1040px]
         items-center
         justify-center
 
@@ -440,28 +405,22 @@ function EmptyProjectPreview({ activeTagsKey }: EmptyProjectPreviewProps) {
       <motion.div
         initial={{
           opacity: 0,
-
           y: 15,
         }}
         animate={{
           opacity: 1,
-
           y: 0,
         }}
         transition={{
           delay: 0.12,
-
           duration: 0.4,
-
           ease: projectsEase,
         }}
         className="
           flex
           flex-col
           items-center
-
           px-8
-
           text-center
         "
       >
@@ -469,10 +428,8 @@ function EmptyProjectPreview({ activeTagsKey }: EmptyProjectPreviewProps) {
           className="
             mb-5
             block
-
             h-px
             w-12
-
             bg-white/25
           "
         />
