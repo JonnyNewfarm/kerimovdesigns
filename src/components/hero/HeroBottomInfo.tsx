@@ -70,11 +70,11 @@ export default function HeroBottomInfo({
       className="
         absolute
         bottom-6
-        lg:bottom-10
         left-0
         right-0
         z-30
         px-10
+        lg:bottom-10
         lg:px-20
       "
     >
@@ -86,6 +86,7 @@ export default function HeroBottomInfo({
           justify-between
         "
       >
+        {/* PORTFOLIO */}
         <motion.div
           initial={false}
           animate={{
@@ -237,15 +238,26 @@ export default function HeroBottomInfo({
                     },
                   }}
                   className="
+                    relative
                     flex
                     flex-1
                     items-end
-                    justify-between
-                    pl-20
+
+                    lg:pl-0
+
+                    xl:justify-between
+                    xl:pl-22
+
+                    2xl:pl-20
                   "
                 >
                   {/* LATEST PROJECT */}
                   <motion.div
+                    className="
+    lg:absolute
+    lg:left-[18%]
+    xl:static
+  "
                     variants={{
                       ...infoVariants,
 
@@ -418,6 +430,10 @@ export default function HeroBottomInfo({
 
                   {/* LOCAL TIME */}
                   <motion.div
+                    className="
+                      ml-auto
+                      xl:ml-0
+                    "
                     variants={{
                       ...infoVariants,
 

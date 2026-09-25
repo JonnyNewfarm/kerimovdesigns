@@ -115,9 +115,7 @@ const validateForm = (values: ContactFormValues): ContactFormErrors => {
 
 export default function ContactForm() {
   const [values, setValues] = useState<ContactFormValues>(initialValues);
-
   const [errors, setErrors] = useState<ContactFormErrors>({});
-
   const [touched, setTouched] = useState<ContactFormTouched>({});
 
   const handleChange = (name: keyof ContactFormValues, value: string) => {
@@ -216,6 +214,9 @@ export default function ContactForm() {
       onSubmit={handleSubmit}
       className="
         grid
+        w-full
+        min-w-0
+        grid-cols-1
         gap-x-10
         gap-y-12
         md:grid-cols-2
@@ -294,7 +295,7 @@ export default function ContactForm() {
         }}
       />
 
-      <div className="md:col-span-2">
+      <div className="min-w-0 md:col-span-2">
         <TextReveal
           as="label"
           htmlFor="message"
@@ -340,7 +341,10 @@ export default function ContactForm() {
             handleBlur("message");
           }}
           className={`
+            block
             w-full
+            min-w-0
+            max-w-full
             resize-none
             border-b
             bg-transparent
@@ -406,6 +410,7 @@ export default function ContactForm() {
         }}
         className="
           flex
+          min-w-0
           justify-end
           md:col-span-2
         "
@@ -417,6 +422,7 @@ export default function ContactForm() {
             delay={0.88}
             duration={0.7}
             y="100%"
+            className="font-semibold"
           >
             Submit inquiry
           </TextReveal>

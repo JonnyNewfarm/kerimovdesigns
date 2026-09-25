@@ -1,15 +1,10 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-
 import { motion, useMotionValue, useSpring } from "framer-motion";
-
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
-
 import { useMemo, useRef } from "react";
-
 import { ShaderMaterial, Vector2 } from "three";
-
 import * as THREE from "three";
 
 import { portfolioBendVertexShader } from "@/components/hero/portfolioImageShaders";
@@ -27,13 +22,11 @@ function FormButtonPlane({
   hoveredRef,
 }: {
   pointerRef: React.MutableRefObject<Vector2>;
-
   hoveredRef: React.MutableRefObject<boolean>;
 }) {
   const materialRef = useRef<ShaderMaterial | null>(null);
 
   const bend = useRef(new Vector2(0, 0));
-
   const bendVelocity = useRef(new Vector2(0, 0));
 
   const viewport = useThree((state) => state.viewport);
@@ -58,12 +51,6 @@ function FormButtonPlane({
         value: new Vector2(0, 0),
       },
 
-      /*
-       * Før:
-       * 0.0048
-       *
-       * Nå roligere.
-       */
       uAmplitude: {
         value: 0.0032,
       },
@@ -86,40 +73,13 @@ function FormButtonPlane({
 
     const delta = Math.min(rawDelta, 1 / 30);
 
-    /*
-     * Pointer fra sentrum.
-     */
-
     const centeredX = pointerRef.current.x - 0.5;
-
     const centeredY = pointerRef.current.y - 0.5;
 
-    /*
-     * =====================================================
-     * BEND TARGET
-     * =====================================================
-     *
-     * Før:
-     *
-     * X = 42
-     * Y = 28
-     *
-     * Nå mye roligere:
-     *
-     * X = 24
-     * Y = 15
-     */
-
     const targetX = hoveredRef.current ? centeredX * 24 : 0;
-
     const targetY = hoveredRef.current ? centeredY * 15 : 0;
 
-    /*
-     * Litt mykere spring også.
-     */
-
     const stiffness = hoveredRef.current ? 62 : 54;
-
     const damping = hoveredRef.current ? 14 : 13;
 
     bendVelocity.current.x += (targetX - bend.current.x) * stiffness * delta;
@@ -130,12 +90,7 @@ function FormButtonPlane({
 
     bend.current.addScaledVector(bendVelocity.current, delta);
 
-    /*
-     * Mindre maksimal deformasjon.
-     */
-
     bend.current.x = THREE.MathUtils.clamp(bend.current.x, -22, 22);
-
     bend.current.y = THREE.MathUtils.clamp(bend.current.y, -14, 14);
 
     material.uniforms.uDelta.value.set(bend.current.x, bend.current.y);
@@ -144,13 +99,15 @@ function FormButtonPlane({
   });
 
   /*
-   * Canvas er større enn selve knappen
-   * slik at benden ikke blir clipped.
+   * Bare litt mindre enn originalen.
+   *
+   * Original:
+   * width  = 0.74
+   * height = 0.38
    */
 
-  const width = viewport.width * 0.74;
-
-  const height = viewport.height * 0.38;
+  const width = viewport.width * 0.71;
+  const height = viewport.height * 0.36;
 
   return (
     <mesh>
@@ -177,13 +134,11 @@ function FormButtonPlane({
 
 type ContactFormThreeButtonProps = {
   children: ReactNode;
-
   type?: "button" | "submit";
 };
 
 export default function ContactFormThreeButton({
   children,
-
   type = "submit",
 }: ContactFormThreeButtonProps) {
   const hoveredRef = useRef(false);
@@ -197,7 +152,6 @@ export default function ContactFormThreeButton({
    */
 
   const x = useMotionValue(0);
-
   const y = useMotionValue(0);
 
   const smoothX = useSpring(x, {
@@ -251,20 +205,9 @@ export default function ContactFormThreeButton({
       1,
     );
 
-    /*
-     * THREE bend.
-     */
-
     pointerRef.current.set(normalizedX, normalizedY);
 
-    /*
-     * Magnetic follow.
-     *
-     * Denne er fortsatt ganske subtil.
-     */
-
     x.set((normalizedX - 0.5) * 9);
-
     y.set((0.5 - normalizedY) * 5);
   }
 
@@ -302,13 +245,13 @@ export default function ContactFormThreeButton({
       className="
         relative
         flex
-        min-h-[58px]
+        min-h-[54px]
         cursor-pointer
         items-center
         justify-center
         overflow-visible
         px-5
-        py-4
+        py-3
         text-xl
         uppercase
         text-[#ecdfcc]
@@ -335,22 +278,16 @@ export default function ContactFormThreeButton({
           orthographic
           camera={{
             position: [0, 0, 5],
-
             zoom: 100,
-
             near: 0.01,
-
             far: 20,
           }}
           dpr={[1, 1.5]}
           frameloop="always"
           gl={{
             antialias: false,
-
             alpha: true,
-
             stencil: false,
-
             powerPreference: "high-performance",
           }}
         >

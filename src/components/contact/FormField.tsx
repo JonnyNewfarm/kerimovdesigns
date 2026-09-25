@@ -38,7 +38,7 @@ export default function FormField({
   const errorId = `${id}-error`;
 
   return (
-    <div>
+    <div className="min-w-0">
       <TextReveal
         as="label"
         htmlFor={id}
@@ -50,9 +50,9 @@ export default function FormField({
           mb-4
           block
           text-[12px]
-          md:text-[16px]
           uppercase
           opacity-90
+          md:text-[16px]
         "
       >
         {label}
@@ -87,7 +87,10 @@ export default function FormField({
         }}
         onBlur={onBlurAction}
         className={`
+          block
           w-full
+          min-w-0
+          max-w-full
           border-b
           bg-transparent
           pb-5
@@ -96,7 +99,7 @@ export default function FormField({
           outline-none
           transition-colors
           duration-300
-          placeholder:text-[#ecdfcc]40
+          placeholder:text-[#ecdfcc]/40
           md:text-4xl
           ${
             error

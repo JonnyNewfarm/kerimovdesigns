@@ -309,7 +309,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
               >
                 <ContactThreeButton onClick={onOpenForm}>
                   <TextReveal
-                    className="font-normal text-color"
+                    className="font-semibold text-color"
                     as="span"
                     viewport={false}
                     delay={0.78}

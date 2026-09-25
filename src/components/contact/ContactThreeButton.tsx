@@ -311,6 +311,7 @@ export default function ContactThreeButton({
         items-center
         justify-center
         overflow-visible
+        font-bold
         px-4
         py-3
         text-sm

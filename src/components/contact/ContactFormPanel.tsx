@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, type TouchEvent, type WheelEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
 
 import TextReveal from "@/components/TextReveal";
+
+import MagneticComp from "../MagneticComp";
 
 import ContactForm from "./ContactForm";
 import {
@@ -11,7 +13,6 @@ import {
   contactEase,
   panelVariants,
 } from "./contactAnimations";
-import MagneticComp from "../MagneticComp";
 
 type ContactFormPanelProps = {
   isOpen: boolean;
@@ -38,37 +39,15 @@ export default function ContactFormPanel({
     }
 
     const body = document.body;
-    const html = document.documentElement;
-
-    const previousBodyOverflow = body.style.overflow;
-    const previousBodyOverscroll = body.style.overscrollBehavior;
-    const previousHtmlOverflow = html.style.overflow;
-    const previousHtmlOverscroll = html.style.overscrollBehavior;
+    const previousOverflow = body.style.overflow;
 
     body.style.overflow = "hidden";
-    body.style.overscrollBehavior = "none";
-
-    html.style.overflow = "hidden";
-    html.style.overscrollBehavior = "none";
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-
-      body.style.overflow = previousBodyOverflow;
-      body.style.overscrollBehavior = previousBodyOverscroll;
-
-      html.style.overflow = previousHtmlOverflow;
-      html.style.overscrollBehavior = previousHtmlOverscroll;
+      body.style.overflow = previousOverflow;
     };
   }, [isOpen, onClose]);
-
-  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-  };
-
-  const handleTouchMove = (event: TouchEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-  };
 
   return (
     <AnimatePresence>
@@ -82,7 +61,6 @@ export default function ContactFormPanel({
             inset-0
             z-[300]
             overflow-hidden
-            overscroll-none
           "
         >
           <motion.button
@@ -104,17 +82,22 @@ export default function ContactFormPanel({
             aria-modal="true"
             aria-labelledby="contact-form-title"
             variants={panelVariants}
-            onWheel={handleWheel}
-            onTouchMove={handleTouchMove}
+            data-lenis-prevent
             className="
               absolute
               bottom-0
               left-0
               right-0
+
+              w-full
+              max-w-full
               max-h-[96dvh]
-              touch-pan-y
+
+              overflow-x-hidden
               overflow-y-auto
+
               overscroll-contain
+
               bg-[#191a18]
               px-5
               pb-8
@@ -122,19 +105,26 @@ export default function ContactFormPanel({
               text-[#ecdfcc]
 
               [scrollbar-width:none]
-             
-              [&::-webkit-scrollbar-track]:bg-transparent
+              [&::-webkit-scrollbar]:hidden
 
               md:px-12
               md:pb-12
               md:pt-8
             "
           >
-            <div className="mx-auto max-w-[1800px]">
+            <div
+              className="
+                mx-auto
+                w-full
+                min-w-0
+                max-w-[1800px]
+              "
+            >
               <div
                 className="
                   mb-14
                   flex
+                  min-w-0
                   items-start
                   justify-between
                   border-b
@@ -143,7 +133,7 @@ export default function ContactFormPanel({
                   md:mb-20
                 "
               >
-                <div>
+                <div className="min-w-0">
                   <TextReveal
                     as="p"
                     viewport={false}
@@ -200,74 +190,73 @@ export default function ContactFormPanel({
                       ease: contactEase,
                     }}
                     className="
-      group
-      relative
-      flex
-      h-11
-      w-11
-      shrink-0
-      cursor-pointer
-      items-center
-      justify-center
-      overflow-hidden
-      rounded-full
-      border
-      border-[#ecdfcc]/40
-      transition-colors
-      duration-500
-      hover:border-[#25221d]
-    "
+                      group
+                      relative
+                      flex
+                      h-11
+                      w-11
+                      shrink-0
+                      cursor-pointer
+                      items-center
+                      justify-center
+                      overflow-hidden
+                      rounded-full
+                      border
+                      border-[#ecdfcc]/40
+                      transition-colors
+                      duration-500
+                      hover:border-[#25221d]
+                    "
                   >
                     <span
                       className="
-        absolute
-        inset-0
-        origin-bottom
-        scale-y-0
-        
-        bg-[#2c2a28]
-        transition-transform
-        duration-500
-        ease-[cubic-bezier(0.76,0,0.24,1)]
-        group-hover:scale-y-100
-      "
+                        absolute
+                        inset-0
+                        origin-bottom
+                        scale-y-0
+                        bg-[#2c2a28]
+                        transition-transform
+                        duration-500
+                        ease-[cubic-bezier(0.76,0,0.24,1)]
+                        group-hover:scale-y-100
+                      "
                     />
 
                     <span className="relative z-10 block h-4 w-4">
                       <span
                         className="
-          absolute
-          left-1/2
-          top-1/2
-          h-px
-          w-4
-          -translate-x-1/2
-          -translate-y-1/2
-          bg-current
-          transition-transform
-          duration-500
-          ease-[cubic-bezier(0.76,0,0.24,1)]
-          group-hover:rotate-45
-        "
+                          absolute
+                          left-1/2
+                          top-1/2
+                          h-px
+                          w-4
+                          -translate-x-1/2
+                          -translate-y-1/2
+                          bg-current
+                          transition-transform
+                          duration-500
+                          ease-[cubic-bezier(0.76,0,0.24,1)]
+                          group-hover:rotate-45
+                        "
                       />
 
                       <span
                         className="
-          absolute
-          left-1/2
-          top-1/2
-          h-px
-          w-4
-          -translate-x-1/2
-          -translate-y-1/2
-          scale-x-0
-          bg-current
-          transition-transform
-          duration-500
-          ease-[cubic-bezier(0.76,0,0.24,1)]
-          group-hover:-rotate-45
-          group-hover:scale-x-100
-        "
+                          absolute
+                          left-1/2
+                          top-1/2
+                          h-px
+                          w-4
+                          -translate-x-1/2
+                          -translate-y-1/2
+                          scale-x-0
+                          bg-current
+                          transition-transform
+                          duration-500
+                          ease-[cubic-bezier(0.76,0,0.24,1)]
+                          group-hover:-rotate-45
+                          group-hover:scale-x-100
+                        "
                       />
                     </span>
                   </motion.button>
