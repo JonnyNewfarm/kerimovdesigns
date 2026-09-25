@@ -50,18 +50,19 @@ export default function ProjectsSidebar({
   return (
     <aside
       className="
-        flex
-        min-h-0
-        min-w-0
-        flex-col
+    flex
+    min-h-0
+    min-w-0
+    flex-col
 
-        lg:h-[calc(100dvh-9rem)]
-        lg:pr-1
+    lg:min-h-[calc(100dvh-9rem)]
+    lg:pb-8
+    lg:pr-1
 
-        xl:pr-2
+    xl:pr-2
 
-        2xl:pr-4
-      "
+    2xl:pr-4
+  "
     >
       <div
         className="
