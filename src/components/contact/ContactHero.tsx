@@ -316,7 +316,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                     duration={0.7}
                     y="100%"
                   >
-                    Send message
+                    Message Me
                   </TextReveal>
                 </ContactThreeButton>
               </motion.div>
