@@ -80,6 +80,11 @@ export default function ProjectsList({
               text-left
               transition-opacity
               duration-300
+              outline-none
+focus:outline-none
+focus-visible:outline-none
+focus:ring-0
+focus-visible:ring-0
             "
                 >
                   <div className="flex min-w-0 items-start gap-4">

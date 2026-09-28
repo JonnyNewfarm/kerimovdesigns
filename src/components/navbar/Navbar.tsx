@@ -174,7 +174,31 @@ const Navbar = () => {
         (pathname.startsWith("/projects") || pathname.startsWith("/project/")));
 
     return [
-      "inline-block -mt-1 text-2xl transition-opacity duration-300",
+      `
+      relative
+      inline-block
+      -mt-1
+      text-2xl
+
+      transition-opacity
+      duration-300
+
+      outline-none
+
+      after:absolute
+      after:left-0
+      after:-bottom-[3px]
+      after:h-[2px]
+      after:w-full
+      after:origin-left
+      after:scale-x-0
+      after:bg-current
+      after:transition-transform
+      after:duration-300
+
+      focus-visible:opacity-100
+      focus-visible:after:scale-x-100
+    `,
       isActive ? "opacity-100" : "opacity-80 hover:opacity-100",
     ].join(" ");
   };

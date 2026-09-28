@@ -67,8 +67,12 @@ export default function RingHero({ title, href }: RingHeroProps) {
 
   const {
     virtualScroll,
+
+    scrollToSection,
+
     isBottomInfoOpen,
     isBottomInfoClosing,
+
     openBottomInfo,
   } = useHeroVirtualScroll({
     showWorld,
@@ -160,15 +164,17 @@ export default function RingHero({ title, href }: RingHeroProps) {
     <div
       ref={container}
       className="
-      relative
-      h-[100dvh]
-      w-full
-      touch-none
-      overscroll-none
-      overflow-hidden
-    "
+        relative
+        h-[100dvh]
+        w-full
+        touch-none
+        overscroll-none
+        overflow-hidden
+      "
     >
       <HeroTransitionLinks
+        enabled={showWorld && !isTransitioning}
+        scrollToSection={scrollToSection}
         contactTransitionRef={contactTransitionRef}
         posterTransitionRef={posterTransitionRef}
         visualIdentityTransitionRef={visualIdentityTransitionRef}
@@ -183,13 +189,13 @@ export default function RingHero({ title, href }: RingHeroProps) {
 
       <div
         className="
-    relative
-    h-[100dvh]
-    touch-none
-    overscroll-none
-    overflow-hidden
-    uppercase
-  "
+          relative
+          h-[100dvh]
+          touch-none
+          overscroll-none
+          overflow-hidden
+          uppercase
+        "
       >
         <HeroCanvas
           hasMounted={hasMounted}

@@ -7,6 +7,10 @@ import TransitionLink from "../TransitionLink";
 type AnchorRef = React.Ref<HTMLAnchorElement>;
 
 type HeroTransitionLinksProps = {
+  enabled: boolean;
+
+  scrollToSection: (sectionIndex: number) => void;
+
   contactTransitionRef: AnchorRef;
   posterTransitionRef: AnchorRef;
   visualIdentityTransitionRef: AnchorRef;
@@ -20,7 +24,70 @@ type HeroTransitionLinksProps = {
   artExhibitionTransitionRef: AnchorRef;
 };
 
+/*
+ * =========================================================
+ * SECTIONS
+ * =========================================================
+ */
+
+const SECTIONS = {
+  VISUAL_IDENTITY: 1,
+  POSTERS: 2,
+  ANIMATIONS: 3,
+  TYPOGRAPHY: 4,
+  ALL_PROJECTS: 5,
+} as const;
+
+/*
+ * =========================================================
+ * KEYBOARD FOCUS STYLE
+ * =========================================================
+ *
+ * Vanligvis er linkene visuelt skjult.
+ *
+ * Når de får keyboard-focus blir de synlige
+ * nederst til venstre.
+ *
+ * Dermed vet keyboard-brukeren nøyaktig hva
+ * som er valgt.
+ * =========================================================
+ */
+const focusLinkClassName = `
+  sr-only
+
+  focus:not-sr-only
+  focus:pointer-events-none
+
+  focus:fixed
+  focus:left-[72px]
+  focus:bottom-5
+  focus:z-[9999]
+
+  lg:focus:bottom-auto
+  lg:focus:top-1/2
+  lg:focus:-translate-y-1/2
+
+  focus:block
+  focus:w-auto
+  focus:h-auto
+
+  focus:bg-transparent
+  focus:p-0
+
+  focus:font-bueno
+  focus:text-[13px]
+  focus:uppercase
+  focus:tracking-[0.02em]
+  focus:text-[#ece7dc]
+
+  focus:outline-none
+`;
+
 export default function HeroTransitionLinks({
+  enabled,
+
+  scrollToSection,
+
   contactTransitionRef,
   posterTransitionRef,
   visualIdentityTransitionRef,
@@ -33,67 +100,116 @@ export default function HeroTransitionLinks({
   aurelisTransitionRef,
   artExhibitionTransitionRef,
 }: HeroTransitionLinksProps) {
+  const tabIndex = enabled ? 0 : -1;
+
   return (
-    <div
-      aria-hidden="true"
+    <nav
+      aria-label="Portfolio navigation"
+      aria-hidden={!enabled}
       className="
         pointer-events-none
         fixed
-        -left-[9999px]
-        top-0
-        opacity-0
+        inset-0
+        z-[9999]
       "
     >
-      <TransitionLink
-        ref={contactTransitionRef}
-        href="/projects"
-        transitionLabel="All Projects"
-        tabIndex={-1}
-      >
-        All Projects
-      </TransitionLink>
-
-      <TransitionLink
-        ref={posterTransitionRef}
-        href="/projects?tags=posters"
-        transitionLabel="Posters"
-        tabIndex={-1}
-      >
-        Posters
-      </TransitionLink>
+      {/*
+       * =====================================================
+       * VISUAL IDENTITY
+       * =====================================================
+       */}
 
       <TransitionLink
         ref={visualIdentityTransitionRef}
         href="/projects?tags=visual-identity"
         transitionLabel="Visual Identity"
-        tabIndex={-1}
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.VISUAL_IDENTITY);
+        }}
       >
         Visual Identity
       </TransitionLink>
+
+      {/*
+       * =====================================================
+       * POSTERS
+       * =====================================================
+       */}
+
+      <TransitionLink
+        ref={posterTransitionRef}
+        href="/projects?tags=posters"
+        transitionLabel="Posters"
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.POSTERS);
+        }}
+      >
+        Posters
+      </TransitionLink>
+
+      {/*
+       * =====================================================
+       * ANIMATIONS
+       * =====================================================
+       */}
 
       <TransitionLink
         ref={animationTransitionRef}
         href="/projects?tags=animations"
         transitionLabel="Animations"
-        tabIndex={-1}
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.ANIMATIONS);
+        }}
       >
         Animations
       </TransitionLink>
+
+      {/*
+       * =====================================================
+       * TYPOGRAPHY
+       * =====================================================
+       */}
 
       <TransitionLink
         ref={typographyTransitionRef}
         href="/projects?tags=typography"
         transitionLabel="Typography"
-        tabIndex={-1}
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.TYPOGRAPHY);
+        }}
       >
         Typography
       </TransitionLink>
+
+      {/*
+       * =====================================================
+       * ALL PROJECTS SCENE
+       * =====================================================
+       *
+       * Alle linkene under eksisterer visuelt
+       * inne i samme Three.js scene.
+       *
+       * Derfor sender Tab alle til section 5.
+       * =====================================================
+       */}
 
       <TransitionLink
         ref={dreamProjectTransitionRef}
         href="/project/69300cd7a94f6af6c6b7d9d8"
         transitionLabel="DRØMMENES MELODI"
-        tabIndex={-1}
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.ALL_PROJECTS);
+        }}
       >
         DRØMMENES MELODI
       </TransitionLink>
@@ -102,7 +218,11 @@ export default function HeroTransitionLinks({
         ref={postersBundleTransitionRef}
         href="/project/6a738fe5c50ff327148b02f9"
         transitionLabel="POSTERS BUNDLE #1"
-        tabIndex={-1}
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.ALL_PROJECTS);
+        }}
       >
         POSTERS BUNDLE #1
       </TransitionLink>
@@ -111,7 +231,11 @@ export default function HeroTransitionLinks({
         ref={kistefossTransitionRef}
         href="/project/6a873e144aea474cdeae7a76"
         transitionLabel="KISTEFOSS MUSEUM"
-        tabIndex={-1}
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.ALL_PROJECTS);
+        }}
       >
         KISTEFOSS MUSEUM
       </TransitionLink>
@@ -120,7 +244,11 @@ export default function HeroTransitionLinks({
         ref={aurelisTransitionRef}
         href="/project/6a873ba44aea474cdeae7a75"
         transitionLabel="AURELIS CAPITAL"
-        tabIndex={-1}
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.ALL_PROJECTS);
+        }}
       >
         AURELIS CAPITAL
       </TransitionLink>
@@ -129,10 +257,31 @@ export default function HeroTransitionLinks({
         ref={artExhibitionTransitionRef}
         href="/project/6930b50f931d3caa254b3237"
         transitionLabel="ART EXHIBITION"
-        tabIndex={-1}
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.ALL_PROJECTS);
+        }}
       >
         ART EXHIBITION
       </TransitionLink>
-    </div>
+
+      {/*
+       * ALL PROJECTS BUTTON
+       */}
+
+      <TransitionLink
+        ref={contactTransitionRef}
+        href="/projects"
+        transitionLabel="All Projects"
+        tabIndex={tabIndex}
+        className={focusLinkClassName}
+        onFocus={() => {
+          scrollToSection(SECTIONS.ALL_PROJECTS);
+        }}
+      >
+        All Projects
+      </TransitionLink>
+    </nav>
   );
 }

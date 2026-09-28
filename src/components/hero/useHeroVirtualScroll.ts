@@ -4,6 +4,8 @@ import { useMotionValue } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
+const PIXELS_PER_SECTION = 620;
+
 export default function useHeroVirtualScroll({
   showWorld,
   isTransitioning,
@@ -43,19 +45,14 @@ export default function useHeroVirtualScroll({
    * =========================================================
    */
 
-  const [isBottomInfoOpen, setIsBottomInfoOpen] =
-    useState(true);
+  const [isBottomInfoOpen, setIsBottomInfoOpen] = useState(true);
 
-  const [
-    isBottomInfoClosing,
-    setIsBottomInfoClosing,
-  ] = useState(false);
+  const [isBottomInfoClosing, setIsBottomInfoClosing] = useState(false);
 
   const isBottomInfoOpenRef = useRef(true);
   const bottomInfoClosingRef = useRef(false);
 
-  const bottomInfoCloseTimeoutRef =
-    useRef<number | null>(null);
+  const bottomInfoCloseTimeoutRef = useRef<number | null>(null);
 
   /*
    * =========================================================
@@ -81,18 +78,17 @@ export default function useHeroVirtualScroll({
       );
     }
 
-    bottomInfoCloseTimeoutRef.current =
-      window.setTimeout(() => {
-        isBottomInfoOpenRef.current = false;
+    bottomInfoCloseTimeoutRef.current = window.setTimeout(() => {
+      isBottomInfoOpenRef.current = false;
 
-        setIsBottomInfoOpen(false);
+      setIsBottomInfoOpen(false);
 
-        bottomInfoClosingRef.current = false;
+      bottomInfoClosingRef.current = false;
 
-        setIsBottomInfoClosing(false);
+      setIsBottomInfoClosing(false);
 
-        bottomInfoCloseTimeoutRef.current = null;
-      }, 1520);
+      bottomInfoCloseTimeoutRef.current = null;
+    }, 1520);
   }, []);
 
   /*
@@ -116,6 +112,44 @@ export default function useHeroVirtualScroll({
     setIsBottomInfoClosing(false);
     setIsBottomInfoOpen(true);
   }, []);
+
+  /*
+   * =========================================================
+   * SCROLL TO SECTION
+   * =========================================================
+   *
+   * Brukes blant annet når en accessibility-link
+   * får keyboard-focus.
+   *
+   * section 0 = første scene
+   * section 1 = neste scene
+   * osv.
+   * =========================================================
+   */
+
+  const scrollToSection = useCallback(
+    (sectionIndex: number) => {
+      /*
+       * Fjern eventuell wheel/touch inertia først.
+       */
+
+      velocityRef.current = 0;
+      isTouchingRef.current = false;
+
+      /*
+       * Flytt TARGET.
+       *
+       * Vi setter ikke virtualScroll direkte,
+       * derfor beholder vi den eksisterende smoothingen.
+       */
+
+      targetScrollRef.current =
+        sectionIndex * PIXELS_PER_SECTION;
+
+      closeBottomInfo();
+    },
+    [closeBottomInfo],
+  );
 
   /*
    * =========================================================
@@ -217,25 +251,19 @@ export default function useHeroVirtualScroll({
       }
 
       /*
-       * Nå følger actual scroll targetScroll smooth.
-       *
-       * Dette er forskjellen fra den gamle løsningen.
-       *
-       * Vi skriver ikke lenger touch-eventet direkte
-       * til MotionValue.
+       * Actual scroll følger target smooth.
        */
 
       const followSpeed = isTouchingRef.current
         ? TOUCH_FOLLOW
         : FREE_FOLLOW;
 
-      currentScrollRef.current =
-        THREE.MathUtils.damp(
-          currentScrollRef.current,
-          targetScrollRef.current,
-          followSpeed,
-          delta,
-        );
+      currentScrollRef.current = THREE.MathUtils.damp(
+        currentScrollRef.current,
+        targetScrollRef.current,
+        followSpeed,
+        delta,
+      );
 
       /*
        * Unngå at damp aldri kommer helt frem.
@@ -312,6 +340,89 @@ export default function useHeroVirtualScroll({
 
     /*
      * =======================================================
+     * KEYBOARD ARROWS
+     * =======================================================
+     *
+     * ArrowDown / ArrowRight:
+     * neste section.
+     *
+     * ArrowUp / ArrowLeft:
+     * forrige section.
+     *
+     * Tab håndteres av DOM-linkene separat.
+     * =======================================================
+     */
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+
+      /*
+       * Ikke hijack keyboard inne i inputs osv.
+       */
+
+      if (target instanceof HTMLElement) {
+        const tagName = target.tagName;
+
+        const isEditable =
+          tagName === "INPUT" ||
+          tagName === "TEXTAREA" ||
+          tagName === "SELECT" ||
+          target.isContentEditable;
+
+        if (isEditable) {
+          return;
+        }
+      }
+
+      let direction = 0;
+
+      switch (event.key) {
+        case "ArrowDown":
+        case "ArrowRight":
+          direction = 1;
+          break;
+
+        case "ArrowUp":
+        case "ArrowLeft":
+          direction = -1;
+          break;
+
+        default:
+          return;
+      }
+
+      event.preventDefault();
+
+      /*
+       * Stopper gammel momentum.
+       */
+
+      velocityRef.current = 0;
+
+      /*
+       * Snap ut fra nærmeste section.
+       *
+       * Dette er bedre enn bare += 620 dersom
+       * brukeren først har scrollet til midt mellom
+       * to sections.
+       */
+
+      const currentSection = Math.round(
+        targetScrollRef.current /
+          PIXELS_PER_SECTION,
+      );
+
+      const nextSection =
+        currentSection + direction;
+
+      targetScrollRef.current =
+        nextSection * PIXELS_PER_SECTION;
+
+      closeBottomInfo();
+    };
+
+    /*
+     * =======================================================
      * TOUCH START
      * =======================================================
      */
@@ -381,8 +492,6 @@ export default function useHeroVirtualScroll({
         deltaY * TOUCH_MULTIPLIER;
 
       /*
-       * Viktig:
-       *
        * Endrer TARGET.
        *
        * Ikke actual virtualScroll.
@@ -406,9 +515,6 @@ export default function useHeroVirtualScroll({
 
       /*
        * Raw touch velocity er noisy på mobile Safari.
-       *
-       * Derfor smoother vi velocity før vi bruker den
-       * som momentum.
        */
 
       velocityRef.current =
@@ -467,6 +573,11 @@ export default function useHeroVirtualScroll({
     );
 
     window.addEventListener(
+      "keydown",
+      handleKeyDown,
+    );
+
+    window.addEventListener(
       "touchstart",
       handleTouchStart,
       {
@@ -514,6 +625,11 @@ export default function useHeroVirtualScroll({
       );
 
       window.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      );
+
+      window.removeEventListener(
         "touchstart",
         handleTouchStart,
       );
@@ -552,8 +668,12 @@ export default function useHeroVirtualScroll({
 
   return {
     virtualScroll,
+
+    scrollToSection,
+
     isBottomInfoOpen,
     isBottomInfoClosing,
+
     openBottomInfo,
   };
 }
