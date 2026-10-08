@@ -12,12 +12,20 @@ export type PointerState = {
 export type SharedPointerRef =
   MutableRefObject<PointerState>;
 
+export type ProjectPreviewVariant =
+  | "preview"
+  | "card";
+
 export type ProjectPreviewThreeImageProps = {
   src: string;
 
   hoverColor?: string | null;
 
   anchorRef: RefObject<HTMLAnchorElement | null>;
+
+  pointerRef?: SharedPointerRef;
+
+  variant?: ProjectPreviewVariant;
 };
 
 export type PreviewImagePlaneProps = {
@@ -36,4 +44,6 @@ export type PreviewHoverLabelProps = {
   pointerRef: SharedPointerRef;
 
   backgroundColor: string;
+
+  compact?: boolean;
 };

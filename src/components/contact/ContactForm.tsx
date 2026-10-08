@@ -3,8 +3,6 @@
 import { motion } from "framer-motion";
 import { type ChangeEvent, type FormEvent, useState } from "react";
 
-import TextReveal from "@/components/TextReveal";
-
 import ContactFormThreeButton from "./ContactFormThreeButton";
 import FormField from "./FormField";
 import { contactEase } from "./contactAnimations";
@@ -30,6 +28,12 @@ const initialValues: ContactFormValues = {
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/*
+ * =========================================================
+ * VALIDATE FIELD
+ * =========================================================
+ */
 
 const validateField = (
   name: keyof ContactFormValues,
@@ -99,6 +103,12 @@ const validateField = (
   }
 };
 
+/*
+ * =========================================================
+ * VALIDATE FORM
+ * =========================================================
+ */
+
 const validateForm = (values: ContactFormValues): ContactFormErrors => {
   const errors: ContactFormErrors = {};
 
@@ -113,10 +123,25 @@ const validateForm = (values: ContactFormValues): ContactFormErrors => {
   return errors;
 };
 
+/*
+ * =========================================================
+ * COMPONENT
+ * =========================================================
+ */
+
 export default function ContactForm() {
   const [values, setValues] = useState<ContactFormValues>(initialValues);
+
   const [errors, setErrors] = useState<ContactFormErrors>({});
+
   const [touched, setTouched] = useState<ContactFormTouched>({});
+  const PANEL_EASE = [0.22, 1, 0.36, 1] as const;
+
+  /*
+   * =====================================================
+   * CHANGE
+   * =====================================================
+   */
 
   const handleChange = (name: keyof ContactFormValues, value: string) => {
     setValues((previous) => ({
@@ -148,6 +173,12 @@ export default function ContactForm() {
     });
   };
 
+  /*
+   * =====================================================
+   * BLUR
+   * =====================================================
+   */
+
   const handleBlur = (name: keyof ContactFormValues) => {
     setTouched((previous) => ({
       ...previous,
@@ -174,9 +205,21 @@ export default function ContactForm() {
     });
   };
 
+  /*
+   * =====================================================
+   * MESSAGE
+   * =====================================================
+   */
+
   const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     handleChange("message", event.target.value);
   };
+
+  /*
+   * =====================================================
+   * SUBMIT
+   * =====================================================
+   */
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -208,6 +251,12 @@ export default function ContactForm() {
 
   const messageErrorId = "message-error";
 
+  /*
+   * =====================================================
+   * RENDER
+   * =====================================================
+   */
+
   return (
     <form
       noValidate
@@ -217,11 +266,19 @@ export default function ContactForm() {
         w-full
         min-w-0
         grid-cols-1
-        gap-x-10
-        gap-y-12
+
+        gap-x-6
+        gap-y-3
+
         md:grid-cols-2
+        md:gap-x-7
+        md:gap-y-4
       "
     >
+      {/* ===============================================
+          NAME
+      ================================================ */}
+
       <FormField
         id="name"
         name="name"
@@ -230,7 +287,6 @@ export default function ContactForm() {
         placeholder="Name"
         value={values.name}
         error={errors.name}
-        delay={0.54}
         autoComplete="name"
         onChangeAction={(value) => {
           handleChange("name", value);
@@ -240,6 +296,10 @@ export default function ContactForm() {
         }}
       />
 
+      {/* ===============================================
+          EMAIL
+      ================================================ */}
+
       <FormField
         id="email"
         name="email"
@@ -248,7 +308,6 @@ export default function ContactForm() {
         placeholder="Email address"
         value={values.email}
         error={errors.email}
-        delay={0.59}
         autoComplete="email"
         onChangeAction={(value) => {
           handleChange("email", value);
@@ -257,6 +316,10 @@ export default function ContactForm() {
           handleBlur("email");
         }}
       />
+
+      {/* ===============================================
+          COMPANY
+      ================================================ */}
 
       <FormField
         id="company"
@@ -267,7 +330,6 @@ export default function ContactForm() {
         value={values.company}
         error={errors.company}
         required={false}
-        delay={0.64}
         autoComplete="organization"
         onChangeAction={(value) => {
           handleChange("company", value);
@@ -277,15 +339,18 @@ export default function ContactForm() {
         }}
       />
 
+      {/* ===============================================
+          PROJECT
+      ================================================ */}
+
       <FormField
         id="project"
         name="project"
         label="Project type"
         type="text"
-        placeholder="Identity, motion, logo..."
+        placeholder="Identity, motion, logo.."
         value={values.project}
         error={errors.project}
-        delay={0.69}
         autoComplete="off"
         onChangeAction={(value) => {
           handleChange("project", value);
@@ -295,97 +360,131 @@ export default function ContactForm() {
         }}
       />
 
-      <div className="min-w-0 md:col-span-2">
-        <TextReveal
-          as="label"
+      {/* ===============================================
+          MESSAGE
+      ================================================ */}
+
+      <div
+        className="
+          min-w-0
+
+          md:col-span-2
+        "
+      >
+        <label
           htmlFor="message"
-          viewport={false}
-          delay={0.74}
-          duration={0.65}
-          y="100%"
           className="
-            mb-4
+            mb-2
             block
-            text-[11px]
+
+            text-[12px]
+            font-black
             uppercase
-            opacity-80
-            md:text-[16px]
+            tracking-[0.08em]
+
+            text-[#e8e2d9]
           "
         >
           Tell me about the project
-        </TextReveal>
+        </label>
 
-        <motion.textarea
+        <textarea
           id="message"
           name="message"
           rows={4}
           value={values.message}
-          placeholder="Project details, timing and budget..."
+          placeholder="Project details, timing and budget.."
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? messageErrorId : undefined}
-          initial={{
-            opacity: 0,
-            y: 18,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.78,
-            duration: 0.75,
-            ease: contactEase,
-          }}
           onChange={handleMessageChange}
           onBlur={() => {
             handleBlur("message");
           }}
           className={`
             block
+
+            min-h-[105px]
             w-full
             min-w-0
             max-w-full
+
             resize-none
+
             border-b
+
             bg-transparent
-            pb-5
-            text-2xl
+
+            pb-3
+
+            font-bueno
+
+            text-[1.15rem]
+            font-semibold
+
+            leading-[1.15]
+
             text-[#ecdfcc]
+
             outline-none
+
             transition-colors
             duration-300
-            placeholder:text-[#ecdfcc]/30
-            md:text-4xl
+
+            placeholder:font-normal
+            placeholder:text-[#ecdfcc]/50
+
+            sm:min-h-[120px]
+            sm:text-[1.3rem]
+
             ${
               errors.message
-                ? "border-[#d6493a] focus:border-[#d6493a]"
-                : "border-[#ecdfcc]/35 focus:border-[#ecdfcc]"
+                ? `
+                  border-[#d6493a]
+                  focus:border-[#d6493a]
+                `
+                : `
+                  border-[#ecdfcc]/25
+                  focus:border-[#ecdfcc]/70
+                `
             }
           `}
         />
 
-        <div className="min-h-6 pt-2">
+        {/* =============================================
+            MESSAGE ERROR
+        ============================================== */}
+
+        <div
+          className="
+            min-h-[16px]
+            pt-1
+          "
+        >
           {errors.message ? (
             <motion.p
               id={messageErrorId}
               role="alert"
               initial={{
                 opacity: 0,
-                y: -4,
+                y: -3,
               }}
               animate={{
                 opacity: 1,
                 y: 0,
               }}
               transition={{
-                duration: 0.3,
+                duration: 0.28,
                 ease: contactEase,
               }}
               className="
-                text-[11px]
+                text-[7px]
+                font-black
                 uppercase
                 tracking-[0.08em]
+
                 text-[#d6493a]
+
+                sm:text-[8px]
               "
             >
               {errors.message}
@@ -394,40 +493,53 @@ export default function ContactForm() {
         </div>
       </div>
 
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 18,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        transition={{
-          delay: 0.84,
-          duration: 0.75,
-          ease: contactEase,
-        }}
+      {/* ===============================================
+          SUBMIT
+      ================================================ */}
+
+      {/* ===============================================
+    BOTTOM / SUBMIT
+================================================ */}
+
+      <div
         className="
-          flex
-          min-w-0
-          justify-end
-          md:col-span-2
-        "
+    flex
+    min-w-0
+    items-end
+    justify-between
+    gap-6
+
+    pt-1
+
+    md:col-span-2
+  "
       >
+        <p
+          className="
+      max-w-[250px]
+
+      text-[8px]
+       invisible
+       sm:visible
+    
+      font-semibold
+      uppercase
+      leading-[1.45]
+      tracking-[0.13em]
+
+      text-[#ecdfcc]
+
+      sm:text-[10px]
+    "
+        >
+          Tell me a little about the project, timeframe and what you would like
+          to create.
+        </p>
+
         <ContactFormThreeButton type="submit">
-          <TextReveal
-            as="span"
-            viewport={false}
-            delay={0.88}
-            duration={0.7}
-            y="100%"
-            className="font-semibold"
-          >
-            Submit inquiry
-          </TextReveal>
+          Submit inquiry
         </ContactFormThreeButton>
-      </motion.div>
+      </div>
     </form>
   );
 }

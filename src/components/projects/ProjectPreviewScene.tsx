@@ -5,16 +5,11 @@ import { useEffect, useRef } from "react";
 import ProjectPreviewHoverLabel from "./ProjectPreviewHoverLabel";
 import ProjectPreviewImagePlane from "./ProjectPreviewImagePlane";
 
-import type { PointerState } from "./projectPreviewTypes";
+import type { PointerState, SharedPointerRef } from "./projectPreviewTypes";
 
 import type { RefObject } from "react";
 
-export default function ProjectPreviewScene({
-  src,
-  anchorRef,
-  hoverColor,
-  onReady,
-}: {
+type ProjectPreviewSceneProps = {
   src: string;
 
   anchorRef: RefObject<HTMLAnchorElement | null>;
@@ -22,29 +17,61 @@ export default function ProjectPreviewScene({
   hoverColor: string;
 
   onReady: () => void;
-}) {
-  const pointerRef = useRef<PointerState>({
+
+  pointerRef?: SharedPointerRef;
+
+  compact?: boolean;
+};
+
+export default function ProjectPreviewScene({
+  src,
+  anchorRef,
+  hoverColor,
+  onReady,
+  pointerRef,
+  compact = false,
+}: ProjectPreviewSceneProps) {
+  /*
+   * =====================================================
+   * FALLBACK POINTER
+   * =====================================================
+   *
+   * Hvis komponenten brukes alene,
+   * fungerer den fortsatt akkurat som før.
+   */
+
+  const localPointerRef = useRef<PointerState>({
     x: 0,
     y: 0,
     active: false,
   });
 
+  const activePointerRef = pointerRef ?? localPointerRef;
+
   /*
-   * Ett pointer-system for både
-   * bildet OG View Case-labelen.
+   * =====================================================
+   * POINTER EVENTS
+   * =====================================================
+   *
+   * Grid-versjonen sender allerede inn shared pointer.
+   * Da oppretter vi IKKE en ekstra listener.
    */
 
   useEffect(() => {
+    if (pointerRef) {
+      return;
+    }
+
     const handlePointerMove = (event: PointerEvent) => {
-      pointerRef.current.x = event.clientX;
+      localPointerRef.current.x = event.clientX;
 
-      pointerRef.current.y = event.clientY;
+      localPointerRef.current.y = event.clientY;
 
-      pointerRef.current.active = true;
+      localPointerRef.current.active = true;
     };
 
     const handlePointerLeave = () => {
-      pointerRef.current.active = false;
+      localPointerRef.current.active = false;
     };
 
     window.addEventListener("pointermove", handlePointerMove, {
@@ -64,21 +91,22 @@ export default function ProjectPreviewScene({
         handlePointerLeave,
       );
     };
-  }, []);
+  }, [pointerRef]);
 
   return (
     <>
       <ProjectPreviewImagePlane
         src={src}
         anchorRef={anchorRef}
-        pointerRef={pointerRef}
+        pointerRef={activePointerRef}
         onReady={onReady}
       />
 
       <ProjectPreviewHoverLabel
         anchorRef={anchorRef}
-        pointerRef={pointerRef}
+        pointerRef={activePointerRef}
         backgroundColor={hoverColor}
+        compact={compact}
       />
     </>
   );

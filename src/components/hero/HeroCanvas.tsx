@@ -2,10 +2,33 @@
 
 import { Canvas } from "@react-three/fiber";
 import type { MotionValue } from "framer-motion";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 
 import HeroSceneLoader, { ReadySignal } from "./HeroSceneLoader";
+
 import PortfolioWorld from "./PortfolioWorld";
+
+/*
+ * =========================================================
+ * GLOBAL HERO INTRO STATE
+ * =========================================================
+ *
+ * Lives only for the lifetime of the current browser document.
+ *
+ * /
+ * -> /projects
+ * -> /
+ *
+ * will NOT replay the intro.
+ *
+ * A real refresh / new page load resets it automatically.
+ */
+
+declare global {
+  interface Window {
+    __heroIntroPlayed?: boolean;
+  }
+}
 
 export default function HeroCanvas({
   hasMounted,
@@ -64,6 +87,92 @@ export default function HeroCanvas({
 
   artExhibitionTransitionRef: React.RefObject<HTMLAnchorElement | null>;
 }) {
+  /*
+   * =======================================================
+   * FIRST LOAD INTRO
+   * =======================================================
+   */
+
+  const [introResolved, setIntroResolved] = useState(false);
+
+  const [shouldPlayIntro, setShouldPlayIntro] = useState(false);
+
+  const didResolveIntro = useRef(false);
+
+  useEffect(() => {
+    if (didResolveIntro.current) {
+      return;
+    }
+
+    didResolveIntro.current = true;
+
+    /*
+     * First visit during this actual browser load.
+     */
+
+    if (!window.__heroIntroPlayed) {
+      window.__heroIntroPlayed = true;
+
+      setShouldPlayIntro(true);
+      setIntroResolved(true);
+
+      return;
+    }
+
+    /*
+     * Returning to "/" from another route.
+     *
+     * Do NOT replay HeroSceneLoader.
+     */
+
+    setShouldPlayIntro(false);
+    setIntroResolved(true);
+  }, []);
+
+  /*
+   * =======================================================
+   * SKIPPED LOADER
+   * =======================================================
+   *
+   * When returning to the hero we still wait until the
+   * Three scene is actually ready before telling the rest
+   * of the page that loading is complete.
+   *
+   * We simply don't show the visual intro again.
+   */
+
+  useEffect(() => {
+    if (!introResolved) {
+      return;
+    }
+
+    if (shouldPlayIntro) {
+      return;
+    }
+
+    if (!sceneReady) {
+      return;
+    }
+
+    if (loaderComplete) {
+      return;
+    }
+
+    onLoaderComplete();
+  }, [
+    introResolved,
+    shouldPlayIntro,
+    sceneReady,
+    loaderComplete,
+    onLoaderComplete,
+  ]);
+
+  /*
+   * =======================================================
+   * RENDER
+   * =======================================================
+   */
+
   return (
     <div
       className="
@@ -73,7 +182,7 @@ export default function HeroCanvas({
         overflow-hidden
       "
     >
-      {hasMounted && allowCanvasMount && (
+      {hasMounted && allowCanvasMount && introResolved && (
         <Canvas
           className="
             h-full
@@ -82,14 +191,18 @@ export default function HeroCanvas({
           "
           camera={{
             position: [0, 0, 0],
+
             fov: isMdUp ? 48 : 63,
+
             near: 0.01,
+
             far: 100,
           }}
-          dpr={isMdUp ? [1, 1.5] : [1, 1.5]}
+          dpr={[1, 1.5]}
           frameloop={isCanvasActive ? "always" : "never"}
           gl={{
             antialias: false,
+
             powerPreference: "high-performance",
 
             alpha: false,
@@ -99,7 +212,16 @@ export default function HeroCanvas({
         >
           <color attach="background" args={["#181c14"]} />
 
-          {!loaderComplete && (
+          {/*
+           * =================================================
+           * HERO INTRO
+           * =================================================
+           *
+           * Only exists on the FIRST visit during the
+           * current browser load.
+           */}
+
+          {shouldPlayIntro && !loaderComplete && (
             <HeroSceneLoader
               sceneReady={sceneReady}
               onComplete={onLoaderComplete}

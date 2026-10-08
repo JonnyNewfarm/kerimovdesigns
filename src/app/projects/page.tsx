@@ -1,5 +1,7 @@
 import { Metadata } from "next";
+
 import Link from "next/link";
+
 import { redirect } from "next/navigation";
 
 import { getProjects } from "../actions";
@@ -11,8 +13,10 @@ import SmoothScroll from "@/components/SmoothScroll";
 
 export const metadata: Metadata = {
   title: "Rustam Kerimov | Projects",
+
   description:
     "Explore the projects and works of Rustam Kerimov, showcasing design and creative skills.",
+
   icons: {
     icon: "/favicon.ico",
   },
@@ -23,7 +27,9 @@ export const revalidate = 60;
 interface PageProps {
   searchParams: Promise<{
     page?: string;
+
     tag?: string;
+
     tags?: string;
   }>;
 }
@@ -38,7 +44,14 @@ const MAX_SELECTED_TAGS = 3;
  * =========================================================
  */
 
-const normalizeTags = ({ tags, tag }: { tags?: string; tag?: string }) => {
+const normalizeTags = ({
+  tags,
+  tag,
+}: {
+  tags?: string;
+
+  tag?: string;
+}) => {
   const rawTags = tags ?? tag;
 
   if (!rawTags) {
@@ -64,6 +77,7 @@ const createProjectsUrl = ({
   tags,
 }: {
   page?: number;
+
   tags?: string[];
 }) => {
   const params = new URLSearchParams();
@@ -141,6 +155,12 @@ const Page = async ({ searchParams }: PageProps) => {
    * =====================================================
    * FILTER PROJECTS
    * =====================================================
+   *
+   * Denne server-side filtreringen brukes fortsatt
+   * av MOBIL-versjonen.
+   *
+   * Desktop får allProjects og filtrerer client-side
+   * slik at Framer Motion kan animere gridet smooth.
    */
 
   const filteredProjects =
@@ -156,7 +176,7 @@ const Page = async ({ searchParams }: PageProps) => {
 
   /*
    * =====================================================
-   * PAGINATION
+   * MOBILE PAGINATION
    * =====================================================
    */
 
@@ -186,7 +206,7 @@ const Page = async ({ searchParams }: PageProps) => {
 
   /*
    * =====================================================
-   * PREV / NEXT
+   * MOBILE PREV / NEXT
    * =====================================================
    */
 
@@ -199,21 +219,29 @@ const Page = async ({ searchParams }: PageProps) => {
    * INITIAL LOADER ASSETS
    * =====================================================
    *
-   * Disse propsene kan endres når filteret endrer seg.
+   * DESKTOP:
    *
-   * Det er OK.
+   * Hele desktop-gridet finnes samtidig.
+   * Derfor preloader vi ALLE prosjektbilder før
+   * ProjectsLoadingGate avslutter.
    *
-   * ProjectsLoadingGate beholdes mounted fordi den IKKE
-   * har en key basert på page/tags.
+   * Når gridet mountes er Three-texturene allerede
+   * varme i cache.
    *
-   * Når initial load er ferdig er showContent permanent true.
+   *
+   * MOBILE:
+   *
+   * Beholder samme oppførsel som før.
+   * Kun bildene på nåværende paginerte side lastes.
    */
 
-  const desktopSrc = filteredProjects[0]?.src ?? null;
+  const desktopSrcs = allProjects
+    .map((project) => project.src)
+    .filter((src): src is string => Boolean(src));
 
   const mobileSrcs = mobileProjects
     .map((project) => project.src)
-    .filter(Boolean);
+    .filter((src): src is string => Boolean(src));
 
   /*
    * =====================================================
@@ -222,7 +250,7 @@ const Page = async ({ searchParams }: PageProps) => {
    */
 
   return (
-    <ProjectsLoadingGate desktopSrc={desktopSrc} mobileSrcs={mobileSrcs}>
+    <ProjectsLoadingGate desktopSrcs={desktopSrcs} mobileSrcs={mobileSrcs}>
       <SmoothScroll>
         <main
           className="
@@ -231,11 +259,9 @@ const Page = async ({ searchParams }: PageProps) => {
             text-color
           "
         >
-          {/*
-           * =============================================
-           * DESKTOP
-           * =============================================
-           */}
+          {/* =============================================
+              DESKTOP
+          ============================================= */}
 
           <div
             className="
@@ -245,18 +271,24 @@ const Page = async ({ searchParams }: PageProps) => {
             "
           >
             <ProjectsTable
-              projects={filteredProjects}
+              /*
+               * VIKTIG:
+               *
+               * Desktop får ALLE prosjekter.
+               *
+               * ProjectsTable filtrerer selv client-side
+               * for å beholde smooth layout-animation.
+               */
+              projects={allProjects}
               startIndex={0}
               availableTags={availableTags}
               activeTags={activeTags}
             />
           </div>
 
-          {/*
-           * =============================================
-           * MOBILE
-           * =============================================
-           */}
+          {/* =============================================
+              MOBILE
+          ============================================= */}
 
           <div
             className="
@@ -281,11 +313,9 @@ const Page = async ({ searchParams }: PageProps) => {
                   pt-6
                 "
               >
-                {/*
-                 * =======================================
-                 * PAGE NUMBER
-                 * =======================================
-                 */}
+                {/* =======================================
+                    PAGE NUMBER
+                ======================================= */}
 
                 <p
                   className="
@@ -299,11 +329,9 @@ const Page = async ({ searchParams }: PageProps) => {
                   {String(totalPages).padStart(2, "0")}
                 </p>
 
-                {/*
-                 * =======================================
-                 * ARROWS
-                 * =======================================
-                 */}
+                {/* =======================================
+                    ARROWS
+                ======================================= */}
 
                 <div
                   className="
@@ -312,9 +340,7 @@ const Page = async ({ searchParams }: PageProps) => {
                     gap-6
                   "
                 >
-                  {/*
-                   * PREVIOUS
-                   */}
+                  {/* PREVIOUS */}
 
                   {prevPage ? (
                     <Link
@@ -352,9 +378,7 @@ const Page = async ({ searchParams }: PageProps) => {
                     </span>
                   )}
 
-                  {/*
-                   * NEXT
-                   */}
+                  {/* NEXT */}
 
                   {nextPage ? (
                     <Link

@@ -1,7 +1,6 @@
 import React from "react";
 import BurgerMenu from "./BurgerMenu";
 import Link from "next/link";
-import { FaRegCopyright } from "react-icons/fa";
 import TransitionLink from "../TransitionLink";
 
 const NavbarMobile = () => {

@@ -29,10 +29,10 @@ export default function PostersScene({
       {/* LEFT */}
       <ImagePlane
         texture={textures[0]}
-        position={[-1.85, 0.45, 0.25]}
+        position={[-1.75, 0.45, 0.25]}
         bendStrength={1}
         width={2.95}
-        height={3.7}
+        height={3.75}
         rotationZ={-0.02}
         isMobile={isMobile}
       />
@@ -40,7 +40,7 @@ export default function PostersScene({
       {/* RIGHT */}
       <ImagePlane
         texture={textures[1]}
-        position={[1.2, 0.2, -0.12]}
+        position={[1.2, 0.1, -0.12]}
         bendStrength={0.94}
         width={2.75}
         height={3.5}

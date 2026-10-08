@@ -2,131 +2,249 @@
 
 import type { ReactNode } from "react";
 
+import { motion } from "framer-motion";
+
 import TextReveal from "@/components/TextReveal";
 
-import ProjectsList from "./ProjectsList";
-import ProjectsPagination from "./ProjectsPagination";
-import ProjectsTagFilter from "./ProjectsTagFilter";
+import ProjectsDesktopFilter from "./ProjectsDesktopFilter";
 
-import type { ProjectListItem } from "./projectsTypes";
+import { useProjectsReveal } from "./ProjectsLoadingGate";
+
+import { projectsEase } from "./projectUtils";
 
 type ProjectsSidebarProps = {
-  visibleProjects: ProjectListItem[];
-  activeIndex: number;
-  pageIndex: number;
-  totalPages: number;
-  direction: 1 | -1;
-  startIndex: number;
-  activeTagsKey: string;
   availableTags: string[];
-  activeTags: string[];
-  hasProjects: boolean;
-  canGoPrevPage: boolean;
-  canGoNextPage: boolean;
+
+  selectedTags: string[];
+
+  totalCount: number;
+
+  resultCount: number;
+
   children?: ReactNode;
-  onSelectProject: (index: number) => void;
-  onPrevPage: () => void;
-  onNextPage: () => void;
+
+  onChange: (tags: string[]) => void;
+
+  onPopupOpenChange?: (open: boolean) => void;
 };
 
 export default function ProjectsSidebar({
-  visibleProjects,
-  activeIndex,
-  pageIndex,
-  totalPages,
-  direction,
-  startIndex,
-  activeTagsKey,
   availableTags,
-  activeTags,
-  hasProjects,
-  canGoPrevPage,
-  canGoNextPage,
+  selectedTags,
+
+  totalCount,
+  resultCount,
+
   children,
-  onSelectProject,
-  onPrevPage,
-  onNextPage,
+
+  onChange,
+  onPopupOpenChange,
 }: ProjectsSidebarProps) {
+  const { revealStarted } = useProjectsReveal();
+
   return (
     <aside
       className="
-    flex
-    min-h-0
-    min-w-0
-    flex-col
-
-    lg:min-h-[calc(100dvh-9rem)]
-    lg:pb-8
-    lg:pr-1
-
-    xl:pr-2
-
-    2xl:pr-4
-  "
+        relative
+        min-w-0
+      "
     >
       <div
         className="
-          relative
-          z-[200]
-          mb-6
+          sticky
+          top-28
+
           flex
-          min-h-[calc(clamp(3rem,5vw,5.4rem)*1.76+1.5rem)]
-          shrink-0
+          h-[calc(100dvh-9rem)]
+          min-h-0
           flex-col
-          justify-end
-          gap-5
         "
       >
-        <ProjectsTagFilter
-          availableTags={availableTags}
-          activeTags={activeTags}
-        />
+        {/* =================================================
+            TOP GROUP
+        ================================================= */}
+
+        <div
+          className="
+            shrink-0
+          "
+        >
+          {/* ===============================================
+              SELECTED WORK
+          ================================================ */}
+
+          <TextReveal
+            as="h1"
+            mode="lines"
+            viewport={false}
+            active={revealStarted}
+            delay={0.14}
+            stagger={0.08}
+            duration={1}
+            y="105%"
+            rotate={1.2}
+            className="
+              max-w-[280px]
+
+              font-bueno
+              text-[clamp(2rem,3.1vw,4.7rem)]
+              font-black
+
+              uppercase
+              leading-[0.82]
+              tracking-[-0.02em]
+            "
+          >
+            {"Selected\nWork"}
+          </TextReveal>
+
+          {/* ===============================================
+              EDITORIAL COPY
+          ================================================ */}
+
+          <motion.div
+            initial={false}
+            animate={{
+              opacity: revealStarted ? 1 : 0,
+
+              y: revealStarted ? 0 : 8,
+            }}
+            transition={{
+              opacity: {
+                duration: 0.75,
+
+                delay: 0.52,
+
+                ease: projectsEase,
+              },
+
+              y: {
+                duration: 0.85,
+
+                delay: 0.52,
+
+                ease: projectsEase,
+              },
+            }}
+            className="
+              mt-8
+
+              xl:mt-9
+            "
+          >
+            {children ? (
+              <div
+                className="
+                  mb-5
+                "
+              >
+                {children}
+              </div>
+            ) : null}
+
+            <p
+              className="
+                max-w-[205px]
+
+                text-[8px]
+                font-black
+                uppercase
+                leading-[1.5]
+                tracking-[0.16em]
+
+                text-white/25
+
+                xl:text-[9px]
+              "
+            >
+              Selected projects across identity, print, digital and experimental
+              work.
+            </p>
+
+            <div
+              className="
+                mt-3
+
+                flex
+                items-center
+                gap-2
+
+                text-[8px]
+                font-black
+                uppercase
+                tracking-[0.18em]
+
+                text-white/15
+
+                xl:text-[9px]
+              "
+            >
+              <span>Oslo</span>
+
+              <span>/</span>
+
+              <span>2026</span>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* =================================================
+            FILTER — ACTUALLY AT THE BOTTOM
+        =================================================
+            
+            Nå er det FILTERET SELV som har mt-auto.
+            
+            Ikke en stor gruppe som inneholder både
+            filter og description.
+            
+            Derfor flyttes filteret faktisk helt ned.
+        ================================================= */}
+
+        <motion.div
+          initial={false}
+          animate={{
+            opacity: revealStarted ? 1 : 0,
+
+            y: revealStarted ? 0 : 12,
+          }}
+          transition={{
+            opacity: {
+              duration: 0.75,
+
+              delay: 0.34,
+
+              ease: projectsEase,
+            },
+
+            y: {
+              duration: 0.9,
+
+              delay: 0.34,
+
+              ease: projectsEase,
+            },
+          }}
+          className="
+            mt-auto
+
+            w-full
+            max-w-[220px]
+
+            pb-1
+
+            xl:max-w-[235px]
+          "
+        >
+          <ProjectsDesktopFilter
+            availableTags={availableTags}
+            selectedTags={selectedTags}
+            totalCount={totalCount}
+            resultCount={resultCount}
+            onChange={onChange}
+            onPopupOpenChange={onPopupOpenChange}
+          />
+        </motion.div>
       </div>
-
-      <TextReveal
-        as="p"
-        mode="words"
-        viewport={false}
-        delay={0.02}
-        duration={0.65}
-        y="80%"
-        className="
-          mb-2
-          mt-5
-          text-[10px]
-          font-black
-          uppercase
-          tracking-[0.35em]
-          text-white/80
-
-          sm:text-xs
-        "
-      >
-        Selected Work
-      </TextReveal>
-
-      <ProjectsList
-        projects={visibleProjects}
-        activeIndex={activeIndex}
-        pageIndex={pageIndex}
-        startIndex={startIndex}
-        direction={direction}
-        activeTagsKey={activeTagsKey}
-        hasProjects={hasProjects}
-        onSelectProject={onSelectProject}
-      />
-
-      <ProjectsPagination
-        pageIndex={pageIndex}
-        totalPages={totalPages}
-        hasProjects={hasProjects}
-        canGoPrevPage={canGoPrevPage}
-        canGoNextPage={canGoNextPage}
-        onPrevPage={onPrevPage}
-        onNextPage={onNextPage}
-      />
-
-      {children ? <div className="mt-8 shrink-0">{children}</div> : null}
     </aside>
   );
 }

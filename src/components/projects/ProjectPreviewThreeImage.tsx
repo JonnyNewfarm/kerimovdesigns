@@ -1,8 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense } from "react";
 
 import ProjectPreviewScene from "./ProjectPreviewScene";
 
@@ -12,18 +11,10 @@ export default function ProjectPreviewThreeImage({
   src,
   hoverColor,
   anchorRef,
+  pointerRef,
+  variant = "preview",
 }: ProjectPreviewThreeImageProps) {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    setIsReady(false);
-  }, [src]);
-
-  const handleReady = useCallback(() => {
-    window.requestAnimationFrame(() => {
-      setIsReady(true);
-    });
-  }, []);
+  const isCard = variant === "card";
 
   const finalHoverColor = hoverColor || "#515b4f";
 
@@ -36,68 +27,38 @@ export default function ProjectPreviewThreeImage({
         overflow-visible
       "
     >
-      {/*
-       * =================================================
-       * SKELETON
-       * =================================================
-       */}
+      {/* =================================================
+          OVERSCAN CANVAS
 
-      <div
-        aria-hidden="true"
-        className={`
-          pointer-events-none
-          absolute
-          inset-0
-          overflow-hidden
+          Ingen skeleton.
+          Ingen opacity-fade.
+          Ingen isReady-state.
 
-          bg-white/[0.035]
-
-          transition-opacity
-          duration-300
-          ease-[cubic-bezier(0.22,1,0.36,1)]
-
-          ${isReady ? "opacity-0" : "opacity-100"}
-        `}
-      >
-        <div
-          className="
-            absolute
-            inset-0
-
-            animate-pulse
-
-            bg-gradient-to-br
-            from-white/[0.02]
-            via-white/[0.07]
-            to-white/[0.02]
-          "
-        />
-      </div>
-
-      {/*
-       * =================================================
-       * OVERSCAN CANVAS
-       * =================================================
-       */}
+          Når texture allerede ligger i cache etter preload,
+          renderer bildet direkte.
+      ================================================= */}
 
       <div
         className={`
           pointer-events-none
-
           absolute
-
-          -left-[12%]
-          -right-[12%]
-          -top-[18%]
-          -bottom-[18%]
-
           overflow-visible
 
-          transition-opacity
-          duration-300
-          ease-[cubic-bezier(0.22,1,0.36,1)]
-
-          ${isReady ? "opacity-100" : "opacity-0"}
+          ${
+            isCard
+              ? `
+                -left-[42%]
+                -right-[42%]
+                -top-[38%]
+                -bottom-[38%]
+              `
+              : `
+                -left-[12%]
+                -right-[12%]
+                -top-[18%]
+                -bottom-[18%]
+              `
+          }
         `}
       >
         <Canvas
@@ -105,31 +66,21 @@ export default function ProjectPreviewThreeImage({
           dpr={[1, 1.25]}
           camera={{
             position: [0, 0, 1000],
-
             zoom: 1,
-
             near: 0.1,
-
             far: 2000,
           }}
           gl={{
             alpha: true,
-
             antialias: false,
-
             powerPreference: "high-performance",
-
             stencil: false,
           }}
           style={{
             position: "absolute",
-
             inset: 0,
-
             width: "100%",
-
             height: "100%",
-
             pointerEvents: "none",
           }}
           onCreated={({ gl }) => {
@@ -140,11 +91,12 @@ export default function ProjectPreviewThreeImage({
         >
           <Suspense fallback={null}>
             <ProjectPreviewScene
-              key={src}
               src={src}
               anchorRef={anchorRef}
               hoverColor={finalHoverColor}
-              onReady={handleReady}
+              onReady={() => {}}
+              pointerRef={pointerRef}
+              compact={isCard}
             />
           </Suspense>
         </Canvas>

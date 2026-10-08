@@ -1,311 +1,115 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
-import { useMemo, useRef } from "react";
-import { ShaderMaterial, Vector2 } from "three";
-import * as THREE from "three";
-
-import { portfolioBendVertexShader } from "@/components/hero/portfolioImageShaders";
-
-import { contactFormButtonFragmentShader } from "./contactFormShaders";
-
-/*
- * =========================================================
- * THREE PLANE
- * =========================================================
- */
-
-function FormButtonPlane({
-  pointerRef,
-  hoveredRef,
-}: {
-  pointerRef: React.MutableRefObject<Vector2>;
-  hoveredRef: React.MutableRefObject<boolean>;
-}) {
-  const materialRef = useRef<ShaderMaterial | null>(null);
-
-  const bend = useRef(new Vector2(0, 0));
-  const bendVelocity = useRef(new Vector2(0, 0));
-
-  const viewport = useThree((state) => state.viewport);
-
-  /*
-   * =========================================================
-   * UNIFORMS
-   * =========================================================
-   */
-
-  const uniforms = useMemo(
-    () => ({
-      uTime: {
-        value: 0,
-      },
-
-      uSpeed: {
-        value: 0.62,
-      },
-
-      uDelta: {
-        value: new Vector2(0, 0),
-      },
-
-      uAmplitude: {
-        value: 0.0032,
-      },
-    }),
-    [],
-  );
-
-  /*
-   * =========================================================
-   * FRAME
-   * =========================================================
-   */
-
-  useFrame((state, rawDelta) => {
-    const material = materialRef.current;
-
-    if (!material) {
-      return;
-    }
-
-    const delta = Math.min(rawDelta, 1 / 30);
-
-    const centeredX = pointerRef.current.x - 0.5;
-    const centeredY = pointerRef.current.y - 0.5;
-
-    const targetX = hoveredRef.current ? centeredX * 24 : 0;
-    const targetY = hoveredRef.current ? centeredY * 15 : 0;
-
-    const stiffness = hoveredRef.current ? 62 : 54;
-    const damping = hoveredRef.current ? 14 : 13;
-
-    bendVelocity.current.x += (targetX - bend.current.x) * stiffness * delta;
-
-    bendVelocity.current.y += (targetY - bend.current.y) * stiffness * delta;
-
-    bendVelocity.current.multiplyScalar(Math.exp(-damping * delta));
-
-    bend.current.addScaledVector(bendVelocity.current, delta);
-
-    bend.current.x = THREE.MathUtils.clamp(bend.current.x, -22, 22);
-    bend.current.y = THREE.MathUtils.clamp(bend.current.y, -14, 14);
-
-    material.uniforms.uDelta.value.set(bend.current.x, bend.current.y);
-
-    material.uniforms.uTime.value = state.clock.elapsedTime;
-  });
-
-  /*
-   * Bare litt mindre enn originalen.
-   *
-   * Original:
-   * width  = 0.74
-   * height = 0.38
-   */
-
-  const width = viewport.width * 0.71;
-  const height = viewport.height * 0.36;
-
-  return (
-    <mesh>
-      <planeGeometry args={[width, height, 40, 16]} />
-
-      <shaderMaterial
-        ref={materialRef}
-        uniforms={uniforms}
-        vertexShader={portfolioBendVertexShader}
-        fragmentShader={contactFormButtonFragmentShader}
-        side={THREE.DoubleSide}
-        toneMapped={false}
-        precision="highp"
-      />
-    </mesh>
-  );
-}
-
-/*
- * =========================================================
- * BUTTON
- * =========================================================
- */
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
 
 type ContactFormThreeButtonProps = {
   children: ReactNode;
   type?: "button" | "submit";
+  disabled?: boolean;
 };
+
+const BUTTON_EASE = [0.22, 1, 0.36, 1] as const;
 
 export default function ContactFormThreeButton({
   children,
   type = "submit",
+  disabled = false,
 }: ContactFormThreeButtonProps) {
-  const hoveredRef = useRef(false);
-
-  const pointerRef = useRef(new Vector2(0.5, 0.5));
-
-  /*
-   * =========================================================
-   * MAGNETIC FOLLOW
-   * =========================================================
-   */
-
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const smoothX = useSpring(x, {
-    stiffness: 160,
-    damping: 17,
-    mass: 0.5,
-  });
-
-  const smoothY = useSpring(y, {
-    stiffness: 160,
-    damping: 17,
-    mass: 0.5,
-  });
-
-  /*
-   * =========================================================
-   * POINTER ENTER
-   * =========================================================
-   */
-
-  function handlePointerEnter(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (event.pointerType !== "mouse") {
-      return;
-    }
-
-    hoveredRef.current = true;
-  }
-
-  /*
-   * =========================================================
-   * POINTER MOVE
-   * =========================================================
-   */
-
-  function handlePointerMove(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (event.pointerType !== "mouse") {
-      return;
-    }
-
-    const rect = event.currentTarget.getBoundingClientRect();
-
-    const normalizedX = THREE.MathUtils.clamp(
-      (event.clientX - rect.left) / rect.width,
-      0,
-      1,
-    );
-
-    const normalizedY = THREE.MathUtils.clamp(
-      1 - (event.clientY - rect.top) / rect.height,
-      0,
-      1,
-    );
-
-    pointerRef.current.set(normalizedX, normalizedY);
-
-    x.set((normalizedX - 0.5) * 9);
-    y.set((0.5 - normalizedY) * 5);
-  }
-
-  /*
-   * =========================================================
-   * POINTER LEAVE
-   * =========================================================
-   */
-
-  function handlePointerLeave() {
-    hoveredRef.current = false;
-
-    pointerRef.current.set(0.5, 0.5);
-
-    x.set(0);
-    y.set(0);
-  }
-
-  /*
-   * =========================================================
-   * RENDER
-   * =========================================================
-   */
-
   return (
     <motion.button
       type={type}
-      onPointerEnter={handlePointerEnter}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
-      style={{
-        x: smoothX,
-        y: smoothY,
+      disabled={disabled}
+      whileHover={
+        disabled
+          ? undefined
+          : {
+              x: 3,
+            }
+      }
+      whileTap={
+        disabled
+          ? undefined
+          : {
+              scale: 0.985,
+            }
+      }
+      transition={{
+        duration: 0.35,
+        ease: BUTTON_EASE,
       }}
-      className="
+      className={`
+        group
+
         relative
+
         flex
-        min-h-[54px]
-        cursor-pointer
+        min-h-[46px]
         items-center
         justify-center
-        overflow-visible
+
+        overflow-hidden
+
+        bg-[#20241e]
+
         px-5
         py-3
-        text-xl
-        uppercase
-        text-[#ecdfcc]
-      "
-    >
-      {/*
-       * =====================================================
-       * THREE CANVAS
-       * =====================================================
-       */}
 
-      <div
+        font-bueno
+        text-[11px]
+        font-black
+        uppercase
+        tracking-[0.08em]
+
+        text-[#ecdfcc]
+
+        transition-colors
+        duration-500
+
+        sm:min-h-[48px]
+        sm:px-6
+        sm:text-[12px]
+
+        ${
+          disabled
+            ? `
+              cursor-not-allowed
+              opacity-35
+            `
+            : `
+              cursor-pointer
+              hover:bg-[#171a15]
+            `
+        }
+      `}
+    >
+      <span
         className="
           pointer-events-none
-          absolute
-          -bottom-[80%]
-          -left-[25%]
-          -right-[25%]
-          -top-[80%]
-          z-0
-        "
-      >
-        <Canvas
-          orthographic
-          camera={{
-            position: [0, 0, 5],
-            zoom: 100,
-            near: 0.01,
-            far: 20,
-          }}
-          dpr={[1, 1.5]}
-          frameloop="always"
-          gl={{
-            antialias: false,
-            alpha: true,
-            stencil: false,
-            powerPreference: "high-performance",
-          }}
-        >
-          <FormButtonPlane pointerRef={pointerRef} hoveredRef={hoveredRef} />
-        </Canvas>
-      </div>
 
-      {/*
-       * =====================================================
-       * TEXT
-       * =====================================================
-       */}
+          absolute
+          inset-0
+
+          origin-bottom
+          scale-y-0
+
+          bg-[#131611]
+
+          transition-transform
+          duration-500
+
+          ease-[cubic-bezier(0.76,0,0.24,1)]
+
+          group-hover:scale-y-100
+        "
+      />
 
       <span
         className="
           pointer-events-none
           relative
           z-10
+
           whitespace-nowrap
         "
       >

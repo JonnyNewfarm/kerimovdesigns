@@ -198,7 +198,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                   "
                 >
                   <a
-                    href="#"
+                    href="https://www.instagram.com/kerimov.designs/"
                     target="_blank"
                     rel="noreferrer"
                     className="
@@ -220,7 +220,7 @@ export default function ContactHero({ onOpenForm }: ContactHeroProps) {
                   </a>
 
                   <a
-                    href="#"
+                    href="https://www.linkedin.com/in/rustam-kerimov-75bb5a331/"
                     target="_blank"
                     rel="noreferrer"
                     className="

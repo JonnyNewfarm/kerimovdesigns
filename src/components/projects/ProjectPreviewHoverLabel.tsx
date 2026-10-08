@@ -19,6 +19,7 @@ export default function ProjectPreviewHoverLabel({
   anchorRef,
   pointerRef,
   backgroundColor,
+  compact = false,
 }: PreviewHoverLabelProps) {
   const meshRef = useRef<THREE.Mesh | null>(null);
 
@@ -28,7 +29,7 @@ export default function ProjectPreviewHoverLabel({
 
   /*
    * =====================================================
-   * POSITION SPRING
+   * POSITION
    * =====================================================
    */
 
@@ -40,7 +41,7 @@ export default function ProjectPreviewHoverLabel({
 
   /*
    * =====================================================
-   * POINTER LAG FOR BEND
+   * POINTER LAG
    * =====================================================
    */
 
@@ -135,15 +136,23 @@ export default function ProjectPreviewHoverLabel({
      * =================================================
      * LABEL SIZE
      * =================================================
+     *
+     * Vanlig preview:
+     * 190 -> 290
+     *
+     * Grid card:
+     * 110 -> 170
      */
 
-    const labelWidth = THREE.MathUtils.clamp(rect.width * 0.25, 190, 290);
+    const labelWidth = compact
+      ? THREE.MathUtils.clamp(rect.width * 0.5, 145, 205)
+      : THREE.MathUtils.clamp(rect.width * 0.25, 190, 290);
 
-    const labelHeight = labelWidth * 0.35;
+    const labelHeight = labelWidth * (compact ? 0.33 : 0.35);
 
     /*
      * =================================================
-     * TARGET POSITION
+     * POSITION TARGET
      * =================================================
      */
 
@@ -158,8 +167,7 @@ export default function ProjectPreviewHoverLabel({
     positionTarget.current.set(targetX, targetY);
 
     /*
-     * Første frame på hover:
-     * ikke fly inn fra forrige posisjon.
+     * Første frame.
      */
 
     if (isHovered && !wasHovered.current) {
@@ -218,18 +226,8 @@ export default function ProjectPreviewHoverLabel({
 
     /*
      * =================================================
-     * BEND TARGET
+     * BEND
      * =================================================
-     *
-     * Før:
-     *
-     * X = 0.30 / max 0.052
-     * Y = 0.17 / max 0.038
-     *
-     * Nå litt roligere:
-     *
-     * X = 0.22 / max 0.036
-     * Y = 0.12 / max 0.026
      */
 
     const targetBendX = isHovered
@@ -250,10 +248,6 @@ export default function ProjectPreviewHoverLabel({
         )
       : 0;
 
-    /*
-     * Litt roligere spring.
-     */
-
     const bendStiffness = isHovered ? 88 : 72;
 
     const bendDamping = isHovered ? 18 : 14;
@@ -272,7 +266,7 @@ export default function ProjectPreviewHoverLabel({
 
     /*
      * =================================================
-     * SCALE REVEAL
+     * SCALE
      * =================================================
      */
 

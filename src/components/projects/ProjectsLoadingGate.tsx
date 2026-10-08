@@ -1,28 +1,43 @@
 "use client";
 
 import { useLoader } from "@react-three/fiber";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { TextureLoader } from "three";
 
 import HeroLoadingSpinner from "../hero/HeroLoadingSpinner";
 
-const MIN_LOADER_VISIBLE_TIME = 800;
-
-const BACKDROP_FADE_DURATION = 0.7;
-
+const MIN_LOADER_VISIBLE_TIME = 850;
 const NAVBAR_HEIGHT = 72;
+
+type ProjectsRevealContextType = {
+  revealStarted: boolean;
+};
+
+const ProjectsRevealContext = createContext<ProjectsRevealContextType>({
+  revealStarted: false,
+});
+
+export const useProjectsReveal = () => {
+  return useContext(ProjectsRevealContext);
+};
 
 type ProjectsLoadingGateProps = {
   children: ReactNode;
-
-  desktopSrc?: string | null;
-
+  desktopSrcs?: string[];
   mobileSrcs?: string[];
 };
 
 export default function ProjectsLoadingGate({
   children,
-  desktopSrc,
+  desktopSrcs = [],
   mobileSrcs = [],
 }: ProjectsLoadingGateProps) {
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
@@ -39,9 +54,35 @@ export default function ProjectsLoadingGate({
 
   const loaderStartedAtRef = useRef(0);
 
+  /*
+   * =====================================================
+   * STABLE SOURCES
+   * =====================================================
+   */
+
+  const stableDesktopSrcs = useMemo(() => {
+    return Array.from(new Set(desktopSrcs.filter(Boolean)));
+  }, [desktopSrcs]);
+
+  const stableMobileSrcs = useMemo(() => {
+    return Array.from(new Set(mobileSrcs.filter(Boolean)));
+  }, [mobileSrcs]);
+
+  /*
+   * =====================================================
+   * TIMER
+   * =====================================================
+   */
+
   useEffect(() => {
     loaderStartedAtRef.current = performance.now();
   }, []);
+
+  /*
+   * =====================================================
+   * VIEWPORT
+   * =====================================================
+   */
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
@@ -59,62 +100,40 @@ export default function ProjectsLoadingGate({
     };
   }, []);
 
+  /*
+   * =====================================================
+   * PRELOAD
+   * =====================================================
+   */
+
   useEffect(() => {
-    if (isDesktop === null || initialLoadFinishedRef.current || revealStarted) {
+    if (isDesktop === null || initialLoadFinishedRef.current) {
       return;
     }
 
     let cancelled = false;
 
-    if (isDesktop) {
-      if (!desktopSrc) {
-        setAssetsReady(true);
+    const sources = isDesktop ? stableDesktopSrcs : stableMobileSrcs;
 
-        return;
-      }
-
-      useLoader.preload(TextureLoader, desktopSrc);
-
-      const loader = new TextureLoader();
-
-      loader.load(
-        desktopSrc,
-
-        () => {
-          if (cancelled) {
-            return;
-          }
-
-          window.requestAnimationFrame(() => {
-            if (cancelled) {
-              return;
-            }
-
-            setAssetsReady(true);
-          });
-        },
-
-        undefined,
-
-        () => {
-          if (cancelled) {
-            return;
-          }
-
-          setAssetsReady(true);
-        },
-      );
-
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    if (mobileSrcs.length === 0) {
+    if (sources.length === 0) {
       setAssetsReady(true);
 
       return;
     }
+
+    /*
+     * Warm R3F cache.
+     */
+
+    if (isDesktop) {
+      sources.forEach((src) => {
+        useLoader.preload(TextureLoader, src);
+      });
+    }
+
+    /*
+     * Browser decode.
+     */
 
     let completed = 0;
 
@@ -125,23 +144,30 @@ export default function ProjectsLoadingGate({
 
       completed += 1;
 
-      if (completed < mobileSrcs.length) {
+      if (completed < sources.length) {
         return;
       }
 
-      window.requestAnimationFrame(() => {
-        if (cancelled) {
+      setAssetsReady(true);
+    };
+
+    const images = sources.map((src) => {
+      const image = new window.Image();
+
+      image.decoding = "async";
+
+      image.onload = () => {
+        if (typeof image.decode === "function") {
+          image
+            .decode()
+            .catch(() => {})
+            .finally(markComplete);
+
           return;
         }
 
-        setAssetsReady(true);
-      });
-    };
-
-    const images = mobileSrcs.map((src) => {
-      const image = new window.Image();
-
-      image.onload = markComplete;
+        markComplete();
+      };
 
       image.onerror = markComplete;
 
@@ -155,11 +181,19 @@ export default function ProjectsLoadingGate({
 
       images.forEach((image) => {
         image.onload = null;
-
         image.onerror = null;
       });
     };
-  }, [isDesktop, desktopSrc, mobileSrcs, revealStarted]);
+  }, [isDesktop, stableDesktopSrcs, stableMobileSrcs]);
+
+  /*
+   * =====================================================
+   * REVEAL
+   * =====================================================
+   *
+   * Children har allerede vært mounted bak loaderen.
+   * Derfor er WebGL canvases varme når reveal starter.
+   */
 
   useEffect(() => {
     if (!assetsReady || revealStarted || initialLoadFinishedRef.current) {
@@ -170,16 +204,37 @@ export default function ProjectsLoadingGate({
 
     const remaining = Math.max(MIN_LOADER_VISIBLE_TIME - elapsed, 0);
 
-    const timeout = window.setTimeout(() => {
-      setRevealStarted(true);
+    let frameOne = 0;
+    let frameTwo = 0;
 
-      setLoaderComplete(true);
+    const timeout = window.setTimeout(() => {
+      frameOne = window.requestAnimationFrame(() => {
+        frameTwo = window.requestAnimationFrame(() => {
+          setRevealStarted(true);
+
+          setLoaderComplete(true);
+        });
+      });
     }, remaining);
 
     return () => {
       window.clearTimeout(timeout);
+
+      if (frameOne) {
+        window.cancelAnimationFrame(frameOne);
+      }
+
+      if (frameTwo) {
+        window.cancelAnimationFrame(frameTwo);
+      }
     };
   }, [assetsReady, revealStarted]);
+
+  /*
+   * =====================================================
+   * LOADER EXIT
+   * =====================================================
+   */
 
   const handleExitComplete = () => {
     initialLoadFinishedRef.current = true;
@@ -187,65 +242,94 @@ export default function ProjectsLoadingGate({
     setLoaderExited(true);
   };
 
-  return (
-    <div
-      className="
-        relative
-        min-h-screen
-        bg-dark
-      "
-    >
-      {revealStarted ? children : null}
+  /*
+   * =====================================================
+   * RENDER
+   * =====================================================
+   */
 
-      {!loaderExited ? (
+  return (
+    <ProjectsRevealContext.Provider
+      value={{
+        revealStarted,
+      }}
+    >
+      <div
+        className="
+          relative
+          min-h-screen
+          bg-dark
+        "
+      >
+        {/* =============================================
+            CONTENT
+
+            Alltid mounted.
+            Cardene styrer sin egen reveal.
+        ============================================== */}
+
         <div
           className="
-            pointer-events-none
-            fixed
-            bottom-0
-            left-0
-            right-0
-            z-[1198]
-            overflow-hidden
+            relative
+            min-h-screen
           "
           style={{
-            top: `${NAVBAR_HEIGHT}px`,
+            pointerEvents: revealStarted ? "auto" : "none",
           }}
         >
-          <div
-            className={`
-              absolute
-              inset-0
+          {children}
+        </div>
 
-              bg-[#181c14]
+        {/* =============================================
+            LOADER
+        ============================================== */}
 
-              transition-opacity
-              ease-[cubic-bezier(0.22,1,0.36,1)]
-
-              ${revealStarted ? "opacity-0" : "opacity-100"}
-            `}
-            style={{
-              transitionDuration: `${BACKDROP_FADE_DURATION}s`,
-
-              transitionDelay: revealStarted ? "0.08s" : "0s",
-            }}
-          />
-
+        {!loaderExited ? (
           <div
             className="
               pointer-events-none
-              absolute
-              inset-0
-              z-[2]
+              fixed
+              bottom-0
+              left-0
+              right-0
+              z-[1198]
+              overflow-hidden
             "
+            style={{
+              top: `${NAVBAR_HEIGHT}px`,
+            }}
           >
-            <HeroLoadingSpinner
-              loaderComplete={loaderComplete}
-              onExitComplete={handleExitComplete}
+            <div
+              className={`
+                absolute
+                inset-0
+
+                bg-[#181c14]
+
+                transition-opacity
+                duration-700
+                ease-[cubic-bezier(0.16,1,0.3,1)]
+
+                ${revealStarted ? "opacity-0" : "opacity-100"}
+              `}
             />
+
+            <div
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                z-[2]
+              "
+            >
+              <HeroLoadingSpinner
+                loaderComplete={loaderComplete}
+                onExitComplete={handleExitComplete}
+              />
+            </div>
           </div>
-        </div>
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+    </ProjectsRevealContext.Provider>
   );
 }

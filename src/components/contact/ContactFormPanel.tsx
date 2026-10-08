@@ -1,29 +1,91 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import TextReveal from "@/components/TextReveal";
-
-import MagneticComp from "../MagneticComp";
+import FilterPopupThreeBackground from "@/components/projects/FilterPopupThreeBackground";
 
 import ContactForm from "./ContactForm";
-import {
-  backdropVariants,
-  contactEase,
-  panelVariants,
-} from "./contactAnimations";
+import { contactEase } from "./contactAnimations";
 
 type ContactFormPanelProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
+const PANEL_EASE = [0.22, 1, 0.36, 1] as const;
+
+const PANEL_ROTATE_Y = 10;
+
 export default function ContactFormPanel({
   isOpen,
   onClose,
 }: ContactFormPanelProps) {
+  const [mounted, setMounted] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  const [isPanelHovered, setIsPanelHovered] = useState(false);
+
+  /*
+   * =====================================================
+   * CLIENT
+   * =====================================================
+   */
+
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  /*
+   * =====================================================
+   * MOBILE
+   * =====================================================
+   */
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+
+    const update = () => {
+      setIsMobile(media.matches);
+    };
+
+    update();
+
+    media.addEventListener("change", update);
+
+    return () => {
+      media.removeEventListener("change", update);
+    };
+  }, []);
+
+  /*
+   * =====================================================
+   * RESET
+   * =====================================================
+   */
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    setIsPanelHovered(false);
+  }, [isOpen]);
+
+  /*
+   * =====================================================
+   * ESCAPE
+   * =====================================================
+   */
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
@@ -32,30 +94,55 @@ export default function ContactFormPanel({
 
     window.addEventListener("keydown", handleKeyDown);
 
-    if (!isOpen) {
-      return () => {
-        window.removeEventListener("keydown", handleKeyDown);
-      };
-    }
-
-    const body = document.body;
-    const previousOverflow = body.style.overflow;
-
-    body.style.overflow = "hidden";
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      body.style.overflow = previousOverflow;
     };
   }, [isOpen, onClose]);
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
+  /*
+   * =====================================================
+   * LOCK PAGE
+   * =====================================================
+   */
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const body = document.body;
+    const html = document.documentElement;
+
+    const previousBodyOverflow = body.style.overflow;
+    const previousHtmlOverflow = html.style.overflow;
+
+    const previousBodyOverscroll = body.style.overscrollBehavior;
+    const previousHtmlOverscroll = html.style.overscrollBehavior;
+
+    body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
+
+    body.style.overscrollBehavior = "none";
+    html.style.overscrollBehavior = "none";
+
+    return () => {
+      body.style.overflow = previousBodyOverflow;
+      html.style.overflow = previousHtmlOverflow;
+
+      body.style.overscrollBehavior = previousBodyOverscroll;
+      html.style.overscrollBehavior = previousHtmlOverscroll;
+    };
+  }, [isOpen]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  return createPortal(
+    <AnimatePresence mode="wait">
+      {isOpen ? (
         <motion.div
-          initial="hidden"
-          animate="visible"
-          exit="exit"
+          key="contact-modal"
           className="
             fixed
             inset-0
@@ -63,211 +150,358 @@ export default function ContactFormPanel({
             overflow-hidden
           "
         >
+          {/* =================================================
+              BACKDROP
+          ================================================= */}
+
           <motion.button
             type="button"
             aria-label="Close contact form"
-            variants={backdropVariants}
             onClick={onClose}
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            exit={{
+              opacity: 0,
+            }}
+            transition={{
+              duration: 0.35,
+              ease: PANEL_EASE,
+            }}
             className="
               absolute
               inset-0
+
               cursor-default
-              bg-[#181c14]/70
-              backdrop-blur-[2px]
+
+              bg-[#0b0e0a]/45
+
+              backdrop-blur-[5px]
             "
           />
 
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="contact-form-title"
-            variants={panelVariants}
-            data-lenis-prevent
+          {/* =================================================
+              STAGE
+          ================================================= */}
+
+          <div
             className="
+              pointer-events-none
+
               absolute
-              bottom-0
-              left-0
-              right-0
+              inset-0
 
-              w-full
-              max-w-full
-              max-h-[96dvh]
+              flex
+              items-center
+              justify-center
 
-              overflow-x-hidden
-              overflow-y-auto
+              p-3
 
-              overscroll-contain
-
-              bg-[#191a18]
-              px-5
-              pb-8
-              pt-5
-              text-[#ecdfcc]
-
-              [scrollbar-width:none]
-              [&::-webkit-scrollbar]:hidden
-
-              md:px-12
-              md:pb-12
-              md:pt-8
+              md:p-6
             "
+            style={{
+              perspective: isMobile ? "none" : "1050px",
+              perspectiveOrigin: "50% 50%",
+            }}
           >
-            <div
+            {/* ===============================================
+                PANEL
+            ================================================ */}
+
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="contact-form-title"
+              data-lenis-prevent
+              onPointerEnter={() => {
+                if (isMobile) {
+                  return;
+                }
+
+                setIsPanelHovered(true);
+              }}
+              onPointerLeave={() => {
+                if (isMobile) {
+                  return;
+                }
+
+                setIsPanelHovered(false);
+              }}
+              initial={{
+                opacity: 0,
+                y: 14,
+                scale: 0.985,
+                rotateY: isMobile ? 0 : PANEL_ROTATE_Y,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                rotateY: isMobile ? 0 : isPanelHovered ? 0 : PANEL_ROTATE_Y,
+              }}
+              exit={{
+                opacity: 0,
+                y: 8,
+                scale: 0.99,
+                rotateY: isMobile ? 0 : PANEL_ROTATE_Y * 0.4,
+              }}
+              transition={{
+                opacity: {
+                  duration: 0.38,
+                  ease: PANEL_EASE,
+                },
+
+                y: {
+                  duration: 0.58,
+                  ease: PANEL_EASE,
+                },
+
+                scale: {
+                  duration: 0.58,
+                  ease: PANEL_EASE,
+                },
+
+                rotateY: {
+                  duration: isPanelHovered ? 0.68 : 0.85,
+                  ease: PANEL_EASE,
+                },
+              }}
+              style={{
+                width: isMobile
+                  ? "calc(100vw - 24px)"
+                  : "min(580px, calc(100vw - 48px))",
+
+                maxHeight: isMobile
+                  ? "calc(100dvh - 24px)"
+                  : "min(620px, calc(100dvh - 64px))",
+
+                transformStyle: isMobile ? "flat" : "preserve-3d",
+
+                transformOrigin: "50% 50%",
+
+                backfaceVisibility: "hidden",
+
+                WebkitBackfaceVisibility: "hidden",
+              }}
               className="
-                mx-auto
-                w-full
-                min-w-0
-                max-w-[1800px]
+                pointer-events-auto
+
+                relative
+                isolate
+
+                flex
+                flex-col
+
+                overflow-hidden
+
+                bg-[#59624f]
+
+                text-[#ecdfcc]
+
+                will-change-transform
               "
             >
+              {/* =============================================
+                  THREE BACKGROUND
+
+                  VIKTIG:
+                  Panelet venter IKKE på canvaset lenger.
+
+                  Derfor ingen glitch når WebGL blir ready.
+              ============================================== */}
+
+              <FilterPopupThreeBackground />
+
+              {/* =============================================
+                  CONTENT
+              ============================================== */}
+
               <div
                 className="
-                  mb-14
+                  relative
+                  z-10
+
                   flex
-                  min-w-0
-                  items-start
-                  justify-between
-                  border-b
-                  border-[#ecdfcc]/25
-                  pb-5
-                  md:mb-20
+                  min-h-0
+                  flex-1
+                  flex-col
                 "
               >
-                <div className="min-w-0">
-                  <TextReveal
-                    as="p"
-                    viewport={false}
-                    delay={0.38}
-                    duration={0.65}
-                    y="100%"
-                    className="
-                      mb-3
-                      text-[11px]
-                      uppercase
-                      opacity-50
-                    "
-                  >
-                    New inquiry
-                  </TextReveal>
+                {/* ===========================================
+                    HEADER
+                ============================================ */}
 
-                  <h2 id="contact-form-title">
-                    <TextReveal
-                      as="span"
-                      viewport={false}
-                      delay={0.43}
-                      duration={0.9}
-                      y="110%"
-                      rotate={2}
-                      className="
-                        text-3xl
-                        font-semibold
-                        uppercase
-                        tracking-[-0.02em]
-                        md:text-3xl
-                      "
-                    >
-                      Send a message
-                    </TextReveal>
-                  </h2>
-                </div>
+                <div
+                  className="
+                    flex
+                    shrink-0
+                    items-start
+                    justify-between
+                    gap-4
 
-                <MagneticComp>
+                    px-4
+                    pb-3
+                    pt-4
+
+                    sm:px-5
+                    sm:pt-6
+                    sm:pb-6
+                  "
+                >
+                  <div className="min-w-0">
+                    <h2 id="contact-form-title">
+                      <TextReveal
+                        as="span"
+                        mode="words"
+                        viewport={false}
+                        delay={0.14}
+                        duration={0.72}
+                        y="105%"
+                        rotate={0.6}
+                        className="
+                          block
+
+                          font-bueno
+                          mb-6
+                          mt-2
+
+                          text-[clamp(1.4rem,3.7vw,1.9rem)]
+                          font-black
+
+                          uppercase
+                          leading-[0.88]
+                          tracking-[-0.025em]
+
+                          text-white
+                        "
+                      >
+                        Send a message
+                      </TextReveal>
+                    </h2>
+                  </div>
+
+                  {/* =========================================
+                      CLOSE
+                  ========================================== */}
+
                   <motion.button
                     type="button"
                     onClick={onClose}
                     aria-label="Close contact form"
                     initial={{
                       opacity: 0,
-                      scale: 0.8,
+                      x: 5,
                     }}
                     animate={{
                       opacity: 1,
-                      scale: 1,
+                      x: 0,
+                    }}
+                    whileHover={
+                      isMobile
+                        ? undefined
+                        : {
+                            x: 2,
+                          }
+                    }
+                    whileTap={{
+                      scale: 0.97,
                     }}
                     transition={{
-                      delay: 0.48,
-                      duration: 0.65,
+                      delay: 0.08,
+                      duration: 0.32,
                       ease: contactEase,
                     }}
                     className="
-                      group
-                      relative
-                      flex
-                      h-11
-                      w-11
                       shrink-0
+
                       cursor-pointer
-                      items-center
-                      justify-center
-                      overflow-hidden
-                      rounded-full
-                      border
-                      border-[#ecdfcc]/40
+
+                      bg-[#20241e]/90
+
+                      px-2.5
+                      py-2
+                      mt-1.5
+
+                      text-[7px]
+                      font-black
+                      uppercase
+                      tracking-[0.17em]
+
+                      text-white/65
+
                       transition-colors
-                      duration-500
-                      hover:border-[#25221d]
+                      duration-300
+
+                      hover:bg-[#171a15]
+                      hover:text-white
                     "
                   >
-                    <span
-                      className="
-                        absolute
-                        inset-0
-                        origin-bottom
-                        scale-y-0
-                        bg-[#2c2a28]
-                        transition-transform
-                        duration-500
-                        ease-[cubic-bezier(0.76,0,0.24,1)]
-                        group-hover:scale-y-100
-                      "
-                    />
-
-                    <span className="relative z-10 block h-4 w-4">
-                      <span
-                        className="
-                          absolute
-                          left-1/2
-                          top-1/2
-                          h-px
-                          w-4
-                          -translate-x-1/2
-                          -translate-y-1/2
-                          bg-current
-                          transition-transform
-                          duration-500
-                          ease-[cubic-bezier(0.76,0,0.24,1)]
-                          group-hover:rotate-45
-                        "
-                      />
-
-                      <span
-                        className="
-                          absolute
-                          left-1/2
-                          top-1/2
-                          h-px
-                          w-4
-                          -translate-x-1/2
-                          -translate-y-1/2
-                          scale-x-0
-                          bg-current
-                          transition-transform
-                          duration-500
-                          ease-[cubic-bezier(0.76,0,0.24,1)]
-                          group-hover:-rotate-45
-                          group-hover:scale-x-100
-                        "
-                      />
-                    </span>
+                    Close
                   </motion.button>
-                </MagneticComp>
-              </div>
+                </div>
 
-              <ContactForm />
-            </div>
-          </motion.div>
+                {/* ===========================================
+                    INTRO
+                ============================================ */}
+
+                {/* ===========================================
+                    FORM
+                ============================================ */}
+
+                <div
+                  data-lenis-prevent
+                  className="
+                    min-h-0
+                    flex-1
+
+                    overflow-x-hidden
+                    overflow-y-auto
+
+                    overscroll-contain
+
+                    px-4
+                    pb-5
+
+                    [scrollbar-width:none]
+
+                    [&::-webkit-scrollbar]:hidden
+
+                    sm:px-5
+                  "
+                >
+                  <motion.div
+                    initial={{
+                      opacity: 0,
+                      y: 8,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    transition={{
+                      duration: 0.6,
+                      delay: 0.18,
+                      ease: PANEL_EASE,
+                    }}
+                    className="
+                      min-w-0
+                      w-full
+                      mb-2
+                    "
+                  >
+                    <ContactForm />
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </motion.div>
-      )}
-    </AnimatePresence>
+      ) : null}
+    </AnimatePresence>,
+
+    document.body,
   );
 }

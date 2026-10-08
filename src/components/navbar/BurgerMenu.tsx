@@ -301,23 +301,50 @@ export default function BurgerMenu() {
                       py-5
                     "
                   >
-                    <span>
-                      <span
-                        className="
-                          text-[clamp(2rem,9vw,2.6rem)]
-                          font-medium
-                          uppercase
-                          leading-[0.85]
-                          tracking-[-0.035em]
-                        "
-                      >
-                        {link.label}
-                      </span>
-                    </span>
+                    <motion.span
+                      initial={false}
+                      animate={{
+                        x: active ? 10 : 0,
+                        scale: active ? 1.035 : 1,
+                        color: active
+                          ? "rgba(236,223,204,1)"
+                          : "rgba(236,223,204,0.48)",
+                      }}
+                      transition={{
+                        duration: 0.5,
+                        ease: REVEAL_EASE,
+                      }}
+                      className="
+                        origin-left
+                        text-[clamp(2rem,9vw,2.6rem)]
+                        font-medium
+                        uppercase
+                        leading-[0.85]
+                        tracking-[-0.035em]
+                      "
+                    >
+                      {link.label}
+                    </motion.span>
 
-                    <span className="text-[10px] uppercase tracking-[0.18em] text-[#ecdfcc]/30">
+                    <motion.span
+                      initial={false}
+                      animate={{
+                        opacity: active ? 0.75 : 0.3,
+                        x: active ? -3 : 0,
+                      }}
+                      transition={{
+                        duration: 0.5,
+                        ease: REVEAL_EASE,
+                      }}
+                      className="
+                        text-[10px]
+                        uppercase
+                        tracking-[0.18em]
+                        text-[#ecdfcc]
+                      "
+                    >
                       0{index + 1}
-                    </span>
+                    </motion.span>
                   </TransitionLink>
                 </motion.div>
               );

@@ -1,0 +1,178 @@
+"use client";
+
+import { Canvas, useFrame } from "@react-three/fiber";
+
+import { useMemo, useRef } from "react";
+
+import * as THREE from "three";
+
+import {
+  filterPopupFragmentShader,
+  filterPopupVertexShader,
+} from "./filterPopupShaders";
+
+type FilterPopupThreeBackgroundProps = {
+  onReady?: () => void;
+};
+
+function FilterPopupPlane({ onReady }: { onReady?: () => void }) {
+  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+
+  const elapsedRef = useRef(0);
+
+  const frameCountRef = useRef(0);
+
+  const readyReportedRef = useRef(false);
+
+  const uniforms = useMemo(
+    () => ({
+      uTime: {
+        value: 0,
+      },
+
+      /*
+       * Litt roligere movement.
+       */
+      uSpeed: {
+        value: 0.62,
+      },
+    }),
+    [],
+  );
+
+  useFrame((_, delta) => {
+    const material = materialRef.current;
+
+    if (!material) {
+      return;
+    }
+
+    elapsedRef.current += Math.min(delta, 0.05);
+
+    material.uniforms.uTime.value = elapsedRef.current;
+
+    if (!readyReportedRef.current) {
+      frameCountRef.current += 1;
+
+      if (frameCountRef.current >= 4) {
+        readyReportedRef.current = true;
+
+        onReady?.();
+      }
+    }
+  });
+
+  return (
+    <mesh frustumCulled={false}>
+      <planeGeometry args={[2, 2, 1, 1]} />
+
+      <shaderMaterial
+        ref={materialRef}
+        vertexShader={filterPopupVertexShader}
+        fragmentShader={filterPopupFragmentShader}
+        uniforms={uniforms}
+        depthTest={false}
+        depthWrite={false}
+        transparent={false}
+        toneMapped={false}
+        precision="highp"
+      />
+    </mesh>
+  );
+}
+
+export default function FilterPopupThreeBackground({
+  onReady,
+}: FilterPopupThreeBackgroundProps) {
+  return (
+    <div
+      aria-hidden="true"
+      className="
+        pointer-events-none
+        absolute
+        inset-0
+        z-0
+        overflow-hidden
+      "
+      style={{
+        /*
+         * Mørkere fallback som matcher gradienten.
+         */
+        background: "rgb(66, 72, 59)",
+        transform: "translateZ(0)",
+      }}
+    >
+      {/*
+       * Solid base layer.
+       *
+       * Hvis canvas bruker et frame på å bli klar,
+       * ser du denne i stedet for svart.
+       */}
+      <div
+        className="
+          absolute
+          inset-0
+        "
+        style={{
+          background: "rgb(66, 72, 59)",
+        }}
+      />
+
+      {/*
+       * Viktig fix:
+       * Canvas-wrapperen overscanner noen px
+       * INNI popupen.
+       *
+       * Parent har overflow-hidden,
+       * så dette kan ikke lage ny ytre kant.
+       *
+       * Men det skjuler seam på høyre/bunn.
+       */}
+      <div
+        className="
+          absolute
+          -inset-[3px]
+        "
+        style={{
+          transform: "translateZ(0)",
+        }}
+      >
+        <Canvas
+          orthographic
+          frameloop="always"
+          dpr={[1, 1.5]}
+          camera={{
+            position: [0, 0, 1],
+          }}
+          gl={{
+            antialias: false,
+            alpha: false,
+            depth: false,
+            stencil: false,
+            powerPreference: "high-performance",
+          }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(new THREE.Color(0.26, 0.285, 0.235), 1);
+
+            gl.domElement.style.display = "block";
+
+            gl.domElement.style.width = "100%";
+
+            gl.domElement.style.height = "100%";
+
+            gl.domElement.style.transform = "translateZ(0)";
+          }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            display: "block",
+          }}
+        >
+          <FilterPopupPlane onReady={onReady} />
+        </Canvas>
+      </div>
+    </div>
+  );
+}
