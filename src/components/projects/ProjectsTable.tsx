@@ -11,7 +11,6 @@ import ProjectsGridCard from "./ProjectsGridCard";
 import { useProjectsReveal } from "./ProjectsLoadingGate";
 
 import type { PointerState, SharedPointerRef } from "./projectPreviewTypes";
-
 import type { ProjectsTableProps } from "./projectsTypes";
 
 import { projectsEase } from "./projectUtils";
@@ -30,20 +29,10 @@ export default function ProjectsTable({
 
   const [showEmptyState, setShowEmptyState] = useState(false);
 
-  const [hoveredProjectId, setHoveredProjectId] = useState<string | null>(null);
-
-  const [filterPopupOpen, setFilterPopupOpen] = useState(false);
-
   /*
    * =====================================================
    * MAIN ANCHOR
    * =====================================================
-   *
-   * Filter-popupen bruker denne for å åpne
-   * over starten av project grid.
-   *
-   * Den er derfor ikke koblet til posisjonen til
-   * "View all filters"-knappen.
    */
 
   const mainRef = useRef<HTMLElement | null>(null);
@@ -70,40 +59,15 @@ export default function ProjectsTable({
     active: false,
   });
 
-  /*
-   * Når popup åpnes skal ingen project-card
-   * fortsatt tro at den er hovered.
-   */
-
-  useEffect(() => {
-    if (!filterPopupOpen) {
-      return;
-    }
-
-    pointerRef.current.active = false;
-
-    setHoveredProjectId(null);
-  }, [filterPopupOpen]);
-
   useEffect(() => {
     const handlePointerMove = (event: PointerEvent) => {
-      if (filterPopupOpen) {
-        pointerRef.current.active = false;
-
-        return;
-      }
-
       pointerRef.current.x = event.clientX;
-
       pointerRef.current.y = event.clientY;
-
       pointerRef.current.active = true;
     };
 
     const handlePointerLeave = () => {
       pointerRef.current.active = false;
-
-      setHoveredProjectId(null);
     };
 
     window.addEventListener("pointermove", handlePointerMove, {
@@ -123,7 +87,7 @@ export default function ProjectsTable({
         handlePointerLeave,
       );
     };
-  }, [filterPopupOpen]);
+  }, []);
 
   /*
    * =====================================================
@@ -144,8 +108,6 @@ export default function ProjectsTable({
   }, [projects, selectedTags]);
 
   const handleFilterChange = (nextTags: string[]) => {
-    setHoveredProjectId(null);
-
     setSelectedTags(nextTags);
   };
 
@@ -161,8 +123,6 @@ export default function ProjectsTable({
 
       return;
     }
-
-    setHoveredProjectId(null);
 
     const timeout = window.setTimeout(() => {
       setShowEmptyState(true);
@@ -180,8 +140,6 @@ export default function ProjectsTable({
    */
 
   const handleViewAllWork = () => {
-    setHoveredProjectId(null);
-
     setSelectedTags([]);
 
     const params = new URLSearchParams(window.location.search);
@@ -275,32 +233,32 @@ export default function ProjectsTable({
 
           <aside
             className="
-    relative
-    min-w-0
-  "
+              relative
+              min-w-0
+            "
           >
             <div
               className="
-      sticky
-      top-28
+                sticky
+                top-28
 
-      flex
-      h-[calc(100dvh-9rem)]
-      min-h-0
-      flex-col
-    "
+                flex
+                h-[calc(100dvh-9rem)]
+                min-h-0
+                flex-col
+              "
             >
               {/* =============================================
-        MIDDLE — EDITORIAL STATEMENT
-    ============================================== */}
+                  MIDDLE — EDITORIAL STATEMENT
+              ============================================== */}
 
               <div
                 className="
-        flex
-        min-h-0
-        flex-1
-        items-center
-      "
+                  flex
+                  min-h-0
+                  flex-1
+                  items-center
+                "
               >
                 <motion.div
                   initial={false}
@@ -322,8 +280,8 @@ export default function ProjectsTable({
                     },
                   }}
                   className="
-          -translate-y-[2vh]
-        "
+                    -translate-y-[2vh]
+                  "
                 >
                   {children ? <div className="mb-6">{children}</div> : null}
 
@@ -338,20 +296,19 @@ export default function ProjectsTable({
                     y="105%"
                     rotate={0.8}
                     className="
+                      font-bueno
 
-    font-bueno
-    text-[clamp(1.3rem,1.55vw,1.75rem)]
-    font-black
+                      text-[clamp(1.3rem,1.55vw,1.75rem)]
+                      font-black
 
-    uppercase
-    leading-[0.92]
-    tracking-[-0.018em]
+                      uppercase
+                      leading-[0.92]
+                      tracking-[-0.018em]
 
-    text-color
+                      text-color
 
-  
-    2xl:text-[clamp(1.4rem,1.5vw,1.9rem)]
-  "
+                      2xl:text-[clamp(1.4rem,1.5vw,1.9rem)]
+                    "
                   >
                     {
                       "Selected projects\nacross identity,\nprint, digital and\nexperimental work."
@@ -361,10 +318,8 @@ export default function ProjectsTable({
               </div>
 
               {/* =============================================
-        BOTTOM — FILTER
-
-        Litt løftet fra bunnen.
-    ============================================== */}
+                  BOTTOM — FILTER
+              ============================================== */}
 
               <motion.div
                 initial={false}
@@ -386,17 +341,17 @@ export default function ProjectsTable({
                   },
                 }}
                 className="
-        w-full
-        max-w-[220px]
-        shrink-0
+                  w-full
+                  max-w-[220px]
+                  shrink-0
 
-        pb-10
+                  pb-10
 
-        xl:max-w-[235px]
-        xl:pb-12
+                  xl:max-w-[235px]
+                  xl:pb-12
 
-        2xl:pb-14
-      "
+                  2xl:pb-14
+                "
               >
                 <ProjectsDesktopFilter
                   availableTags={availableTags}
@@ -428,23 +383,18 @@ export default function ProjectsTable({
               initial={false}
               animate={{
                 opacity: revealStarted ? 1 : 0,
-
                 y: revealStarted ? 0 : 7,
               }}
               transition={{
                 opacity: {
                   duration: 0.7,
-
                   delay: 0.28,
-
                   ease: projectsEase,
                 },
 
                 y: {
                   duration: 0.8,
-
                   delay: 0.28,
-
                   ease: projectsEase,
                 },
               }}
@@ -469,17 +419,14 @@ export default function ProjectsTable({
                 key={filteredProjects.length}
                 initial={{
                   opacity: 0,
-
                   y: 4,
                 }}
                 animate={{
                   opacity: 1,
-
                   y: 0,
                 }}
                 transition={{
                   duration: 0.38,
-
                   ease: projectsEase,
                 }}
               >
@@ -490,13 +437,7 @@ export default function ProjectsTable({
 
               <span>{String(projects.length).padStart(2, "0")}</span>
 
-              <span
-                className="
-                  ml-1
-                "
-              >
-                Projects
-              </span>
+              <span className="ml-1">Projects</span>
             </motion.div>
 
             {/* =============================================
@@ -509,7 +450,6 @@ export default function ProjectsTable({
                 transition={{
                   layout: {
                     duration: 0.78,
-
                     ease: [0.22, 1, 0.36, 1],
                   },
                 }}
@@ -530,14 +470,6 @@ export default function ProjectsTable({
                 {projects.map((project, index) => {
                   const active = activeIds.has(project.id);
 
-                  const isHovered = hoveredProjectId === project.id;
-
-                  const isDimmed =
-                    !filterPopupOpen &&
-                    active &&
-                    hoveredProjectId !== null &&
-                    !isHovered;
-
                   return (
                     <ProjectsGridCard
                       key={project.id}
@@ -552,19 +484,6 @@ export default function ProjectsTable({
                         activeOrderById.get(project.id) ??
                         projects.length + index
                       }
-                      isDimmed={isDimmed}
-                      onImagePointerEnter={() => {
-                        if (!active || filterPopupOpen) {
-                          return;
-                        }
-
-                        setHoveredProjectId(project.id);
-                      }}
-                      onImagePointerLeave={() => {
-                        setHoveredProjectId((current) =>
-                          current === project.id ? null : current,
-                        );
-                      }}
                     />
                   );
                 })}
@@ -585,7 +504,6 @@ export default function ProjectsTable({
                 }}
                 transition={{
                   duration: 0.4,
-
                   ease: projectsEase,
                 }}
                 className="
@@ -631,19 +549,15 @@ export default function ProjectsTable({
                   <motion.div
                     initial={{
                       opacity: 0,
-
                       y: 10,
                     }}
                     animate={{
                       opacity: 1,
-
                       y: 0,
                     }}
                     transition={{
                       duration: 0.75,
-
                       delay: 0.17,
-
                       ease: projectsEase,
                     }}
                     className="
@@ -681,7 +595,6 @@ export default function ProjectsTable({
                       }}
                       transition={{
                         duration: 0.4,
-
                         ease: projectsEase,
                       }}
                       className="
