@@ -1,10 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import TextReveal from "@/components/TextReveal";
+
 import ContactPopupThreeBackground from "./ContactPopupThreeBackground";
 import ContactForm from "./ContactForm";
 import { contactEase } from "./contactAnimations";
@@ -27,6 +28,8 @@ export default function ContactFormPanel({
   const [isMobile, setIsMobile] = useState(false);
 
   const [isPanelHovered, setIsPanelHovered] = useState(false);
+
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
   /*
    * =====================================================
@@ -102,6 +105,11 @@ export default function ContactFormPanel({
    * =====================================================
    * LOCK PAGE
    * =====================================================
+   *
+   * Fryser siden bak modalen helt.
+   *
+   * Viktig på mobil fordi hero / Lenis / Three ellers
+   * kan motta scroll og touch mens Contact er åpen.
    */
 
   useEffect(() => {
@@ -112,24 +120,63 @@ export default function ContactFormPanel({
     const body = document.body;
     const html = document.documentElement;
 
-    const previousBodyOverflow = body.style.overflow;
-    const previousHtmlOverflow = html.style.overflow;
+    const scrollY = window.scrollY;
 
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyPosition = body.style.position;
+    const previousBodyTop = body.style.top;
+    const previousBodyLeft = body.style.left;
+    const previousBodyRight = body.style.right;
+    const previousBodyWidth = body.style.width;
     const previousBodyOverscroll = body.style.overscrollBehavior;
+
+    const previousHtmlOverflow = html.style.overflow;
     const previousHtmlOverscroll = html.style.overscrollBehavior;
 
-    body.style.overflow = "hidden";
-    html.style.overflow = "hidden";
+    /*
+     * Lock document.
+     */
 
-    body.style.overscrollBehavior = "none";
+    html.style.overflow = "hidden";
     html.style.overscrollBehavior = "none";
 
-    return () => {
-      body.style.overflow = previousBodyOverflow;
-      html.style.overflow = previousHtmlOverflow;
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "none";
 
+    /*
+     * Frys body på nåværende scrollposisjon.
+     *
+     * Dette er spesielt viktig på iOS/mobile Safari,
+     * hvor overflow:hidden alene ikke alltid er nok.
+     */
+
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+
+    return () => {
+      /*
+       * Restore original document styles.
+       */
+
+      body.style.overflow = previousBodyOverflow;
+      body.style.position = previousBodyPosition;
+      body.style.top = previousBodyTop;
+      body.style.left = previousBodyLeft;
+      body.style.right = previousBodyRight;
+      body.style.width = previousBodyWidth;
       body.style.overscrollBehavior = previousBodyOverscroll;
+
+      html.style.overflow = previousHtmlOverflow;
       html.style.overscrollBehavior = previousHtmlOverscroll;
+
+      /*
+       * Restore exact scroll position.
+       */
+
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
 
@@ -142,6 +189,18 @@ export default function ContactFormPanel({
       {isOpen ? (
         <motion.div
           key="contact-modal"
+          onPointerDown={(event) => {
+            event.stopPropagation();
+          }}
+          onPointerMove={(event) => {
+            event.stopPropagation();
+          }}
+          onWheel={(event) => {
+            event.stopPropagation();
+          }}
+          onTouchMove={(event) => {
+            event.stopPropagation();
+          }}
           className="
             fixed
             inset-0
@@ -215,6 +274,8 @@ export default function ContactFormPanel({
               aria-modal="true"
               aria-labelledby="contact-form-title"
               data-lenis-prevent
+              data-lenis-prevent-wheel
+              data-lenis-prevent-touch
               onPointerEnter={() => {
                 if (isMobile) {
                   return;
@@ -228,6 +289,18 @@ export default function ContactFormPanel({
                 }
 
                 setIsPanelHovered(false);
+              }}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
+              onPointerMove={(event) => {
+                event.stopPropagation();
+              }}
+              onWheel={(event) => {
+                event.stopPropagation();
+              }}
+              onTouchMove={(event) => {
+                event.stopPropagation();
               }}
               initial={{
                 opacity: 0,
@@ -306,13 +379,11 @@ export default function ContactFormPanel({
               {/* =============================================
                   THREE BACKGROUND
 
-                  VIKTIG:
-                  Panelet venter IKKE på canvaset lenger.
-
-                  Derfor ingen glitch når WebGL blir ready.
+                  Panelet venter ikke på canvaset.
               ============================================== */}
 
               <ContactPopupThreeBackground />
+
               {/* =============================================
                   CONTENT
               ============================================== */}
@@ -345,8 +416,8 @@ export default function ContactFormPanel({
                     pt-4
 
                     sm:px-5
-                    sm:pt-6
                     sm:pb-6
+                    sm:pt-6
                   "
                 >
                   <div className="min-w-0">
@@ -362,9 +433,10 @@ export default function ContactFormPanel({
                         className="
                           block
 
-                          font-bueno
                           mb-6
                           mt-2
+
+                          font-bueno
 
                           text-[clamp(1.4rem,3.7vw,1.9rem)]
                           font-black
@@ -413,6 +485,7 @@ export default function ContactFormPanel({
                       ease: contactEase,
                     }}
                     className="
+                      mt-1.5
                       shrink-0
 
                       cursor-pointer
@@ -421,7 +494,6 @@ export default function ContactFormPanel({
 
                       px-2.5
                       py-2
-                      mt-1.5
 
                       text-[7px]
                       font-black
@@ -442,15 +514,24 @@ export default function ContactFormPanel({
                 </div>
 
                 {/* ===========================================
-                    INTRO
-                ============================================ */}
-
-                {/* ===========================================
                     FORM
                 ============================================ */}
 
                 <div
+                  ref={scrollAreaRef}
                   data-lenis-prevent
+                  data-lenis-prevent-wheel
+                  data-lenis-prevent-touch
+                  onWheel={(event) => {
+                    event.stopPropagation();
+                  }}
+                  onTouchMove={(event) => {
+                    event.stopPropagation();
+                  }}
+                  style={{
+                    touchAction: "pan-y",
+                    WebkitOverflowScrolling: "touch",
+                  }}
                   className="
                     min-h-0
                     flex-1
@@ -485,9 +566,9 @@ export default function ContactFormPanel({
                       ease: PANEL_EASE,
                     }}
                     className="
+                      mb-2
                       min-w-0
                       w-full
-                      mb-2
                     "
                   >
                     <ContactForm />

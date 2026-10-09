@@ -23,6 +23,7 @@ type ProjectListItem = {
   id: string;
   title: string;
   src: string;
+  hoverText?: string | null;
   type: string | null;
   tools: string | null;
   tags: string[];
@@ -1046,7 +1047,7 @@ const ProjectCard = ({
     >
       <TransitionLink
         href={`/project/${project.id}`}
-        transitionLabel={project.title}
+        transitionColor={project.hoverText}
         className="block"
       >
         <motion.div
@@ -1114,7 +1115,7 @@ const ProjectCard = ({
 
         <TransitionLink
           href={`/project/${project.id}`}
-          transitionLabel={project.title}
+          transitionColor={project.hoverText}
           className="inline-block"
         >
           <TextReveal
