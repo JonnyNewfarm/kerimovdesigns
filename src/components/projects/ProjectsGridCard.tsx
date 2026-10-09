@@ -235,7 +235,7 @@ export default function ProjectsGridCard({
         <TransitionLink
           ref={imageLinkRef}
           href={`/project/${project.id}`}
-          transitionLabel={project.title}
+          transitionColor={project.hoverText}
           aria-label={`Open project ${project.title}`}
           className="
             group
@@ -328,7 +328,7 @@ export default function ProjectsGridCard({
 
           <TransitionLink
             href={`/project/${project.id}`}
-            transitionLabel={project.title}
+            transitionColor={project.hoverText}
             className="
               block
               w-fit

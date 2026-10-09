@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { useContactOverlay } from "../contact/ContactOverlayProvider";
 import { useHeroIntro } from "../HeroIntroContext";
 import LinkReveal from "../LinkReveal";
 import { useProjectNav } from "../ProjectNavContext";
@@ -31,6 +32,8 @@ const Navbar = () => {
   const { introExited } = useHeroIntro();
   const { projectTitle } = useProjectNav();
 
+  const { isContactOpen, openContact } = useContactOverlay();
+
   const [showProjectTitle, setShowProjectTitle] = useState(true);
   const [isProjectTitleHovered, setIsProjectTitleHovered] = useState(false);
   const [showSecondaryInfo, setShowSecondaryInfo] = useState(true);
@@ -43,6 +46,12 @@ const Navbar = () => {
   const isProjectDetailPage = pathname.startsWith("/project/");
 
   const shouldShowNavbar = !isHomePage || introExited;
+
+  /*
+   * =========================================================
+   * SECONDARY NAV INFO
+   * =========================================================
+   */
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -94,6 +103,12 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleNavbarInfoScroll);
     };
   }, []);
+
+  /*
+   * =========================================================
+   * PROJECT TITLE
+   * =========================================================
+   */
 
   useEffect(() => {
     if (!isProjectDetailPage) {
@@ -157,6 +172,12 @@ const Navbar = () => {
     };
   }, [isProjectDetailPage, pathname]);
 
+  /*
+   * =========================================================
+   * CLOSE PROJECT
+   * =========================================================
+   */
+
   const handleCloseProject = () => {
     if (window.history.length > 1) {
       router.back();
@@ -167,41 +188,56 @@ const Navbar = () => {
     router.push("/projects");
   };
 
+  /*
+   * =========================================================
+   * LINK STYLE
+   * =========================================================
+   */
+
   const getLinkClassName = (href: string) => {
     const isActive =
-      pathname === href ||
-      (href === "/projects" &&
-        (pathname.startsWith("/projects") || pathname.startsWith("/project/")));
+      href === "/contact"
+        ? pathname === "/contact" || isContactOpen
+        : pathname === href ||
+          (href === "/projects" &&
+            (pathname.startsWith("/projects") ||
+              pathname.startsWith("/project/")));
 
     return [
       `
-      relative
-      inline-block
-      -mt-1
-      text-2xl
+        relative
+        inline-block
+        -mt-1
+        text-2xl
 
-      transition-opacity
-      duration-300
+        transition-opacity
+        duration-300
 
-      outline-none
+        outline-none
 
-      after:absolute
-      after:left-0
-      after:-bottom-[3px]
-      after:h-[2px]
-      after:w-full
-      after:origin-left
-      after:scale-x-0
-      after:bg-current
-      after:transition-transform
-      after:duration-300
+        after:absolute
+        after:left-0
+        after:-bottom-[3px]
+        after:h-[2px]
+        after:w-full
+        after:origin-left
+        after:scale-x-0
+        after:bg-current
+        after:transition-transform
+        after:duration-300
 
-      focus-visible:opacity-100
-      focus-visible:after:scale-x-100
-    `,
+        focus-visible:opacity-100
+        focus-visible:after:scale-x-100
+      `,
       isActive ? "opacity-100" : "opacity-80 hover:opacity-100",
     ].join(" ");
   };
+
+  /*
+   * =========================================================
+   * SECONDARY INFO ANIMATION
+   * =========================================================
+   */
 
   const secondaryInfoAnimation = showSecondaryInfo
     ? {
@@ -218,6 +254,12 @@ const Navbar = () => {
   const secondaryInfoClassName = `tracking-tighter ${
     showSecondaryInfo ? "pointer-events-auto" : "pointer-events-none"
   }`;
+
+  /*
+   * =========================================================
+   * RENDER
+   * =========================================================
+   */
 
   return (
     <motion.nav
@@ -254,397 +296,473 @@ const Navbar = () => {
         lg:block
       "
     >
-      <div className="text-color z-50 flex w-full items-start justify-between px-20 py-3 text-[14px] font-extrabold">
-        <div className="h-full w-full">
-          <div className="flex items-start justify-between">
-            {/* NAME */}
-            <motion.div
-              initial={false}
-              animate={secondaryInfoAnimation}
-              transition={{
-                duration: showSecondaryInfo ? 0.6 : 0.4,
-                ease: PROJECT_EASE,
-              }}
-              className={secondaryInfoClassName}
+      <div
+        className="
+          text-color
+          z-50
+          w-full
+
+          px-20
+          py-3
+
+          text-[13px]
+          font-extrabold
+
+          xl:text-[14px]
+        "
+      >
+        <div
+          className="
+            grid
+            w-full
+            min-w-0
+            items-start
+
+            grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]
+
+            xl:grid-cols-4
+          "
+        >
+          {/* =================================================
+              NAME
+          ================================================= */}
+
+          <motion.div
+            initial={false}
+            animate={secondaryInfoAnimation}
+            transition={{
+              duration: showSecondaryInfo ? 0.6 : 0.4,
+              ease: PROJECT_EASE,
+            }}
+            className={`
+              ${secondaryInfoClassName}
+              justify-self-start
+            `}
+          >
+            <TextReveal
+              as="p"
+              mode="words"
+              viewport={false}
+              active={shouldShowNavbar}
+              delay={REVEAL_DELAYS.name}
+              stagger={0.025}
+              duration={0.75}
+              y="115%"
+              rotate={1.5}
+              className="m-0 uppercase leading-tight"
             >
-              <TextReveal
-                as="p"
-                mode="words"
-                viewport={false}
+              Name / Rustam Kerimov
+            </TextReveal>
+          </motion.div>
+
+          {/* =================================================
+              OCCUPATION
+          ================================================= */}
+
+          <motion.div
+            initial={false}
+            animate={secondaryInfoAnimation}
+            transition={{
+              duration: showSecondaryInfo ? 0.6 : 0.4,
+              delay: showSecondaryInfo ? 0.05 : 0,
+              ease: PROJECT_EASE,
+            }}
+            className={`
+              ${secondaryInfoClassName}
+
+              hidden
+
+              xl:col-start-2
+              xl:block
+              xl:justify-self-start
+            `}
+          >
+            <TextReveal
+              as="p"
+              mode="words"
+              viewport={false}
+              active={shouldShowNavbar}
+              delay={REVEAL_DELAYS.occupation}
+              stagger={0.025}
+              duration={0.75}
+              y="115%"
+              rotate={1.5}
+              className="m-0 uppercase leading-tight"
+            >
+              Occupation / Graphic designer
+            </TextReveal>
+          </motion.div>
+
+          {/* =================================================
+              LOCATION
+          ================================================= */}
+
+          <motion.div
+            initial={false}
+            animate={secondaryInfoAnimation}
+            transition={{
+              duration: showSecondaryInfo ? 0.6 : 0.4,
+              delay: showSecondaryInfo ? 0.1 : 0,
+              ease: PROJECT_EASE,
+            }}
+            className={`
+              ${secondaryInfoClassName}
+
+              col-start-2
+              justify-self-start
+
+              xl:col-start-3
+            `}
+          >
+            <TextReveal
+              as="p"
+              mode="words"
+              viewport={false}
+              active={shouldShowNavbar}
+              delay={REVEAL_DELAYS.location}
+              stagger={0.025}
+              duration={0.75}
+              y="115%"
+              rotate={1.5}
+              className="m-0 uppercase leading-tight"
+            >
+              Location / Oslo, Norway
+            </TextReveal>
+          </motion.div>
+
+          {/* =================================================
+              NAVIGATION
+          ================================================= */}
+
+          <div
+            className="
+              col-start-3
+              justify-self-end
+              tracking-tighter
+
+              xl:col-start-4
+            "
+          >
+            <div className="m-0 flex items-center gap-x-4 leading-tight">
+              {/* HOME */}
+
+              <LinkReveal
                 active={shouldShowNavbar}
-                delay={REVEAL_DELAYS.name}
-                stagger={0.025}
+                delay={REVEAL_DELAYS.home}
                 duration={0.75}
                 y="115%"
                 rotate={1.5}
-                className="m-0 uppercase leading-tight"
               >
-                Name / Rustam Kerimov
-              </TextReveal>
-            </motion.div>
+                <TransitionLink
+                  href="/"
+                  transitionLabel="Index"
+                  className={getLinkClassName("/")}
+                >
+                  <WaveLinkText text="HOME" />
+                </TransitionLink>
+              </LinkReveal>
 
-            {/* OCCUPATION - ONLY XL AND UP */}
-            <motion.div
-              initial={false}
-              animate={secondaryInfoAnimation}
-              transition={{
-                duration: showSecondaryInfo ? 0.6 : 0.4,
-                delay: showSecondaryInfo ? 0.05 : 0,
-                ease: PROJECT_EASE,
-              }}
-              className={`${secondaryInfoClassName} hidden xl:block`}
-            >
-              <TextReveal
-                as="p"
-                mode="words"
-                viewport={false}
-                active={shouldShowNavbar}
-                delay={REVEAL_DELAYS.occupation}
-                stagger={0.025}
-                duration={0.75}
-                y="115%"
-                rotate={1.5}
-                className="m-0 uppercase leading-tight"
-              >
-                Occupation / Graphic designer
-              </TextReveal>
-            </motion.div>
+              {/* =================================================
+                  WORK + PROJECT TITLE
+              ================================================= */}
 
-            {/* LOCATION */}
-            <motion.div
-              initial={false}
-              animate={secondaryInfoAnimation}
-              transition={{
-                duration: showSecondaryInfo ? 0.6 : 0.4,
-                delay: showSecondaryInfo ? 0.1 : 0,
-                ease: PROJECT_EASE,
-              }}
-              className={secondaryInfoClassName}
-            >
-              <TextReveal
-                as="p"
-                mode="words"
-                viewport={false}
-                active={shouldShowNavbar}
-                delay={REVEAL_DELAYS.location}
-                stagger={0.025}
-                duration={0.75}
-                y="115%"
-                rotate={1.5}
-                className="m-0 uppercase leading-tight"
-              >
-                Location / Oslo, Norway
-              </TextReveal>
-            </motion.div>
-
-            {/* NAVIGATION */}
-            <div className="tracking-tighter">
-              <div className="m-0 flex items-center gap-x-4 leading-tight">
+              <div className="relative inline-block">
                 <LinkReveal
                   active={shouldShowNavbar}
-                  delay={REVEAL_DELAYS.home}
+                  delay={REVEAL_DELAYS.work}
                   duration={0.75}
                   y="115%"
                   rotate={1.5}
                 >
                   <TransitionLink
-                    href="/"
-                    transitionLabel="Index"
-                    className={getLinkClassName("/")}
+                    href="/projects"
+                    transitionLabel="Selected Work"
+                    className={getLinkClassName("/projects")}
                   >
-                    <WaveLinkText text="HOME" />
+                    <WaveLinkText text="MY WORK" />
                   </TransitionLink>
                 </LinkReveal>
 
-                <div className="relative inline-block">
-                  <LinkReveal
-                    active={shouldShowNavbar}
-                    delay={REVEAL_DELAYS.work}
-                    duration={0.75}
-                    y="115%"
-                    rotate={1.5}
-                  >
-                    <TransitionLink
-                      href="/projects"
-                      transitionLabel="Selected Work"
-                      className={getLinkClassName("/projects")}
+                <AnimatePresence initial={false}>
+                  {isProjectDetailPage && projectTitle && (
+                    <motion.div
+                      className={`
+                        absolute
+                        left-1/2
+                        top-full
+                        mt-[3px]
+                        whitespace-nowrap
+
+                        ${
+                          showProjectTitle
+                            ? "pointer-events-auto"
+                            : "pointer-events-none"
+                        }
+                      `}
+                      initial="hidden"
+                      animate={showProjectTitle ? "visible" : "hidden"}
+                      variants={{
+                        visible: {
+                          opacity: 1,
+                          y: 0,
+                          filter: "blur(0px)",
+
+                          transition: {
+                            duration: 0.55,
+                            ease: PROJECT_EASE,
+
+                            staggerChildren: 0.06,
+                            delayChildren: 0.06,
+                          },
+                        },
+
+                        hidden: {
+                          opacity: 0,
+                          y: -7,
+                          filter: "blur(4px)",
+
+                          transition: {
+                            duration: 0.38,
+                            ease: PROJECT_EASE,
+
+                            staggerChildren: 0.035,
+                            staggerDirection: -1,
+                          },
+                        },
+                      }}
                     >
-                      <WaveLinkText text="MY WORK" />
-                    </TransitionLink>
-                  </LinkReveal>
+                      <div className="flex -translate-x-full items-end">
+                        {/* =========================================
+                            PROJECT TITLE
+                        ========================================== */}
 
-                  <AnimatePresence initial={false}>
-                    {isProjectDetailPage && projectTitle && (
-                      <motion.div
-                        className={`
-        absolute
-        left-1/2
-        top-full
-        mt-[3px]
-        whitespace-nowrap
+                        <motion.button
+                          type="button"
+                          onClick={handleCloseProject}
+                          onMouseEnter={() => setIsProjectTitleHovered(true)}
+                          onMouseLeave={() => setIsProjectTitleHovered(false)}
+                          aria-label={`Close ${projectTitle} and go back`}
+                          variants={{
+                            visible: {
+                              opacity: 1,
+                              x: 0,
+                              y: 0,
 
-        ${showProjectTitle ? "pointer-events-auto" : "pointer-events-none"}
-      `}
-                        initial="hidden"
-                        animate={showProjectTitle ? "visible" : "hidden"}
-                        variants={{
-                          visible: {
-                            opacity: 1,
-                            y: 0,
-                            filter: "blur(0px)",
-
-                            transition: {
-                              duration: 0.55,
-                              ease: PROJECT_EASE,
-
-                              staggerChildren: 0.06,
-                              delayChildren: 0.06,
-                            },
-                          },
-
-                          hidden: {
-                            opacity: 0,
-                            y: -7,
-                            filter: "blur(4px)",
-
-                            transition: {
-                              duration: 0.38,
-                              ease: PROJECT_EASE,
-
-                              staggerChildren: 0.035,
-                              staggerDirection: -1,
-                            },
-                          },
-                        }}
-                      >
-                        <div className="flex -translate-x-full items-end">
-                          {/*
-                           * =================================================
-                           * PROJECT TITLE
-                           * =================================================
-                           */}
-
-                          <motion.button
-                            type="button"
-                            onClick={handleCloseProject}
-                            onMouseEnter={() => setIsProjectTitleHovered(true)}
-                            onMouseLeave={() => setIsProjectTitleHovered(false)}
-                            aria-label={`Close ${projectTitle} and go back`}
-                            variants={{
-                              visible: {
-                                opacity: 1,
-                                x: 0,
-                                y: 0,
-
-                                transition: {
-                                  duration: 0.5,
-                                  ease: PROJECT_EASE,
-                                },
-                              },
-
-                              hidden: {
-                                opacity: 0,
-                                x: 6,
-                                y: -3,
-
-                                transition: {
-                                  duration: 0.32,
-                                  ease: PROJECT_EASE,
-                                },
-                              },
-                            }}
-                            className="
-            relative
-            mr-2
-            flex
-            cursor-pointer
-            items-end
-            border-0
-            bg-transparent
-            p-0
-            text-current
-          "
-                          >
-                            {/*
-                             * HOVER CROSS
-                             */}
-
-                            <motion.span
-                              aria-hidden="true"
-                              initial={false}
-                              animate={{
-                                opacity: isProjectTitleHovered ? 1 : 0,
-                                scale: isProjectTitleHovered ? 1 : 0,
-                                rotate: isProjectTitleHovered ? 0 : -90,
-                              }}
-                              transition={{
-                                duration: 0.35,
+                              transition: {
+                                duration: 0.5,
                                 ease: PROJECT_EASE,
-                              }}
-                              style={{
-                                transformOrigin: "50% 50%",
-                              }}
-                              className="
-              absolute
-              -left-5
-              -top-[2px]
+                              },
+                            },
 
-              flex
-              h-5
-              w-5
-              -translate-y-1/2
-              items-center
-              justify-center
-            "
-                            >
-                              <span className="absolute h-[1.5px] w-[10px] rotate-45 bg-current" />
+                            hidden: {
+                              opacity: 0,
+                              x: 6,
+                              y: -3,
 
-                              <span className="absolute h-[1.5px] w-[10px] -rotate-45 bg-current" />
-                            </motion.span>
-
-                            {/*
-                             * TITLE
-                             */}
-
-                            <motion.span
-                              initial={false}
-                              animate={{
-                                opacity: isProjectTitleHovered ? 1 : 0.9,
-                              }}
-                              transition={{
-                                duration: 0.4,
+                              transition: {
+                                duration: 0.32,
                                 ease: PROJECT_EASE,
-                              }}
-                              className="
-              mb-[-2px]
-              block
-              max-w-[240px]
-              truncate
-              text-[10px]
-              font-black
-              uppercase
-              leading-none
-              tracking-[0.18em]
-            "
-                            >
-                              {projectTitle}
-                            </motion.span>
-                          </motion.button>
+                              },
+                            },
+                          }}
+                          className="
+                            relative
+                            mr-2
+                            flex
+                            cursor-pointer
+                            items-end
+                            border-0
+                            bg-transparent
+                            p-0
+                            text-current
+                          "
+                        >
+                          {/* HOVER CROSS */}
 
-                          {/*
-                           * =================================================
-                           * CONNECTOR LINE
-                           * =================================================
-                           */}
-
-                          <motion.svg
+                          <motion.span
                             aria-hidden="true"
-                            width="42"
-                            height="28"
-                            viewBox="0 0 42 28"
-                            fill="none"
+                            initial={false}
+                            animate={{
+                              opacity: isProjectTitleHovered ? 1 : 0,
+                              scale: isProjectTitleHovered ? 1 : 0,
+                              rotate: isProjectTitleHovered ? 0 : -90,
+                            }}
+                            transition={{
+                              duration: 0.35,
+                              ease: PROJECT_EASE,
+                            }}
+                            style={{
+                              transformOrigin: "50% 50%",
+                            }}
                             className="
-            block
-            shrink-0
-            overflow-visible
-          "
+                              absolute
+                              -left-5
+                              -top-[2px]
+
+                              flex
+                              h-5
+                              w-5
+                              -translate-y-1/2
+                              items-center
+                              justify-center
+                            "
+                          >
+                            <span className="absolute h-[1.5px] w-[10px] rotate-45 bg-current" />
+
+                            <span className="absolute h-[1.5px] w-[10px] -rotate-45 bg-current" />
+                          </motion.span>
+
+                          {/* TITLE */}
+
+                          <motion.span
+                            initial={false}
+                            animate={{
+                              opacity: isProjectTitleHovered ? 1 : 0.9,
+                            }}
+                            transition={{
+                              duration: 0.4,
+                              ease: PROJECT_EASE,
+                            }}
+                            className="
+                              mb-[-2px]
+                              block
+                              max-w-[240px]
+                              truncate
+                              text-[10px]
+                              font-black
+                              uppercase
+                              leading-none
+                              tracking-[0.18em]
+                            "
+                          >
+                            {projectTitle}
+                          </motion.span>
+                        </motion.button>
+
+                        {/* =========================================
+                            CONNECTOR LINE
+                        ========================================== */}
+
+                        <motion.svg
+                          aria-hidden="true"
+                          width="42"
+                          height="28"
+                          viewBox="0 0 42 28"
+                          fill="none"
+                          className="
+                            block
+                            shrink-0
+                            overflow-visible
+                          "
+                          variants={{
+                            visible: {
+                              opacity: 1,
+                              x: 0,
+
+                              transition: {
+                                duration: 0.45,
+                                ease: PROJECT_EASE,
+                              },
+                            },
+
+                            hidden: {
+                              opacity: 0,
+                              x: 5,
+
+                              transition: {
+                                duration: 0.28,
+                                ease: PROJECT_EASE,
+                              },
+                            },
+                          }}
+                        >
+                          <motion.path
+                            d="M41 1V27H1"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="square"
+                            strokeLinejoin="miter"
                             variants={{
                               visible: {
-                                opacity: 1,
-                                x: 0,
+                                pathLength: 1,
+                                pathOffset: 0,
+                                opacity: 0.65,
 
                                 transition: {
-                                  duration: 0.45,
-                                  ease: PROJECT_EASE,
+                                  pathLength: {
+                                    duration: 0.65,
+                                    ease: PROJECT_EASE,
+                                  },
+
+                                  pathOffset: {
+                                    duration: 0.65,
+                                    ease: PROJECT_EASE,
+                                  },
+
+                                  opacity: {
+                                    duration: 0.2,
+                                  },
                                 },
                               },
 
                               hidden: {
+                                pathLength: 0,
+                                pathOffset: 1,
                                 opacity: 0,
-                                x: 5,
 
                                 transition: {
-                                  duration: 0.28,
-                                  ease: PROJECT_EASE,
+                                  pathLength: {
+                                    duration: 0.38,
+                                    ease: PROJECT_EASE,
+                                  },
+
+                                  pathOffset: {
+                                    duration: 0.38,
+                                    ease: PROJECT_EASE,
+                                  },
+
+                                  opacity: {
+                                    duration: 0.22,
+                                  },
                                 },
                               },
                             }}
-                          >
-                            <motion.path
-                              d="M41 1V27H1"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="square"
-                              strokeLinejoin="miter"
-                              variants={{
-                                visible: {
-                                  pathLength: 1,
-                                  pathOffset: 0,
-                                  opacity: 0.65,
-
-                                  transition: {
-                                    pathLength: {
-                                      duration: 0.65,
-                                      ease: PROJECT_EASE,
-                                    },
-
-                                    pathOffset: {
-                                      duration: 0.65,
-                                      ease: PROJECT_EASE,
-                                    },
-
-                                    opacity: {
-                                      duration: 0.2,
-                                    },
-                                  },
-                                },
-
-                                hidden: {
-                                  pathLength: 0,
-                                  pathOffset: 1,
-                                  opacity: 0,
-
-                                  transition: {
-                                    pathLength: {
-                                      duration: 0.38,
-                                      ease: PROJECT_EASE,
-                                    },
-
-                                    pathOffset: {
-                                      duration: 0.38,
-                                      ease: PROJECT_EASE,
-                                    },
-
-                                    opacity: {
-                                      duration: 0.22,
-                                    },
-                                  },
-                                },
-                              }}
-                            />
-                          </motion.svg>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <LinkReveal
-                  active={shouldShowNavbar}
-                  delay={REVEAL_DELAYS.contact}
-                  duration={0.75}
-                  y="115%"
-                  rotate={1.5}
-                >
-                  <TransitionLink
-                    href="/contact"
-                    transitionLabel="Let's Collaborate"
-                    className={getLinkClassName("/contact")}
-                  >
-                    <WaveLinkText text="CONTACT" />
-                  </TransitionLink>
-                </LinkReveal>
+                          />
+                        </motion.svg>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+
+              {/* =================================================
+                  CONTACT
+              ================================================= */}
+
+              <LinkReveal
+                active={shouldShowNavbar}
+                delay={REVEAL_DELAYS.contact}
+                duration={0.75}
+                y="115%"
+                rotate={1.5}
+              >
+                <button
+                  type="button"
+                  onClick={openContact}
+                  aria-expanded={isContactOpen}
+                  className={`
+                    ${getLinkClassName("/contact")}
+
+                    cursor-pointer
+                    border-0
+                    bg-transparent
+                    p-0
+                    text-inherit
+                  `}
+                >
+                  <WaveLinkText text="CONTACT" />
+                </button>
+              </LinkReveal>
             </div>
           </div>
         </div>

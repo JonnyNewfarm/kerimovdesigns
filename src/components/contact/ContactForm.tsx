@@ -501,27 +501,34 @@ export default function ContactForm() {
     BOTTOM / SUBMIT
 ================================================ */}
 
+      {/* ===============================================
+    BOTTOM / SUBMIT
+================================================ */}
+
       <div
         className="
     flex
     min-w-0
     items-end
-    justify-between
-    gap-6
+    justify-end
 
     pt-1
+
+    sm:justify-between
+    sm:gap-6
 
     md:col-span-2
   "
       >
-        <p
+        <div
           className="
-      max-w-[250px]
+      hidden
+      flex-wrap
+      items-center
+      gap-x-4
+      gap-y-2
 
       text-[8px]
-       invisible
-       sm:visible
-    
       font-semibold
       uppercase
       leading-[1.45]
@@ -529,16 +536,55 @@ export default function ContactForm() {
 
       text-[#ecdfcc]
 
+      sm:flex
       sm:text-[10px]
     "
         >
-          Tell me a little about the project, timeframe and what you would like
-          to create.
-        </p>
+          <a
+            href="https://www.linkedin.com/in/rustam-kerimov-75bb5a331/"
+            target="_blank"
+            rel="noreferrer"
+            className="
+        transition-opacity
+        duration-300
+        hover:opacity-50
+      "
+          >
+            LinkedIn
+          </a>
 
-        <ContactFormThreeButton type="submit">
-          Submit inquiry
-        </ContactFormThreeButton>
+          <a
+            href="https://www.instagram.com/kerimov.designs/"
+            target="_blank"
+            rel="noreferrer"
+            className="
+        transition-opacity
+        duration-300
+        hover:opacity-50
+      "
+          >
+            Instagram
+          </a>
+
+          <a
+            href="mailto:rustam-98@hotmail.com"
+            className="
+        tracking-normal
+
+        transition-opacity
+        duration-300
+        hover:opacity-50
+      "
+          >
+            rustam-98@hotmail.com
+          </a>
+        </div>
+
+        <div className="shrink-0">
+          <ContactFormThreeButton type="submit">
+            Submit inquiry
+          </ContactFormThreeButton>
+        </div>
       </div>
     </form>
   );

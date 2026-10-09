@@ -926,7 +926,7 @@ export default function HeroLoadingSpinner({
           /*
            * Vent til slurpen er ferdig.
            */
-          delay: loaderComplete ? 1 : 0,
+          delay: loaderComplete ? 0.7 : 0,
 
           ease: [0.22, 1, 0.36, 1],
         },

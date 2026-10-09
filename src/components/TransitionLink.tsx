@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+
 import type { AnchorHTMLAttributes, MouseEvent, ReactNode } from "react";
+
 import { forwardRef } from "react";
+
 import {
   usePageTransition,
   type TransitionDirection,
@@ -11,9 +14,15 @@ import {
 interface TransitionLinkProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
   href: string;
+
   children: ReactNode;
+
   className?: string;
+
   transitionLabel?: string;
+
+  transitionColor?: string | null;
+
   direction?: TransitionDirection;
 }
 
@@ -26,6 +35,7 @@ const TransitionLink = forwardRef<HTMLAnchorElement, TransitionLinkProps>(
       target,
       onClick,
       transitionLabel,
+      transitionColor,
       direction = "left",
       ...props
     },
@@ -36,7 +46,9 @@ const TransitionLink = forwardRef<HTMLAnchorElement, TransitionLinkProps>(
     const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
       onClick?.(event);
 
-      if (event.defaultPrevented) return;
+      if (event.defaultPrevented) {
+        return;
+      }
 
       const isExternal =
         href.startsWith("http") ||
@@ -52,12 +64,14 @@ const TransitionLink = forwardRef<HTMLAnchorElement, TransitionLinkProps>(
 
       const isAnchorOnly = href.startsWith("#");
 
-      if (isExternal || isNewTab || isAnchorOnly) return;
+      if (isExternal || isNewTab || isAnchorOnly) {
+        return;
+      }
 
       event.preventDefault();
 
       if (!isTransitioning) {
-        startTransition(href, transitionLabel, direction);
+        startTransition(href, transitionLabel, direction, transitionColor);
       }
     };
 

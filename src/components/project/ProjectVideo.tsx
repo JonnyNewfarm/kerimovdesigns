@@ -154,17 +154,6 @@ export default function ProjectVideo({
   return (
     <div className={outerClassName}>
       <div className={innerClassName}>
-        <h2
-          className="
-            mb-2
-            text-xl
-            font-black
-            uppercase
-          "
-        >
-          Video
-        </h2>
-
         <button
           type="button"
           aria-label={isVideoPlaying ? "Pause video" : "Play video"}

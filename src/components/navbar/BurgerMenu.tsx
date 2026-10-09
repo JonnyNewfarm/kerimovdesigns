@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { useContactOverlay } from "../contact/ContactOverlayProvider";
 import TransitionLink from "../TransitionLink";
 
 const MENU_EASE = [0.76, 0, 0.24, 1] as const;
@@ -31,25 +32,51 @@ export default function BurgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [instantClose, setInstantClose] = useState(false);
 
+  /*
+   * Contact åpnes først etter at
+   * mobile drawer er ferdig lukket.
+   */
+
+  const [openContactAfterClose, setOpenContactAfterClose] = useState(false);
+
+  const { openContact } = useContactOverlay();
+
   const pathname = usePathname();
   const previousPathname = useRef(pathname);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
+  /*
+   * =====================================================
+   * ROUTE CHANGE
+   * =====================================================
+   */
+
   useEffect(() => {
-    if (previousPathname.current === pathname) return;
+    if (previousPathname.current === pathname) {
+      return;
+    }
 
     setInstantClose(true);
     setIsOpen(false);
+
     previousPathname.current = pathname;
 
     const frame = requestAnimationFrame(() => {
       setInstantClose(false);
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [pathname]);
+
+  /*
+   * =====================================================
+   * OUTSIDE / ESCAPE / SCROLL LOCK
+   * =====================================================
+   */
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -83,10 +110,18 @@ export default function BurgerMenu() {
 
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown);
+
       document.removeEventListener("keydown", handleKeyDown);
+
       document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
+
+  /*
+   * =====================================================
+   * ACTIVE
+   * =====================================================
+   */
 
   const isActiveLink = (href: string) => {
     if (href === "/") {
@@ -96,12 +131,42 @@ export default function BurgerMenu() {
     return pathname.startsWith(href);
   };
 
+  /*
+   * =====================================================
+   * CONTACT
+   * =====================================================
+   */
+
+  const handleContactClick = () => {
+    setOpenContactAfterClose(true);
+
+    setIsOpen(false);
+  };
+
+  const handleDrawerAnimationComplete = () => {
+    if (isOpen || !openContactAfterClose) {
+      return;
+    }
+
+    setOpenContactAfterClose(false);
+
+    openContact();
+  };
+
+  /*
+   * =====================================================
+   * RENDER
+   * =====================================================
+   */
+
   return (
     <>
       <motion.button
         ref={buttonRef}
         type="button"
-        onClick={() => setIsOpen((current) => !current)}
+        onClick={() => {
+          setIsOpen((current) => !current);
+        }}
         aria-label={isOpen ? "Close menu" : "Open menu"}
         aria-expanded={isOpen}
         aria-controls="mobile-navigation"
@@ -122,13 +187,23 @@ export default function BurgerMenu() {
           lg:hidden
         "
       >
-        <span className="relative flex h-5 w-5 items-center justify-center">
+        <span
+          className="
+            relative
+            flex
+            h-5
+            w-5
+            items-center
+            justify-center
+          "
+        >
           <motion.span
             variants={{
               closed: {
                 rotate: 0,
                 width: 11,
               },
+
               open: {
                 rotate: 45,
                 width: 15,
@@ -138,7 +213,11 @@ export default function BurgerMenu() {
               duration: 0.5,
               ease: MENU_EASE,
             }}
-            className="absolute h-px bg-current"
+            className="
+              absolute
+              h-px
+              bg-current
+            "
           />
 
           <motion.span
@@ -147,6 +226,7 @@ export default function BurgerMenu() {
                 rotate: 0,
                 width: 11,
               },
+
               open: {
                 rotate: -45,
                 width: 15,
@@ -156,11 +236,21 @@ export default function BurgerMenu() {
               duration: 0.5,
               ease: MENU_EASE,
             }}
-            className="absolute h-px bg-current"
+            className="
+              absolute
+              h-px
+              bg-current
+            "
           />
         </span>
 
-        <span className="relative h-[1.2em] overflow-hidden">
+        <span
+          className="
+            relative
+            h-[1.2em]
+            overflow-hidden
+          "
+        >
           <motion.span
             animate={{
               y: isOpen ? "-50%" : "0%",
@@ -169,26 +259,50 @@ export default function BurgerMenu() {
               duration: 0.5,
               ease: MENU_EASE,
             }}
-            className="flex flex-col"
+            className="
+              flex
+              flex-col
+            "
           >
-            <span className="h-[1.2em] font-semibold leading-[1.2em]">
+            <span
+              className="
+                h-[1.2em]
+                font-semibold
+                leading-[1.2em]
+              "
+            >
               Menu
             </span>
 
-            <span className="h-[1.2em] font-semibold leading-[1.2em]">
+            <span
+              className="
+                h-[1.2em]
+                font-semibold
+                leading-[1.2em]
+              "
+            >
               Close
             </span>
           </motion.span>
         </span>
       </motion.button>
 
+      {/* =================================================
+          BACKDROP
+      ================================================= */}
+
       <AnimatePresence>
-        {isOpen && (
+        {isOpen ? (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
             exit={{
               opacity: 0,
+
               transition: {
                 duration: instantClose ? 0 : 0.35,
                 ease: MENU_EASE,
@@ -202,13 +316,19 @@ export default function BurgerMenu() {
               fixed
               inset-0
               z-40
+
               bg-black/45
               backdrop-blur-sm
+
               md:hidden
             "
           />
-        )}
+        ) : null}
       </AnimatePresence>
+
+      {/* =================================================
+          DRAWER
+      ================================================= */}
 
       <motion.div
         ref={menuRef}
@@ -219,22 +339,30 @@ export default function BurgerMenu() {
         }}
         transition={{
           duration: instantClose ? 0 : isOpen ? 0.8 : 0.65,
+
           ease: MENU_EASE,
         }}
+        onAnimationComplete={handleDrawerAnimationComplete}
         aria-hidden={!isOpen}
         className="
           fixed
           inset-0
           z-50
+
           flex
           min-h-dvh
           flex-col
+
           overflow-hidden
+
           bg-[#161310]
+
           px-6
           pb-8
           pt-28
+
           text-[#ecdfcc]
+
           lg:hidden
         "
         style={{
@@ -254,23 +382,91 @@ export default function BurgerMenu() {
           }}
           className="
             mb-8
+
             flex
             items-end
             justify-between
+
             border-b
             border-white/10
+
             pb-5
           "
         >
-          <p className="text-[10px] uppercase tracking-[0.24em] text-[#ecdfcc]/80">
+          <p
+            className="
+              text-[10px]
+              uppercase
+              tracking-[0.24em]
+              text-[#ecdfcc]/80
+            "
+          >
             Navigation
           </p>
         </motion.div>
 
-        <div className="flex flex-1 flex-col">
+        <div
+          className="
+            flex
+            flex-1
+            flex-col
+          "
+        >
           <nav className="flex flex-col">
             {menuLinks.map((link, index) => {
               const active = isActiveLink(link.href);
+
+              const itemContent = (
+                <>
+                  <motion.span
+                    initial={false}
+                    animate={{
+                      x: active ? 10 : 0,
+
+                      scale: active ? 1.035 : 1,
+
+                      color: active
+                        ? "rgba(236,223,204,1)"
+                        : "rgba(236,223,204,0.48)",
+                    }}
+                    transition={{
+                      duration: 0.5,
+                      ease: REVEAL_EASE,
+                    }}
+                    className="
+                      origin-left
+
+                      text-[clamp(2rem,9vw,2.6rem)]
+                      font-medium
+                      uppercase
+                      leading-[0.85]
+                      tracking-[-0.035em]
+                    "
+                  >
+                    {link.label}
+                  </motion.span>
+
+                  <motion.span
+                    initial={false}
+                    animate={{
+                      opacity: active ? 0.75 : 0.3,
+                      x: active ? -3 : 0,
+                    }}
+                    transition={{
+                      duration: 0.5,
+                      ease: REVEAL_EASE,
+                    }}
+                    className="
+                      text-[10px]
+                      uppercase
+                      tracking-[0.18em]
+                      text-[#ecdfcc]
+                    "
+                  >
+                    0{index + 1}
+                  </motion.span>
+                </>
+              );
 
               return (
                 <motion.div
@@ -282,70 +478,66 @@ export default function BurgerMenu() {
                   }}
                   transition={{
                     duration: instantClose ? 0 : 0.6,
+
                     delay: isOpen ? 0.24 + index * 0.08 : 0,
+
                     ease: REVEAL_EASE,
                   }}
                 >
-                  <TransitionLink
-                    href={link.href}
-                    transitionLabel={link.transitionLabel}
-                    direction="right"
-                    className="
-                      relative
-                      flex
-                      min-h-[96px]
-                      items-center
-                      justify-between
-                      border-b
-                      border-white/10
-                      py-5
-                    "
-                  >
-                    <motion.span
-                      initial={false}
-                      animate={{
-                        x: active ? 10 : 0,
-                        scale: active ? 1.035 : 1,
-                        color: active
-                          ? "rgba(236,223,204,1)"
-                          : "rgba(236,223,204,0.48)",
-                      }}
-                      transition={{
-                        duration: 0.5,
-                        ease: REVEAL_EASE,
-                      }}
+                  {link.href === "/contact" ? (
+                    <button
+                      type="button"
+                      onClick={handleContactClick}
                       className="
-                        origin-left
-                        text-[clamp(2rem,9vw,2.6rem)]
-                        font-medium
-                        uppercase
-                        leading-[0.85]
-                        tracking-[-0.035em]
-                      "
-                    >
-                      {link.label}
-                    </motion.span>
+                        relative
 
-                    <motion.span
-                      initial={false}
-                      animate={{
-                        opacity: active ? 0.75 : 0.3,
-                        x: active ? -3 : 0,
-                      }}
-                      transition={{
-                        duration: 0.5,
-                        ease: REVEAL_EASE,
-                      }}
-                      className="
-                        text-[10px]
-                        uppercase
-                        tracking-[0.18em]
-                        text-[#ecdfcc]
+                        flex
+                        min-h-[96px]
+                        w-full
+
+                        cursor-pointer
+                        items-center
+                        justify-between
+
+                        border-0
+                        border-b
+                        border-white/10
+
+                        bg-transparent
+
+                        py-5
+
+                        text-left
+                        text-inherit
+
+                        outline-none
                       "
                     >
-                      0{index + 1}
-                    </motion.span>
-                  </TransitionLink>
+                      {itemContent}
+                    </button>
+                  ) : (
+                    <TransitionLink
+                      href={link.href}
+                      transitionLabel={link.transitionLabel}
+                      direction="right"
+                      className="
+                        relative
+
+                        flex
+                        min-h-[96px]
+
+                        items-center
+                        justify-between
+
+                        border-b
+                        border-white/10
+
+                        py-5
+                      "
+                    >
+                      {itemContent}
+                    </TransitionLink>
+                  )}
                 </motion.div>
               );
             })}

@@ -18,8 +18,13 @@ import type {
 
 type PageTransitionDissolveProps = {
   status: TransitionStatus;
+
   variant: TransitionVariant;
+
+  color?: string | null;
+
   onCovered: () => void;
+
   onFinished: () => void;
 };
 
@@ -37,6 +42,63 @@ function easeInOutSine(value: number) {
 
 /*
  * =========================================================
+ * COLOR
+ * =========================================================
+ */
+
+function getTransitionColors(
+  variant: TransitionVariant,
+  color?: string | null,
+) {
+  const cleanedColor = color?.trim() || "";
+
+  /*
+   * =====================================================
+   * PROJECT COLOR
+   * =====================================================
+   *
+   * Bruk prosjektets hoverText-farge,
+   * men bland den mot nøytrale toner
+   * så fullscreen-transitionen ikke blir for intens.
+   */
+
+  if (/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(cleanedColor)) {
+    const projectColor = new THREE.Color(cleanedColor);
+
+    const neutralDark = new THREE.Color("#2f302d");
+
+    const neutralLight = new THREE.Color("#4a4944");
+
+    return {
+      a: projectColor.clone().lerp(neutralDark, 0.52),
+
+      b: projectColor.clone().lerp(neutralLight, 0.38),
+    };
+  }
+
+  /*
+   * =====================================================
+   * FALLBACK
+   * =====================================================
+   */
+
+  if (variant === "projectDetails") {
+    return {
+      a: new THREE.Color("#11130f"),
+
+      b: new THREE.Color("#1e211c"),
+    };
+  }
+
+  return {
+    a: new THREE.Color("#31362f"),
+
+    b: new THREE.Color("#545c51"),
+  };
+}
+
+/*
+ * =========================================================
  * DISSOLVE PLANE
  * =========================================================
  */
@@ -44,6 +106,7 @@ function easeInOutSine(value: number) {
 function DissolvePlane({
   status,
   variant,
+  color,
   onCovered,
   onFinished,
 }: DissolvePlaneProps) {
@@ -75,19 +138,10 @@ function DissolvePlane({
    * =====================================================
    */
 
-  const colors = useMemo(() => {
-    if (variant === "projectDetails") {
-      return {
-        a: new THREE.Color("#11130f"),
-        b: new THREE.Color("#1e211c"),
-      };
-    }
-
-    return {
-      a: new THREE.Color("#31362f"),
-      b: new THREE.Color("#545c51"),
-    };
-  }, [variant]);
+  const colors = useMemo(
+    () => getTransitionColors(variant, color),
+    [variant, color],
+  );
 
   /*
    * =====================================================
@@ -250,6 +304,7 @@ function DissolvePlane({
 export default function PageTransitionDissolve({
   status,
   variant,
+  color,
   onCovered,
   onFinished,
 }: PageTransitionDissolveProps) {
@@ -292,6 +347,7 @@ export default function PageTransitionDissolve({
         <DissolvePlane
           status={status}
           variant={variant}
+          color={color}
           onCovered={onCovered}
           onFinished={onFinished}
         />

@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import TextReveal from "@/components/TextReveal";
-import FilterPopupThreeBackground from "@/components/projects/FilterPopupThreeBackground";
-
+import ContactPopupThreeBackground from "./ContactPopupThreeBackground";
 import ContactForm from "./ContactForm";
 import { contactEase } from "./contactAnimations";
 
@@ -313,8 +312,7 @@ export default function ContactFormPanel({
                   Derfor ingen glitch når WebGL blir ready.
               ============================================== */}
 
-              <FilterPopupThreeBackground />
-
+              <ContactPopupThreeBackground />
               {/* =============================================
                   CONTENT
               ============================================== */}

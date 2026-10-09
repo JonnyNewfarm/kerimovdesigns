@@ -34,6 +34,7 @@ type PageTransitionContextType = {
     href: string,
     label?: string,
     direction?: TransitionDirection,
+    color?: string | null,
   ) => void;
 
   isTransitioning: boolean;
@@ -43,6 +44,8 @@ type TransitionState = {
   status: TransitionStatus;
 
   variant: TransitionVariant;
+
+  color: string | null;
 };
 
 interface ClientPageTransitionWrapperProps {
@@ -63,6 +66,8 @@ const IDLE_TRANSITION: TransitionState = {
   status: "idle",
 
   variant: "destination",
+
+  color: null,
 };
 
 /*
@@ -144,6 +149,7 @@ export default function ClientPageTransitionWrapper({
       href: string,
       _label?: string,
       _direction: TransitionDirection = "left",
+      color?: string | null,
     ) => {
       if (!href || href === pathname || statusRef.current !== "idle") {
         return;
@@ -167,10 +173,6 @@ export default function ClientPageTransitionWrapper({
 
       /*
        * Start loading destination immediately.
-       *
-       * Especially important for /projects because
-       * its R3F textures should already be in cache
-       * by the time we reveal the page.
        */
 
       router.prefetch(href);
@@ -179,6 +181,8 @@ export default function ClientPageTransitionWrapper({
         status: "entering",
 
         variant: getTransitionVariant(href),
+
+        color: color?.trim() || null,
       });
     },
     [pathname, router, shouldReduceMotion],
@@ -203,16 +207,6 @@ export default function ClientPageTransitionWrapper({
 
     pushTriggeredRef.current = true;
 
-    /*
-     * Overlay is fully opaque.
-     *
-     * Navigate now.
-     *
-     * IMPORTANT:
-     * We are NOT holding the old children anymore.
-     * The new route can mount/load immediately.
-     */
-
     router.push(href);
   }, [router]);
 
@@ -229,24 +223,9 @@ export default function ClientPageTransitionWrapper({
 
     previousPathnameRef.current = pathname;
 
-    /*
-     * Normal navigation that didn't come from
-     * TransitionLink.
-     */
-
     if (!pendingHrefRef.current) {
       return;
     }
-
-    /*
-     * The destination has now mounted.
-     *
-     * Start revealing IMMEDIATELY.
-     *
-     * No heldChildren.
-     * No two requestAnimationFrames.
-     * No delayed mounting of Three canvases/textures.
-     */
 
     statusRef.current = "leaving";
 
@@ -300,21 +279,13 @@ export default function ClientPageTransitionWrapper({
 
   return (
     <PageTransitionContext.Provider value={contextValue}>
-      {/*
-       * CRITICAL:
-       *
-       * Always render the REAL current route.
-       *
-       * This means /projects canvases and textures
-       * start loading immediately when Next mounts it.
-       */}
-
       {children}
 
       {isTransitioning && !shouldReduceMotion ? (
         <PageTransitionDissolve
           status={transition.status}
           variant={transition.variant}
+          color={transition.color}
           onCovered={handleCovered}
           onFinished={handleFinished}
         />
