@@ -12,6 +12,7 @@ import TextReveal from "@/components/TextReveal";
 import TransitionLink from "../TransitionLink";
 import FilterPopupThreeBackground from "./FilterPopupThreeBackground";
 import PageTransitionGate from "./PageTransitionGate";
+import { useProjectsReveal } from "./ProjectsLoadingGate";
 
 type ProjectListItem = {
   id: string;
@@ -50,6 +51,8 @@ const ProjectsTableMobile = ({
   activeTags = [],
 }: ProjectsTableMobileProps) => {
   const router = useRouter();
+
+  const { revealStarted } = useProjectsReveal();
 
   const [mounted, setMounted] = useState(false);
 
@@ -203,11 +206,8 @@ const ProjectsTableMobile = ({
                   fixed
                   inset-0
                   z-[180]
-
                   cursor-default
-
                   bg-[#0b0e0a]/40
-
                   backdrop-blur-[5px]
                 "
               />
@@ -218,11 +218,9 @@ const ProjectsTableMobile = ({
                   fixed
                   inset-0
                   z-[190]
-
                   flex
                   items-center
                   justify-center
-
                   p-4
                 "
               >
@@ -263,24 +261,17 @@ const ProjectsTableMobile = ({
                   }}
                   className="
                     pointer-events-auto
-
                     relative
                     isolate
-
                     flex
-
                     h-[min(520px,calc(100dvh-48px))]
                     w-full
                     max-w-[380px]
-
                     flex-col
-
                     overflow-hidden
-
                     border-0
                     bg-transparent
                     outline-none
-
                     text-color
                   "
                 >
@@ -294,7 +285,6 @@ const ProjectsTableMobile = ({
                     className="
                       relative
                       z-10
-
                       flex
                       min-h-0
                       flex-1
@@ -308,7 +298,6 @@ const ProjectsTableMobile = ({
                         items-start
                         justify-between
                         gap-5
-
                         px-6
                         pb-6
                         pt-6
@@ -321,7 +310,6 @@ const ProjectsTableMobile = ({
                             font-black
                             uppercase
                             tracking-[0.28em]
-
                             text-white/55
                           "
                         >
@@ -331,15 +319,12 @@ const ProjectsTableMobile = ({
                         <h3
                           className="
                             mt-2
-
                             font-bueno
                             text-[2rem]
                             font-black
-
                             uppercase
                             leading-[0.92]
                             tracking-[-0.025em]
-
                             text-white
                           "
                         >
@@ -362,17 +347,13 @@ const ProjectsTableMobile = ({
                           shrink-0
                           items-center
                           justify-center
-
                           bg-[#20241e]/85
-
                           px-3
                           py-2
-
                           text-[8px]
                           font-black
                           uppercase
                           tracking-[0.18em]
-
                           text-white/65
                         "
                       >
@@ -384,14 +365,10 @@ const ProjectsTableMobile = ({
                       className="
                         min-h-0
                         flex-1
-
                         overflow-y-auto
-
                         px-6
                         pb-6
-
                         [scrollbar-width:none]
-
                         [&::-webkit-scrollbar]:hidden
                       "
                     >
@@ -399,7 +376,6 @@ const ProjectsTableMobile = ({
                         className="
                           grid
                           grid-cols-2
-
                           gap-x-3
                           gap-y-1
                         "
@@ -440,7 +416,6 @@ const ProjectsTableMobile = ({
                         items-center
                         justify-between
                         gap-4
-
                         px-6
                         pb-5
                         pt-2
@@ -452,7 +427,6 @@ const ProjectsTableMobile = ({
                           font-black
                           uppercase
                           tracking-[0.16em]
-
                           text-white/70
                         "
                       >
@@ -482,12 +456,10 @@ const ProjectsTableMobile = ({
                             }}
                             className="
                               shrink-0
-
                               text-[9px]
                               font-black
                               uppercase
                               tracking-[0.18em]
-
                               text-white/75
                             "
                           >
@@ -516,8 +488,9 @@ const ProjectsTableMobile = ({
               as="h1"
               mode="words"
               viewport={false}
-              delay={0.02}
-              duration={0.75}
+              active={revealStarted}
+              delay={0.04}
+              duration={0.85}
               y="90%"
               className="
                 text-[7vw]
@@ -531,23 +504,27 @@ const ProjectsTableMobile = ({
             </TextReveal>
 
             <motion.div
-              initial={{
-                opacity: 0,
-                y: 10,
-              }}
+              initial={false}
               animate={{
-                opacity: 1,
-                y: 0,
+                opacity: revealStarted ? 1 : 0,
+                y: revealStarted ? 0 : 10,
               }}
               transition={{
-                delay: 0.08,
-                duration: 0.65,
-                ease: revealEase,
+                opacity: {
+                  delay: 0.1,
+                  duration: 0.7,
+                  ease: revealEase,
+                },
+
+                y: {
+                  delay: 0.1,
+                  duration: 0.85,
+                  ease: revealEase,
+                },
               }}
               className="
                 relative
                 z-30
-
                 mt-9
               "
             >
@@ -559,16 +536,13 @@ const ProjectsTableMobile = ({
                 }}
                 className="
                   group
-
                   flex
                   items-center
                   gap-3
-
                   text-[11px]
                   font-black
                   uppercase
                   tracking-[0.2em]
-
                   text-white/70
                 "
               >
@@ -576,8 +550,9 @@ const ProjectsTableMobile = ({
                   as="span"
                   mode="words"
                   viewport={false}
-                  delay={0.1}
-                  duration={0.65}
+                  active={revealStarted}
+                  delay={0.14}
+                  duration={0.7}
                   y="90%"
                 >
                   Filters
@@ -586,7 +561,6 @@ const ProjectsTableMobile = ({
                 <span
                   className="
                     relative
-
                     block
                     h-[10px]
                     w-[10px]
@@ -598,12 +572,9 @@ const ProjectsTableMobile = ({
                       absolute
                       left-0
                       top-1/2
-
                       h-px
                       w-full
-
                       -translate-y-1/2
-
                       bg-current
                     "
                   />
@@ -613,12 +584,9 @@ const ProjectsTableMobile = ({
                       absolute
                       left-1/2
                       top-0
-
                       h-full
                       w-px
-
                       -translate-x-1/2
-
                       bg-current
                     "
                   />
@@ -637,24 +605,30 @@ const ProjectsTableMobile = ({
                     number={startIndex + index + 1}
                     index={index}
                     priority={index === 0}
+                    revealStarted={revealStarted}
                   />
                 ))}
               </div>
 
               {children ? (
                 <motion.div
-                  initial={{
-                    opacity: 0,
-                    y: 16,
-                  }}
+                  initial={false}
                   animate={{
-                    opacity: 1,
-                    y: 0,
+                    opacity: revealStarted ? 1 : 0,
+                    y: revealStarted ? 0 : 16,
                   }}
                   transition={{
-                    delay: 0.18,
-                    duration: 0.65,
-                    ease: revealEase,
+                    opacity: {
+                      delay: 0.3,
+                      duration: 0.7,
+                      ease: revealEase,
+                    },
+
+                    y: {
+                      delay: 0.3,
+                      duration: 0.85,
+                      ease: revealEase,
+                    },
                   }}
                   className="
                     mt-16
@@ -667,24 +641,22 @@ const ProjectsTableMobile = ({
               ) : null}
             </>
           ) : (
-            /* ===========================================
-                EMPTY
-            ============================================ */
-
             <motion.div
-              initial={{
-                opacity: 0,
-                y: 18,
-                filter: "blur(5px)",
-              }}
+              initial={false}
               animate={{
-                opacity: 1,
-                y: 0,
-                filter: "blur(0px)",
+                opacity: revealStarted ? 1 : 0,
+                y: revealStarted ? 0 : 18,
               }}
               transition={{
-                duration: 0.65,
-                ease: revealEase,
+                opacity: {
+                  duration: 0.7,
+                  ease: revealEase,
+                },
+
+                y: {
+                  duration: 0.85,
+                  ease: revealEase,
+                },
               }}
               className="
                 flex
@@ -693,9 +665,7 @@ const ProjectsTableMobile = ({
                 items-center
                 justify-center
                 gap-5
-
                 px-6
-
                 text-center
               "
             >
@@ -704,7 +674,6 @@ const ProjectsTableMobile = ({
                   text-sm
                   uppercase
                   tracking-[0.2em]
-
                   text-white/50
                 "
               >
@@ -718,13 +687,10 @@ const ProjectsTableMobile = ({
                   className="
                     border-b
                     border-white/40
-
                     pb-1
-
                     text-xs
                     uppercase
                     tracking-[0.2em]
-
                     text-white
                   "
                 >
@@ -801,11 +767,8 @@ function PopupFilterButton({
         w-full
         min-w-0
         items-center
-
         px-2
-
         text-left
-
         text-[9px]
         font-black
         uppercase
@@ -832,10 +795,8 @@ function PopupFilterButton({
           className="
             ml-auto
             pl-3
-
             text-[11px]
             leading-none
-
             text-white/65
           "
         >
@@ -851,6 +812,7 @@ interface ProjectCardProps {
   number: number;
   index: number;
   priority?: boolean;
+  revealStarted: boolean;
 }
 
 const ProjectCard = ({
@@ -858,26 +820,12 @@ const ProjectCard = ({
   number,
   index,
   priority = false,
+  revealStarted,
 }: ProjectCardProps) => {
-  const cardDelay = 0.08 + Math.min(index, 4) * 0.08;
+  const cardDelay = 0.1 + Math.min(index, 4) * 0.09;
 
   return (
-    <motion.article
-      initial={{
-        opacity: 0,
-        y: 24,
-        filter: "blur(6px)",
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-        filter: "blur(0px)",
-      }}
-      transition={{
-        delay: cardDelay,
-        duration: 0.75,
-        ease: revealEase,
-      }}
+    <article
       className="
         flex
         flex-col
@@ -889,28 +837,36 @@ const ProjectCard = ({
         className="block"
       >
         <motion.div
-          initial={{
-            opacity: 0,
-            scale: 1.025,
-            filter: "blur(8px)",
-          }}
+          initial={false}
           animate={{
-            opacity: 1,
-            scale: 1,
-            filter: "blur(0px)",
+            opacity: revealStarted ? 1 : 0,
+            y: revealStarted ? 0 : 20,
+            scale: revealStarted ? 1 : 1.012,
           }}
           transition={{
-            delay: cardDelay,
-            duration: 0.85,
-            ease: revealEase,
+            opacity: {
+              delay: cardDelay,
+              duration: 0.8,
+              ease: revealEase,
+            },
+
+            y: {
+              delay: cardDelay,
+              duration: 0.95,
+              ease: revealEase,
+            },
+
+            scale: {
+              delay: cardDelay,
+              duration: 1,
+              ease: revealEase,
+            },
           }}
           className="
             w-full
             overflow-hidden
-
             border
             border-white/15
-
             bg-white/5
           "
         >
@@ -935,16 +891,15 @@ const ProjectCard = ({
         <TextReveal
           as="p"
           viewport={false}
-          delay={cardDelay + 0.04}
-          duration={0.55}
-          y="75%"
+          active={revealStarted}
+          delay={cardDelay + 0.08}
+          duration={0.65}
+          y="85%"
           className="
             mb-3
-
             text-[10px]
             uppercase
             tracking-[0.28em]
-
             text-white/35
           "
         >
@@ -960,9 +915,10 @@ const ProjectCard = ({
             as="h2"
             mode="words"
             viewport={false}
-            delay={cardDelay + 0.07}
-            duration={0.7}
-            y="85%"
+            active={revealStarted}
+            delay={cardDelay + 0.12}
+            duration={0.8}
+            y="90%"
             className="
               text-2xl
               font-semibold
@@ -976,36 +932,36 @@ const ProjectCard = ({
         </TransitionLink>
 
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 10,
-          }}
+          initial={false}
           animate={{
-            opacity: 1,
-            y: 0,
+            opacity: revealStarted ? 1 : 0,
+            y: revealStarted ? 0 : 12,
           }}
           transition={{
-            delay: cardDelay + 0.12,
-            duration: 0.6,
-            ease: revealEase,
+            opacity: {
+              delay: cardDelay + 0.18,
+              duration: 0.7,
+              ease: revealEase,
+            },
+
+            y: {
+              delay: cardDelay + 0.18,
+              duration: 0.85,
+              ease: revealEase,
+            },
           }}
           className="
             mt-6
-
             flex
             items-start
             justify-between
             gap-6
-
             border-t
             border-white/15
-
             pt-4
-
             text-xs
             uppercase
             tracking-[0.18em]
-
             text-white/55
           "
         >
@@ -1014,7 +970,6 @@ const ProjectCard = ({
               flex
               max-w-[60%]
               flex-wrap
-
               gap-x-3
               gap-y-1
             "
@@ -1024,9 +979,10 @@ const ProjectCard = ({
                 key={tag}
                 as="span"
                 viewport={false}
-                delay={cardDelay + 0.14 + tagIndex * 0.025}
-                duration={0.55}
-                y="75%"
+                active={revealStarted}
+                delay={cardDelay + 0.2 + tagIndex * 0.025}
+                duration={0.6}
+                y="80%"
               >
                 {formatTag(tag)}
               </TextReveal>
@@ -1037,9 +993,10 @@ const ProjectCard = ({
             <TextReveal
               as="span"
               viewport={false}
-              delay={cardDelay + 0.16}
-              duration={0.55}
-              y="75%"
+              active={revealStarted}
+              delay={cardDelay + 0.22}
+              duration={0.6}
+              y="80%"
               className="
                 max-w-[40%]
                 text-right
@@ -1050,7 +1007,7 @@ const ProjectCard = ({
           ) : null}
         </motion.div>
       </div>
-    </motion.article>
+    </article>
   );
 };
 
