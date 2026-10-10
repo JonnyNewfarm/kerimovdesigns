@@ -57,10 +57,6 @@ export default function FormField({
         will-change-[transform,opacity,filter]
       "
     >
-      {/* =================================================
-          LABEL
-      ================================================= */}
-
       <label
         htmlFor={id}
         className="
@@ -78,10 +74,6 @@ export default function FormField({
         {label}
         {!required ? " / Optional" : ""}
       </label>
-
-      {/* =================================================
-          INPUT
-      ================================================= */}
 
       <input
         id={id}
@@ -142,10 +134,6 @@ export default function FormField({
           }
         `}
       />
-
-      {/* =================================================
-          ERROR
-      ================================================= */}
 
       <div
         className="

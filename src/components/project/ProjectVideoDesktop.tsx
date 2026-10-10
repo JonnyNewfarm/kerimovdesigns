@@ -22,12 +22,6 @@ export default function ProjectVideoDesktop({
 
   const [videoAspectRatio, setVideoAspectRatio] = useState(16 / 9);
 
-  /*
-   * =====================================================
-   * RESET + AUTOPLAY
-   * =====================================================
-   */
-
   useEffect(() => {
     const video = localVideoRef.current;
 
@@ -37,22 +31,12 @@ export default function ProjectVideoDesktop({
       return;
     }
 
-    /*
-     * Muted er nødvendig for stabil autoplay.
-     */
     video.muted = true;
 
     const playVideo = async () => {
       try {
         await video.play();
-      } catch {
-        /*
-         * Kan feile dersom media ikke er
-         * klart enda.
-         *
-         * onCanPlay prøver igjen.
-         */
-      }
+      } catch {}
     };
 
     void playVideo();
@@ -63,12 +47,6 @@ export default function ProjectVideoDesktop({
       hasStartedRef.current = false;
     };
   }, [src, hasStartedRef]);
-
-  /*
-   * =====================================================
-   * FORCE PLAY
-   * =====================================================
-   */
 
   const tryPlay = (video: HTMLVideoElement) => {
     if (!video.paused) {
@@ -97,20 +75,6 @@ export default function ProjectVideoDesktop({
           lg:translate-x-20
         "
       >
-        {/*
-         * =================================================
-         * THREE ANCHOR
-         *
-         * Denne div-en bestemmer:
-         *
-         * - plassering
-         * - størrelse
-         * - hover area
-         *
-         * Three.js rendrer selve videoen.
-         * =================================================
-         */}
-
         <div
           ref={(element) => {
             anchorRef.current = element;
@@ -123,16 +87,6 @@ export default function ProjectVideoDesktop({
             aspectRatio: videoAspectRatio,
           }}
         >
-          {/*
-           * =================================================
-           * REAL VIDEO
-           *
-           * Usynlig i DOM.
-           *
-           * Three.js bruker den som VideoTexture.
-           * =================================================
-           */}
-
           <video
             ref={(element) => {
               localVideoRef.current = element;

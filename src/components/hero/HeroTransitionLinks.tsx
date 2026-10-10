@@ -24,12 +24,6 @@ type HeroTransitionLinksProps = {
   artExhibitionTransitionRef: AnchorRef;
 };
 
-/*
- * =========================================================
- * SECTIONS
- * =========================================================
- */
-
 const SECTIONS = {
   VISUAL_IDENTITY: 1,
   POSTERS: 2,
@@ -38,20 +32,14 @@ const SECTIONS = {
   ALL_PROJECTS: 5,
 } as const;
 
-/*
- * =========================================================
- * KEYBOARD FOCUS STYLE
- * =========================================================
- *
- * Vanligvis er linkene visuelt skjult.
- *
- * Når de får keyboard-focus blir de synlige
- * nederst til venstre.
- *
- * Dermed vet keyboard-brukeren nøyaktig hva
- * som er valgt.
- * =========================================================
- */
+const PROJECT_TRANSITION_COLORS = {
+  DREAM_PROJECT: "#5F3568",
+  POSTERS_BUNDLE: "#8593F3",
+  KISTEFOSS: "#0F3470",
+  AURELIS: "#075354",
+  ART_EXHIBITION: "#706F66",
+} as const;
+
 const focusLinkClassName = `
   sr-only
 
@@ -113,12 +101,6 @@ export default function HeroTransitionLinks({
         z-[9999]
       "
     >
-      {/*
-       * =====================================================
-       * VISUAL IDENTITY
-       * =====================================================
-       */}
-
       <TransitionLink
         ref={visualIdentityTransitionRef}
         href="/projects?tags=visual-identity"
@@ -131,12 +113,6 @@ export default function HeroTransitionLinks({
       >
         Visual Identity
       </TransitionLink>
-
-      {/*
-       * =====================================================
-       * POSTERS
-       * =====================================================
-       */}
 
       <TransitionLink
         ref={posterTransitionRef}
@@ -151,12 +127,6 @@ export default function HeroTransitionLinks({
         Posters
       </TransitionLink>
 
-      {/*
-       * =====================================================
-       * ANIMATIONS
-       * =====================================================
-       */}
-
       <TransitionLink
         ref={animationTransitionRef}
         href="/projects?tags=animations"
@@ -169,12 +139,6 @@ export default function HeroTransitionLinks({
       >
         Animations
       </TransitionLink>
-
-      {/*
-       * =====================================================
-       * TYPOGRAPHY
-       * =====================================================
-       */}
 
       <TransitionLink
         ref={typographyTransitionRef}
@@ -189,22 +153,11 @@ export default function HeroTransitionLinks({
         Typography
       </TransitionLink>
 
-      {/*
-       * =====================================================
-       * ALL PROJECTS SCENE
-       * =====================================================
-       *
-       * Alle linkene under eksisterer visuelt
-       * inne i samme Three.js scene.
-       *
-       * Derfor sender Tab alle til section 5.
-       * =====================================================
-       */}
-
       <TransitionLink
         ref={dreamProjectTransitionRef}
         href="/project/69300cd7a94f6af6c6b7d9d8"
         transitionLabel="DRØMMENES MELODI"
+        transitionColor={PROJECT_TRANSITION_COLORS.DREAM_PROJECT}
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -218,6 +171,7 @@ export default function HeroTransitionLinks({
         ref={postersBundleTransitionRef}
         href="/project/6a738fe5c50ff327148b02f9"
         transitionLabel="POSTERS BUNDLE #1"
+        transitionColor={PROJECT_TRANSITION_COLORS.POSTERS_BUNDLE}
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -231,6 +185,7 @@ export default function HeroTransitionLinks({
         ref={kistefossTransitionRef}
         href="/project/6a873e144aea474cdeae7a76"
         transitionLabel="KISTEFOSS MUSEUM"
+        transitionColor={PROJECT_TRANSITION_COLORS.KISTEFOSS}
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -244,6 +199,7 @@ export default function HeroTransitionLinks({
         ref={aurelisTransitionRef}
         href="/project/6a873ba44aea474cdeae7a75"
         transitionLabel="AURELIS CAPITAL"
+        transitionColor={PROJECT_TRANSITION_COLORS.AURELIS}
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -257,6 +213,7 @@ export default function HeroTransitionLinks({
         ref={artExhibitionTransitionRef}
         href="/project/6930b50f931d3caa254b3237"
         transitionLabel="ART EXHIBITION"
+        transitionColor={PROJECT_TRANSITION_COLORS.ART_EXHIBITION}
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -265,10 +222,6 @@ export default function HeroTransitionLinks({
       >
         ART EXHIBITION
       </TransitionLink>
-
-      {/*
-       * ALL PROJECTS BUTTON
-       */}
 
       <TransitionLink
         ref={contactTransitionRef}

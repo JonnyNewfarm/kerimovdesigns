@@ -37,14 +37,10 @@ export default function useHoverLabelTexture(
 
     const createTexture =
       async () => {
-        /*
-         * Vent på Satoshi dersom fonten
-         * fortsatt loader.
-         */
+        
         try {
           await document.fonts.ready;
         } catch {
-          // fallback font brukes.
         }
 
         if (cancelled) {
@@ -56,10 +52,7 @@ export default function useHoverLabelTexture(
             "canvas",
           );
 
-        /*
-         * Høy resolution så teksten
-         * holder seg skarp.
-         */
+       
         canvas.width =
           1024;
 
@@ -75,9 +68,7 @@ export default function useHoverLabelTexture(
           return;
         }
 
-        /*
-         * BACKGROUND
-         */
+        
 
         ctx.clearRect(
           0,
@@ -96,9 +87,7 @@ export default function useHoverLabelTexture(
           canvas.height,
         );
 
-        /*
-         * TEXT
-         */
+      
 
         let fontSize =
           170;
@@ -145,9 +134,7 @@ export default function useHoverLabelTexture(
           canvas.height / 2 + 4,
         );
 
-        /*
-         * THREE TEXTURE
-         */
+        
 
         createdTexture =
           new THREE.CanvasTexture(

@@ -74,36 +74,20 @@ type TextPlaneProps = {
   textPadding?: number;
 };
 
-/*
- * =========================================================
- * TEXTURE
- * =========================================================
- */
-
-export function prepareTexture(texture: Texture) {
+export function prepareTexture(texture: Texture, isMobile = false) {
   texture.colorSpace = SRGBColorSpace;
 
-  // Sharp når bildet vises stort / nær kamera.
   texture.magFilter = THREE.LinearFilter;
-
-  // Bedre sampling når bildet blir mindre eller står skrått.
   texture.minFilter = THREE.LinearMipmapLinearFilter;
 
   texture.generateMipmaps = true;
 
-  // Viktig for planes som beveger seg rundt ringen / står på skrå.
-  texture.anisotropy = 8;
+  texture.anisotropy = isMobile ? 2 : 8;
 
   texture.needsUpdate = true;
 
   return texture;
 }
-
-/*
- * =========================================================
- * TEXT TEXTURE
- * =========================================================
- */
 
 function createTextTexture({
   text,
@@ -134,19 +118,6 @@ function createTextTexture({
 }) {
   const canvas = document.createElement("canvas");
 
-  /*
-   * =========================================================
-   * TEXTURE QUALITY
-   * =========================================================
-   *
-   * Før:
-   * 512px uansett device.
-   *
-   * Nå:
-   * Retina får høyere oppløsning, men vi capper på 2x
-   * så det ikke blir unødvendig tungt.
-   */
-
   const deviceScale = Math.min(window.devicePixelRatio || 1, 2);
 
   const baseTextureHeight = 512;
@@ -169,11 +140,6 @@ function createTextTexture({
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  /*
-   * Fordi canvas-oppløsningen nå kan være 2x,
-   * må font / padding også skaleres.
-   */
-
   const scaledFontSize = fontSize * deviceScale;
 
   const scaledLineHeight = lineHeight * deviceScale;
@@ -186,10 +152,6 @@ function createTextTexture({
 
   ctx.textBaseline = "middle";
 
-  /*
-   * Litt bedre tekst-rendering.
-   */
-
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
@@ -198,12 +160,6 @@ function createTextTexture({
   let finalFontSize = scaledFontSize;
 
   ctx.font = `900 ${finalFontSize}px Satoshi, Arial, Helvetica, sans-serif`;
-
-  /*
-   * =========================================================
-   * FIT TEXT
-   * =========================================================
-   */
 
   if (fitText) {
     const maxTextWidth = canvas.width - scaledPadding * 2;
@@ -218,11 +174,6 @@ function createTextTexture({
       ctx.font = `900 ${finalFontSize}px Satoshi, Arial, Helvetica, sans-serif`;
     }
   }
-
-  /*
-   * Behold samme visuelle line-height selv om
-   * fonten eventuelt har blitt skalert ned av fitText.
-   */
 
   const adjustedLineHeight =
     scaledLineHeight * (finalFontSize / scaledFontSize);
@@ -245,12 +196,6 @@ function createTextTexture({
     ctx.fillText(line, x, startY + index * adjustedLineHeight);
   });
 
-  /*
-   * =========================================================
-   * THREE TEXTURE
-   * =========================================================
-   */
-
   const texture = new CanvasTexture(canvas);
 
   texture.colorSpace = SRGBColorSpace;
@@ -267,12 +212,6 @@ function createTextTexture({
 
   return texture;
 }
-
-/*
- * =========================================================
- * TEXT PLANE
- * =========================================================
- */
 
 export function TextPlane({
   text,
@@ -380,12 +319,6 @@ export function TextPlane({
   );
 }
 
-/*
- * =========================================================
- * COVER UV
- * =========================================================
- */
-
 export function getCoverUv(
   texture: Texture,
   planeWidth: number,
@@ -420,12 +353,6 @@ export function getCoverUv(
   };
 }
 
-/*
- * =========================================================
- * IMAGE PLANE
- * =========================================================
- */
-
 export function ImagePlane({
   texture,
   position,
@@ -442,16 +369,8 @@ export function ImagePlane({
 
   isMobile = false,
 }: ImagePlaneProps) {
-  /*
-   * Outer group:
-   * intro position + scale.
-   */
   const groupRef = useRef<THREE.Group | null>(null);
 
-  /*
-   * Inner mesh:
-   * hover / magnetic.
-   */
   const meshRef = useRef<THREE.Mesh | null>(null);
 
   const materialRef = useRef<ShaderMaterial | null>(null);
@@ -460,31 +379,15 @@ export function ImagePlane({
 
   const hovered = useRef(false);
 
-  /*
-   * INTRO
-   */
-
   const introProgress = useRef(intro ? 0 : 1);
-
-  /*
-   * POINTER
-   */
 
   const pointerTarget = useRef(new Vector2(0.5, 0.5));
 
   const smoothPointer = useRef(new Vector2(0.5, 0.5));
 
-  /*
-   * HOVER BEND
-   */
-
   const hoverBend = useRef(new Vector2(0, 0));
 
   const hoverBendVelocity = useRef(new Vector2(0, 0));
-
-  /*
-   * MAGNETIC POSITION
-   */
 
   const positionTarget = useRef(new Vector2(0, 0));
 
@@ -492,17 +395,9 @@ export function ImagePlane({
 
   const positionVelocity = useRef(new Vector2(0, 0));
 
-  /*
-   * HOVER SCALE
-   */
-
   const scaleCurrent = useRef(1);
 
   const scaleVelocity = useRef(0);
-
-  /*
-   * TEXTURE COVER
-   */
 
   const cover = useMemo(
     () => getCoverUv(texture, width, height),
@@ -534,12 +429,6 @@ export function ImagePlane({
     [texture, cover],
   );
 
-  /*
-   * =====================================================
-   * FRAME
-   * =====================================================
-   */
-
   useFrame((_, rawDelta) => {
     const group = groupRef.current;
 
@@ -553,21 +442,11 @@ export function ImagePlane({
 
     const delta = Math.min(rawDelta, 1 / 30);
 
-    /*
-     * ===================================================
-     * INTRO
-     * ===================================================
-     */
-
     if (intro && introActive && introProgress.current < 1) {
       introProgress.current = Math.min(1, introProgress.current + delta / 1.45);
     }
 
     const p = intro ? introProgress.current : 1;
-
-    /*
-     * INTRO MOVEMENT
-     */
 
     const moveEase = 1 - Math.pow(1 - p, 3);
 
@@ -585,43 +464,17 @@ export function ImagePlane({
       position[2],
     );
 
-    /*
-     * INTRO SCALE
-     *
-     * Dette er intro-animation, ikke hover.
-     * Den beholdes også på mobil.
-     */
-
     const scaleEase = 1 - Math.pow(1 - p, 4);
 
     const introScale = intro ? THREE.MathUtils.lerp(0.72, 1, scaleEase) : 1;
 
     group.scale.setScalar(introScale);
 
-    /*
-     * INTRO BEND
-     */
-
     const bendRelease = THREE.MathUtils.smoothstep(p, 0.1, 1);
 
     const introBendX = intro ? THREE.MathUtils.lerp(-165, 0, bendRelease) : 0;
 
     const introBendY = intro ? THREE.MathUtils.lerp(12, 0, bendRelease) : 0;
-
-    /*
-     * ===================================================
-     * MOBILE
-     * ===================================================
-     *
-     * På mobil:
-     *
-     * - ingen hover
-     * - ingen magnetic
-     * - ingen hover scale
-     * - ingen hover bend
-     *
-     * Kun scroll bend + eventuell intro.
-     */
 
     if (isMobile) {
       hovered.current = false;
@@ -665,12 +518,6 @@ export function ImagePlane({
       return;
     }
 
-    /*
-     * ===================================================
-     * DESKTOP POINTER LAG
-     * ===================================================
-     */
-
     const pointerFollow = 1 - Math.exp(-delta * 7);
 
     smoothPointer.current.lerp(pointerTarget.current, pointerFollow);
@@ -678,12 +525,6 @@ export function ImagePlane({
     const rawDifferenceX = pointerTarget.current.x - smoothPointer.current.x;
 
     const rawDifferenceY = pointerTarget.current.y - smoothPointer.current.y;
-
-    /*
-     * ===================================================
-     * DESKTOP HOVER BEND
-     * ===================================================
-     */
 
     const hoverStrengthX = 115;
 
@@ -711,12 +552,6 @@ export function ImagePlane({
 
     hoverBend.current.y = THREE.MathUtils.clamp(hoverBend.current.y, -20, 20);
 
-    /*
-     * ===================================================
-     * SCROLL BEND
-     * ===================================================
-     */
-
     const scrollX = THREE.MathUtils.clamp(-difference.current * 3.15, -78, 78);
 
     const scrollY = THREE.MathUtils.clamp(difference.current * 0.58, -42, 42);
@@ -726,12 +561,6 @@ export function ImagePlane({
 
       scrollY * bendStrength + hoverBend.current.y + introBendY,
     );
-
-    /*
-     * ===================================================
-     * MAGNETIC FOLLOW
-     * ===================================================
-     */
 
     const maxFollowX = width * 0.065;
 
@@ -763,12 +592,6 @@ export function ImagePlane({
 
     mesh.position.set(positionCurrent.current.x, positionCurrent.current.y, 0);
 
-    /*
-     * ===================================================
-     * HOVER SCALE
-     * ===================================================
-     */
-
     const hoverScaleTarget = hovered.current ? 1.1 : 1;
 
     const scaleStiffness = 70;
@@ -784,12 +607,6 @@ export function ImagePlane({
 
     mesh.scale.setScalar(scaleCurrent.current);
   });
-
-  /*
-   * =========================================================
-   * DESKTOP EVENTS
-   * =========================================================
-   */
 
   function handleEnter(event: ThreeEvent<PointerEvent>) {
     event.stopPropagation();
@@ -821,12 +638,6 @@ export function ImagePlane({
     pointerTarget.current.set(0.5, 0.5);
   }
 
-  /*
-   * =========================================================
-   * RENDER
-   * =========================================================
-   */
-
   return (
     <group ref={groupRef} position={position} rotation={[0, 0, rotationZ]}>
       <mesh
@@ -836,8 +647,9 @@ export function ImagePlane({
         onPointerMove={isMobile ? undefined : handleMove}
         onPointerLeave={isMobile ? undefined : handleLeave}
       >
-        <planeGeometry args={[width, height, 28, 32]} />
-
+        <planeGeometry
+          args={[width, height, isMobile ? 14 : 28, isMobile ? 16 : 32]}
+        />
         <shaderMaterial
           ref={materialRef}
           uniforms={uniforms}
@@ -853,12 +665,6 @@ export function ImagePlane({
     </group>
   );
 }
-
-/*
- * =========================================================
- * RING POSITION
- * =========================================================
- */
 
 function getRingPosition(angle: number): Position {
   return [Math.sin(angle) * WORLD_RADIUS, 0, -Math.cos(angle) * WORLD_RADIUS];

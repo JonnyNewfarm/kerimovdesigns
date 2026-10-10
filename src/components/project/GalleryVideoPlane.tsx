@@ -34,12 +34,6 @@ export default function GalleryVideoPlane({
 
   const posterTextureRef = useRef<THREE.Texture | null>(null);
 
-  /*
-   * =====================================================
-   * VIDEO TEXTURE
-   * =====================================================
-   */
-
   useEffect(() => {
     let frameId = 0;
 
@@ -51,11 +45,6 @@ export default function GalleryVideoPlane({
       }
 
       const element = video.videoRef.current;
-
-      /*
-       * ProjectVideoDesktop kan montere
-       * litt senere enn Canvas.
-       */
 
       if (!element) {
         frameId = requestAnimationFrame(setupTexture);
@@ -94,12 +83,6 @@ export default function GalleryVideoPlane({
       videoTextureRef.current = null;
     };
   }, [video.videoRef]);
-
-  /*
-   * =====================================================
-   * POSTER
-   * =====================================================
-   */
 
   useEffect(() => {
     if (!video.poster) {
@@ -150,19 +133,9 @@ export default function GalleryVideoPlane({
       index={index}
       getAnchor={() => video.anchorRef.current}
       getTexture={() => {
-        /*
-         * Før video faktisk spiller:
-         * bruk poster.
-         */
-
         if (!video.hasStartedRef.current && posterTextureRef.current) {
           return posterTextureRef.current;
         }
-
-        /*
-         * Når onPlaying har skjedd:
-         * bruk live VideoTexture.
-         */
 
         return videoTextureRef.current ?? posterTextureRef.current;
       }}

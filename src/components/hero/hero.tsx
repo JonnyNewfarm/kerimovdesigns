@@ -79,12 +79,6 @@ export default function RingHero({ title, href }: RingHeroProps) {
     isTransitioning,
   });
 
-  /*
-   * =========================================================
-   * MOUNT / NAVBAR STATE
-   * =========================================================
-   */
-
   useEffect(() => {
     setHasMounted(true);
 
@@ -108,12 +102,6 @@ export default function RingHero({ title, href }: RingHeroProps) {
     setHasCheckedVisit(true);
   }, [setIntroExited]);
 
-  /*
-   * =========================================================
-   * CANVAS MOUNT
-   * =========================================================
-   */
-
   useEffect(() => {
     if (isTransitioning) {
       return;
@@ -128,21 +116,9 @@ export default function RingHero({ title, href }: RingHeroProps) {
     };
   }, [isTransitioning]);
 
-  /*
-   * =========================================================
-   * THREE READY
-   * =========================================================
-   */
-
   const handleSceneReady = useCallback(() => {
     setSceneReady(true);
   }, []);
-
-  /*
-   * =========================================================
-   * LOADER COMPLETE
-   * =========================================================
-   */
 
   const handleLoaderComplete = useCallback(() => {
     setLoaderComplete(true);
@@ -151,12 +127,6 @@ export default function RingHero({ title, href }: RingHeroProps) {
 
     setIntroExited(true);
   }, [setIntroExited]);
-
-  /*
-   * =========================================================
-   * SCROLL LOCK
-   * =========================================================
-   */
 
   useScrollLock(hasMounted && hasCheckedVisit && !loaderComplete);
 

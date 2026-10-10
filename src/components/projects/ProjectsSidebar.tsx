@@ -60,19 +60,11 @@ export default function ProjectsSidebar({
           flex-col
         "
       >
-        {/* =================================================
-            TOP GROUP
-        ================================================= */}
-
         <div
           className="
             shrink-0
           "
         >
-          {/* ===============================================
-              SELECTED WORK
-          ================================================ */}
-
           <TextReveal
             as="h1"
             mode="lines"
@@ -97,10 +89,6 @@ export default function ProjectsSidebar({
           >
             {"Selected\nWork"}
           </TextReveal>
-
-          {/* ===============================================
-              EDITORIAL COPY
-          ================================================ */}
 
           <motion.div
             initial={false}
@@ -187,18 +175,6 @@ export default function ProjectsSidebar({
             </div>
           </motion.div>
         </div>
-
-        {/* =================================================
-            FILTER — ACTUALLY AT THE BOTTOM
-        =================================================
-            
-            Nå er det FILTERET SELV som har mt-auto.
-            
-            Ikke en stor gruppe som inneholder både
-            filter og description.
-            
-            Derfor flyttes filteret faktisk helt ned.
-        ================================================= */}
 
         <motion.div
           initial={false}

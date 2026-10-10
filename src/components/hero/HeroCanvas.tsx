@@ -8,22 +8,6 @@ import HeroSceneLoader, { ReadySignal } from "./HeroSceneLoader";
 
 import PortfolioWorld from "./PortfolioWorld";
 
-/*
- * =========================================================
- * GLOBAL HERO INTRO STATE
- * =========================================================
- *
- * Lives only for the lifetime of the current browser document.
- *
- * /
- * -> /projects
- * -> /
- *
- * will NOT replay the intro.
- *
- * A real refresh / new page load resets it automatically.
- */
-
 declare global {
   interface Window {
     __heroIntroPlayed?: boolean;
@@ -87,12 +71,6 @@ export default function HeroCanvas({
 
   artExhibitionTransitionRef: React.RefObject<HTMLAnchorElement | null>;
 }) {
-  /*
-   * =======================================================
-   * FIRST LOAD INTRO
-   * =======================================================
-   */
-
   const [introResolved, setIntroResolved] = useState(false);
 
   const [shouldPlayIntro, setShouldPlayIntro] = useState(false);
@@ -106,10 +84,6 @@ export default function HeroCanvas({
 
     didResolveIntro.current = true;
 
-    /*
-     * First visit during this actual browser load.
-     */
-
     if (!window.__heroIntroPlayed) {
       window.__heroIntroPlayed = true;
 
@@ -119,27 +93,9 @@ export default function HeroCanvas({
       return;
     }
 
-    /*
-     * Returning to "/" from another route.
-     *
-     * Do NOT replay HeroSceneLoader.
-     */
-
     setShouldPlayIntro(false);
     setIntroResolved(true);
   }, []);
-
-  /*
-   * =======================================================
-   * SKIPPED LOADER
-   * =======================================================
-   *
-   * When returning to the hero we still wait until the
-   * Three scene is actually ready before telling the rest
-   * of the page that loading is complete.
-   *
-   * We simply don't show the visual intro again.
-   */
 
   useEffect(() => {
     if (!introResolved) {
@@ -166,12 +122,6 @@ export default function HeroCanvas({
     loaderComplete,
     onLoaderComplete,
   ]);
-
-  /*
-   * =======================================================
-   * RENDER
-   * =======================================================
-   */
 
   return (
     <div
@@ -211,15 +161,6 @@ export default function HeroCanvas({
           }}
         >
           <color attach="background" args={["#181c14"]} />
-
-          {/*
-           * =================================================
-           * HERO INTRO
-           * =================================================
-           *
-           * Only exists on the FIRST visit during the
-           * current browser load.
-           */}
 
           {shouldPlayIntro && !loaderComplete && (
             <HeroSceneLoader

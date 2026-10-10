@@ -22,21 +22,9 @@ type ProjectModalWrapperProps = {
 export default function ProjectModalWrapper({
   project,
 }: ProjectModalWrapperProps) {
-  /*
-   * =====================================================
-   * IMAGE DIMENSIONS
-   * =====================================================
-   */
-
   const [imageDimensions, setImageDimensions] = useState<ImageDimensionsMap>(
     {},
   );
-
-  /*
-   * =====================================================
-   * PROJECT DATA
-   * =====================================================
-   */
 
   const images = useMemo(() => {
     return getProjectImages(project);
@@ -49,12 +37,6 @@ export default function ProjectModalWrapper({
   const imageCount = images.length;
 
   const videoCount = project.srcVideo ? 1 : 0;
-
-  /*
-   * =====================================================
-   * PRELOAD IMAGES
-   * =====================================================
-   */
 
   useEffect(() => {
     if (images.length <= 2) {
@@ -82,21 +64,10 @@ export default function ProjectModalWrapper({
     };
   }, [images]);
 
-  /*
-   * =====================================================
-   * IMAGE LOADED
-   * =====================================================
-   */
-
   const handleImageLoad = (index: number, dimensions: ImageDimensions) => {
     setImageDimensions((previous) => {
       const current = previous[index];
 
-      /*
-       * Ikke trigger unødvendig
-       * state update dersom dimensions
-       * allerede er riktige.
-       */
       if (
         current?.width === dimensions.width &&
         current?.height === dimensions.height
@@ -111,12 +82,6 @@ export default function ProjectModalWrapper({
       };
     });
   };
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <>

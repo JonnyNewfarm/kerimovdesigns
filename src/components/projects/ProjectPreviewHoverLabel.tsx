@@ -27,41 +27,17 @@ export default function ProjectPreviewHoverLabel({
 
   const texture = useHoverLabelTexture(backgroundColor);
 
-  /*
-   * =====================================================
-   * POSITION
-   * =====================================================
-   */
-
   const positionTarget = useRef(new THREE.Vector2(0, 0));
 
   const positionCurrent = useRef(new THREE.Vector2(0, 0));
 
   const positionVelocity = useRef(new THREE.Vector2(0, 0));
 
-  /*
-   * =====================================================
-   * POINTER LAG
-   * =====================================================
-   */
-
   const pointerSmooth = useRef(new THREE.Vector2(0, 0));
-
-  /*
-   * =====================================================
-   * BEND
-   * =====================================================
-   */
 
   const bendCurrent = useRef(new THREE.Vector2(0, 0));
 
   const bendVelocity = useRef(new THREE.Vector2(0, 0));
-
-  /*
-   * =====================================================
-   * REVEAL
-   * =====================================================
-   */
 
   const scaleCurrent = useRef(0.35);
 
@@ -70,12 +46,6 @@ export default function ProjectPreviewHoverLabel({
   const opacityCurrent = useRef(0);
 
   const wasHovered = useRef(false);
-
-  /*
-   * =====================================================
-   * UNIFORMS
-   * =====================================================
-   */
 
   const uniforms = useMemo(
     () => ({
@@ -93,12 +63,6 @@ export default function ProjectPreviewHoverLabel({
     }),
     [texture],
   );
-
-  /*
-   * =====================================================
-   * FRAME
-   * =====================================================
-   */
 
   useFrame((_, rawDelta) => {
     const mesh = meshRef.current;
@@ -119,12 +83,6 @@ export default function ProjectPreviewHoverLabel({
       return;
     }
 
-    /*
-     * =================================================
-     * HOVER
-     * =================================================
-     */
-
     const isHovered =
       pointerRef.current.active &&
       pointerRef.current.x >= rect.left &&
@@ -132,29 +90,11 @@ export default function ProjectPreviewHoverLabel({
       pointerRef.current.y >= rect.top &&
       pointerRef.current.y <= rect.bottom;
 
-    /*
-     * =================================================
-     * LABEL SIZE
-     * =================================================
-     *
-     * Vanlig preview:
-     * 190 -> 290
-     *
-     * Grid card:
-     * 110 -> 170
-     */
-
     const labelWidth = compact
       ? THREE.MathUtils.clamp(rect.width * 0.5, 145, 205)
       : THREE.MathUtils.clamp(rect.width * 0.25, 190, 290);
 
     const labelHeight = labelWidth * (compact ? 0.33 : 0.35);
-
-    /*
-     * =================================================
-     * POSITION TARGET
-     * =================================================
-     */
 
     const centerX = rect.left + rect.width / 2;
 
@@ -166,10 +106,6 @@ export default function ProjectPreviewHoverLabel({
 
     positionTarget.current.set(targetX, targetY);
 
-    /*
-     * Første frame.
-     */
-
     if (isHovered && !wasHovered.current) {
       positionCurrent.current.copy(positionTarget.current);
 
@@ -177,12 +113,6 @@ export default function ProjectPreviewHoverLabel({
 
       pointerSmooth.current.set(pointerRef.current.x, pointerRef.current.y);
     }
-
-    /*
-     * =================================================
-     * POSITION SPRING
-     * =================================================
-     */
 
     if (isHovered) {
       const positionStiffness = 125;
@@ -206,12 +136,6 @@ export default function ProjectPreviewHoverLabel({
       positionCurrent.current.addScaledVector(positionVelocity.current, delta);
     }
 
-    /*
-     * =================================================
-     * POINTER LAG
-     * =================================================
-     */
-
     const pointerFollow = 1 - Math.exp(-delta * 7);
 
     pointerSmooth.current.x +=
@@ -223,12 +147,6 @@ export default function ProjectPreviewHoverLabel({
     const differenceX = pointerRef.current.x - pointerSmooth.current.x;
 
     const differenceY = pointerRef.current.y - pointerSmooth.current.y;
-
-    /*
-     * =================================================
-     * BEND
-     * =================================================
-     */
 
     const targetBendX = isHovered
       ? THREE.MathUtils.clamp(
@@ -264,12 +182,6 @@ export default function ProjectPreviewHoverLabel({
 
     material.uniforms.uDelta.value.copy(bendCurrent.current);
 
-    /*
-     * =================================================
-     * SCALE
-     * =================================================
-     */
-
     const scaleTarget = isHovered ? 1 : 0.35;
 
     const scaleStiffness = 95;
@@ -283,12 +195,6 @@ export default function ProjectPreviewHoverLabel({
 
     scaleCurrent.current += scaleVelocity.current * delta;
 
-    /*
-     * =================================================
-     * OPACITY
-     * =================================================
-     */
-
     const opacityTarget = isHovered ? 0.96 : 0;
 
     const opacityFollow = 1 - Math.exp(-delta * 13);
@@ -297,12 +203,6 @@ export default function ProjectPreviewHoverLabel({
       (opacityTarget - opacityCurrent.current) * opacityFollow;
 
     material.uniforms.uOpacity.value = opacityCurrent.current;
-
-    /*
-     * =================================================
-     * TRANSFORM
-     * =================================================
-     */
 
     mesh.position.set(positionCurrent.current.x, positionCurrent.current.y, 10);
 

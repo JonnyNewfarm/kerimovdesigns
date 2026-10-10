@@ -62,15 +62,6 @@ export default function ProjectGalleryItem({
             w-full
           "
         >
-          {/*
-           * Dette eksisterer kun for:
-           *
-           * - layout
-           * - aspect ratio
-           * - image dimensions
-           *
-           * Three.js rendrer det synlige bildet.
-           */}
           <Image
             unoptimized
             src={src}

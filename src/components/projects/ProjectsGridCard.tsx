@@ -31,12 +31,6 @@ type ProjectsGridCardProps = {
 
 const MAX_VISIBLE_TAGS = 2;
 
-/*
- * =========================================================
- * EASING
- * =========================================================
- */
-
 const REVEAL_EASE = [0.16, 1, 0.3, 1] as const;
 
 const FILTER_EASE = [0.22, 1, 0.36, 1] as const;
@@ -52,19 +46,6 @@ export default function ProjectsGridCard({
   const { revealStarted } = useProjectsReveal();
 
   const imageLinkRef = useRef<HTMLAnchorElement | null>(null);
-
-  /*
-   * =====================================================
-   * KEEP CARD / CANVAS MOUNTED
-   * =====================================================
-   *
-   * Vi unmount-er ikke Three Canvas når man filtrerer.
-   *
-   * Cardet fader først ut.
-   * Deretter tas det ut av layout med display:none.
-   *
-   * Canvas-contexten beholdes.
-   */
 
   const [inLayout, setInLayout] = useState(active);
 
@@ -84,33 +65,15 @@ export default function ProjectsGridCard({
     };
   }, [active]);
 
-  /*
-   * =====================================================
-   * TAGS
-   * =====================================================
-   */
-
   const visibleTags = project.tags.slice(0, MAX_VISIBLE_TAGS);
 
   const hiddenTagsCount = Math.max(project.tags.length - MAX_VISIBLE_TAGS, 0);
-
-  /*
-   * =====================================================
-   * INITIAL STAGGER
-   * =====================================================
-   */
 
   const column = index % 3;
 
   const row = Math.floor(index / 3);
 
   const revealDelay = column * 0.07 + Math.min(row, 2) * 0.075;
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <motion.article
@@ -158,14 +121,6 @@ export default function ProjectsGridCard({
 
         order: active ? activeOrder : 9999 + projectNumber,
 
-        /*
-         * Ingen clipPath.
-         * Ingen contain.
-         *
-         * Three må få tegne utenfor
-         * cardets originale bounds.
-         */
-
         willChange: "transform, opacity",
       }}
       className="
@@ -177,17 +132,6 @@ export default function ProjectsGridCard({
         hover:z-30
       "
     >
-      {/* =================================================
-          IMAGE
-
-          VIKTIG:
-          Ingen clipPath.
-          Ingen overflow-hidden.
-
-          Three-plane kan derfor bøye seg utenfor
-          venstre/høyre kant uten å bli klippet.
-      ================================================= */}
-
       <motion.div
         initial={false}
         animate={{
@@ -263,10 +207,6 @@ export default function ProjectsGridCard({
         </TransitionLink>
       </motion.div>
 
-      {/* =================================================
-          PROJECT INFO
-      ================================================= */}
-
       <motion.div
         initial={false}
         animate={{
@@ -301,10 +241,6 @@ export default function ProjectsGridCard({
           xl:gap-x-4
         "
       >
-        {/* =================================================
-            NUMBER
-        ================================================= */}
-
         <p
           className="
             pt-[3px]
@@ -322,10 +258,6 @@ export default function ProjectsGridCard({
         </p>
 
         <div className="min-w-0">
-          {/* ===============================================
-              TITLE
-          ================================================ */}
-
           <TransitionLink
             href={`/project/${project.id}`}
             transitionColor={project.hoverText}
@@ -354,10 +286,6 @@ export default function ProjectsGridCard({
               {project.title}
             </h2>
           </TransitionLink>
-
-          {/* ===============================================
-              TAGS
-          ================================================ */}
 
           {visibleTags.length > 0 ? (
             <div
@@ -430,10 +358,6 @@ export default function ProjectsGridCard({
               ) : null}
             </div>
           ) : null}
-
-          {/* ===============================================
-              TYPE / YEAR
-          ================================================ */}
 
           {project.type ? (
             <p

@@ -1,4 +1,4 @@
-export const previewBendVertexShader = /* glsl */ `
+export const previewBendVertexShader =  `
 precision highp float;
 
 varying vec2 vUv;
@@ -40,7 +40,7 @@ void main() {
 }
 `;
 
-export const previewImageFragmentShader = /* glsl */ `
+export const previewImageFragmentShader = `
 precision highp float;
 
 varying vec2 vUv;
@@ -70,7 +70,7 @@ void main() {
 }
 `;
 
-export const hoverLabelFragmentShader = /* glsl */ `
+export const hoverLabelFragmentShader = `
 precision highp float;
 
 varying vec2 vUv;

@@ -16,12 +16,6 @@ type Props = {
   params: ParamsType;
 };
 
-/*
- * =========================================================
- * METADATA
- * =========================================================
- */
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { projectId } = await params;
 
@@ -68,12 +62,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-/*
- * =========================================================
- * PAGE
- * =========================================================
- */
-
 export default async function Page({ params }: Props) {
   const { projectId } = await params;
 
@@ -83,29 +71,9 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  /*
-   * =====================================================
-   * INITIAL PROJECT ASSETS
-   * =====================================================
-   *
-   * Kun de første to.
-   *
-   * Det er nok til at starten på siden
-   * føles ferdig når reveal skjer.
-   *
-   * Resten blir preloadet videre av
-   * ProjectModalWrapper slik du allerede gjør.
-   */
-
   const initialImages = [project.src, project.src2].filter(
     (src): src is string => Boolean(src),
   );
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <ProjectDetailsLoadingGate initialImages={initialImages}>

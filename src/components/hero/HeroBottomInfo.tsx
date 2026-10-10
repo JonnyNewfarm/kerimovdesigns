@@ -80,10 +80,6 @@ export default function HeroBottomInfo({
         lg:px-[clamp(2.5rem,4.5vw,5rem)]
       "
     >
-      {/* =====================================================
-          MOBILE
-      ====================================================== */}
-
       <div
         className="
           flex
@@ -178,10 +174,6 @@ export default function HeroBottomInfo({
         </div>
       </div>
 
-      {/* =====================================================
-          DESKTOP
-      ====================================================== */}
-
       <div
         className="
           hidden
@@ -193,10 +185,6 @@ export default function HeroBottomInfo({
           lg:flex
         "
       >
-        {/* =================================================
-            PORTFOLIO
-        ================================================= */}
-
         <motion.div
           initial={false}
           animate={{
@@ -241,10 +229,6 @@ export default function HeroBottomInfo({
             Portfolio / 2026
           </TextReveal>
         </motion.div>
-
-        {/* =================================================
-            INFO AREA
-        ================================================= */}
 
         <div
           className="
@@ -297,10 +281,6 @@ ml-[clamp(5rem,7vw,8rem)]
                   gap-x-[clamp(1.5rem,3vw,5rem)]
                 "
               >
-                {/* =================================================
-                    LATEST PROJECT
-                ================================================= */}
-
                 <motion.div
                   className="
                     shrink-0
@@ -433,10 +413,6 @@ ml-[clamp(5rem,7vw,8rem)]
                   </LinkReveal>
                 </motion.div>
 
-                {/* =================================================
-                    STATUS
-                ================================================= */}
-
                 <motion.div
                   className="
                     shrink-0
@@ -498,10 +474,6 @@ ml-[clamp(5rem,7vw,8rem)]
                     Status / Open for work
                   </TextReveal>
                 </motion.div>
-
-                {/* =================================================
-                    LOCAL TIME
-                ================================================= */}
 
                 <motion.div
                   className="

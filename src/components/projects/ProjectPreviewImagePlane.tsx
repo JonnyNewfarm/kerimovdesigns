@@ -13,12 +13,6 @@ import {
 
 import type { PreviewImagePlaneProps } from "./projectPreviewTypes";
 
-/*
- * =========================================================
- * COVER UV
- * =========================================================
- */
-
 function getCoverUv(
   texture: THREE.Texture,
   containerWidth: number,
@@ -73,12 +67,6 @@ function getCoverUv(
   };
 }
 
-/*
- * =========================================================
- * COMPONENT
- * =========================================================
- */
-
 export default function ProjectPreviewImagePlane({
   src,
   anchorRef,
@@ -88,12 +76,6 @@ export default function ProjectPreviewImagePlane({
   const meshRef = useRef<THREE.Mesh | null>(null);
 
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
-
-  /*
-   * =====================================================
-   * TEXTURE
-   * =====================================================
-   */
 
   const texture = useLoader(THREE.TextureLoader, src);
 
@@ -112,12 +94,6 @@ export default function ProjectPreviewImagePlane({
 
     texture.needsUpdate = true;
   }, [texture]);
-
-  /*
-   * =====================================================
-   * READY
-   * =====================================================
-   */
 
   const readyReportedRef = useRef(false);
 
@@ -152,12 +128,6 @@ export default function ProjectPreviewImagePlane({
     };
   }, [texture, onReady]);
 
-  /*
-   * =====================================================
-   * UNIFORMS
-   * =====================================================
-   */
-
   const uniforms = useMemo(
     () => ({
       uTexture: {
@@ -179,29 +149,11 @@ export default function ProjectPreviewImagePlane({
     [texture],
   );
 
-  /*
-   * =====================================================
-   * POINTER
-   * =====================================================
-   */
-
   const smoothPointer = useRef(new THREE.Vector2(0.5, 0.5));
-
-  /*
-   * =====================================================
-   * HOVER BEND
-   * =====================================================
-   */
 
   const hoverBend = useRef(new THREE.Vector2(0, 0));
 
   const hoverVelocity = useRef(new THREE.Vector2(0, 0));
-
-  /*
-   * =====================================================
-   * SCROLL BEND
-   * =====================================================
-   */
 
   const scrollBend = useRef(0);
 
@@ -213,43 +165,19 @@ export default function ProjectPreviewImagePlane({
     previousScrollY.current = window.scrollY;
   }, []);
 
-  /*
-   * =====================================================
-   * MOUSE FOLLOW
-   * =====================================================
-   */
-
   const positionTarget = useRef(new THREE.Vector2(0, 0));
 
   const positionCurrent = useRef(new THREE.Vector2(0, 0));
 
   const positionVelocity = useRef(new THREE.Vector2(0, 0));
 
-  /*
-   * =====================================================
-   * SCALE
-   * =====================================================
-   */
-
   const scaleCurrent = useRef(1);
 
   const scaleVelocity = useRef(0);
 
-  /*
-   * =====================================================
-   * Z
-   * =====================================================
-   */
-
   const zCurrent = useRef(0);
 
   const zVelocity = useRef(0);
-
-  /*
-   * =====================================================
-   * FRAME
-   * =====================================================
-   */
 
   useFrame((_, delta) => {
     const mesh = meshRef.current;
@@ -270,23 +198,11 @@ export default function ProjectPreviewImagePlane({
       return;
     }
 
-    /*
-     * ===================================================
-     * COVER
-     * ===================================================
-     */
-
     const cover = getCoverUv(texture, rect.width, rect.height);
 
     material.uniforms.uUvScale.value.copy(cover.scale);
 
     material.uniforms.uUvOffset.value.copy(cover.offset);
-
-    /*
-     * ===================================================
-     * POINTER
-     * ===================================================
-     */
 
     const pointer = pointerRef.current;
 
@@ -314,12 +230,6 @@ export default function ProjectPreviewImagePlane({
       );
     }
 
-    /*
-     * ===================================================
-     * POINTER SMOOTHING
-     * ===================================================
-     */
-
     const pointerFollow = isHovered ? 7 : 4.5;
 
     smoothPointer.current.x = THREE.MathUtils.damp(
@@ -335,12 +245,6 @@ export default function ProjectPreviewImagePlane({
       pointerFollow,
       dt,
     );
-
-    /*
-     * ===================================================
-     * HOVER BEND
-     * ===================================================
-     */
 
     const differenceX = smoothPointer.current.x - 0.5;
 
@@ -358,10 +262,6 @@ export default function ProjectPreviewImagePlane({
 
     const hoverDamping = isHovered ? 17 : 14;
 
-    /*
-     * X
-     */
-
     const hoverForceX = (targetHoverX - hoverBend.current.x) * hoverStiffness;
 
     hoverVelocity.current.x += hoverForceX * dt;
@@ -370,10 +270,6 @@ export default function ProjectPreviewImagePlane({
 
     hoverBend.current.x += hoverVelocity.current.x * dt;
 
-    /*
-     * Y
-     */
-
     const hoverForceY = (targetHoverY - hoverBend.current.y) * hoverStiffness;
 
     hoverVelocity.current.y += hoverForceY * dt;
@@ -381,12 +277,6 @@ export default function ProjectPreviewImagePlane({
     hoverVelocity.current.y *= Math.exp(-hoverDamping * dt);
 
     hoverBend.current.y += hoverVelocity.current.y * dt;
-
-    /*
-     * ===================================================
-     * ORIGINAL SUBTLE SCROLL BEND
-     * ===================================================
-     */
 
     const currentScrollY = window.scrollY;
 
@@ -408,10 +298,6 @@ export default function ProjectPreviewImagePlane({
 
     scrollBend.current += scrollVelocity.current * dt;
 
-    /*
-     * Smooth tilbake til flat.
-     */
-
     if (Math.abs(scrollDifference) < 0.01) {
       scrollBend.current = THREE.MathUtils.damp(scrollBend.current, 0, 4.5, dt);
 
@@ -423,23 +309,11 @@ export default function ProjectPreviewImagePlane({
       );
     }
 
-    /*
-     * ===================================================
-     * FINAL BEND
-     * ===================================================
-     */
-
     material.uniforms.uDelta.value.set(
       hoverBend.current.x,
 
       hoverBend.current.y + scrollBend.current,
     );
-
-    /*
-     * ===================================================
-     * MOUSE FOLLOW
-     * ===================================================
-     */
 
     const maxFollowX = rect.width * 0.065;
 
@@ -449,17 +323,9 @@ export default function ProjectPreviewImagePlane({
 
     positionTarget.current.y = isHovered ? -differenceY * maxFollowY * 2 : 0;
 
-    /*
-     * Den gamle, mykere followeren.
-     */
-
     const positionStiffness = isHovered ? 30 : 60;
 
     const positionDamping = isHovered ? 8 : 10;
-
-    /*
-     * X
-     */
 
     const positionForceX =
       (positionTarget.current.x - positionCurrent.current.x) *
@@ -471,10 +337,6 @@ export default function ProjectPreviewImagePlane({
 
     positionCurrent.current.x += positionVelocity.current.x * dt;
 
-    /*
-     * Y
-     */
-
     const positionForceY =
       (positionTarget.current.y - positionCurrent.current.y) *
       positionStiffness;
@@ -484,12 +346,6 @@ export default function ProjectPreviewImagePlane({
     positionVelocity.current.y *= Math.exp(-positionDamping * dt);
 
     positionCurrent.current.y += positionVelocity.current.y * dt;
-
-    /*
-     * ===================================================
-     * HOVER SCALE
-     * ===================================================
-     */
 
     const targetScale = isHovered ? 1.045 : 1;
 
@@ -505,12 +361,6 @@ export default function ProjectPreviewImagePlane({
 
     scaleCurrent.current += scaleVelocity.current * dt;
 
-    /*
-     * ===================================================
-     * Z LIFT
-     * ===================================================
-     */
-
     const targetZ = isHovered ? 18 : 0;
 
     const zStiffness = isHovered ? 70 : 60;
@@ -524,12 +374,6 @@ export default function ProjectPreviewImagePlane({
     zVelocity.current *= Math.exp(-zDamping * dt);
 
     zCurrent.current += zVelocity.current * dt;
-
-    /*
-     * ===================================================
-     * APPLY
-     * ===================================================
-     */
 
     mesh.position.set(
       positionCurrent.current.x,
@@ -545,12 +389,6 @@ export default function ProjectPreviewImagePlane({
       1,
     );
   });
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <mesh ref={meshRef} frustumCulled={false}>

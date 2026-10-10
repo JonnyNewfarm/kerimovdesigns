@@ -12,9 +12,7 @@ void main() {
   vec3 newPosition =
     position;
 
-  /*
-   * Samme type bend som AnimatedPortraitPlane.
-   */
+  
   newPosition.x +=
     sin(uv.y * PI) *
     uDelta.x *
@@ -53,9 +51,7 @@ uniform vec2 uUvScale;
 uniform vec2 uUvOffset;
 
 void main() {
-  /*
-   * object-fit: cover.
-   */
+ 
   vec2 imageUv =
     vUv *
     uUvScale +
@@ -110,7 +106,7 @@ void main() {
 }
 `;
 
-export const portfolioButtonFragmentShader = /* glsl */ `
+export const portfolioButtonFragmentShader =  `
 precision highp float;
 
 varying vec2 vUv;
@@ -149,15 +145,7 @@ void main() {
     gradient
   );
 
-  /*
-   * DARK BIAS
-   *
-   * Samme eksakte farger som før.
-   *
-   * Vi presser bare gradienten kraftig
-   * ned mot 0, slik at colorA dekker
-   * mye mer av knappen.
-   */
+ 
   gradient = pow(
     gradient,
     1.8
@@ -207,7 +195,7 @@ void main() {
 `;
 
 
-export const projectLabelFragmentShader = /* glsl */ `
+export const projectLabelFragmentShader =  `
 precision highp float;
 
 varying vec2 vUv;
@@ -224,7 +212,6 @@ void main() {
 
   float time = uTime * uSpeed;
 
-  // Hovedflow
   float wave =
     sin(
       uv.x * 4.6 +
@@ -232,7 +219,6 @@ void main() {
       time * 0.75
     ) * 0.5 + 0.5;
 
-  // Svak sekundær variasjon
   float wave2 =
     sin(
       uv.x * -2.2 +
@@ -273,7 +259,7 @@ void main() {
 `;
 
 
-export const portfolioLogoGradientFragmentShader = /* glsl */ `
+export const portfolioLogoGradientFragmentShader =  `
 precision highp float;
 
 varying vec2 vUv;
@@ -287,26 +273,20 @@ uniform float uTime;
 uniform float uSpeed;
 
 void main() {
-  /*
-   * COVER UV
-   */
+  
   vec2 imageUv =
     vUv *
     uUvScale +
     uUvOffset;
 
-  /*
-   * PNG TEXTURE
-   */
+ 
   vec4 textureColor =
     texture2D(
       uTexture,
       imageUv
     );
 
-  /*
-   * PNG ALPHA MASK
-   */
+ 
   float alpha =
     textureColor.a;
 
@@ -320,9 +300,7 @@ void main() {
     uTime *
     uSpeed;
 
-  /*
-   * PRIMARY FLOW
-   */
+ 
   float wave =
     sin(
       uv.x * 5.2 +
@@ -330,9 +308,7 @@ void main() {
       time
     ) * 0.5 + 0.5;
 
-  /*
-   * SECONDARY FLOW
-   */
+
   float wave2 =
     sin(
       uv.x * -2.8 +
@@ -340,9 +316,7 @@ void main() {
       time * 0.55
     ) * 0.5 + 0.5;
 
-  /*
-   * MIX FLOWS
-   */
+ 
   float gradient =
     mix(
       wave,
@@ -357,13 +331,7 @@ void main() {
       gradient
     );
 
-  /*
-   * COOL EDITORIAL PALETTE
-   *
-   * A: #314A78
-   * B: #7189B0
-   * C: #C7D2D8
-   */
+
   vec3 colorA = vec3(
     0.192,
     0.290,
@@ -382,9 +350,7 @@ void main() {
     0.847
   );
 
-  /*
-   * THREE COLOR GRADIENT
-   */
+ 
   vec3 color;
 
   if (gradient < 0.5) {
@@ -403,9 +369,7 @@ void main() {
       );
   }
 
-  /*
-   * OUTPUT
-   */
+ 
   gl_FragColor =
     vec4(
       color,
@@ -417,7 +381,7 @@ void main() {
 }
 `;
 
-export const projectGalleryBendVertexShader = /* glsl */ `
+export const projectGalleryBendVertexShader =  `
 precision highp float;
 
 varying vec2 vUv;
@@ -458,7 +422,7 @@ void main() {
 }
 `;
 
-export const projectGalleryImageFragmentShader = /* glsl */ `
+export const projectGalleryImageFragmentShader =  `
 precision highp float;
 
 varying vec2 vUv;

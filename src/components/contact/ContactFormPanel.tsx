@@ -31,21 +31,9 @@ export default function ContactFormPanel({
 
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
-  /*
-   * =====================================================
-   * CLIENT
-   * =====================================================
-   */
-
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  /*
-   * =====================================================
-   * MOBILE
-   * =====================================================
-   */
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 767px)");
@@ -63,12 +51,6 @@ export default function ContactFormPanel({
     };
   }, []);
 
-  /*
-   * =====================================================
-   * RESET
-   * =====================================================
-   */
-
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -76,12 +58,6 @@ export default function ContactFormPanel({
 
     setIsPanelHovered(false);
   }, [isOpen]);
-
-  /*
-   * =====================================================
-   * ESCAPE
-   * =====================================================
-   */
 
   useEffect(() => {
     if (!isOpen) {
@@ -100,17 +76,6 @@ export default function ContactFormPanel({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
-
-  /*
-   * =====================================================
-   * LOCK PAGE
-   * =====================================================
-   *
-   * Fryser siden bak modalen helt.
-   *
-   * Viktig på mobil fordi hero / Lenis / Three ellers
-   * kan motta scroll og touch mens Contact er åpen.
-   */
 
   useEffect(() => {
     if (!isOpen) {
@@ -133,22 +98,11 @@ export default function ContactFormPanel({
     const previousHtmlOverflow = html.style.overflow;
     const previousHtmlOverscroll = html.style.overscrollBehavior;
 
-    /*
-     * Lock document.
-     */
-
     html.style.overflow = "hidden";
     html.style.overscrollBehavior = "none";
 
     body.style.overflow = "hidden";
     body.style.overscrollBehavior = "none";
-
-    /*
-     * Frys body på nåværende scrollposisjon.
-     *
-     * Dette er spesielt viktig på iOS/mobile Safari,
-     * hvor overflow:hidden alene ikke alltid er nok.
-     */
 
     body.style.position = "fixed";
     body.style.top = `-${scrollY}px`;
@@ -157,10 +111,6 @@ export default function ContactFormPanel({
     body.style.width = "100%";
 
     return () => {
-      /*
-       * Restore original document styles.
-       */
-
       body.style.overflow = previousBodyOverflow;
       body.style.position = previousBodyPosition;
       body.style.top = previousBodyTop;
@@ -171,10 +121,6 @@ export default function ContactFormPanel({
 
       html.style.overflow = previousHtmlOverflow;
       html.style.overscrollBehavior = previousHtmlOverscroll;
-
-      /*
-       * Restore exact scroll position.
-       */
 
       window.scrollTo(0, scrollY);
     };
@@ -208,10 +154,6 @@ export default function ContactFormPanel({
             overflow-hidden
           "
         >
-          {/* =================================================
-              BACKDROP
-          ================================================= */}
-
           <motion.button
             type="button"
             aria-label="Close contact form"
@@ -241,10 +183,6 @@ export default function ContactFormPanel({
             "
           />
 
-          {/* =================================================
-              STAGE
-          ================================================= */}
-
           <div
             className="
               pointer-events-none
@@ -265,10 +203,6 @@ export default function ContactFormPanel({
               perspectiveOrigin: "50% 50%",
             }}
           >
-            {/* ===============================================
-                PANEL
-            ================================================ */}
-
             <motion.div
               role="dialog"
               aria-modal="true"
@@ -376,17 +310,7 @@ export default function ContactFormPanel({
                 will-change-transform
               "
             >
-              {/* =============================================
-                  THREE BACKGROUND
-
-                  Panelet venter ikke på canvaset.
-              ============================================== */}
-
               <ContactPopupThreeBackground />
-
-              {/* =============================================
-                  CONTENT
-              ============================================== */}
 
               <div
                 className="
@@ -399,10 +323,6 @@ export default function ContactFormPanel({
                   flex-col
                 "
               >
-                {/* ===========================================
-                    HEADER
-                ============================================ */}
-
                 <div
                   className="
                     flex
@@ -453,69 +373,80 @@ export default function ContactFormPanel({
                     </h2>
                   </div>
 
-                  {/* =========================================
-                      CLOSE
-                  ========================================== */}
-
                   <motion.button
                     type="button"
                     onClick={onClose}
                     aria-label="Close contact form"
                     initial={{
                       opacity: 0,
-                      x: 5,
+                      y: -4,
                     }}
                     animate={{
                       opacity: 1,
-                      x: 0,
+                      y: 0,
                     }}
-                    whileHover={
-                      isMobile
-                        ? undefined
-                        : {
-                            x: 2,
-                          }
-                    }
                     whileTap={{
                       scale: 0.97,
                     }}
                     transition={{
                       delay: 0.08,
-                      duration: 0.32,
+                      duration: 0.4,
                       ease: contactEase,
                     }}
                     className="
-                      mt-1.5
-                      shrink-0
+    group
+    relative
 
-                      cursor-pointer
+    mt-1.5
+    shrink-0
 
-                      bg-[#20241e]/90
+    cursor-pointer
 
-                      px-2.5
-                      py-2
+    border-0
+    bg-transparent
+    p-0
 
-                      text-[7px]
-                      font-black
-                      uppercase
-                      tracking-[0.17em]
+    font-black
+    uppercase
 
-                      text-white/65
 
-                      transition-colors
-                      duration-300
+    transition-colors
+    duration-300
+    text-[9px]
+tracking-[0.16em]
+text-white/70
+hover:text-white
 
-                      hover:bg-[#171a15]
-                      hover:text-white
-                    "
+  "
                   >
-                    Close
+                    <span className="relative block">
+                      Close
+                      <span
+                        aria-hidden="true"
+                        className="
+        absolute
+        -bottom-[4px]
+        left-0
+
+        h-px
+        w-full
+
+        origin-right
+        scale-x-0
+
+        bg-current
+
+        transition-transform
+        duration-500
+        ease-[cubic-bezier(0.76,0,0.24,1)]
+
+        group-hover:origin-left
+        group-hover:scale-x-100
+      "
+                      />
+                    </span>
                   </motion.button>
                 </div>
-
-                {/* ===========================================
-                    FORM
-                ============================================ */}
 
                 <div
                   ref={scrollAreaRef}

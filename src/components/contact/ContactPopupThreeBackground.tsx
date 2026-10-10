@@ -29,9 +29,6 @@ function ContactPopupPlane({ onReady }: { onReady?: () => void }) {
         value: 0,
       },
 
-      /*
-       * Litt roligere enn filter-popupen.
-       */
       uSpeed: {
         value: 0.48,
       },
@@ -94,19 +91,11 @@ export default function ContactPopupThreeBackground({
         overflow-hidden
       "
       style={{
-        /*
-         * Matcher den mørkeste delen
-         * av Contact-gradienten.
-         */
         background: "rgb(69, 71, 61)",
 
         transform: "translateZ(0)",
       }}
     >
-      {/* =================================================
-          FALLBACK
-      ================================================= */}
-
       <div
         className="
           absolute
@@ -116,10 +105,6 @@ export default function ContactPopupThreeBackground({
           background: "rgb(69, 71, 61)",
         }}
       />
-
-      {/* =================================================
-          CANVAS OVERSCAN
-      ================================================= */}
 
       <div
         className="

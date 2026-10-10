@@ -29,12 +29,6 @@ export default function GalleryMediaPlane({
 
   const { size } = useThree();
 
-  /*
-   * =====================================================
-   * UNIFORMS
-   * =====================================================
-   */
-
   const uniforms = useMemo(
     () => ({
       uTexture: {
@@ -60,31 +54,13 @@ export default function GalleryMediaPlane({
     [],
   );
 
-  /*
-   * =====================================================
-   * POINTER
-   * =====================================================
-   */
-
   const pointerTarget = useRef(new THREE.Vector2(0.5, 0.5));
 
   const pointerSmooth = useRef(new THREE.Vector2(0.5, 0.5));
 
-  /*
-   * =====================================================
-   * HOVER BEND
-   * =====================================================
-   */
-
   const hoverBend = useRef(new THREE.Vector2(0, 0));
 
   const hoverBendVelocity = useRef(new THREE.Vector2(0, 0));
-
-  /*
-   * =====================================================
-   * MAGNETIC POSITION
-   * =====================================================
-   */
 
   const positionTarget = useRef(new THREE.Vector2(0, 0));
 
@@ -92,29 +68,11 @@ export default function GalleryMediaPlane({
 
   const positionVelocity = useRef(new THREE.Vector2(0, 0));
 
-  /*
-   * =====================================================
-   * SCALE
-   * =====================================================
-   */
-
   const scaleCurrent = useRef(1);
 
   const scaleVelocity = useRef(0);
 
-  /*
-   * =====================================================
-   * OPACITY
-   * =====================================================
-   */
-
   const opacityCurrent = useRef(0);
-
-  /*
-   * =====================================================
-   * FRAME
-   * =====================================================
-   */
 
   useFrame((_, rawDelta) => {
     const mesh = meshRef.current;
@@ -135,12 +93,6 @@ export default function GalleryMediaPlane({
 
     const delta = Math.min(rawDelta, 1 / 30);
 
-    /*
-     * =================================================
-     * DOM BOUNDS
-     * =================================================
-     */
-
     const rect = anchor.getBoundingClientRect();
 
     const outsideViewport = rect.bottom < -300 || rect.top > size.height + 300;
@@ -152,12 +104,6 @@ export default function GalleryMediaPlane({
     }
 
     mesh.visible = true;
-
-    /*
-     * =================================================
-     * TEXTURE
-     * =================================================
-     */
 
     material.uniforms.uTexture.value = texture;
 
@@ -172,19 +118,7 @@ export default function GalleryMediaPlane({
       material.uniforms.uUvOffset.value,
     );
 
-    /*
-     * =================================================
-     * HOVER
-     * =================================================
-     */
-
     const isHovered = hoveredIndexRef.current === index;
-
-    /*
-     * =================================================
-     * POINTER LOCAL UV
-     * =================================================
-     */
 
     if (isHovered && pointerRef.current.active) {
       const x = THREE.MathUtils.clamp(
@@ -206,14 +140,6 @@ export default function GalleryMediaPlane({
       pointerTarget.current.set(0.5, 0.5);
     }
 
-    /*
-     * =================================================
-     * POINTER LAG
-     *
-     * Samme type feel som hero.
-     * =================================================
-     */
-
     const pointerFollow = 1 - Math.exp(-delta * 7);
 
     pointerSmooth.current.lerp(pointerTarget.current, pointerFollow);
@@ -221,12 +147,6 @@ export default function GalleryMediaPlane({
     const differenceX = pointerTarget.current.x - pointerSmooth.current.x;
 
     const differenceY = pointerTarget.current.y - pointerSmooth.current.y;
-
-    /*
-     * =================================================
-     * HOVER BEND
-     * =================================================
-     */
 
     const targetHoverX = isHovered
       ? THREE.MathUtils.clamp(
@@ -260,31 +180,11 @@ export default function GalleryMediaPlane({
 
     hoverBend.current.addScaledVector(hoverBendVelocity.current, delta);
 
-    /*
-     * =================================================
-     * FINAL BEND
-     *
-     * Scroll:
-     * Y only.
-     *
-     * Hover:
-     * X + Y.
-     * =================================================
-     */
-
     material.uniforms.uDelta.value.set(
       hoverBend.current.x,
 
       scrollBendRef.current + hoverBend.current.y,
     );
-
-    /*
-     * =================================================
-     * MAGNETIC FOLLOW
-     *
-     * Samme styrke som hero.
-     * =================================================
-     */
 
     const maxFollowX = rect.width * 0.065;
 
@@ -314,14 +214,6 @@ export default function GalleryMediaPlane({
 
     positionCurrent.current.addScaledVector(positionVelocity.current, delta);
 
-    /*
-     * =================================================
-     * HOVER SCALE
-     *
-     * Hero: 1 -> 1.1.
-     * =================================================
-     */
-
     const scaleTarget = isHovered ? 1.1 : 1;
 
     const scaleStiffness = 70;
@@ -334,12 +226,6 @@ export default function GalleryMediaPlane({
     scaleVelocity.current *= Math.exp(-scaleDamping * delta);
 
     scaleCurrent.current += scaleVelocity.current * delta;
-
-    /*
-     * =================================================
-     * DOM -> THREE POSITION
-     * =================================================
-     */
 
     const centerX = rect.left + rect.width / 2;
 
@@ -357,12 +243,6 @@ export default function GalleryMediaPlane({
       0,
     );
 
-    /*
-     * =================================================
-     * SIZE
-     * =================================================
-     */
-
     mesh.scale.set(
       rect.width * scaleCurrent.current,
 
@@ -370,12 +250,6 @@ export default function GalleryMediaPlane({
 
       1,
     );
-
-    /*
-     * =================================================
-     * DIM OTHER MEDIA
-     * =================================================
-     */
 
     const shouldDim =
       hoveredIndexRef.current !== null && hoveredIndexRef.current !== index;

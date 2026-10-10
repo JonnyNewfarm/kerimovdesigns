@@ -1,5 +1,5 @@
 
-export const pageTransitionVertexShader = /* glsl */ `
+export const pageTransitionVertexShader =  `
   varying vec2 vUv;
 
   void main() {
@@ -12,7 +12,7 @@ export const pageTransitionVertexShader = /* glsl */ `
   }
 `;
 
-export const pageTransitionFragmentShader = /* glsl */ `
+export const pageTransitionFragmentShader =  `
   precision highp float;
 
   uniform float uTime;
@@ -23,12 +23,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
 
   varying vec2 vUv;
 
-  /*
-   * =========================================================
-   * HASH
-   * =========================================================
-   */
-
+  
   float hash(vec2 p) {
     p = fract(
       p * vec2(
@@ -47,11 +42,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
     );
   }
 
-  /*
-   * =========================================================
-   * NOISE
-   * =========================================================
-   */
+ 
 
   float noise(vec2 p) {
     vec2 i = floor(p);
@@ -101,11 +92,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
     );
   }
 
-  /*
-   * =========================================================
-   * FBM
-   * =========================================================
-   */
+ 
 
   float fbm(vec2 p) {
     float value = 0.0;
@@ -139,20 +126,11 @@ export const pageTransitionFragmentShader = /* glsl */ `
     return value;
   }
 
-  /*
-   * =========================================================
-   * MAIN
-   * =========================================================
-   */
+  
 
   void main() {
     vec2 uv = vUv;
 
-    /*
-     * =====================================================
-     * LARGE CLOUD FIELD
-     * =====================================================
-     */
 
     vec2 cloudUv =
       uv * vec2(
@@ -183,11 +161,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         )
       );
 
-    /*
-     * =====================================================
-     * SECOND FIELD
-     * =====================================================
-     */
+ 
 
     vec2 secondUv =
       uv * vec2(
@@ -220,11 +194,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         field
       );
 
-    /*
-     * =====================================================
-     * DISSOLVE
-     * =====================================================
-     */
+ 
 
     float threshold =
       mix(
@@ -244,11 +214,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         field
       );
 
-    /*
-     * =====================================================
-     * SECONDARY BREAKUP
-     * =====================================================
-     */
+ 
 
     float edgeDistance =
       abs(
@@ -288,11 +254,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         1.0
       );
 
-    /*
-     * =====================================================
-     * CLEAN START
-     * =====================================================
-     */
+  
 
     mask *=
       smoothstep(
@@ -301,12 +263,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         uProgress
       );
 
-    /*
-     * =====================================================
-     * CLEAN FULL COVER
-     * =====================================================
-     */
-
+   
     mask =
       mix(
         mask,
@@ -318,16 +275,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         )
       );
 
-    /*
-     * =====================================================
-     * NEUTRAL BASE
-     * =====================================================
-     *
-     * No obvious left/right gradient.
-     *
-     * Just slight variation between two
-     * charcoal / grey-olive tones.
-     */
+  
 
     float baseVariation =
       smoothstep(
@@ -343,16 +291,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         baseVariation * 0.42
       );
 
-    /*
-     * =====================================================
-     * SUBTLE GREEN MIX
-     * =====================================================
-     *
-     * Instead of a gradient:
-     * large organic cloudy patches.
-     *
-     * Very low strength.
-     */
+    
 
     float greenField =
       fbm(
@@ -370,9 +309,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         greenField
       );
 
-    /*
-     * Muted olive.
-     */
+    
 
     vec3 oliveTint =
       vec3(
@@ -381,11 +318,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         0.20
       );
 
-    /*
-     * Only a small amount.
-     *
-     * Max ~9%.
-     */
+   
 
     color =
       mix(
@@ -394,12 +327,7 @@ export const pageTransitionFragmentShader = /* glsl */ `
         greenField * 0.09
       );
 
-    /*
-     * =====================================================
-     * VERY SUBTLE DEPTH
-     * =====================================================
-     */
-
+   
     color +=
       (
         cloudA -

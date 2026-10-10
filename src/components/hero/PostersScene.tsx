@@ -26,7 +26,6 @@ export default function PostersScene({
 
   return (
     <SceneShell angle={angle} scale={scale}>
-      {/* LEFT */}
       <ImagePlane
         texture={textures[0]}
         position={[-1.75, 0.45, 0.25]}
@@ -37,7 +36,6 @@ export default function PostersScene({
         isMobile={isMobile}
       />
 
-      {/* RIGHT */}
       <ImagePlane
         texture={textures[1]}
         position={[1.2, 0.1, -0.12]}

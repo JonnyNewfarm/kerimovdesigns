@@ -24,18 +24,14 @@ export function updateCoverUv(
 
   let sourceHeight = 1;
 
-  /*
-   * VIDEO
-   */
+  
 
   if (source instanceof HTMLVideoElement) {
     sourceWidth = source.videoWidth || 1;
 
     sourceHeight = source.videoHeight || 1;
   } else {
-    /*
-     * IMAGE
-     */
+    
 
     sourceWidth =
       source.naturalWidth ||
@@ -56,10 +52,7 @@ export function updateCoverUv(
     planeWidth /
     planeHeight;
 
-  /*
-   * Landscape source compared
-   * with plane.
-   */
+
 
   if (sourceAspect > planeAspect) {
     const scaleX =
@@ -79,9 +72,7 @@ export function updateCoverUv(
     return;
   }
 
-  /*
-   * Portrait / taller source.
-   */
+
 
   const scaleY =
     sourceAspect /

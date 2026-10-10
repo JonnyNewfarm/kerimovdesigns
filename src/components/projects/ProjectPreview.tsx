@@ -69,12 +69,6 @@ export default function ProjectPreview({
               flex-col
             "
           >
-            {/*
-             * =================================================
-             * THREE PREVIEW
-             * =================================================
-             */}
-
             <TransitionLink
               ref={imageLinkRef}
               href={`/project/${project.id}`}
@@ -134,12 +128,6 @@ export default function ProjectPreview({
     </main>
   );
 }
-
-/*
- * =========================================================
- * DETAILS
- * =========================================================
- */
 
 type ProjectPreviewDetailsProps = {
   project: ProjectListItem;
@@ -318,12 +306,6 @@ function ProjectPreviewDetails({ project }: ProjectPreviewDetailsProps) {
   );
 }
 
-/*
- * =========================================================
- * METADATA
- * =========================================================
- */
-
 type ProjectMetadataItemProps = {
   label: string;
   children: React.ReactNode;
@@ -355,12 +337,6 @@ function ProjectMetadataItem({ label, children }: ProjectMetadataItemProps) {
     </div>
   );
 }
-
-/*
- * =========================================================
- * EMPTY
- * =========================================================
- */
 
 type EmptyProjectPreviewProps = {
   activeTagsKey: string;

@@ -30,9 +30,6 @@ function FilterPopupPlane({ onReady }: { onReady?: () => void }) {
         value: 0,
       },
 
-      /*
-       * Litt roligere movement.
-       */
       uSpeed: {
         value: 0.62,
       },
@@ -95,19 +92,10 @@ export default function FilterPopupThreeBackground({
         overflow-hidden
       "
       style={{
-        /*
-         * Mørkere fallback som matcher gradienten.
-         */
         background: "rgb(66, 72, 59)",
         transform: "translateZ(0)",
       }}
     >
-      {/*
-       * Solid base layer.
-       *
-       * Hvis canvas bruker et frame på å bli klar,
-       * ser du denne i stedet for svart.
-       */}
       <div
         className="
           absolute
@@ -118,16 +106,6 @@ export default function FilterPopupThreeBackground({
         }}
       />
 
-      {/*
-       * Viktig fix:
-       * Canvas-wrapperen overscanner noen px
-       * INNI popupen.
-       *
-       * Parent har overflow-hidden,
-       * så dette kan ikke lage ny ytre kant.
-       *
-       * Men det skjuler seam på høyre/bunn.
-       */}
       <div
         className="
           absolute

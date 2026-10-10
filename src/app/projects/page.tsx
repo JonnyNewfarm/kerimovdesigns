@@ -38,12 +38,6 @@ const ITEMS_PER_PAGE = 5;
 
 const MAX_SELECTED_TAGS = 3;
 
-/*
- * =========================================================
- * NORMALIZE TAGS
- * =========================================================
- */
-
 const normalizeTags = ({
   tags,
   tag,
@@ -65,12 +59,6 @@ const normalizeTags = ({
     .filter((value, index, values) => values.indexOf(value) === index)
     .slice(0, MAX_SELECTED_TAGS);
 };
-
-/*
- * =========================================================
- * PROJECT URL
- * =========================================================
- */
 
 const createProjectsUrl = ({
   page,
@@ -95,31 +83,13 @@ const createProjectsUrl = ({
   return query ? `/projects?${query}` : "/projects";
 };
 
-/*
- * =========================================================
- * PAGE
- * =========================================================
- */
-
 const Page = async ({ searchParams }: PageProps) => {
   const resolvedSearchParams = await searchParams;
-
-  /*
-   * =====================================================
-   * PAGE NUMBER
-   * =====================================================
-   */
 
   const parsedPage = Number(resolvedSearchParams.page);
 
   const currentPage =
     Number.isFinite(parsedPage) && parsedPage > 0 ? Math.floor(parsedPage) : 1;
-
-  /*
-   * =====================================================
-   * TAGS
-   * =====================================================
-   */
 
   const activeTags = normalizeTags({
     tags: resolvedSearchParams.tags,
@@ -127,19 +97,7 @@ const Page = async ({ searchParams }: PageProps) => {
     tag: resolvedSearchParams.tag,
   });
 
-  /*
-   * =====================================================
-   * PROJECT DATA
-   * =====================================================
-   */
-
   const allProjects = await getProjects();
-
-  /*
-   * =====================================================
-   * AVAILABLE TAGS
-   * =====================================================
-   */
 
   const availableTags = Array.from(
     new Set(
@@ -150,18 +108,6 @@ const Page = async ({ searchParams }: PageProps) => {
   )
     .filter(Boolean)
     .sort((a, b) => a.localeCompare(b));
-
-  /*
-   * =====================================================
-   * FILTER PROJECTS
-   * =====================================================
-   *
-   * Denne server-side filtreringen brukes fortsatt
-   * av MOBIL-versjonen.
-   *
-   * Desktop får allProjects og filtrerer client-side
-   * slik at Framer Motion kan animere gridet smooth.
-   */
 
   const filteredProjects =
     activeTags.length === 0
@@ -174,19 +120,9 @@ const Page = async ({ searchParams }: PageProps) => {
           );
         });
 
-  /*
-   * =====================================================
-   * MOBILE PAGINATION
-   * =====================================================
-   */
-
   const total = filteredProjects.length;
 
   const totalPages = Math.max(Math.ceil(total / ITEMS_PER_PAGE), 1);
-
-  /*
-   * Redirect invalid pages.
-   */
 
   if (total > 0 && currentPage > totalPages) {
     redirect(
@@ -204,36 +140,9 @@ const Page = async ({ searchParams }: PageProps) => {
 
   const mobileProjects = filteredProjects.slice(startIndex, endIndex);
 
-  /*
-   * =====================================================
-   * MOBILE PREV / NEXT
-   * =====================================================
-   */
-
   const prevPage = currentPage > 1 ? currentPage - 1 : null;
 
   const nextPage = currentPage < totalPages ? currentPage + 1 : null;
-
-  /*
-   * =====================================================
-   * INITIAL LOADER ASSETS
-   * =====================================================
-   *
-   * DESKTOP:
-   *
-   * Hele desktop-gridet finnes samtidig.
-   * Derfor preloader vi ALLE prosjektbilder før
-   * ProjectsLoadingGate avslutter.
-   *
-   * Når gridet mountes er Three-texturene allerede
-   * varme i cache.
-   *
-   *
-   * MOBILE:
-   *
-   * Beholder samme oppførsel som før.
-   * Kun bildene på nåværende paginerte side lastes.
-   */
 
   const desktopSrcs = allProjects
     .map((project) => project.src)
@@ -242,12 +151,6 @@ const Page = async ({ searchParams }: PageProps) => {
   const mobileSrcs = mobileProjects
     .map((project) => project.src)
     .filter((src): src is string => Boolean(src));
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <ProjectsLoadingGate desktopSrcs={desktopSrcs} mobileSrcs={mobileSrcs}>
@@ -259,10 +162,6 @@ const Page = async ({ searchParams }: PageProps) => {
             text-color
           "
         >
-          {/* =============================================
-              DESKTOP
-          ============================================= */}
-
           <div
             className="
               hidden
@@ -271,24 +170,12 @@ const Page = async ({ searchParams }: PageProps) => {
             "
           >
             <ProjectsTable
-              /*
-               * VIKTIG:
-               *
-               * Desktop får ALLE prosjekter.
-               *
-               * ProjectsTable filtrerer selv client-side
-               * for å beholde smooth layout-animation.
-               */
               projects={allProjects}
               startIndex={0}
               availableTags={availableTags}
               activeTags={activeTags}
             />
           </div>
-
-          {/* =============================================
-              MOBILE
-          ============================================= */}
 
           <div
             className="
@@ -313,10 +200,6 @@ const Page = async ({ searchParams }: PageProps) => {
                   pt-6
                 "
               >
-                {/* =======================================
-                    PAGE NUMBER
-                ======================================= */}
-
                 <p
                   className="
                     text-[10px]
@@ -329,10 +212,6 @@ const Page = async ({ searchParams }: PageProps) => {
                   {String(totalPages).padStart(2, "0")}
                 </p>
 
-                {/* =======================================
-                    ARROWS
-                ======================================= */}
-
                 <div
                   className="
                     flex
@@ -340,8 +219,6 @@ const Page = async ({ searchParams }: PageProps) => {
                     gap-6
                   "
                 >
-                  {/* PREVIOUS */}
-
                   {prevPage ? (
                     <Link
                       href={createProjectsUrl({
@@ -377,8 +254,6 @@ const Page = async ({ searchParams }: PageProps) => {
                       <PaginationArrow direction="prev" />
                     </span>
                   )}
-
-                  {/* NEXT */}
 
                   {nextPage ? (
                     <Link
@@ -426,12 +301,6 @@ const Page = async ({ searchParams }: PageProps) => {
 };
 
 export default Page;
-
-/*
- * =========================================================
- * PAGINATION ARROW
- * =========================================================
- */
 
 const PaginationArrow = ({ direction }: { direction: "prev" | "next" }) => {
   const isPrev = direction === "prev";

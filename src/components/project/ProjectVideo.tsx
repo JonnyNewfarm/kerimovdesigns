@@ -30,9 +30,7 @@ export default function ProjectVideo({
       return;
     }
 
-    // PAUSE
     if (!video.paused) {
-      // Oppdater UI med én gang.
       setIsVideoPlaying(false);
       setIsVideoLoading(false);
 
@@ -41,8 +39,6 @@ export default function ProjectVideo({
       return;
     }
 
-    // PLAY
-    // Oppdater UI med én gang, ikke vent på onPlaying.
     setIsVideoPlaying(true);
     setIsVideoLoading(true);
 
@@ -206,10 +202,6 @@ export default function ProjectVideo({
             onPlaying={(event) => {
               const video = event.currentTarget;
 
-              // Viktig:
-              // et forsinket onPlaying-event skal IKKE
-              // få lov til å sette pauseikon dersom
-              // videoen allerede er pauset.
               if (video.paused) {
                 return;
               }
@@ -246,7 +238,6 @@ export default function ProjectVideo({
             }}
           />
 
-          {/* Poster */}
           <AnimatePresence>
             {!hasStartedPlaying && poster ? (
               <motion.img

@@ -29,12 +29,6 @@ const initialValues: ContactFormValues = {
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/*
- * =========================================================
- * VALIDATE FIELD
- * =========================================================
- */
-
 const validateField = (
   name: keyof ContactFormValues,
   value: string,
@@ -103,12 +97,6 @@ const validateField = (
   }
 };
 
-/*
- * =========================================================
- * VALIDATE FORM
- * =========================================================
- */
-
 const validateForm = (values: ContactFormValues): ContactFormErrors => {
   const errors: ContactFormErrors = {};
 
@@ -123,12 +111,6 @@ const validateForm = (values: ContactFormValues): ContactFormErrors => {
   return errors;
 };
 
-/*
- * =========================================================
- * COMPONENT
- * =========================================================
- */
-
 export default function ContactForm() {
   const [values, setValues] = useState<ContactFormValues>(initialValues);
 
@@ -136,12 +118,6 @@ export default function ContactForm() {
 
   const [touched, setTouched] = useState<ContactFormTouched>({});
   const PANEL_EASE = [0.22, 1, 0.36, 1] as const;
-
-  /*
-   * =====================================================
-   * CHANGE
-   * =====================================================
-   */
 
   const handleChange = (name: keyof ContactFormValues, value: string) => {
     setValues((previous) => ({
@@ -173,12 +149,6 @@ export default function ContactForm() {
     });
   };
 
-  /*
-   * =====================================================
-   * BLUR
-   * =====================================================
-   */
-
   const handleBlur = (name: keyof ContactFormValues) => {
     setTouched((previous) => ({
       ...previous,
@@ -205,21 +175,9 @@ export default function ContactForm() {
     });
   };
 
-  /*
-   * =====================================================
-   * MESSAGE
-   * =====================================================
-   */
-
   const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     handleChange("message", event.target.value);
   };
-
-  /*
-   * =====================================================
-   * SUBMIT
-   * =====================================================
-   */
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -251,12 +209,6 @@ export default function ContactForm() {
 
   const messageErrorId = "message-error";
 
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
-
   return (
     <form
       noValidate
@@ -275,10 +227,6 @@ export default function ContactForm() {
         md:gap-y-4
       "
     >
-      {/* ===============================================
-          NAME
-      ================================================ */}
-
       <FormField
         id="name"
         name="name"
@@ -296,10 +244,6 @@ export default function ContactForm() {
         }}
       />
 
-      {/* ===============================================
-          EMAIL
-      ================================================ */}
-
       <FormField
         id="email"
         name="email"
@@ -316,10 +260,6 @@ export default function ContactForm() {
           handleBlur("email");
         }}
       />
-
-      {/* ===============================================
-          COMPANY
-      ================================================ */}
 
       <FormField
         id="company"
@@ -339,10 +279,6 @@ export default function ContactForm() {
         }}
       />
 
-      {/* ===============================================
-          PROJECT
-      ================================================ */}
-
       <FormField
         id="project"
         name="project"
@@ -359,10 +295,6 @@ export default function ContactForm() {
           handleBlur("project");
         }}
       />
-
-      {/* ===============================================
-          MESSAGE
-      ================================================ */}
 
       <div
         className="
@@ -450,10 +382,6 @@ export default function ContactForm() {
           `}
         />
 
-        {/* =============================================
-            MESSAGE ERROR
-        ============================================== */}
-
         <div
           className="
             min-h-[16px]
@@ -492,18 +420,6 @@ export default function ContactForm() {
           ) : null}
         </div>
       </div>
-
-      {/* ===============================================
-          SUBMIT
-      ================================================ */}
-
-      {/* ===============================================
-    BOTTOM / SUBMIT
-================================================ */}
-
-      {/* ===============================================
-    BOTTOM / SUBMIT
-================================================ */}
 
       <div
         className="

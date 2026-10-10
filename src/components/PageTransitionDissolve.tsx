@@ -40,27 +40,11 @@ function easeInOutSine(value: number) {
   return -(Math.cos(Math.PI * value) - 1) / 2;
 }
 
-/*
- * =========================================================
- * COLOR
- * =========================================================
- */
-
 function getTransitionColors(
   variant: TransitionVariant,
   color?: string | null,
 ) {
   const cleanedColor = color?.trim() || "";
-
-  /*
-   * =====================================================
-   * PROJECT COLOR
-   * =====================================================
-   *
-   * Bruk prosjektets hoverText-farge,
-   * men bland den mot nøytrale toner
-   * så fullscreen-transitionen ikke blir for intens.
-   */
 
   if (/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(cleanedColor)) {
     const projectColor = new THREE.Color(cleanedColor);
@@ -75,12 +59,6 @@ function getTransitionColors(
       b: projectColor.clone().lerp(neutralLight, 0.38),
     };
   }
-
-  /*
-   * =====================================================
-   * FALLBACK
-   * =====================================================
-   */
 
   if (variant === "projectDetails") {
     return {
@@ -97,12 +75,6 @@ function getTransitionColors(
   };
 }
 
-/*
- * =========================================================
- * DISSOLVE PLANE
- * =========================================================
- */
-
 function DissolvePlane({
   status,
   variant,
@@ -113,12 +85,6 @@ function DissolvePlane({
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
 
   const { viewport } = useThree();
-
-  /*
-   * =====================================================
-   * PROGRESS
-   * =====================================================
-   */
 
   const progressRef = useRef(status === "leaving" ? 1 : 0);
 
@@ -132,22 +98,10 @@ function DissolvePlane({
     completed: false,
   });
 
-  /*
-   * =====================================================
-   * COLORS
-   * =====================================================
-   */
-
   const colors = useMemo(
     () => getTransitionColors(variant, color),
     [variant, color],
   );
-
-  /*
-   * =====================================================
-   * UNIFORMS
-   * =====================================================
-   */
 
   const uniforms = useMemo(
     () => ({
@@ -206,12 +160,6 @@ function DissolvePlane({
     material.uniforms.uColorB.value.copy(colors.b);
   }, [colors]);
 
-  /*
-   * =====================================================
-   * FRAME
-   * =====================================================
-   */
-
   useFrame((state, rawDelta) => {
     const material = materialRef.current;
 
@@ -230,10 +178,6 @@ function DissolvePlane({
     }
 
     animation.elapsed += delta;
-
-    /*
-     * Keep timing exactly where we liked it.
-     */
 
     const duration = status === "entering" ? 0.82 : 0.68;
 
@@ -270,12 +214,6 @@ function DissolvePlane({
     onFinished();
   });
 
-  /*
-   * =====================================================
-   * PLANE
-   * =====================================================
-   */
-
   return (
     <mesh>
       <planeGeometry args={[viewport.width * 1.02, viewport.height * 1.02]} />
@@ -294,12 +232,6 @@ function DissolvePlane({
     </mesh>
   );
 }
-
-/*
- * =========================================================
- * OVERLAY
- * =========================================================
- */
 
 export default function PageTransitionDissolve({
   status,

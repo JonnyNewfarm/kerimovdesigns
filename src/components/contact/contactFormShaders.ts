@@ -1,4 +1,4 @@
-export const contactFormButtonFragmentShader = /* glsl */ `
+export const contactFormButtonFragmentShader =  `
 precision highp float;
 
 varying vec2 vUv;
@@ -13,9 +13,7 @@ void main() {
     uTime *
     uSpeed;
 
-  /*
-   * PRIMARY FLOW
-   */
+
   float wave =
     sin(
       uv.x * 5.2 +
@@ -23,9 +21,7 @@ void main() {
       time
     ) * 0.5 + 0.5;
 
-  /*
-   * SECONDARY FLOW
-   */
+  
   float wave2 =
     sin(
       uv.x * -2.8 +
@@ -33,9 +29,7 @@ void main() {
       time * 0.55
     ) * 0.5 + 0.5;
 
-  /*
-   * GRADIENT
-   */
+ 
   float gradient =
     mix(
       wave,
@@ -50,9 +44,7 @@ void main() {
       gradient
     );
 
-  /*
-   * SAME COLORS AS PORTFOLIO BUTTON
-   */
+  
 
   vec3 colorA = vec3(
     0.29,

@@ -29,29 +29,11 @@ export default function ProjectsTable({
 
   const [showEmptyState, setShowEmptyState] = useState(false);
 
-  /*
-   * =====================================================
-   * MAIN ANCHOR
-   * =====================================================
-   */
-
   const mainRef = useRef<HTMLElement | null>(null);
-
-  /*
-   * =====================================================
-   * SYNC ACTIVE TAGS
-   * =====================================================
-   */
 
   useEffect(() => {
     setSelectedTags(activeTags);
   }, [activeTags]);
-
-  /*
-   * =====================================================
-   * POINTER
-   * =====================================================
-   */
 
   const pointerRef = useRef<PointerState>({
     x: 0,
@@ -89,12 +71,6 @@ export default function ProjectsTable({
     };
   }, []);
 
-  /*
-   * =====================================================
-   * FILTERED PROJECTS
-   * =====================================================
-   */
-
   const filteredProjects = useMemo(() => {
     if (selectedTags.length === 0) {
       return projects;
@@ -111,12 +87,6 @@ export default function ProjectsTable({
     setSelectedTags(nextTags);
   };
 
-  /*
-   * =====================================================
-   * EMPTY STATE
-   * =====================================================
-   */
-
   useEffect(() => {
     if (filteredProjects.length > 0) {
       setShowEmptyState(false);
@@ -132,12 +102,6 @@ export default function ProjectsTable({
       window.clearTimeout(timeout);
     };
   }, [filteredProjects.length]);
-
-  /*
-   * =====================================================
-   * VIEW ALL WORK
-   * =====================================================
-   */
 
   const handleViewAllWork = () => {
     setSelectedTags([]);
@@ -158,12 +122,6 @@ export default function ProjectsTable({
     window.history.pushState(null, "", nextUrl);
   };
 
-  /*
-   * =====================================================
-   * ACTIVE PROJECTS
-   * =====================================================
-   */
-
   const activeIds = useMemo(() => {
     return new Set(filteredProjects.map((project) => project.id));
   }, [filteredProjects]);
@@ -179,12 +137,6 @@ export default function ProjectsTable({
   }, [projects]);
 
   const sharedPointerRef = pointerRef as SharedPointerRef;
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <section
@@ -227,10 +179,6 @@ export default function ProjectsTable({
             2xl:px-16
           "
         >
-          {/* =================================================
-              LEFT
-          ================================================= */}
-
           <aside
             className="
               relative
@@ -248,10 +196,6 @@ export default function ProjectsTable({
                 flex-col
               "
             >
-              {/* =============================================
-                  MIDDLE — EDITORIAL STATEMENT
-              ============================================== */}
-
               <div
                 className="
                   flex
@@ -317,10 +261,6 @@ export default function ProjectsTable({
                 </motion.div>
               </div>
 
-              {/* =============================================
-                  BOTTOM — FILTER
-              ============================================== */}
-
               <motion.div
                 initial={false}
                 animate={{
@@ -364,10 +304,6 @@ export default function ProjectsTable({
             </div>
           </aside>
 
-          {/* =================================================
-              PROJECT AREA
-          ================================================= */}
-
           <main
             ref={mainRef}
             className="
@@ -375,10 +311,6 @@ export default function ProjectsTable({
               min-w-0
             "
           >
-            {/* =============================================
-                PROJECT COUNT
-            ============================================== */}
-
             <motion.div
               initial={false}
               animate={{
@@ -440,10 +372,6 @@ export default function ProjectsTable({
               <span className="ml-1">Projects</span>
             </motion.div>
 
-            {/* =============================================
-                GRID
-            ============================================== */}
-
             <LayoutGroup id="projects-grid">
               <motion.div
                 layout
@@ -489,10 +417,6 @@ export default function ProjectsTable({
                 })}
               </motion.div>
             </LayoutGroup>
-
-            {/* =============================================
-                EMPTY STATE
-            ============================================== */}
 
             {showEmptyState ? (
               <motion.div

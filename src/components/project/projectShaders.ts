@@ -1,4 +1,4 @@
-export const projectGalleryImageFragmentShader = /* glsl */ `
+export const projectGalleryImageFragmentShader = `
 precision highp float;
 
 varying vec2 vUv;

@@ -33,31 +33,13 @@ export default function ProjectGalleryDesktop({
   imageDimensions,
   onImageLoadAction,
 }: ProjectGalleryDesktopProps) {
-  /*
-   * =====================================================
-   * IMAGE ANCHORS
-   * =====================================================
-   */
-
   const anchorsRef = useRef<Array<HTMLDivElement | null>>([]);
-
-  /*
-   * =====================================================
-   * VIDEO
-   * =====================================================
-   */
 
   const videoAnchorRef = useRef<HTMLDivElement | null>(null);
 
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
 
   const videoHasStartedRef = useRef(false);
-
-  /*
-   * =====================================================
-   * REGISTER IMAGE ANCHOR
-   * =====================================================
-   */
 
   const handleRegister = useCallback(
     (
@@ -69,12 +51,6 @@ export default function ProjectGalleryDesktop({
     },
     [],
   );
-
-  /*
-   * =====================================================
-   * VIDEO BRIDGE
-   * =====================================================
-   */
 
   const videoBridge = useMemo<ProjectGalleryVideoBridge | null>(() => {
     if (!project.srcVideo) {
@@ -92,20 +68,8 @@ export default function ProjectGalleryDesktop({
     };
   }, [project.srcVideo, project.src]);
 
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
-
   return (
     <>
-      {/*
-       * Én Three canvas for:
-       *
-       * - alle bilder
-       * - autoplay-video
-       */}
       <ProjectGalleryThreeCanvas
         images={images}
         anchorsRef={anchorsRef}
@@ -168,18 +132,6 @@ export default function ProjectGalleryDesktop({
               </div>
             );
           })}
-
-          {/*
-           * =================================================
-           * DESKTOP VIDEO
-           *
-           * Ingen Video-heading.
-           * Ingen play/pause.
-           * Ingen spinner.
-           *
-           * Bare autoplay media-plane.
-           * =================================================
-           */}
 
           {project.srcVideo && videoBridge ? (
             <ProjectVideoDesktop

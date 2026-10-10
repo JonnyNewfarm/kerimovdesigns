@@ -54,12 +54,6 @@ export default function PortfolioWorld({
 
   artExhibitionTransitionRef,
 }: PortfolioWorldProps) {
-  /*
-   * =======================================================
-   * LOAD IMAGES
-   * =======================================================
-   */
-
   const rustamTexture = useLoader(TextureLoader, RUSTAM_IMAGE);
 
   const visualTextures = useLoader(
@@ -82,22 +76,24 @@ export default function PortfolioWorld({
     ALL_PROJECT_IMAGE_PATHS,
   ) as Texture[];
 
-  /*
-   * =======================================================
-   * COLOR SPACE / TEXTURE PREP
-   * =======================================================
-   */
-
   useMemo(() => {
-    prepareTexture(rustamTexture);
+    prepareTexture(rustamTexture, isMobile);
 
-    visualTextures.forEach(prepareTexture);
+    visualTextures.forEach((texture) => {
+      prepareTexture(texture, isMobile);
+    });
 
-    posterTextures.forEach(prepareTexture);
+    posterTextures.forEach((texture) => {
+      prepareTexture(texture, isMobile);
+    });
 
-    typographyTextures.forEach(prepareTexture);
+    typographyTextures.forEach((texture) => {
+      prepareTexture(texture, isMobile);
+    });
 
-    allProjectTextures.forEach(prepareTexture);
+    allProjectTextures.forEach((texture) => {
+      prepareTexture(texture, isMobile);
+    });
   }, [
     rustamTexture,
     visualTextures,
@@ -105,12 +101,6 @@ export default function PortfolioWorld({
     typographyTextures,
     allProjectTextures,
   ]);
-
-  /*
-   * =======================================================
-   * WORLD SCALE
-   * =======================================================
-   */
 
   const scale = isMobile ? 1.1 : 0.82;
 

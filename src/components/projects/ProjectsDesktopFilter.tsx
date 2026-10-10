@@ -20,12 +20,6 @@ type ProjectsDesktopFilterProps = {
   onPopupOpenChange?: (open: boolean) => void;
 };
 
-/*
- * =========================================================
- * SETTINGS
- * =========================================================
- */
-
 const MAX_SELECTED_TAGS = 3;
 
 const COLLAPSED_TAG_COUNT = 5;
@@ -36,33 +30,13 @@ const VIEWPORT_PADDING = 24;
 
 const POPUP_TOP = 112;
 
-/*
- * POSITIV rotateY:
- *
- * høyre side kommer nærmere kamera.
- *
- * Vi holder den subtil.
- */
-
 const POPUP_ROTATE_Y = 12;
 
 const FILTER_EASE = [0.22, 1, 0.36, 1] as const;
 
-/*
- * =========================================================
- * HELPERS
- * =========================================================
- */
-
 const formatTag = (tag: string) => {
   return tag.replaceAll("-", " ");
 };
-
-/*
- * =========================================================
- * COMPONENT
- * =========================================================
- */
 
 export default function ProjectsDesktopFilter({
   availableTags,
@@ -78,38 +52,15 @@ export default function ProjectsDesktopFilter({
 
   const [threeReady, setThreeReady] = useState(false);
 
-  /*
-   * =====================================================
-   * EXPLICIT PANEL HOVER
-   * =====================================================
-   *
-   * Ikke Framer whileHover.
-   *
-   * Native pointer enter/leave er mye mer stabilt her,
-   * spesielt siden popupen inneholder Canvas + buttons.
-   */
-
   const [isPanelHovered, setIsPanelHovered] = useState(false);
 
   const [popupLeft, setPopupLeft] = useState(VIEWPORT_PADDING);
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-  /*
-   * =====================================================
-   * CLIENT
-   * =====================================================
-   */
-
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  /*
-   * =====================================================
-   * OPEN
-   * =====================================================
-   */
 
   const openPopup = () => {
     setThreeReady(false);
@@ -121,12 +72,6 @@ export default function ProjectsDesktopFilter({
     onPopupOpenChange?.(true);
   };
 
-  /*
-   * =====================================================
-   * CLOSE
-   * =====================================================
-   */
-
   const closePopup = () => {
     setIsPanelHovered(false);
 
@@ -135,23 +80,11 @@ export default function ProjectsDesktopFilter({
     onPopupOpenChange?.(false);
   };
 
-  /*
-   * =====================================================
-   * CLEANUP
-   * =====================================================
-   */
-
   useEffect(() => {
     return () => {
       onPopupOpenChange?.(false);
     };
   }, [onPopupOpenChange]);
-
-  /*
-   * =====================================================
-   * COLLAPSED TAGS
-   * =====================================================
-   */
 
   const collapsedTags = useMemo(() => {
     const result: string[] = [];
@@ -170,12 +103,6 @@ export default function ProjectsDesktopFilter({
 
     return result;
   }, [availableTags, selectedTags]);
-
-  /*
-   * =====================================================
-   * URL
-   * =====================================================
-   */
 
   const updateUrl = (nextTags: string[]) => {
     const params = new URLSearchParams(window.location.search);
@@ -200,23 +127,11 @@ export default function ProjectsDesktopFilter({
     window.history.pushState(null, "", nextUrl);
   };
 
-  /*
-   * =====================================================
-   * COMMIT
-   * =====================================================
-   */
-
   const commitTags = (nextTags: string[]) => {
     onChange(nextTags);
 
     updateUrl(nextTags);
   };
-
-  /*
-   * =====================================================
-   * CLEAR
-   * =====================================================
-   */
 
   const clearTags = () => {
     if (selectedTags.length === 0) {
@@ -225,12 +140,6 @@ export default function ProjectsDesktopFilter({
 
     commitTags([]);
   };
-
-  /*
-   * =====================================================
-   * TOGGLE
-   * =====================================================
-   */
 
   const toggleTag = (tag: string) => {
     const isSelected = selectedTags.includes(tag);
@@ -245,12 +154,6 @@ export default function ProjectsDesktopFilter({
 
     commitTags(nextTags);
   };
-
-  /*
-   * =====================================================
-   * POSITION
-   * =====================================================
-   */
 
   useEffect(() => {
     if (!isPopupOpen) {
@@ -285,12 +188,6 @@ export default function ProjectsDesktopFilter({
     };
   }, [isPopupOpen]);
 
-  /*
-   * =====================================================
-   * ESCAPE
-   * =====================================================
-   */
-
   useEffect(() => {
     if (!isPopupOpen) {
       return;
@@ -309,21 +206,11 @@ export default function ProjectsDesktopFilter({
     };
   }, [isPopupOpen]);
 
-  /*
-   * =====================================================
-   * POPUP
-   * =====================================================
-   */
-
   const popup = mounted
     ? createPortal(
         <AnimatePresence>
           {isPopupOpen ? (
             <>
-              {/* =========================================
-                  BACKDROP
-              ========================================== */}
-
               <motion.button
                 type="button"
                 aria-label="Close filters"
@@ -354,10 +241,6 @@ export default function ProjectsDesktopFilter({
                 "
               />
 
-              {/* =========================================
-                  PERSPECTIVE STAGE
-              ========================================== */}
-
               <div
                 style={{
                   position: "fixed",
@@ -370,11 +253,6 @@ export default function ProjectsDesktopFilter({
                     VIEWPORT_PADDING * 2
                   }px))`,
 
-                  /*
-                   * Litt sterkere perspective gjør
-                   * rotateY mer lesbart.
-                   */
-
                   perspective: "900px",
 
                   perspectiveOrigin: "50% 50%",
@@ -384,20 +262,10 @@ export default function ProjectsDesktopFilter({
                   zIndex: 190,
                 }}
               >
-                {/* =======================================
-                    PANEL
-                ======================================== */}
-
                 <motion.div
                   role="dialog"
                   aria-modal="true"
                   aria-label="All project filters"
-                  /*
-                   * Native pointer state.
-                   *
-                   * Denne treffer hele panelet,
-                   * uansett hvilken child du står over.
-                   */
                   onPointerEnter={() => {
                     setIsPanelHovered(true);
                   }}
@@ -411,16 +279,6 @@ export default function ProjectsDesktopFilter({
                     y: threeReady ? 0 : 14,
 
                     scale: threeReady ? 1 : 0.985,
-
-                    /*
-                     * DETTE ER HELE 3D-TILTEN.
-                     *
-                     * Normal:
-                     * høyre side nærmere kamera.
-                     *
-                     * Hover:
-                     * helt flat.
-                     */
 
                     rotateY: isPanelHovered ? 0 : POPUP_ROTATE_Y,
                   }}
@@ -484,19 +342,11 @@ export default function ProjectsDesktopFilter({
                     will-change-transform
                   "
                 >
-                  {/* =====================================
-                      THREE BACKGROUND
-                  ====================================== */}
-
                   <FilterPopupThreeBackground
                     onReady={() => {
                       setThreeReady(true);
                     }}
                   />
-
-                  {/* =====================================
-                      CONTENT
-                  ====================================== */}
 
                   <div
                     className="
@@ -509,8 +359,6 @@ export default function ProjectsDesktopFilter({
                       flex-col
                     "
                   >
-                    {/* HEADER */}
-
                     <div
                       className="
                         flex
@@ -557,54 +405,80 @@ export default function ProjectsDesktopFilter({
                         </h3>
                       </div>
 
-                      {/* CLOSE */}
-
                       <motion.button
                         type="button"
                         onClick={closePopup}
-                        whileHover={{
-                          x: 2,
+                        aria-label="Close filters"
+                        initial={{
+                          opacity: 0,
+                          y: -4,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
                         }}
                         whileTap={{
                           scale: 0.97,
                         }}
                         transition={{
-                          duration: 0.32,
+                          delay: 0.08,
+                          duration: 0.4,
                           ease: FILTER_EASE,
                         }}
                         className="
-                          group
+    group
+    relative
 
-                          flex
-                          shrink-0
-                          cursor-pointer
-                          items-center
-                          justify-center
+    
+    shrink-0
 
-                          bg-[#20241e]/85
+    cursor-pointer
 
-                          px-3
-                          py-2
+    border-0
+    bg-transparent
+    p-0
 
-                          text-[8px]
-                          font-black
-                          uppercase
-                          tracking-[0.18em]
+    text-[9px]
+    font-black
+    uppercase
+    tracking-[0.16em]
 
-                          text-white/65
+    text-white/70
 
-                          transition-colors
-                          duration-300
+    transition-colors
+    duration-300
 
-                          hover:bg-[#181b16]
-                          hover:text-white
-                        "
+    hover:text-white
+  "
                       >
-                        Close
+                        <span className="relative block">
+                          Close
+                          <span
+                            aria-hidden="true"
+                            className="
+        absolute
+        -bottom-[4px]
+        left-0
+
+        h-px
+        w-full
+
+        origin-right
+        scale-x-0
+
+        bg-current
+
+        transition-transform
+        duration-500
+        ease-[cubic-bezier(0.76,0,0.24,1)]
+
+        group-hover:origin-left
+        group-hover:scale-x-100
+      "
+                          />
+                        </span>
                       </motion.button>
                     </div>
-
-                    {/* FILTERS */}
 
                     <div
                       className="
@@ -658,8 +532,6 @@ export default function ProjectsDesktopFilter({
                       </div>
                     </div>
 
-                    {/* FOOTER */}
-
                     <div
                       className="
                         flex
@@ -685,8 +557,6 @@ export default function ProjectsDesktopFilter({
                       >
                         Select up to three filters
                       </p>
-
-                      {/* CLEAR IN POPUP — BEHOLDT */}
 
                       <AnimatePresence initial={false}>
                         {selectedTags.length > 0 ? (
@@ -744,19 +614,9 @@ export default function ProjectsDesktopFilter({
       )
     : null;
 
-  /*
-   * =====================================================
-   * SIDEBAR
-   * =====================================================
-   */
-
   return (
     <>
       <div className="w-full min-w-0">
-        {/* ===============================================
-            FILTER LABEL
-        ================================================ */}
-
         <TextReveal
           as="p"
           mode="words"
@@ -781,10 +641,6 @@ export default function ProjectsDesktopFilter({
           Filter
         </TextReveal>
 
-        {/* ===============================================
-            ALL WORK
-        ================================================ */}
-
         <FilterButton
           label="All work"
           active={selectedTags.length === 0}
@@ -793,10 +649,6 @@ export default function ProjectsDesktopFilter({
           revealStarted={revealStarted}
           revealDelay={0.5}
         />
-
-        {/* ===============================================
-            SHORT FILTER LIST
-        ================================================ */}
 
         <div className="mt-[2px]">
           {collapsedTags.map((tag, index) => {
@@ -818,10 +670,6 @@ export default function ProjectsDesktopFilter({
             );
           })}
         </div>
-
-        {/* ===============================================
-            VIEW ALL FILTERS
-        ================================================ */}
 
         {availableTags.length > COLLAPSED_TAG_COUNT ? (
           <motion.button
@@ -930,24 +778,12 @@ export default function ProjectsDesktopFilter({
             </span>
           </motion.button>
         ) : null}
-
-        {/*
-          Ingen "Clear selection" her lenger.
-
-          Clear-knappen inne i popupen er fortsatt beholdt.
-        */}
       </div>
 
       {popup}
     </>
   );
 }
-
-/*
- * =========================================================
- * SIDEBAR FILTER BUTTON
- * =========================================================
- */
 
 type FilterButtonProps = {
   label: string;
@@ -1058,12 +894,6 @@ function FilterButton({
     </motion.button>
   );
 }
-
-/*
- * =========================================================
- * POPUP FILTER BUTTON
- * =========================================================
- */
 
 type PopupFilterButtonProps = {
   label: string;

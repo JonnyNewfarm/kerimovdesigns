@@ -31,15 +31,6 @@ export default function ProjectPreviewScene({
   pointerRef,
   compact = false,
 }: ProjectPreviewSceneProps) {
-  /*
-   * =====================================================
-   * FALLBACK POINTER
-   * =====================================================
-   *
-   * Hvis komponenten brukes alene,
-   * fungerer den fortsatt akkurat som før.
-   */
-
   const localPointerRef = useRef<PointerState>({
     x: 0,
     y: 0,
@@ -47,15 +38,6 @@ export default function ProjectPreviewScene({
   });
 
   const activePointerRef = pointerRef ?? localPointerRef;
-
-  /*
-   * =====================================================
-   * POINTER EVENTS
-   * =====================================================
-   *
-   * Grid-versjonen sender allerede inn shared pointer.
-   * Da oppretter vi IKKE en ekstra listener.
-   */
 
   useEffect(() => {
     if (pointerRef) {

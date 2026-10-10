@@ -32,11 +32,6 @@ export default function BurgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [instantClose, setInstantClose] = useState(false);
 
-  /*
-   * Contact åpnes først etter at
-   * mobile drawer er ferdig lukket.
-   */
-
   const [openContactAfterClose, setOpenContactAfterClose] = useState(false);
 
   const { openContact } = useContactOverlay();
@@ -46,12 +41,6 @@ export default function BurgerMenu() {
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-
-  /*
-   * =====================================================
-   * ROUTE CHANGE
-   * =====================================================
-   */
 
   useEffect(() => {
     if (previousPathname.current === pathname) {
@@ -71,12 +60,6 @@ export default function BurgerMenu() {
       cancelAnimationFrame(frame);
     };
   }, [pathname]);
-
-  /*
-   * =====================================================
-   * OUTSIDE / ESCAPE / SCROLL LOCK
-   * =====================================================
-   */
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -117,12 +100,6 @@ export default function BurgerMenu() {
     };
   }, [isOpen]);
 
-  /*
-   * =====================================================
-   * ACTIVE
-   * =====================================================
-   */
-
   const isActiveLink = (href: string) => {
     if (href === "/") {
       return pathname === "/";
@@ -130,12 +107,6 @@ export default function BurgerMenu() {
 
     return pathname.startsWith(href);
   };
-
-  /*
-   * =====================================================
-   * CONTACT
-   * =====================================================
-   */
 
   const handleContactClick = () => {
     setOpenContactAfterClose(true);
@@ -152,12 +123,6 @@ export default function BurgerMenu() {
 
     openContact();
   };
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <>
@@ -287,10 +252,6 @@ export default function BurgerMenu() {
         </span>
       </motion.button>
 
-      {/* =================================================
-          BACKDROP
-      ================================================= */}
-
       <AnimatePresence>
         {isOpen ? (
           <motion.div
@@ -325,10 +286,6 @@ export default function BurgerMenu() {
           />
         ) : null}
       </AnimatePresence>
-
-      {/* =================================================
-          DRAWER
-      ================================================= */}
 
       <motion.div
         ref={menuRef}

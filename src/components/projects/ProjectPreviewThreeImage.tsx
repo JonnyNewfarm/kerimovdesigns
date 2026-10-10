@@ -27,17 +27,6 @@ export default function ProjectPreviewThreeImage({
         overflow-visible
       "
     >
-      {/* =================================================
-          OVERSCAN CANVAS
-
-          Ingen skeleton.
-          Ingen opacity-fade.
-          Ingen isReady-state.
-
-          Når texture allerede ligger i cache etter preload,
-          renderer bildet direkte.
-      ================================================= */}
-
       <div
         className={`
           pointer-events-none

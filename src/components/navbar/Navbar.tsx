@@ -47,12 +47,6 @@ const Navbar = () => {
 
   const shouldShowNavbar = !isHomePage || introExited;
 
-  /*
-   * =========================================================
-   * SECONDARY NAV INFO
-   * =========================================================
-   */
-
   useEffect(() => {
     let lastScrollY = window.scrollY;
 
@@ -103,12 +97,6 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleNavbarInfoScroll);
     };
   }, []);
-
-  /*
-   * =========================================================
-   * PROJECT TITLE
-   * =========================================================
-   */
 
   useEffect(() => {
     if (!isProjectDetailPage) {
@@ -172,12 +160,6 @@ const Navbar = () => {
     };
   }, [isProjectDetailPage, pathname]);
 
-  /*
-   * =========================================================
-   * CLOSE PROJECT
-   * =========================================================
-   */
-
   const handleCloseProject = () => {
     if (window.history.length > 1) {
       router.back();
@@ -187,12 +169,6 @@ const Navbar = () => {
 
     router.push("/projects");
   };
-
-  /*
-   * =========================================================
-   * LINK STYLE
-   * =========================================================
-   */
 
   const getLinkClassName = (href: string) => {
     const isActive =
@@ -235,12 +211,6 @@ const Navbar = () => {
     ].join(" ");
   };
 
-  /*
-   * =========================================================
-   * SECONDARY INFO ANIMATION
-   * =========================================================
-   */
-
   const secondaryInfoAnimation = showSecondaryInfo
     ? {
         opacity: 1,
@@ -256,12 +226,6 @@ const Navbar = () => {
   const secondaryInfoClassName = `shrink-0 whitespace-nowrap tracking-tighter ${
     showSecondaryInfo ? "pointer-events-auto" : "pointer-events-none"
   }`;
-
-  /*
-   * =========================================================
-   * RENDER
-   * =========================================================
-   */
 
   return (
     <motion.nav
@@ -328,10 +292,6 @@ const Navbar = () => {
             gap-x-[clamp(1.5rem,2.5vw,4rem)]
           "
         >
-          {/* =================================================
-              NAME
-          ================================================= */}
-
           <motion.div
             initial={false}
             animate={secondaryInfoAnimation}
@@ -361,10 +321,6 @@ const Navbar = () => {
               Name / Rustam Kerimov
             </TextReveal>
           </motion.div>
-
-          {/* =================================================
-              OCCUPATION
-          ================================================= */}
 
           <motion.div
             initial={false}
@@ -397,10 +353,6 @@ const Navbar = () => {
             </TextReveal>
           </motion.div>
 
-          {/* =================================================
-              LOCATION
-          ================================================= */}
-
           <motion.div
             initial={false}
             animate={secondaryInfoAnimation}
@@ -432,10 +384,6 @@ const Navbar = () => {
             </TextReveal>
           </motion.div>
 
-          {/* =================================================
-              NAVIGATION
-          ================================================= */}
-
           <div
             className="
               shrink-0
@@ -456,8 +404,6 @@ const Navbar = () => {
                 leading-tight
               "
             >
-              {/* HOME */}
-
               <LinkReveal
                 active={shouldShowNavbar}
                 delay={REVEAL_DELAYS.home}
@@ -473,10 +419,6 @@ const Navbar = () => {
                   <WaveLinkText text="HOME" />
                 </TransitionLink>
               </LinkReveal>
-
-              {/* =================================================
-                  WORK + PROJECT TITLE
-              ================================================= */}
 
               <div className="relative inline-block">
                 <LinkReveal
@@ -596,8 +538,6 @@ const Navbar = () => {
                             text-current
                           "
                         >
-                          {/* HOVER CROSS */}
-
                           <motion.span
                             aria-hidden="true"
                             initial={false}
@@ -633,8 +573,6 @@ const Navbar = () => {
                             <span className="absolute h-[1.5px] w-[10px] -rotate-45 bg-current" />
                           </motion.span>
 
-                          {/* TITLE */}
-
                           <motion.span
                             initial={false}
                             animate={{
@@ -663,10 +601,6 @@ const Navbar = () => {
                             {projectTitle}
                           </motion.span>
                         </motion.button>
-
-                        {/* =========================================
-                            CONNECTOR LINE
-                        ========================================== */}
 
                         <motion.svg
                           aria-hidden="true"
@@ -759,10 +693,6 @@ const Navbar = () => {
                   ) : null}
                 </AnimatePresence>
               </div>
-
-              {/* =================================================
-                  CONTACT
-              ================================================= */}
 
               <LinkReveal
                 active={shouldShowNavbar}

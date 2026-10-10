@@ -13,12 +13,6 @@ import TransitionLink from "../TransitionLink";
 import FilterPopupThreeBackground from "./FilterPopupThreeBackground";
 import PageTransitionGate from "./PageTransitionGate";
 
-/*
- * =========================================================
- * TYPES
- * =========================================================
- */
-
 type ProjectListItem = {
   id: string;
   title: string;
@@ -38,33 +32,15 @@ interface ProjectsTableMobileProps {
   activeTags?: string[];
 }
 
-/*
- * =========================================================
- * SETTINGS
- * =========================================================
- */
-
 const revealEase = [0.22, 1, 0.36, 1] as const;
 
 const FILTER_EASE = [0.22, 1, 0.36, 1] as const;
 
 const MAX_SELECTED_TAGS = 3;
 
-/*
- * =========================================================
- * HELPERS
- * =========================================================
- */
-
 const formatTag = (tag: string) => {
   return tag.replaceAll("-", " ");
 };
-
-/*
- * =========================================================
- * MOBILE PROJECTS
- * =========================================================
- */
 
 const ProjectsTableMobile = ({
   projects = [],
@@ -83,31 +59,13 @@ const ProjectsTableMobile = ({
 
   const [selectedTags, setSelectedTags] = useState<string[]>(activeTags);
 
-  /*
-   * =====================================================
-   * CLIENT
-   * =====================================================
-   */
-
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  /*
-   * =====================================================
-   * SYNC SERVER TAGS
-   * =====================================================
-   */
-
   useEffect(() => {
     setSelectedTags(activeTags);
   }, [activeTags]);
-
-  /*
-   * =====================================================
-   * LOCK BODY WHEN FILTER IS OPEN
-   * =====================================================
-   */
 
   useEffect(() => {
     if (!filterOpen) {
@@ -141,12 +99,6 @@ const ProjectsTableMobile = ({
     };
   }, [filterOpen]);
 
-  /*
-   * =====================================================
-   * ESCAPE
-   * =====================================================
-   */
-
   useEffect(() => {
     if (!filterOpen) {
       return;
@@ -165,12 +117,6 @@ const ProjectsTableMobile = ({
     };
   }, [filterOpen]);
 
-  /*
-   * =====================================================
-   * OPEN / CLOSE
-   * =====================================================
-   */
-
   const openFilter = () => {
     setThreeReady(false);
     setFilterOpen(true);
@@ -180,19 +126,8 @@ const ProjectsTableMobile = ({
     setFilterOpen(false);
   };
 
-  /*
-   * =====================================================
-   * URL
-   * =====================================================
-   */
-
   const updateUrl = (nextTags: string[]) => {
     const params = new URLSearchParams(window.location.search);
-
-    /*
-     * Når filter endres går vi tilbake til
-     * første mobile pagination-page.
-     */
 
     params.delete("page");
     params.delete("tag");
@@ -214,23 +149,11 @@ const ProjectsTableMobile = ({
     });
   };
 
-  /*
-   * =====================================================
-   * COMMIT FILTER
-   * =====================================================
-   */
-
   const commitTags = (nextTags: string[]) => {
     setSelectedTags(nextTags);
 
     updateUrl(nextTags);
   };
-
-  /*
-   * =====================================================
-   * CLEAR
-   * =====================================================
-   */
 
   const clearTags = () => {
     if (selectedTags.length === 0) {
@@ -239,12 +162,6 @@ const ProjectsTableMobile = ({
 
     commitTags([]);
   };
-
-  /*
-   * =====================================================
-   * TOGGLE TAG
-   * =====================================================
-   */
 
   const toggleTag = (tag: string) => {
     const isSelected = selectedTags.includes(tag);
@@ -260,21 +177,11 @@ const ProjectsTableMobile = ({
     commitTags(nextTags);
   };
 
-  /*
-   * =====================================================
-   * FILTER POPUP
-   * =====================================================
-   */
-
   const filterPopup = mounted
     ? createPortal(
         <AnimatePresence>
           {filterOpen ? (
             <>
-              {/* =========================================
-                  BACKDROP
-              ========================================== */}
-
               <motion.button
                 type="button"
                 aria-label="Close filters"
@@ -305,10 +212,6 @@ const ProjectsTableMobile = ({
                 "
               />
 
-              {/* =========================================
-                  CENTER STAGE
-              ========================================== */}
-
               <div
                 className="
                   pointer-events-none
@@ -323,14 +226,6 @@ const ProjectsTableMobile = ({
                   p-4
                 "
               >
-                {/* =======================================
-                    PANEL
-
-                    Ingen perspective.
-                    Ingen rotateY.
-                    Ingen desktop tilt.
-                ======================================== */}
-
                 <motion.div
                   role="dialog"
                   aria-modal="true"
@@ -389,19 +284,11 @@ const ProjectsTableMobile = ({
                     text-color
                   "
                 >
-                  {/* =====================================
-                      THREE BACKGROUND
-                  ====================================== */}
-
                   <FilterPopupThreeBackground
                     onReady={() => {
                       setThreeReady(true);
                     }}
                   />
-
-                  {/* =====================================
-                      CONTENT
-                  ====================================== */}
 
                   <div
                     className="
@@ -414,10 +301,6 @@ const ProjectsTableMobile = ({
                       flex-col
                     "
                   >
-                    {/* ===================================
-                        HEADER
-                    ==================================== */}
-
                     <div
                       className="
                         flex
@@ -464,10 +347,6 @@ const ProjectsTableMobile = ({
                         </h3>
                       </div>
 
-                      {/* =================================
-                          CLOSE
-                      ================================== */}
-
                       <motion.button
                         type="button"
                         onClick={closeFilter}
@@ -500,10 +379,6 @@ const ProjectsTableMobile = ({
                         Close
                       </motion.button>
                     </div>
-
-                    {/* ===================================
-                        FILTERS
-                    ==================================== */}
 
                     <div
                       className="
@@ -556,10 +431,6 @@ const ProjectsTableMobile = ({
                         })}
                       </div>
                     </div>
-
-                    {/* ===================================
-                        FOOTER
-                    ==================================== */}
 
                     <div
                       className="
@@ -636,20 +507,10 @@ const ProjectsTableMobile = ({
       )
     : null;
 
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
-
   return (
     <>
       <section className="min-h-screen bg-dark pb-24 text-color">
         <PageTransitionGate className="min-h-screen">
-          {/* =============================================
-              INTRO
-          ============================================== */}
-
           <div className="px-6 pt-28">
             <TextReveal
               as="h1"
@@ -668,13 +529,6 @@ const ProjectsTableMobile = ({
             >
               A Selection of Projects, Practice & Collaborations
             </TextReveal>
-
-            {/* ===========================================
-                MOBILE FILTER TRIGGER
-
-                ProjectTagFilter er fjernet.
-                Nå åpner denne samme Three-popup som desktop.
-            ============================================ */}
 
             <motion.div
               initial={{
@@ -772,10 +626,6 @@ const ProjectsTableMobile = ({
               </motion.button>
             </motion.div>
           </div>
-
-          {/* =============================================
-              PROJECTS
-          ============================================== */}
 
           {projects.length > 0 ? (
             <>
@@ -891,12 +741,6 @@ const ProjectsTableMobile = ({
   );
 };
 
-/*
- * =========================================================
- * POPUP FILTER BUTTON
- * =========================================================
- */
-
 type PopupFilterButtonProps = {
   label: string;
   active: boolean;
@@ -1001,12 +845,6 @@ function PopupFilterButton({
     </motion.button>
   );
 }
-
-/*
- * =========================================================
- * PROJECT CARD
- * =========================================================
- */
 
 interface ProjectCardProps {
   project: ProjectListItem;

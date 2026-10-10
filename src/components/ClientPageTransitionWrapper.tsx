@@ -17,12 +17,6 @@ import { usePathname, useRouter } from "next/navigation";
 
 import PageTransitionDissolve from "./PageTransitionDissolve";
 
-/*
- * =========================================================
- * TYPES
- * =========================================================
- */
-
 export type TransitionDirection = "left" | "right";
 
 export type TransitionStatus = "idle" | "entering" | "leaving";
@@ -52,12 +46,6 @@ interface ClientPageTransitionWrapperProps {
   children: ReactNode;
 }
 
-/*
- * =========================================================
- * CONTEXT
- * =========================================================
- */
-
 const PageTransitionContext = createContext<PageTransitionContextType | null>(
   null,
 );
@@ -69,12 +57,6 @@ const IDLE_TRANSITION: TransitionState = {
 
   color: null,
 };
-
-/*
- * =========================================================
- * HOOK
- * =========================================================
- */
 
 export function usePageTransition() {
   const context = useContext(PageTransitionContext);
@@ -88,12 +70,6 @@ export function usePageTransition() {
   return context;
 }
 
-/*
- * =========================================================
- * VARIANT
- * =========================================================
- */
-
 function getTransitionVariant(href: string): TransitionVariant {
   const destinationPath = href.split("?")[0].split("#")[0];
 
@@ -103,12 +79,6 @@ function getTransitionVariant(href: string): TransitionVariant {
 
   return "destination";
 }
-
-/*
- * =========================================================
- * WRAPPER
- * =========================================================
- */
 
 export default function ClientPageTransitionWrapper({
   children,
@@ -130,19 +100,7 @@ export default function ClientPageTransitionWrapper({
 
   const pushTriggeredRef = useRef(false);
 
-  /*
-   * =====================================================
-   * STATUS
-   * =====================================================
-   */
-
   const isTransitioning = transition.status !== "idle";
-
-  /*
-   * =====================================================
-   * START
-   * =====================================================
-   */
 
   const startTransition = useCallback(
     (
@@ -154,10 +112,6 @@ export default function ClientPageTransitionWrapper({
       if (!href || href === pathname || statusRef.current !== "idle") {
         return;
       }
-
-      /*
-       * Reduced motion
-       */
 
       if (shouldReduceMotion) {
         router.push(href);
@@ -171,10 +125,6 @@ export default function ClientPageTransitionWrapper({
 
       pushTriggeredRef.current = false;
 
-      /*
-       * Start loading destination immediately.
-       */
-
       router.prefetch(href);
 
       setTransition({
@@ -187,12 +137,6 @@ export default function ClientPageTransitionWrapper({
     },
     [pathname, router, shouldReduceMotion],
   );
-
-  /*
-   * =====================================================
-   * SCREEN COVERED
-   * =====================================================
-   */
 
   const handleCovered = useCallback(() => {
     if (statusRef.current !== "entering" || pushTriggeredRef.current) {
@@ -209,12 +153,6 @@ export default function ClientPageTransitionWrapper({
 
     router.push(href);
   }, [router]);
-
-  /*
-   * =====================================================
-   * PATHNAME CHANGED
-   * =====================================================
-   */
 
   useEffect(() => {
     if (pathname === previousPathnameRef.current) {
@@ -236,12 +174,6 @@ export default function ClientPageTransitionWrapper({
     }));
   }, [pathname]);
 
-  /*
-   * =====================================================
-   * REVEAL COMPLETE
-   * =====================================================
-   */
-
   const handleFinished = useCallback(() => {
     if (statusRef.current !== "leaving") {
       return;
@@ -256,12 +188,6 @@ export default function ClientPageTransitionWrapper({
     setTransition(IDLE_TRANSITION);
   }, []);
 
-  /*
-   * =====================================================
-   * CONTEXT
-   * =====================================================
-   */
-
   const contextValue = useMemo<PageTransitionContextType>(
     () => ({
       startTransition,
@@ -270,12 +196,6 @@ export default function ClientPageTransitionWrapper({
     }),
     [startTransition, isTransitioning],
   );
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <PageTransitionContext.Provider value={contextValue}>

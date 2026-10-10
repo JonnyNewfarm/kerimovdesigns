@@ -19,12 +19,6 @@ export default function ProjectGalleryScene({
   anchorsRef,
   video,
 }: ProjectGalleryThreeCanvasProps) {
-  /*
-   * =====================================================
-   * POINTER
-   * =====================================================
-   */
-
   const pointerRef = useRef<PointerState>({
     x: 0,
     y: 0,
@@ -33,30 +27,13 @@ export default function ProjectGalleryScene({
 
   const hoveredIndexRef = useRef<number | null>(null);
 
-  /*
-   * =====================================================
-   * SCROLL
-   * =====================================================
-   */
-
   const scrollBendRef = useRef(0);
 
   const scrollVelocity = useRef(0);
 
   const lastScroll = useRef(0);
 
-  /*
-   * Video behandles som neste
-   * gallery-item etter bildene.
-   */
-
   const videoIndex = images.length;
-
-  /*
-   * =====================================================
-   * GLOBAL POINTER
-   * =====================================================
-   */
 
   useEffect(() => {
     const handlePointerMove = (event: PointerEvent) => {
@@ -96,35 +73,13 @@ export default function ProjectGalleryScene({
     lastScroll.current = window.scrollY;
   }, []);
 
-  /*
-   * =====================================================
-   * MASTER FRAME
-   *
-   * - hover detection
-   * - vertical scroll bend
-   *
-   * priority -1 gjør at dette skjer før
-   * media-plane frames.
-   * =====================================================
-   */
-
   useFrame(
     (_, rawDelta) => {
       const delta = Math.min(rawDelta, 1 / 30);
 
-      /*
-       * =================================================
-       * HOVER DETECTION
-       * =================================================
-       */
-
       let hovered: number | null = null;
 
       if (pointerRef.current.active) {
-        /*
-         * VIDEO
-         */
-
         const videoAnchor = video?.anchorRef.current;
 
         if (videoAnchor) {
@@ -140,10 +95,6 @@ export default function ProjectGalleryScene({
             hovered = videoIndex;
           }
         }
-
-        /*
-         * IMAGES
-         */
 
         if (hovered === null) {
           for (let index = anchorsRef.current.length - 1; index >= 0; index--) {
@@ -172,23 +123,11 @@ export default function ProjectGalleryScene({
 
       hoveredIndexRef.current = hovered;
 
-      /*
-       * =================================================
-       * VERTICAL SCROLL BEND
-       * =================================================
-       */
-
       const scroll = window.scrollY;
 
       const difference = scroll - lastScroll.current;
 
       lastScroll.current = scroll;
-
-      /*
-       * Kun vertikal deformation.
-       *
-       * Ikke lateral scroll.
-       */
 
       const target = THREE.MathUtils.clamp(
         -difference * 0.0018,
@@ -196,10 +135,6 @@ export default function ProjectGalleryScene({
         -0.022,
         0.022,
       );
-
-      /*
-       * Smooth spring.
-       */
 
       const stiffness = 105;
 
@@ -211,11 +146,6 @@ export default function ProjectGalleryScene({
       scrollVelocity.current *= Math.exp(-damping * delta);
 
       scrollBendRef.current += scrollVelocity.current * delta;
-
-      /*
-       * Retter seg smooth ut
-       * når scrolling stopper.
-       */
 
       const returnFollow = 1 - Math.exp(-delta * 4.5);
 

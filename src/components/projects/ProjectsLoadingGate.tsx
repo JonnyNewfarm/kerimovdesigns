@@ -54,12 +54,6 @@ export default function ProjectsLoadingGate({
 
   const loaderStartedAtRef = useRef(0);
 
-  /*
-   * =====================================================
-   * STABLE SOURCES
-   * =====================================================
-   */
-
   const stableDesktopSrcs = useMemo(() => {
     return Array.from(new Set(desktopSrcs.filter(Boolean)));
   }, [desktopSrcs]);
@@ -68,21 +62,9 @@ export default function ProjectsLoadingGate({
     return Array.from(new Set(mobileSrcs.filter(Boolean)));
   }, [mobileSrcs]);
 
-  /*
-   * =====================================================
-   * TIMER
-   * =====================================================
-   */
-
   useEffect(() => {
     loaderStartedAtRef.current = performance.now();
   }, []);
-
-  /*
-   * =====================================================
-   * VIEWPORT
-   * =====================================================
-   */
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
@@ -100,12 +82,6 @@ export default function ProjectsLoadingGate({
     };
   }, []);
 
-  /*
-   * =====================================================
-   * PRELOAD
-   * =====================================================
-   */
-
   useEffect(() => {
     if (isDesktop === null || initialLoadFinishedRef.current) {
       return;
@@ -121,19 +97,11 @@ export default function ProjectsLoadingGate({
       return;
     }
 
-    /*
-     * Warm R3F cache.
-     */
-
     if (isDesktop) {
       sources.forEach((src) => {
         useLoader.preload(TextureLoader, src);
       });
     }
-
-    /*
-     * Browser decode.
-     */
 
     let completed = 0;
 
@@ -186,15 +154,6 @@ export default function ProjectsLoadingGate({
     };
   }, [isDesktop, stableDesktopSrcs, stableMobileSrcs]);
 
-  /*
-   * =====================================================
-   * REVEAL
-   * =====================================================
-   *
-   * Children har allerede vært mounted bak loaderen.
-   * Derfor er WebGL canvases varme når reveal starter.
-   */
-
   useEffect(() => {
     if (!assetsReady || revealStarted || initialLoadFinishedRef.current) {
       return;
@@ -230,23 +189,11 @@ export default function ProjectsLoadingGate({
     };
   }, [assetsReady, revealStarted]);
 
-  /*
-   * =====================================================
-   * LOADER EXIT
-   * =====================================================
-   */
-
   const handleExitComplete = () => {
     initialLoadFinishedRef.current = true;
 
     setLoaderExited(true);
   };
-
-  /*
-   * =====================================================
-   * RENDER
-   * =====================================================
-   */
 
   return (
     <ProjectsRevealContext.Provider
@@ -261,13 +208,6 @@ export default function ProjectsLoadingGate({
           bg-dark
         "
       >
-        {/* =============================================
-            CONTENT
-
-            Alltid mounted.
-            Cardene styrer sin egen reveal.
-        ============================================== */}
-
         <div
           className="
             relative
@@ -279,10 +219,6 @@ export default function ProjectsLoadingGate({
         >
           {children}
         </div>
-
-        {/* =============================================
-            LOADER
-        ============================================== */}
 
         {!loaderExited ? (
           <div

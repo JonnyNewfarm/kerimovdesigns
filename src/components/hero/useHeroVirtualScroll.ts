@@ -15,11 +15,7 @@ export default function useHeroVirtualScroll({
 }) {
   const virtualScroll = useMotionValue(0);
 
-  /*
-   * =========================================================
-   * SCROLL STATE
-   * =========================================================
-   */
+ 
 
   const currentScrollRef = useRef(0);
   const targetScrollRef = useRef(0);
@@ -28,22 +24,13 @@ export default function useHeroVirtualScroll({
 
   const scrollFrameRef = useRef<number | null>(null);
 
-  /*
-   * =========================================================
-   * TOUCH STATE
-   * =========================================================
-   */
+  
 
   const isTouchingRef = useRef(false);
 
   const touchLastYRef = useRef(0);
   const touchLastTimeRef = useRef(0);
 
-  /*
-   * =========================================================
-   * BOTTOM INFO
-   * =========================================================
-   */
 
   const [isBottomInfoOpen, setIsBottomInfoOpen] = useState(true);
 
@@ -54,11 +41,6 @@ export default function useHeroVirtualScroll({
 
   const bottomInfoCloseTimeoutRef = useRef<number | null>(null);
 
-  /*
-   * =========================================================
-   * CLOSE BOTTOM INFO
-   * =========================================================
-   */
 
   const closeBottomInfo = useCallback(() => {
     if (
@@ -91,11 +73,7 @@ export default function useHeroVirtualScroll({
     }, 1520);
   }, []);
 
-  /*
-   * =========================================================
-   * OPEN BOTTOM INFO
-   * =========================================================
-   */
+  
 
   const openBottomInfo = useCallback(() => {
     if (bottomInfoCloseTimeoutRef.current !== null) {
@@ -113,36 +91,16 @@ export default function useHeroVirtualScroll({
     setIsBottomInfoOpen(true);
   }, []);
 
-  /*
-   * =========================================================
-   * SCROLL TO SECTION
-   * =========================================================
-   *
-   * Brukes blant annet når en accessibility-link
-   * får keyboard-focus.
-   *
-   * section 0 = første scene
-   * section 1 = neste scene
-   * osv.
-   * =========================================================
-   */
+
 
   const scrollToSection = useCallback(
     (sectionIndex: number) => {
-      /*
-       * Fjern eventuell wheel/touch inertia først.
-       */
+    
 
       velocityRef.current = 0;
       isTouchingRef.current = false;
 
-      /*
-       * Flytt TARGET.
-       *
-       * Vi setter ikke virtualScroll direkte,
-       * derfor beholder vi den eksisterende smoothingen.
-       */
-
+   
       targetScrollRef.current =
         sectionIndex * PIXELS_PER_SECTION;
 
@@ -151,11 +109,7 @@ export default function useHeroVirtualScroll({
     [closeBottomInfo],
   );
 
-  /*
-   * =========================================================
-   * TIMEOUT CLEANUP
-   * =========================================================
-   */
+ 
 
   useEffect(() => {
     return () => {
@@ -187,38 +141,19 @@ export default function useHeroVirtualScroll({
 
     let lastFrameTime = performance.now();
 
-    /*
-     * =======================================================
-     * TUNING
-     * =======================================================
-     */
-
-    // Hvor tett verden følger fingeren.
-    //
-    // Høyere = mer direkte.
-    // Lavere = mer svevende.
+ 
     const TOUCH_FOLLOW = 18;
 
-    // Smoothness etter man slipper.
     const FREE_FOLLOW = 10;
 
-    // Hvor mye finger-bevegelse flytter verden.
     const TOUCH_MULTIPLIER = 1.18;
 
-    // Hvor lenge momentum varer.
-    //
-    // Lavere = glir lenger.
-    // Høyere = stopper raskere.
+   
     const MOMENTUM_FRICTION = 4.4;
 
-    // Maks fart etter swipe.
     const MAX_VELOCITY = 1250;
 
-    /*
-     * =======================================================
-     * FRAME LOOP
-     * =======================================================
-     */
+   
 
     const animate = (time: number) => {
       const rawDelta =
@@ -232,10 +167,7 @@ export default function useHeroVirtualScroll({
         1 / 30,
       );
 
-      /*
-       * Når fingeren ikke er på skjermen fortsetter
-       * targetScroll med momentum.
-       */
+     
 
       if (!isTouchingRef.current) {
         targetScrollRef.current +=
@@ -250,9 +182,7 @@ export default function useHeroVirtualScroll({
         }
       }
 
-      /*
-       * Actual scroll følger target smooth.
-       */
+    
 
       const followSpeed = isTouchingRef.current
         ? TOUCH_FOLLOW
@@ -265,10 +195,7 @@ export default function useHeroVirtualScroll({
         delta,
       );
 
-      /*
-       * Unngå at damp aldri kommer helt frem.
-       */
-
+    
       if (
         Math.abs(
           targetScrollRef.current -
@@ -287,12 +214,7 @@ export default function useHeroVirtualScroll({
         window.requestAnimationFrame(animate);
     };
 
-    /*
-     * =======================================================
-     * DESKTOP WHEEL
-     * =======================================================
-     */
-
+   
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
 
@@ -322,10 +244,7 @@ export default function useHeroVirtualScroll({
         closeBottomInfo();
       }
 
-      /*
-       * Wheel gir velocity i stedet for å hoppe
-       * scroll-position direkte.
-       */
+     
 
       velocityRef.current +=
         wheelDelta * 10.5;
@@ -338,27 +257,12 @@ export default function useHeroVirtualScroll({
         );
     };
 
-    /*
-     * =======================================================
-     * KEYBOARD ARROWS
-     * =======================================================
-     *
-     * ArrowDown / ArrowRight:
-     * neste section.
-     *
-     * ArrowUp / ArrowLeft:
-     * forrige section.
-     *
-     * Tab håndteres av DOM-linkene separat.
-     * =======================================================
-     */
+   
 
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target;
 
-      /*
-       * Ikke hijack keyboard inne i inputs osv.
-       */
+   
 
       if (target instanceof HTMLElement) {
         const tagName = target.tagName;
@@ -393,19 +297,11 @@ export default function useHeroVirtualScroll({
 
       event.preventDefault();
 
-      /*
-       * Stopper gammel momentum.
-       */
+     
 
       velocityRef.current = 0;
 
-      /*
-       * Snap ut fra nærmeste section.
-       *
-       * Dette er bedre enn bare += 620 dersom
-       * brukeren først har scrollet til midt mellom
-       * to sections.
-       */
+     
 
       const currentSection = Math.round(
         targetScrollRef.current /
@@ -421,11 +317,7 @@ export default function useHeroVirtualScroll({
       closeBottomInfo();
     };
 
-    /*
-     * =======================================================
-     * TOUCH START
-     * =======================================================
-     */
+   
 
     const handleTouchStart = (
       event: TouchEvent,
@@ -441,18 +333,12 @@ export default function useHeroVirtualScroll({
       touchLastYRef.current = touch.clientY;
       touchLastTimeRef.current = performance.now();
 
-      /*
-       * Kill gammel inertia når man tar tak igjen.
-       */
+     
 
       velocityRef.current = 0;
     };
 
-    /*
-     * =======================================================
-     * TOUCH MOVE
-     * =======================================================
-     */
+  
 
     const handleTouchMove = (
       event: TouchEvent,
@@ -471,17 +357,12 @@ export default function useHeroVirtualScroll({
       const currentY = touch.clientY;
       const currentTime = performance.now();
 
-      /*
-       * Positiv delta = finger beveger seg opp.
-       */
+      
 
       let deltaY =
         touchLastYRef.current - currentY;
 
-      /*
-       * Ignorer insane touch-event jumps.
-       */
-
+  
       deltaY = THREE.MathUtils.clamp(
         deltaY,
         -60,
@@ -491,18 +372,10 @@ export default function useHeroVirtualScroll({
       const scrollDelta =
         deltaY * TOUCH_MULTIPLIER;
 
-      /*
-       * Endrer TARGET.
-       *
-       * Ikke actual virtualScroll.
-       */
-
+   
       targetScrollRef.current += scrollDelta;
 
-      /*
-       * Beregn velocity for inertia etter touchend.
-       */
-
+     
       const deltaTime = Math.max(
         (currentTime -
           touchLastTimeRef.current) /
@@ -513,9 +386,7 @@ export default function useHeroVirtualScroll({
       const instantaneousVelocity =
         scrollDelta / deltaTime;
 
-      /*
-       * Raw touch velocity er noisy på mobile Safari.
-       */
+   
 
       velocityRef.current =
         THREE.MathUtils.lerp(
@@ -536,20 +407,11 @@ export default function useHeroVirtualScroll({
       touchLastTimeRef.current = currentTime;
     };
 
-    /*
-     * =======================================================
-     * TOUCH END
-     * =======================================================
-     */
+    
 
     const handleTouchEnd = () => {
       isTouchingRef.current = false;
 
-      /*
-       * velocityRef beholdes.
-       *
-       * Frame loop tar over og lager inertia.
-       */
     };
 
     const handleTouchCancel = () => {
@@ -558,11 +420,7 @@ export default function useHeroVirtualScroll({
       velocityRef.current = 0;
     };
 
-    /*
-     * =======================================================
-     * EVENTS
-     * =======================================================
-     */
+   
 
     window.addEventListener(
       "wheel",
@@ -612,12 +470,7 @@ export default function useHeroVirtualScroll({
     scrollFrameRef.current =
       window.requestAnimationFrame(animate);
 
-    /*
-     * =======================================================
-     * CLEANUP
-     * =======================================================
-     */
-
+   
     return () => {
       window.removeEventListener(
         "wheel",

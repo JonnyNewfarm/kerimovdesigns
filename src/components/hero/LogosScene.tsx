@@ -53,7 +53,6 @@ export default function LogosScene({
 
   return (
     <SceneShell angle={angle} scale={scale}>
-      {/* FESTIVAL */}
       <LogoTile
         texture={textures[0]}
         width={1.75}
@@ -61,7 +60,6 @@ export default function LogosScene({
         position={[-2.45, 0.82, 0.04]}
       />
 
-      {/* AMPERSAND */}
       <LogoTile
         texture={textures[1]}
         width={1.35}
@@ -69,7 +67,6 @@ export default function LogosScene({
         position={[-0.45, 1.28, -0.08]}
       />
 
-      {/* BBS */}
       <LogoTile
         texture={textures[4]}
         width={2.2}
@@ -77,7 +74,6 @@ export default function LogosScene({
         position={[2.35, 0.45, 0.18]}
       />
 
-      {/* AW */}
       <LogoTile
         texture={textures[3]}
         width={1.25}
@@ -85,7 +81,6 @@ export default function LogosScene({
         position={[-1.45, -1.35, -0.05]}
       />
 
-      {/* BY:LARM */}
       <LogoTile
         texture={textures[2]}
         width={1.65}

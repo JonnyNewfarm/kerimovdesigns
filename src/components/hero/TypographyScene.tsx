@@ -26,7 +26,6 @@ export default function TypographyScene({
 
   return (
     <SceneShell angle={angle} scale={scale}>
-      {/* LEFT / SLIGHTLY HIGHER */}
       <ImagePlane
         texture={textures[0]}
         position={[-1.7, 0.05, 0.3]}
@@ -37,7 +36,6 @@ export default function TypographyScene({
         isMobile={isMobile}
       />
 
-      {/* RIGHT / LOWER */}
       <ImagePlane
         texture={textures[1]}
         position={[1.35, -0.35, -0.08]}
