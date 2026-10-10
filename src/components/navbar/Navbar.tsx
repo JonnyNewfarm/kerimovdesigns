@@ -207,8 +207,10 @@ const Navbar = () => {
       `
         relative
         inline-block
+
         -mt-1
-        text-2xl
+
+        text-[clamp(1.15rem,1.55vw,1.5rem)]
 
         transition-opacity
         duration-300
@@ -251,7 +253,7 @@ const Navbar = () => {
         filter: "blur(5px)",
       };
 
-  const secondaryInfoClassName = `tracking-tighter ${
+  const secondaryInfoClassName = `shrink-0 whitespace-nowrap tracking-tighter ${
     showSecondaryInfo ? "pointer-events-auto" : "pointer-events-none"
   }`;
 
@@ -289,10 +291,14 @@ const Navbar = () => {
         fixed
         top-0
         z-[99]
+
         hidden
         w-full
+
         bg-transparent
+
         py-4
+
         lg:block
       "
     >
@@ -300,27 +306,26 @@ const Navbar = () => {
         className="
           text-color
           z-50
+
           w-full
 
-          px-20
+          px-[clamp(2.5rem,4.5vw,5rem)]
           py-3
 
-          text-[13px]
+          text-[clamp(0.7rem,0.9vw,0.875rem)]
           font-extrabold
-
-          xl:text-[14px]
         "
       >
         <div
           className="
-            grid
+            flex
             w-full
             min-w-0
+
             items-start
+            justify-between
 
-            grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]
-
-            xl:grid-cols-4
+            gap-x-[clamp(1.5rem,2.5vw,4rem)]
           "
         >
           {/* =================================================
@@ -334,10 +339,7 @@ const Navbar = () => {
               duration: showSecondaryInfo ? 0.6 : 0.4,
               ease: PROJECT_EASE,
             }}
-            className={`
-              ${secondaryInfoClassName}
-              justify-self-start
-            `}
+            className={secondaryInfoClassName}
           >
             <TextReveal
               as="p"
@@ -349,7 +351,12 @@ const Navbar = () => {
               duration={0.75}
               y="115%"
               rotate={1.5}
-              className="m-0 uppercase leading-tight"
+              className="
+                m-0
+                whitespace-nowrap
+                uppercase
+                leading-tight
+              "
             >
               Name / Rustam Kerimov
             </TextReveal>
@@ -367,15 +374,7 @@ const Navbar = () => {
               delay: showSecondaryInfo ? 0.05 : 0,
               ease: PROJECT_EASE,
             }}
-            className={`
-              ${secondaryInfoClassName}
-
-              hidden
-
-              xl:col-start-2
-              xl:block
-              xl:justify-self-start
-            `}
+            className={secondaryInfoClassName}
           >
             <TextReveal
               as="p"
@@ -387,7 +386,12 @@ const Navbar = () => {
               duration={0.75}
               y="115%"
               rotate={1.5}
-              className="m-0 uppercase leading-tight"
+              className="
+                m-0
+                whitespace-nowrap
+                uppercase
+                leading-tight
+              "
             >
               Occupation / Graphic designer
             </TextReveal>
@@ -405,14 +409,7 @@ const Navbar = () => {
               delay: showSecondaryInfo ? 0.1 : 0,
               ease: PROJECT_EASE,
             }}
-            className={`
-              ${secondaryInfoClassName}
-
-              col-start-2
-              justify-self-start
-
-              xl:col-start-3
-            `}
+            className={secondaryInfoClassName}
           >
             <TextReveal
               as="p"
@@ -424,7 +421,12 @@ const Navbar = () => {
               duration={0.75}
               y="115%"
               rotate={1.5}
-              className="m-0 uppercase leading-tight"
+              className="
+                m-0
+                whitespace-nowrap
+                uppercase
+                leading-tight
+              "
             >
               Location / Oslo, Norway
             </TextReveal>
@@ -436,14 +438,24 @@ const Navbar = () => {
 
           <div
             className="
-              col-start-3
-              justify-self-end
-              tracking-tighter
+              shrink-0
 
-              xl:col-start-4
+              whitespace-nowrap
+              tracking-tighter
             "
           >
-            <div className="m-0 flex items-center gap-x-4 leading-tight">
+            <div
+              className="
+                m-0
+                flex
+                items-center
+
+                gap-x-[clamp(0.7rem,1vw,1rem)]
+
+                whitespace-nowrap
+                leading-tight
+              "
+            >
               {/* HOME */}
 
               <LinkReveal
@@ -484,13 +496,15 @@ const Navbar = () => {
                 </LinkReveal>
 
                 <AnimatePresence initial={false}>
-                  {isProjectDetailPage && projectTitle && (
+                  {isProjectDetailPage && projectTitle ? (
                     <motion.div
                       className={`
                         absolute
                         left-1/2
                         top-full
+
                         mt-[3px]
+
                         whitespace-nowrap
 
                         ${
@@ -567,13 +581,18 @@ const Navbar = () => {
                           }}
                           className="
                             relative
+
                             mr-2
+
                             flex
                             cursor-pointer
                             items-end
+
                             border-0
                             bg-transparent
+
                             p-0
+
                             text-current
                           "
                         >
@@ -602,7 +621,9 @@ const Navbar = () => {
                               flex
                               h-5
                               w-5
+
                               -translate-y-1/2
+
                               items-center
                               justify-center
                             "
@@ -625,11 +646,15 @@ const Navbar = () => {
                             }}
                             className="
                               mb-[-2px]
+
                               block
                               max-w-[240px]
+
                               truncate
+
                               text-[10px]
                               font-black
+
                               uppercase
                               leading-none
                               tracking-[0.18em]
@@ -731,7 +756,7 @@ const Navbar = () => {
                         </motion.svg>
                       </div>
                     </motion.div>
-                  )}
+                  ) : null}
                 </AnimatePresence>
               </div>
 
@@ -754,9 +779,12 @@ const Navbar = () => {
                     ${getLinkClassName("/contact")}
 
                     cursor-pointer
+
                     border-0
                     bg-transparent
+
                     p-0
+
                     text-inherit
                   `}
                 >

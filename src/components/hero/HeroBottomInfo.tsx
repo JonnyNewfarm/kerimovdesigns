@@ -73,20 +73,130 @@ export default function HeroBottomInfo({
         left-0
         right-0
         z-30
+
         px-10
+
         lg:bottom-10
-        lg:px-20
+        lg:px-[clamp(2.5rem,4.5vw,5rem)]
       "
     >
+      {/* =====================================================
+          MOBILE
+      ====================================================== */}
+
       <div
         className="
           flex
           w-full
           items-end
-          justify-between
+          justify-end
+
+          lg:hidden
         "
       >
-        {/* PORTFOLIO */}
+        <div
+          className="
+            flex
+            items-center
+
+            gap-x-1
+
+            whitespace-nowrap
+
+            text-[12px]
+          "
+        >
+          <span className="satoshi-black text-color">Latest Project</span>
+
+          <span>/</span>
+
+          <TransitionLink
+            href={`/project/${href}`}
+            transitionLabel={title}
+            className="
+              group
+              relative
+              w-fit
+              whitespace-nowrap
+            "
+          >
+            <span>{title}</span>
+
+            <span
+              className="
+                pointer-events-none
+
+                absolute
+                bottom-0
+                left-0
+
+                h-px
+                w-full
+
+                overflow-hidden
+              "
+            >
+              <span
+                className="
+                  absolute
+                  inset-0
+
+                  origin-right
+                  scale-x-100
+
+                  bg-current
+
+                  transition-transform
+                  duration-500
+                  ease-[cubic-bezier(0.76,0,0.24,1)]
+
+                  group-hover:scale-x-0
+                "
+              />
+
+              <span
+                className="
+                  absolute
+                  inset-0
+
+                  origin-left
+                  scale-x-0
+
+                  bg-current
+
+                  transition-transform
+                  duration-500
+                  delay-0
+                  ease-[cubic-bezier(0.76,0,0.24,1)]
+
+                  group-hover:scale-x-100
+                  group-hover:delay-[180ms]
+                "
+              />
+            </span>
+          </TransitionLink>
+        </div>
+      </div>
+
+      {/* =====================================================
+          DESKTOP
+      ====================================================== */}
+
+      <div
+        className="
+          hidden
+          w-full
+          min-w-0
+
+          items-end
+
+          lg:flex
+        "
+      >
+        {/* =================================================
+            PORTFOLIO
+        ================================================= */}
+
         <motion.div
           initial={false}
           animate={{
@@ -94,11 +204,15 @@ export default function HeroBottomInfo({
           }}
           transition={{
             duration: isBottomInfoClosing || !isBottomInfoOpen ? 0.9 : 0.75,
+
             ease: [0.76, 0, 0.24, 1],
           }}
           style={{
             transformOrigin: "left bottom",
           }}
+          className="
+            shrink-0
+          "
         >
           <TextReveal
             as="h1"
@@ -112,423 +226,391 @@ export default function HeroBottomInfo({
             rotate={BOTTOM_REVEAL_ROTATE}
             className="
               satoshi-black
-              hidden
+
               whitespace-nowrap
+              lg:text-[clamp(1.7rem,2.2vw,2rem)]
+
+
+
               leading-[0.95]
               tracking-[-0.02em]
+
               text-color
-              lg:block
-              lg:text-4xl
             "
           >
             Portfolio / 2026
           </TextReveal>
         </motion.div>
 
+        {/* =================================================
+            INFO AREA
+        ================================================= */}
+
         <div
           className="
             relative
-            flex
+
+ml-[clamp(5rem,7vw,8rem)]
+            min-w-0
             flex-1
-            items-end
-            justify-end
           "
         >
-          {/* MOBILE */}
-          <div
-            className="
-              flex
-              items-center
-              gap-x-1
-              whitespace-nowrap
-              text-[12px]
-              lg:hidden
-            "
-          >
-            <span className="satoshi-black text-color">Latest Project</span>
+          <AnimatePresence initial={false} mode="wait">
+            {isBottomInfoOpen ? (
+              <motion.div
+                key="bottom-info"
+                initial="hidden"
+                animate={isBottomInfoClosing ? "exit" : "visible"}
+                exit={{
+                  opacity: 0,
 
-            <span>/</span>
+                  transition: {
+                    duration: 0.01,
+                  },
+                }}
+                variants={{
+                  hidden: {},
 
-            <TransitionLink
-              href={`/project/${href}`}
-              transitionLabel={title}
-              className="
-                group
-                relative
-                w-fit
-                whitespace-nowrap
-              "
-            >
-              <span>{title}</span>
+                  visible: {
+                    transition: {
+                      staggerChildren: 0.085,
+                    },
+                  },
 
-              <span
+                  exit: {
+                    transition: {
+                      delayChildren: 0.7,
+                      staggerChildren: 0.1,
+                      staggerDirection: -1,
+                    },
+                  },
+                }}
                 className="
-                  pointer-events-none
-                  absolute
-                  bottom-0
-                  left-0
-                  h-px
+                  flex
                   w-full
-                  overflow-hidden
+                  min-w-0
+                  ml-2
+
+                  items-end
+                  justify-between
+
+                  gap-x-[clamp(1.5rem,3vw,5rem)]
                 "
               >
-                <span
-                  className="
-                    absolute
-                    inset-0
-                    origin-right
-                    scale-x-100
-                    bg-current
-                    transition-transform
-                    duration-500
-                    ease-[cubic-bezier(0.76,0,0.24,1)]
-                    group-hover:scale-x-0
-                  "
-                />
+                {/* =================================================
+                    LATEST PROJECT
+                ================================================= */}
 
-                <span
-                  className="
-                    absolute
-                    inset-0
-                    origin-left
-                    scale-x-0
-                    bg-current
-                    transition-transform
-                    duration-500
-                    delay-0
-                    ease-[cubic-bezier(0.76,0,0.24,1)]
-                    group-hover:scale-x-100
-                    group-hover:delay-[180ms]
-                  "
-                />
-              </span>
-            </TransitionLink>
-          </div>
-
-          {/* DESKTOP */}
-          <div className="hidden flex-1 lg:block">
-            <AnimatePresence initial={false} mode="wait">
-              {isBottomInfoOpen ? (
                 <motion.div
-                  key="bottom-info"
-                  initial="hidden"
-                  animate={isBottomInfoClosing ? "exit" : "visible"}
-                  exit={{
-                    opacity: 0,
-
-                    transition: {
-                      duration: 0.01,
-                    },
-                  }}
+                  className="
+                    shrink-0
+                    whitespace-nowrap
+                  "
                   variants={{
-                    hidden: {},
-
-                    visible: {
-                      transition: {
-                        staggerChildren: 0.085,
-                      },
-                    },
+                    ...infoVariants,
 
                     exit: {
+                      opacity: 0,
+                      x: 46,
+                      scale: 0.975,
+                      filter: "blur(6px)",
+
                       transition: {
-                        delayChildren: 0.7,
-                        staggerChildren: 0.1,
-                        staggerDirection: -1,
+                        x: {
+                          duration: 0.72,
+                          ease: [0.16, 1, 0.3, 1],
+                        },
+
+                        opacity: {
+                          duration: 0.52,
+                          ease: "easeOut",
+                        },
+
+                        scale: {
+                          duration: 0.7,
+                          ease: [0.16, 1, 0.3, 1],
+                        },
+
+                        filter: {
+                          duration: 0.58,
+                          ease: "easeOut",
+                        },
                       },
                     },
                   }}
-                  className="
-                    relative
-                    flex
-                    flex-1
-                    items-end
-
-                    lg:pl-0
-
-                    xl:justify-between
-                    xl:pl-22
-
-                    2xl:pl-20
-                  "
                 >
-                  {/* LATEST PROJECT */}
-                  <motion.div
-                    className="
-    lg:absolute
-    lg:left-[18%]
-    xl:static
-  "
-                    variants={{
-                      ...infoVariants,
-
-                      exit: {
-                        opacity: 0,
-                        x: 46,
-                        scale: 0.975,
-                        filter: "blur(6px)",
-
-                        transition: {
-                          x: {
-                            duration: 0.72,
-                            ease: [0.16, 1, 0.3, 1],
-                          },
-
-                          opacity: {
-                            duration: 0.52,
-                            ease: "easeOut",
-                          },
-
-                          scale: {
-                            duration: 0.7,
-                            ease: [0.16, 1, 0.3, 1],
-                          },
-
-                          filter: {
-                            duration: 0.58,
-                            ease: "easeOut",
-                          },
-                        },
-                      },
-                    }}
+                  <LinkReveal
+                    active={showWorld}
+                    delay={BOTTOM_REVEAL_DELAYS.latestProject}
+                    duration={BOTTOM_REVEAL_DURATION}
+                    y={BOTTOM_REVEAL_Y}
+                    rotate={BOTTOM_REVEAL_ROTATE}
                   >
-                    <LinkReveal
-                      active={showWorld}
-                      delay={BOTTOM_REVEAL_DELAYS.latestProject}
-                      duration={BOTTOM_REVEAL_DURATION}
-                      y={BOTTOM_REVEAL_Y}
-                      rotate={BOTTOM_REVEAL_ROTATE}
+                    <div
+                      className="
+                        flex
+                        items-center
+
+                        gap-x-1
+
+                        whitespace-nowrap
+
+                        text-[clamp(0.7rem,0.9vw,0.875rem)]
+                      "
                     >
-                      <div
+                      <span className="satoshi-black text-color">
+                        Latest Project
+                      </span>
+
+                      <span>/</span>
+
+                      <TransitionLink
+                        href={`/project/${href}`}
+                        transitionLabel={title}
                         className="
-                          flex
-                          items-center
-                          gap-x-1
+                          group
+                          relative
+                          w-fit
                           whitespace-nowrap
-                          text-[14px]
                         "
                       >
-                        <span className="satoshi-black text-color">
-                          Latest Project
-                        </span>
+                        <span>{title}</span>
 
-                        <span>/</span>
-
-                        <TransitionLink
-                          href={`/project/${href}`}
-                          transitionLabel={title}
+                        <span
                           className="
-                            group
-                            relative
-                            w-fit
-                            whitespace-nowrap
+                            pointer-events-none
+
+                            absolute
+                            bottom-0
+                            left-0
+
+                            h-px
+                            w-full
+
+                            overflow-hidden
                           "
                         >
-                          <span>{title}</span>
+                          <span
+                            className="
+                              absolute
+                              inset-0
+
+                              origin-right
+                              scale-x-100
+
+                              bg-current
+
+                              transition-transform
+                              duration-500
+                              ease-[cubic-bezier(0.76,0,0.24,1)]
+
+                              group-hover:scale-x-0
+                            "
+                          />
 
                           <span
                             className="
-                              pointer-events-none
                               absolute
-                              bottom-0
-                              left-0
-                              h-px
-                              w-full
-                              overflow-hidden
+                              inset-0
+
+                              origin-left
+                              scale-x-0
+
+                              bg-current
+
+                              transition-transform
+                              duration-500
+                              delay-0
+                              ease-[cubic-bezier(0.76,0,0.24,1)]
+
+                              group-hover:scale-x-100
+                              group-hover:delay-[180ms]
                             "
-                          >
-                            <span
-                              className="
-                                absolute
-                                inset-0
-                                origin-right
-                                scale-x-100
-                                bg-current
-                                transition-transform
-                                duration-500
-                                ease-[cubic-bezier(0.76,0,0.24,1)]
-                                group-hover:scale-x-0
-                              "
-                            />
+                          />
+                        </span>
+                      </TransitionLink>
+                    </div>
+                  </LinkReveal>
+                </motion.div>
 
-                            <span
-                              className="
-                                absolute
-                                inset-0
-                                origin-left
-                                scale-x-0
-                                bg-current
-                                transition-transform
-                                duration-500
-                                delay-0
-                                ease-[cubic-bezier(0.76,0,0.24,1)]
-                                group-hover:scale-x-100
-                                group-hover:delay-[180ms]
-                              "
-                            />
-                          </span>
-                        </TransitionLink>
-                      </div>
-                    </LinkReveal>
-                  </motion.div>
+                {/* =================================================
+                    STATUS
+                ================================================= */}
 
-                  {/* STATUS - ONLY XL AND UP */}
-                  <motion.div
-                    className="hidden xl:block"
-                    variants={{
-                      ...infoVariants,
+                <motion.div
+                  className="
+                    shrink-0
+                    whitespace-nowrap
+                  "
+                  variants={{
+                    ...infoVariants,
 
-                      exit: {
-                        opacity: 0,
-                        x: 52,
-                        scale: 0.975,
-                        filter: "blur(6px)",
+                    exit: {
+                      opacity: 0,
+                      x: 52,
+                      scale: 0.975,
+                      filter: "blur(6px)",
 
-                        transition: {
-                          x: {
-                            duration: 0.72,
-                            ease: [0.16, 1, 0.3, 1],
-                          },
+                      transition: {
+                        x: {
+                          duration: 0.72,
+                          ease: [0.16, 1, 0.3, 1],
+                        },
 
-                          opacity: {
-                            duration: 0.52,
-                            ease: "easeOut",
-                          },
+                        opacity: {
+                          duration: 0.52,
+                          ease: "easeOut",
+                        },
 
-                          scale: {
-                            duration: 0.7,
-                            ease: [0.16, 1, 0.3, 1],
-                          },
+                        scale: {
+                          duration: 0.7,
+                          ease: [0.16, 1, 0.3, 1],
+                        },
 
-                          filter: {
-                            duration: 0.58,
-                            ease: "easeOut",
-                          },
+                        filter: {
+                          duration: 0.58,
+                          ease: "easeOut",
                         },
                       },
-                    }}
+                    },
+                  }}
+                >
+                  <TextReveal
+                    as="p"
+                    mode="words"
+                    viewport={false}
+                    active={showWorld}
+                    delay={BOTTOM_REVEAL_DELAYS.status}
+                    stagger={BOTTOM_REVEAL_STAGGER}
+                    duration={BOTTOM_REVEAL_DURATION}
+                    y={BOTTOM_REVEAL_Y}
+                    rotate={BOTTOM_REVEAL_ROTATE}
+                    className="
+                      satoshi-black
+
+                      whitespace-nowrap
+
+                      text-[clamp(0.7rem,0.9vw,0.875rem)]
+
+                      text-color
+                    "
                   >
-                    <TextReveal
-                      as="p"
-                      mode="words"
-                      viewport={false}
-                      active={showWorld}
-                      delay={BOTTOM_REVEAL_DELAYS.status}
-                      stagger={BOTTOM_REVEAL_STAGGER}
-                      duration={BOTTOM_REVEAL_DURATION}
-                      y={BOTTOM_REVEAL_Y}
-                      rotate={BOTTOM_REVEAL_ROTATE}
+                    Status / Open for work
+                  </TextReveal>
+                </motion.div>
+
+                {/* =================================================
+                    LOCAL TIME
+                ================================================= */}
+
+                <motion.div
+                  className="
+                    shrink-0
+                    whitespace-nowrap
+                  "
+                  variants={{
+                    ...infoVariants,
+
+                    exit: {
+                      opacity: 0,
+                      x: 58,
+                      scale: 0.975,
+                      filter: "blur(6px)",
+
+                      transition: {
+                        x: {
+                          duration: 0.72,
+                          ease: [0.16, 1, 0.3, 1],
+                        },
+
+                        opacity: {
+                          duration: 0.52,
+                          ease: "easeOut",
+                        },
+
+                        scale: {
+                          duration: 0.7,
+                          ease: [0.16, 1, 0.3, 1],
+                        },
+
+                        filter: {
+                          duration: 0.58,
+                          ease: "easeOut",
+                        },
+                      },
+                    },
+                  }}
+                >
+                  <LinkReveal
+                    active={showWorld}
+                    delay={BOTTOM_REVEAL_DELAYS.time}
+                    duration={BOTTOM_REVEAL_DURATION}
+                    y={BOTTOM_REVEAL_Y}
+                    rotate={BOTTOM_REVEAL_ROTATE}
+                  >
+                    <p
                       className="
                         satoshi-black
+
                         whitespace-nowrap
-                        text-[14px]
+
+                        text-[clamp(0.7rem,0.9vw,0.875rem)]
+
                         text-color
                       "
                     >
-                      Status / Open for work
-                    </TextReveal>
-                  </motion.div>
-
-                  {/* LOCAL TIME */}
-                  <motion.div
-                    className="
-                      ml-auto
-                      xl:ml-0
-                    "
-                    variants={{
-                      ...infoVariants,
-
-                      exit: {
-                        opacity: 0,
-                        x: 58,
-                        scale: 0.975,
-                        filter: "blur(6px)",
-
-                        transition: {
-                          x: {
-                            duration: 0.72,
-                            ease: [0.16, 1, 0.3, 1],
-                          },
-
-                          opacity: {
-                            duration: 0.52,
-                            ease: "easeOut",
-                          },
-
-                          scale: {
-                            duration: 0.7,
-                            ease: [0.16, 1, 0.3, 1],
-                          },
-
-                          filter: {
-                            duration: 0.58,
-                            ease: "easeOut",
-                          },
-                        },
-                      },
-                    }}
-                  >
-                    <LinkReveal
-                      active={showWorld}
-                      delay={BOTTOM_REVEAL_DELAYS.time}
-                      duration={BOTTOM_REVEAL_DURATION}
-                      y={BOTTOM_REVEAL_Y}
-                      rotate={BOTTOM_REVEAL_ROTATE}
-                    >
-                      <p
-                        className="
-                          satoshi-black
-                          whitespace-nowrap
-                          text-[14px]
-                          text-color
-                        "
-                      >
-                        <LocalTime />
-                      </p>
-                    </LinkReveal>
-                  </motion.div>
+                      <LocalTime />
+                    </p>
+                  </LinkReveal>
                 </motion.div>
-              ) : (
-                <motion.button
-                  key="open-info"
-                  type="button"
-                  onClick={openBottomInfo}
-                  initial={{
-                    opacity: 0,
-                    x: -12,
-                    filter: "blur(6px)",
-                  }}
-                  animate={{
-                    opacity: 1,
-                    x: 0,
-                    filter: "blur(0px)",
-                  }}
-                  exit={{
-                    opacity: 0,
-                    x: 12,
-                    filter: "blur(5px)",
-                  }}
-                  transition={{
-                    duration: 0.24,
-                    delay: 0,
-                    ease: [0.12, 1, 0.2, 1],
-                  }}
-                  className="
-                    satoshi-black
-                    absolute
-                    bottom-0
-                    right-0
-                    cursor-pointer
-                    whitespace-nowrap
-                    uppercase
-                    text-color
-                    text-[14px]
-                  "
-                >
-                  Open info
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
+              </motion.div>
+            ) : (
+              <motion.button
+                key="open-info"
+                type="button"
+                onClick={openBottomInfo}
+                initial={{
+                  opacity: 0,
+                  x: -12,
+                  filter: "blur(6px)",
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  filter: "blur(0px)",
+                }}
+                exit={{
+                  opacity: 0,
+                  x: 12,
+                  filter: "blur(5px)",
+                }}
+                transition={{
+                  duration: 0.24,
+                  delay: 0,
+                  ease: [0.12, 1, 0.2, 1],
+                }}
+                className="
+                  satoshi-black
+
+                  absolute
+                  bottom-0
+                  right-0
+
+                  cursor-pointer
+
+                  whitespace-nowrap
+
+                  uppercase
+
+                  text-[clamp(0.7rem,0.9vw,0.875rem)]
+
+                  text-color
+                "
+              >
+                Open info
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </motion.div>
