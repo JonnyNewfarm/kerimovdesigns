@@ -356,7 +356,7 @@ const ProjectsTableMobile = ({
     uppercase
     tracking-[0.16em]
 
-    text-white/60
+    text-white/80
 
     transition-colors
     duration-300
