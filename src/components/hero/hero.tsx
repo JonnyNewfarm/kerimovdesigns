@@ -19,10 +19,11 @@ const HOME_VISITED_KEY = "hero-home-visited";
 
 type RingHeroProps = {
   title: string;
+  color: string;
   href: string;
 };
 
-export default function RingHero({ title, href }: RingHeroProps) {
+export default function RingHero({ title, href, color }: RingHeroProps) {
   const container = useRef<HTMLDivElement | null>(null);
 
   const posterTransitionRef = useRef<HTMLAnchorElement | null>(null);
@@ -194,6 +195,7 @@ export default function RingHero({ title, href }: RingHeroProps) {
         <HeroBottomInfo
           title={title}
           href={href}
+          color={color}
           showWorld={showWorld}
           isBottomInfoOpen={isBottomInfoOpen}
           isBottomInfoClosing={isBottomInfoClosing}

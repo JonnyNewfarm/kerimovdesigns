@@ -11,7 +11,11 @@ export default async function Home() {
     <Smoothscroll>
       <div className="relative min-h-screen w-full bg-dark text-color">
         {latestProject && (
-          <RingHero title={latestProject.title} href={latestProject.id} />
+          <RingHero
+            color={latestProject.hoverText!}
+            title={latestProject.title}
+            href={latestProject.id}
+          />
         )}
       </div>
     </Smoothscroll>

@@ -41,6 +41,7 @@ const infoVariants = {
 
 export default function HeroBottomInfo({
   title,
+  color,
   href,
   showWorld,
   isBottomInfoOpen,
@@ -48,6 +49,7 @@ export default function HeroBottomInfo({
   openBottomInfo,
 }: {
   title: string;
+  color: string;
   href: string;
   showWorld: boolean;
   isBottomInfoOpen: boolean;
@@ -108,7 +110,7 @@ export default function HeroBottomInfo({
 
           <TransitionLink
             href={`/project/${href}`}
-            transitionLabel={title}
+            transitionColor={color}
             className="
               group
               relative
@@ -346,7 +348,7 @@ ml-[clamp(5rem,7vw,8rem)]
 
                       <TransitionLink
                         href={`/project/${href}`}
-                        transitionLabel={title}
+                        transitionColor={color}
                         className="
                           group
                           relative
