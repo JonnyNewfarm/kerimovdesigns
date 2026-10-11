@@ -336,26 +336,33 @@ const ProjectsTableMobile = ({
                         type="button"
                         onClick={closeFilter}
                         whileTap={{
-                          scale: 0.96,
+                          scale: 0.97,
                         }}
                         transition={{
                           duration: 0.25,
                           ease: FILTER_EASE,
                         }}
                         className="
-                          flex
-                          shrink-0
-                          items-center
-                          justify-center
-                          bg-[#20241e]/85
-                          px-3
-                          py-2
-                          text-[8px]
-                          font-black
-                          uppercase
-                          tracking-[0.18em]
-                          text-white/65
-                        "
+    mt-1
+    shrink-0
+    cursor-pointer
+
+    border-0
+    bg-transparent
+    p-0
+
+    text-[9px]
+    font-black
+    uppercase
+    tracking-[0.16em]
+
+    text-white/60
+
+    transition-colors
+    duration-300
+
+    hover:text-white
+  "
                       >
                         Close
                       </motion.button>
