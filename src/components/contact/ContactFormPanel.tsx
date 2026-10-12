@@ -29,6 +29,8 @@ export default function ContactFormPanel({
 
   const [isPanelHovered, setIsPanelHovered] = useState(false);
 
+  const [showThreeBackground, setShowThreeBackground] = useState(false);
+
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -57,6 +59,24 @@ export default function ContactFormPanel({
     }
 
     setIsPanelHovered(false);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setShowThreeBackground(false);
+
+      return;
+    }
+
+    setShowThreeBackground(false);
+
+    const timeoutId = window.setTimeout(() => {
+      setShowThreeBackground(true);
+    }, 120);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -259,17 +279,14 @@ export default function ContactFormPanel({
                   duration: 0.38,
                   ease: PANEL_EASE,
                 },
-
                 y: {
                   duration: 0.58,
                   ease: PANEL_EASE,
                 },
-
                 scale: {
                   duration: 0.58,
                   ease: PANEL_EASE,
                 },
-
                 rotateY: {
                   duration: isPanelHovered ? 0.68 : 0.85,
                   ease: PANEL_EASE,
@@ -291,6 +308,9 @@ export default function ContactFormPanel({
                 backfaceVisibility: "hidden",
 
                 WebkitBackfaceVisibility: "hidden",
+
+                background:
+                  "radial-gradient(circle at 18% 18%, rgba(105,108,91,0.72) 0%, rgba(105,108,91,0.18) 35%, transparent 62%), radial-gradient(circle at 82% 78%, rgba(67,72,60,0.62) 0%, rgba(67,72,60,0.12) 38%, transparent 64%), linear-gradient(135deg, #4a4d42 0%, #55564a 48%, #626252 100%)",
               }}
               className="
                 pointer-events-auto
@@ -303,14 +323,40 @@ export default function ContactFormPanel({
 
                 overflow-hidden
 
-                bg-[#59624f]
-
                 text-[#ecdfcc]
 
                 will-change-transform
               "
             >
-              <ContactPopupThreeBackground />
+              <AnimatePresence initial={false}>
+                {showThreeBackground ? (
+                  <motion.div
+                    key="contact-three-background"
+                    initial={{
+                      opacity: 0,
+                    }}
+                    animate={{
+                      opacity: 1,
+                    }}
+                    exit={{
+                      opacity: 0,
+                    }}
+                    transition={{
+                      duration: 0.28,
+                      ease: PANEL_EASE,
+                    }}
+                    className="
+                      pointer-events-none
+
+                      absolute
+                      inset-0
+                      z-0
+                    "
+                  >
+                    <ContactPopupThreeBackground />
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
 
               <div
                 className="
@@ -394,55 +440,55 @@ export default function ContactFormPanel({
                       ease: contactEase,
                     }}
                     className="
-    group
-    relative
+                      group
+                      relative
 
-    mt-1.5
-    shrink-0
+                      mt-1.5
+                      shrink-0
 
-    cursor-pointer
+                      cursor-pointer
 
-    border-0
-    bg-transparent
-    p-0
+                      border-0
+                      bg-transparent
+                      p-0
 
-    font-black
-    uppercase
+                      text-[9px]
+                      font-black
+                      uppercase
+                      tracking-[0.16em]
 
+                      text-white/70
 
-    transition-colors
-    duration-300
-    text-[9px]
-tracking-[0.16em]
-text-white/70
-hover:text-white
+                      transition-colors
+                      duration-300
 
-  "
+                      hover:text-white
+                    "
                   >
                     <span className="relative block">
                       Close
                       <span
                         aria-hidden="true"
                         className="
-        absolute
-        -bottom-[4px]
-        left-0
+                          absolute
+                          -bottom-[4px]
+                          left-0
 
-        h-px
-        w-full
+                          h-px
+                          w-full
 
-        origin-right
-        scale-x-0
+                          origin-right
+                          scale-x-0
 
-        bg-current
+                          bg-current
 
-        transition-transform
-        duration-500
-        ease-[cubic-bezier(0.76,0,0.24,1)]
+                          transition-transform
+                          duration-500
+                          ease-[cubic-bezier(0.76,0,0.24,1)]
 
-        group-hover:origin-left
-        group-hover:scale-x-100
-      "
+                          group-hover:origin-left
+                          group-hover:scale-x-100
+                        "
                       />
                     </span>
                   </motion.button>
@@ -511,7 +557,6 @@ hover:text-white
         </motion.div>
       ) : null}
     </AnimatePresence>,
-
     document.body,
   );
 }
