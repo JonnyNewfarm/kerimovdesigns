@@ -20,24 +20,15 @@ export default function ContactFormThreeButton({
     <motion.button
       type={type}
       disabled={disabled}
-      whileHover={
-        disabled
-          ? undefined
-          : {
-              y: -2,
-              scale: 1.012,
-            }
-      }
       whileTap={
         disabled
           ? undefined
           : {
-              y: 0,
               scale: 0.985,
             }
       }
       transition={{
-        duration: 0.4,
+        duration: 0.35,
         ease: BUTTON_EASE,
       }}
       className={`
