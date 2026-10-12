@@ -24,50 +24,50 @@ export default function ContactFormThreeButton({
         disabled
           ? undefined
           : {
-              x: 3,
+              y: -2,
+              scale: 1.012,
             }
       }
       whileTap={
         disabled
           ? undefined
           : {
+              y: 0,
               scale: 0.985,
             }
       }
       transition={{
-        duration: 0.35,
+        duration: 0.4,
         ease: BUTTON_EASE,
       }}
       className={`
         group
-
         relative
 
         flex
-        min-h-[46px]
+        min-h-[48px]
+        min-w-[168px]
         items-center
         justify-center
 
         overflow-hidden
 
-        bg-[#1f221d]
+        bg-[#11130f]
 
-        px-5
+        px-6
         py-3
 
         font-bueno
         text-[11px]
         font-black
         uppercase
-        tracking-[0.08em]
+        tracking-[0.095em]
 
-        text-[#ecdfcc]
+        text-[#f0eadf]
 
-        transition-colors
-        duration-500
-
-        sm:min-h-[48px]
-        sm:px-6
+        sm:min-h-[50px]
+        sm:min-w-[178px]
+        sm:px-7
         sm:text-[12px]
 
         ${
@@ -78,7 +78,6 @@ export default function ContactFormThreeButton({
             `
             : `
               cursor-pointer
-              hover:bg-[#171a15]
             `
         }
       `}
@@ -86,34 +85,54 @@ export default function ContactFormThreeButton({
       <span
         className="
           pointer-events-none
-
-          absolute
-          inset-0
-
-          origin-bottom
-          scale-y-0
-
-          bg-[#131611]
-
-          transition-transform
-          duration-500
-
-          ease-[cubic-bezier(0.76,0,0.24,1)]
-
-          group-hover:scale-y-100
-        "
-      />
-
-      <span
-        className="
-          pointer-events-none
           relative
           z-10
 
+          block
+          h-[1.05em]
+
+          overflow-hidden
+
           whitespace-nowrap
+          leading-none
         "
       >
-        {children}
+        <span
+          className="
+            block
+
+            translate-y-0
+
+            transition-transform
+            duration-[550ms]
+
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+
+            group-hover:-translate-y-full
+          "
+        >
+          {children}
+        </span>
+
+        <span
+          aria-hidden="true"
+          className="
+            absolute
+            left-0
+            top-full
+
+            block
+
+            transition-transform
+            duration-[550ms]
+
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+
+            group-hover:-translate-y-full
+          "
+        >
+          {children}
+        </span>
       </span>
     </motion.button>
   );
