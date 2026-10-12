@@ -28,9 +28,7 @@ const POPUP_WIDTH = 380;
 
 const VIEWPORT_PADDING = 24;
 
-const POPUP_TOP = 112;
-
-const POPUP_ROTATE_Y = 12;
+const POPUP_ROTATE_Y = 13;
 
 const FILTER_EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -244,21 +242,15 @@ export default function ProjectsDesktopFilter({
               <div
                 style={{
                   position: "fixed",
-
-                  top: POPUP_TOP,
-
+                  top: "50%",
                   left: popupLeft,
-
                   width: `min(${POPUP_WIDTH}px, calc(100vw - ${
                     VIEWPORT_PADDING * 2
                   }px))`,
-
+                  transform: "translateY(-50%)",
                   perspective: "900px",
-
                   perspectiveOrigin: "50% 50%",
-
                   pointerEvents: threeReady ? "auto" : "none",
-
                   zIndex: 190,
                 }}
               >
@@ -390,15 +382,14 @@ export default function ProjectsDesktopFilter({
                           className="
                             mt-2
 
-                            font-bueno
-                            text-[2rem]
+                            text-[1.9rem]
                             font-black
 
                             uppercase
                             leading-[0.92]
                             tracking-[-0.025em]
 
-                            text-white
+                            text-white/90
                           "
                         >
                           All filters
