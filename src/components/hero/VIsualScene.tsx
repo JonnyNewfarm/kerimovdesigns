@@ -28,9 +28,9 @@ export default function VisualScene({
     <SceneShell angle={angle} scale={scale}>
       <ImagePlane
         texture={textures[0]}
-        position={[-1.35, -0.5, 0.28]}
+        position={[-1.4, -0.5, 0.28]}
         bendStrength={1}
-        rotationZ={-0}
+        rotationZ={0.035}
         width={2}
         height={3}
         isMobile={isMobile}
@@ -41,8 +41,8 @@ export default function VisualScene({
         position={[1, -0.05, -0.15]}
         bendStrength={0.86}
         rotationZ={0}
-        width={2.3}
-        height={3.3}
+        width={2.4}
+        height={3.4}
         isMobile={isMobile}
       />
 
