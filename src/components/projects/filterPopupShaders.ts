@@ -1,26 +1,63 @@
-export const filterPopupVertexShader =  `
+export const filterPopupVertexShader = `
 precision highp float;
 
 varying vec2 vUv;
 
+uniform vec2 uDelta;
+uniform float uAmplitude;
+uniform float uIntroScale;
+uniform float uIntroOffsetX;
+
+const float PI = 3.141592653589793238;
+
 void main() {
   vUv = uv;
 
-  gl_Position = vec4(
-    position.xy,
-    0.0,
-    1.0
-  );
+  vec3 newPosition =
+    position;
+
+  newPosition.x +=
+    sin(uv.y * PI) *
+    uDelta.x *
+    uAmplitude;
+
+  newPosition.y +=
+    sin(uv.x * PI) *
+    uDelta.y *
+    uAmplitude;
+
+  float speed =
+    length(uDelta);
+
+  newPosition.z +=
+    sin(uv.x * PI) *
+    sin(uv.y * PI) *
+    speed *
+    uAmplitude *
+    0.16;
+
+  newPosition.xy *=
+    uIntroScale;
+
+  newPosition.x +=
+    uIntroOffsetX;
+
+  gl_Position =
+    vec4(
+      newPosition,
+      1.0
+    );
 }
 `;
 
-export const filterPopupFragmentShader =  `
+export const filterPopupFragmentShader = `
 precision highp float;
 
 varying vec2 vUv;
 
 uniform float uTime;
 uniform float uSpeed;
+uniform float uOpacity;
 
 void main() {
   vec2 uv = vUv;
@@ -28,8 +65,6 @@ void main() {
   float time =
     uTime *
     uSpeed;
-
- 
 
   vec2 warpedUv = uv;
 
@@ -45,16 +80,12 @@ void main() {
       time * 0.58
     ) * 0.035;
 
-  
-
   float wave =
     sin(
       warpedUv.x * 5.2 +
       warpedUv.y * 2.6 -
       time
     ) * 0.5 + 0.5;
-
-  
 
   float wave2 =
     sin(
@@ -63,15 +94,12 @@ void main() {
       time * 0.55
     ) * 0.5 + 0.5;
 
-  
   float wave3 =
     sin(
       warpedUv.x * 2.0 -
       warpedUv.y * 3.2 +
       time * 0.38
     ) * 0.5 + 0.5;
-
- 
 
   float gradient =
     mix(
@@ -94,15 +122,11 @@ void main() {
       gradient
     );
 
-
-
   gradient =
     pow(
       gradient,
       1.55
     );
-
- 
 
   vec3 colorA = vec3(
     0.29,
@@ -140,16 +164,12 @@ void main() {
       );
   }
 
- 
-
   color =
     mix(
       color,
       colorA,
       0.24
     );
-
-  
 
   vec2 centered =
     uv - 0.5;
@@ -168,12 +188,10 @@ void main() {
       edge * 0.18
     );
 
- 
-
   gl_FragColor =
     vec4(
       color,
-      1.0
+      uOpacity
     );
 }
 `;

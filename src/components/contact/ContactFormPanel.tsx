@@ -29,7 +29,7 @@ export default function ContactFormPanel({
 
   const [isPanelHovered, setIsPanelHovered] = useState(false);
 
-  const [showThreeBackground, setShowThreeBackground] = useState(false);
+  const [threeReady, setThreeReady] = useState(false);
 
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
@@ -55,28 +55,14 @@ export default function ContactFormPanel({
 
   useEffect(() => {
     if (!isOpen) {
+      setThreeReady(false);
+
       return;
     }
+
+    setThreeReady(false);
 
     setIsPanelHovered(false);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setShowThreeBackground(false);
-
-      return;
-    }
-
-    setShowThreeBackground(false);
-
-    const timeoutId = window.setTimeout(() => {
-      setShowThreeBackground(true);
-    }, 120);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -103,6 +89,7 @@ export default function ContactFormPanel({
     }
 
     const body = document.body;
+
     const html = document.documentElement;
 
     const scrollY = window.scrollY;
@@ -308,9 +295,6 @@ export default function ContactFormPanel({
                 backfaceVisibility: "hidden",
 
                 WebkitBackfaceVisibility: "hidden",
-
-                background:
-                  "radial-gradient(circle at 18% 18%, rgba(105,108,91,0.72) 0%, rgba(105,108,91,0.18) 35%, transparent 62%), radial-gradient(circle at 82% 78%, rgba(67,72,60,0.62) 0%, rgba(67,72,60,0.12) 38%, transparent 64%), linear-gradient(135deg, #4a4d42 0%, #55564a 48%, #626252 100%)",
               }}
               className="
                 pointer-events-auto
@@ -328,37 +312,30 @@ export default function ContactFormPanel({
                 will-change-transform
               "
             >
-              <AnimatePresence initial={false}>
-                {showThreeBackground ? (
-                  <motion.div
-                    key="contact-three-background"
-                    initial={{
-                      opacity: 0,
-                    }}
-                    animate={{
-                      opacity: 1,
-                    }}
-                    exit={{
-                      opacity: 0,
-                    }}
-                    transition={{
-                      duration: 0.28,
-                      ease: PANEL_EASE,
-                    }}
-                    className="
-                      pointer-events-none
+              <ContactPopupThreeBackground
+                onReady={() => {
+                  setThreeReady(true);
+                }}
+              />
 
-                      absolute
-                      inset-0
-                      z-0
-                    "
-                  >
-                    <ContactPopupThreeBackground />
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-
-              <div
+              <motion.div
+                initial={false}
+                animate={{
+                  opacity: threeReady ? 1 : 0,
+                  y: threeReady ? 0 : 8,
+                }}
+                transition={{
+                  opacity: {
+                    duration: 0.5,
+                    delay: threeReady ? 0.42 : 0,
+                    ease: PANEL_EASE,
+                  },
+                  y: {
+                    duration: 0.6,
+                    delay: threeReady ? 0.42 : 0,
+                    ease: PANEL_EASE,
+                  },
+                }}
                 className="
                   relative
                   z-10
@@ -551,7 +528,7 @@ export default function ContactFormPanel({
                     <ContactForm />
                   </motion.div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>

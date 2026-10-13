@@ -242,15 +242,23 @@ export default function ProjectsDesktopFilter({
               <div
                 style={{
                   position: "fixed",
+
                   top: "50%",
+
                   left: popupLeft,
+
                   width: `min(${POPUP_WIDTH}px, calc(100vw - ${
                     VIEWPORT_PADDING * 2
                   }px))`,
+
                   transform: "translateY(-50%)",
+
                   perspective: "900px",
+
                   perspectiveOrigin: "50% 50%",
+
                   pointerEvents: threeReady ? "auto" : "none",
+
                   zIndex: 190,
                 }}
               >
@@ -340,16 +348,33 @@ export default function ProjectsDesktopFilter({
                     }}
                   />
 
-                  <div
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      opacity: threeReady ? 1 : 0,
+                      y: threeReady ? 0 : 8,
+                    }}
+                    transition={{
+                      opacity: {
+                        duration: 0.5,
+                        delay: threeReady ? 0.38 : 0,
+                        ease: FILTER_EASE,
+                      },
+                      y: {
+                        duration: 0.6,
+                        delay: threeReady ? 0.38 : 0,
+                        ease: FILTER_EASE,
+                      },
+                    }}
                     className="
-                      relative
-                      z-10
+    relative
+    z-10
 
-                      flex
-                      min-h-0
-                      flex-1
-                      flex-col
-                    "
+    flex
+    min-h-0
+    flex-1
+    flex-col
+  "
                   >
                     <div
                       className="
@@ -417,55 +442,54 @@ export default function ProjectsDesktopFilter({
                           ease: FILTER_EASE,
                         }}
                         className="
-    group
-    relative
+                          group
+                          relative
 
-    
-    shrink-0
+                          shrink-0
 
-    cursor-pointer
+                          cursor-pointer
 
-    border-0
-    bg-transparent
-    p-0
+                          border-0
+                          bg-transparent
+                          p-0
 
-    text-[9px]
-    font-black
-    uppercase
-    tracking-[0.16em]
+                          text-[9px]
+                          font-black
+                          uppercase
+                          tracking-[0.16em]
 
-    text-white/70
+                          text-white/70
 
-    transition-colors
-    duration-300
+                          transition-colors
+                          duration-300
 
-    hover:text-white
-  "
+                          hover:text-white
+                        "
                       >
                         <span className="relative block">
                           Close
                           <span
                             aria-hidden="true"
                             className="
-        absolute
-        -bottom-[4px]
-        left-0
+                              absolute
+                              -bottom-[4px]
+                              left-0
 
-        h-px
-        w-full
+                              h-px
+                              w-full
 
-        origin-right
-        scale-x-0
+                              origin-right
+                              scale-x-0
 
-        bg-current
+                              bg-current
 
-        transition-transform
-        duration-500
-        ease-[cubic-bezier(0.76,0,0.24,1)]
+                              transition-transform
+                              duration-500
+                              ease-[cubic-bezier(0.76,0,0.24,1)]
 
-        group-hover:origin-left
-        group-hover:scale-x-100
-      "
+                              group-hover:origin-left
+                              group-hover:scale-x-100
+                            "
                           />
                         </span>
                       </motion.button>
@@ -594,7 +618,7 @@ export default function ProjectsDesktopFilter({
                         ) : null}
                       </AnimatePresence>
                     </div>
-                  </div>
+                  </motion.div>
                 </motion.div>
               </div>
             </>

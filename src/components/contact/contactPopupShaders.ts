@@ -1,10 +1,11 @@
-export const contactPopupFragmentShader = /* glsl */ `
+export const contactPopupFragmentShader = `
 precision highp float;
 
 varying vec2 vUv;
 
 uniform float uTime;
 uniform float uSpeed;
+uniform float uOpacity;
 
 void main() {
   vec2 uv = vUv;
@@ -13,14 +14,12 @@ void main() {
     uTime *
     uSpeed;
 
-
   float wave =
     sin(
       uv.x * 5.2 +
       uv.y * 2.6 -
       time
     ) * 0.5 + 0.5;
-
 
   float wave2 =
     sin(
@@ -29,7 +28,6 @@ void main() {
       time * 0.55
     ) * 0.5 + 0.5;
 
- 
   float gradient =
     mix(
       wave,
@@ -43,8 +41,6 @@ void main() {
       0.92,
       gradient
     );
-
- 
 
   vec3 colorA = vec3(
     0.27,
@@ -85,7 +81,7 @@ void main() {
   gl_FragColor =
     vec4(
       color,
-      1.0
+      uOpacity
     );
 }
 `;

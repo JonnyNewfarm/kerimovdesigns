@@ -1,9 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-
 import { useMemo, useRef } from "react";
-
 import * as THREE from "three";
 
 import {
@@ -20,6 +18,8 @@ function FilterPopupPlane({ onReady }: { onReady?: () => void }) {
 
   const elapsedRef = useRef(0);
 
+  const introProgress = useRef(0);
+
   const frameCountRef = useRef(0);
 
   const readyReportedRef = useRef(false);
@@ -33,20 +33,70 @@ function FilterPopupPlane({ onReady }: { onReady?: () => void }) {
       uSpeed: {
         value: 0.62,
       },
+
+      uDelta: {
+        value: new THREE.Vector2(-95, 6),
+      },
+
+      uAmplitude: {
+        value: 0.00145,
+      },
+
+      uIntroScale: {
+        value: 0.72,
+      },
+
+      uIntroOffsetX: {
+        value: 0.43,
+      },
+
+      uOpacity: {
+        value: 0,
+      },
     }),
     [],
   );
 
-  useFrame((_, delta) => {
+  useFrame((_, rawDelta) => {
     const material = materialRef.current;
 
     if (!material) {
       return;
     }
 
-    elapsedRef.current += Math.min(delta, 0.05);
+    const delta = Math.min(rawDelta, 1 / 30);
+
+    elapsedRef.current += delta;
+
+    introProgress.current = Math.min(1, introProgress.current + delta / 1.45);
+
+    const p = introProgress.current;
+
+    const moveEase = 1 - Math.pow(1 - p, 3);
+
+    const scaleEase = 1 - Math.pow(1 - p, 4);
+
+    const bendRelease = THREE.MathUtils.smoothstep(p, 0.1, 1);
+
+    const introBendX = THREE.MathUtils.lerp(-95, 0, bendRelease);
+
+    const introBendY = THREE.MathUtils.lerp(6, 0, bendRelease);
+
+    const introScale = THREE.MathUtils.lerp(0.72, 1, scaleEase);
+
+    const introOffsetX = THREE.MathUtils.lerp(0.43, 0, moveEase);
+
+    const opacity = THREE.MathUtils.smoothstep(p, 0.02, 0.38);
 
     material.uniforms.uTime.value = elapsedRef.current;
+
+    material.uniforms.uDelta.value.set(introBendX, introBendY);
+
+    material.uniforms.uIntroScale.value = introScale;
+
+    material.uniforms.uIntroOffsetX.value = introOffsetX;
+
+    material.uniforms.uOpacity.value = opacity;
 
     if (!readyReportedRef.current) {
       frameCountRef.current += 1;
@@ -61,17 +111,18 @@ function FilterPopupPlane({ onReady }: { onReady?: () => void }) {
 
   return (
     <mesh frustumCulled={false}>
-      <planeGeometry args={[2, 2, 1, 1]} />
+      <planeGeometry args={[2, 2, 28, 32]} />
 
       <shaderMaterial
         ref={materialRef}
         vertexShader={filterPopupVertexShader}
         fragmentShader={filterPopupFragmentShader}
         uniforms={uniforms}
+        transparent
         depthTest={false}
         depthWrite={false}
-        transparent={false}
         toneMapped={false}
+        side={THREE.DoubleSide}
         precision="highp"
       />
     </mesh>
@@ -92,20 +143,9 @@ export default function FilterPopupThreeBackground({
         overflow-hidden
       "
       style={{
-        background: "rgb(66, 72, 59)",
         transform: "translateZ(0)",
       }}
     >
-      <div
-        className="
-          absolute
-          inset-0
-        "
-        style={{
-          background: "rgb(66, 72, 59)",
-        }}
-      />
-
       <div
         className="
           absolute
@@ -124,13 +164,13 @@ export default function FilterPopupThreeBackground({
           }}
           gl={{
             antialias: false,
-            alpha: false,
+            alpha: true,
             depth: false,
             stencil: false,
             powerPreference: "high-performance",
           }}
           onCreated={({ gl }) => {
-            gl.setClearColor(new THREE.Color(0.26, 0.285, 0.235), 1);
+            gl.setClearColor(new THREE.Color(0, 0, 0), 0);
 
             gl.domElement.style.display = "block";
 
