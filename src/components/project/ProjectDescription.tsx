@@ -114,33 +114,70 @@ export default function ProjectDescription({
             aria-expanded={isExpanded}
             aria-controls="project-description-content"
             className="
-              mt-8
-              inline-flex
-              cursor-pointer
-              items-center
-              gap-3
-              text-[10px]
-              font-black
-              uppercase
-              tracking-[0.32em]
-              text-white/55
-              transition-opacity
-              duration-300
-              hover:opacity-100
-              sm:text-xs
-            "
+    group
+
+    mt-8
+    inline-flex
+    cursor-pointer
+    items-center
+    gap-3
+
+    text-[10px]
+    font-black
+    uppercase
+    tracking-[0.32em]
+
+    text-white/55
+
+    outline-none
+    focus-visible:outline-none
+    focus-visible:text-white
+
+    transition-colors
+    duration-300
+
+    hover:text-white
+
+    sm:text-xs
+  "
           >
-            <span>{isExpanded ? "Show less" : "Read more"}</span>
+            <span
+              className="
+      relative
+      block
+      pb-[3px]
+
+      after:pointer-events-none
+      after:absolute
+      after:bottom-0
+      after:left-0
+      after:h-[2px]
+      after:w-full
+      after:origin-left
+      after:scale-x-0
+      after:bg-current
+      after:content-['']
+
+      after:transition-transform
+      after:duration-300
+
+      group-focus-visible:after:scale-x-100
+    "
+            >
+              {isExpanded ? "Show less" : "Read more"}
+            </span>
 
             <span
               className={`
-                inline-flex
-                origin-center
-                transition-transform
-                duration-500
-                ease-[cubic-bezier(0.16,1,0.3,1)]
-                ${isExpanded ? "rotate-90" : "-rotate-90"}
-              `}
+      inline-flex
+      origin-center
+
+      transition-transform
+      duration-500
+      ease-[cubic-bezier(0.16,1,0.3,1)]
+
+      ${isExpanded ? "rotate-90" : "-rotate-90"}
+    `}
               aria-hidden="true"
             >
               <svg
@@ -150,11 +187,12 @@ export default function ProjectDescription({
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 className="
-                  h-[14px]
-                  w-[24px]
-                  sm:h-[16px]
-                  sm:w-[28px]
-                "
+        h-[14px]
+        w-[24px]
+
+        sm:h-[16px]
+        sm:w-[28px]
+      "
               >
                 <path
                   d="M4 14H26"

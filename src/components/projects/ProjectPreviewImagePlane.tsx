@@ -44,20 +44,17 @@ function getCoverUv(
   const containerAspect = containerWidth / containerHeight;
 
   const scale = new THREE.Vector2(1, 1);
-
   const offset = new THREE.Vector2(0, 0);
 
   if (containerAspect > imageAspect) {
     const visibleHeight = imageAspect / containerAspect;
 
     scale.set(1, visibleHeight);
-
     offset.set(0, (1 - visibleHeight) * 0.5);
   } else {
     const visibleWidth = containerAspect / imageAspect;
 
     scale.set(visibleWidth, 1);
-
     offset.set((1 - visibleWidth) * 0.5, 0);
   }
 
@@ -83,15 +80,12 @@ export default function ProjectPreviewImagePlane({
     texture.colorSpace = THREE.SRGBColorSpace;
 
     texture.wrapS = THREE.ClampToEdgeWrapping;
-
     texture.wrapT = THREE.ClampToEdgeWrapping;
 
     texture.minFilter = THREE.LinearFilter;
-
     texture.magFilter = THREE.LinearFilter;
 
     texture.generateMipmaps = false;
-
     texture.needsUpdate = true;
   }, [texture]);
 
@@ -123,7 +117,6 @@ export default function ProjectPreviewImagePlane({
 
     return () => {
       window.cancelAnimationFrame(frameOne);
-
       window.cancelAnimationFrame(frameTwo);
     };
   }, [texture, onReady]);
@@ -156,7 +149,6 @@ export default function ProjectPreviewImagePlane({
   const hoverVelocity = useRef(new THREE.Vector2(0, 0));
 
   const scrollBend = useRef(0);
-
   const scrollVelocity = useRef(0);
 
   const previousScrollY = useRef(0);
@@ -172,18 +164,14 @@ export default function ProjectPreviewImagePlane({
   const positionVelocity = useRef(new THREE.Vector2(0, 0));
 
   const scaleCurrent = useRef(1);
-
   const scaleVelocity = useRef(0);
 
   const zCurrent = useRef(0);
-
   const zVelocity = useRef(0);
 
   useFrame((_, delta) => {
     const mesh = meshRef.current;
-
     const material = materialRef.current;
-
     const anchor = anchorRef.current;
 
     if (!mesh || !material || !anchor) {
@@ -201,7 +189,6 @@ export default function ProjectPreviewImagePlane({
     const cover = getCoverUv(texture, rect.width, rect.height);
 
     material.uniforms.uUvScale.value.copy(cover.scale);
-
     material.uniforms.uUvOffset.value.copy(cover.offset);
 
     const pointer = pointerRef.current;
@@ -213,9 +200,17 @@ export default function ProjectPreviewImagePlane({
       pointer.y >= rect.top &&
       pointer.y <= rect.bottom;
 
+    // Keyboard focus activates the same depth/scale
+    // animation as mouse hover.
+    const isKeyboardFocused = anchor.matches(":focus-visible");
+
+    const isInteractive = isHovered || isKeyboardFocused;
+
     let targetPointerX = 0.5;
     let targetPointerY = 0.5;
 
+    // Mouse controls bending and pointer follow.
+    // Keyboard focus keeps the image centered.
     if (isHovered) {
       targetPointerX = THREE.MathUtils.clamp(
         (pointer.x - rect.left) / rect.width,
@@ -259,13 +254,11 @@ export default function ProjectPreviewImagePlane({
       : 0;
 
     const hoverStiffness = isHovered ? 82 : 70;
-
     const hoverDamping = isHovered ? 17 : 14;
 
     const hoverForceX = (targetHoverX - hoverBend.current.x) * hoverStiffness;
 
     hoverVelocity.current.x += hoverForceX * dt;
-
     hoverVelocity.current.x *= Math.exp(-hoverDamping * dt);
 
     hoverBend.current.x += hoverVelocity.current.x * dt;
@@ -273,11 +266,11 @@ export default function ProjectPreviewImagePlane({
     const hoverForceY = (targetHoverY - hoverBend.current.y) * hoverStiffness;
 
     hoverVelocity.current.y += hoverForceY * dt;
-
     hoverVelocity.current.y *= Math.exp(-hoverDamping * dt);
 
     hoverBend.current.y += hoverVelocity.current.y * dt;
 
+    // Scroll bending
     const currentScrollY = window.scrollY;
 
     const scrollDifference = currentScrollY - previousScrollY.current;
@@ -293,7 +286,6 @@ export default function ProjectPreviewImagePlane({
     const scrollForce = (targetScrollBend - scrollBend.current) * 105;
 
     scrollVelocity.current += scrollForce * dt;
-
     scrollVelocity.current *= Math.exp(-12 * dt);
 
     scrollBend.current += scrollVelocity.current * dt;
@@ -311,12 +303,11 @@ export default function ProjectPreviewImagePlane({
 
     material.uniforms.uDelta.value.set(
       hoverBend.current.x,
-
       hoverBend.current.y + scrollBend.current,
     );
 
+    // Pointer-follow position
     const maxFollowX = rect.width * 0.065;
-
     const maxFollowY = rect.height * 0.04;
 
     positionTarget.current.x = isHovered ? differenceX * maxFollowX * 2 : 0;
@@ -324,7 +315,6 @@ export default function ProjectPreviewImagePlane({
     positionTarget.current.y = isHovered ? -differenceY * maxFollowY * 2 : 0;
 
     const positionStiffness = isHovered ? 30 : 60;
-
     const positionDamping = isHovered ? 8 : 10;
 
     const positionForceX =
@@ -347,30 +337,26 @@ export default function ProjectPreviewImagePlane({
 
     positionCurrent.current.y += positionVelocity.current.y * dt;
 
-    const targetScale = isHovered ? 1.045 : 1;
-
-    const scaleStiffness = isHovered ? 75 : 65;
-
-    const scaleDamping = isHovered ? 14 : 15;
+    // Scale: mouse hover OR keyboard focus
+    const targetScale = isKeyboardFocused ? 1.12 : isHovered ? 1.045 : 1;
+    const scaleStiffness = isInteractive ? 75 : 65;
+    const scaleDamping = isInteractive ? 14 : 15;
 
     const scaleForce = (targetScale - scaleCurrent.current) * scaleStiffness;
 
     scaleVelocity.current += scaleForce * dt;
-
     scaleVelocity.current *= Math.exp(-scaleDamping * dt);
 
     scaleCurrent.current += scaleVelocity.current * dt;
 
-    const targetZ = isHovered ? 18 : 0;
-
-    const zStiffness = isHovered ? 70 : 60;
-
-    const zDamping = isHovered ? 14 : 15;
+    // Depth: mouse hover OR keyboard focus
+    const targetZ = isKeyboardFocused ? 65 : isHovered ? 18 : 0;
+    const zStiffness = isInteractive ? 70 : 60;
+    const zDamping = isInteractive ? 14 : 15;
 
     const zForce = (targetZ - zCurrent.current) * zStiffness;
 
     zVelocity.current += zForce * dt;
-
     zVelocity.current *= Math.exp(-zDamping * dt);
 
     zCurrent.current += zVelocity.current * dt;
@@ -383,9 +369,7 @@ export default function ProjectPreviewImagePlane({
 
     mesh.scale.set(
       rect.width * scaleCurrent.current,
-
       rect.height * scaleCurrent.current,
-
       1,
     );
   });

@@ -48,6 +48,7 @@ export default function ProjectsGridCard({
   const imageLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   const [inLayout, setInLayout] = useState(active);
+  const [imageFocused, setImageFocused] = useState(false);
 
   useEffect(() => {
     if (active) {
@@ -124,13 +125,14 @@ export default function ProjectsGridCard({
         willChange: "transform, opacity",
       }}
       className="
-        relative
-        z-0
-        min-w-0
-        overflow-visible
+  relative
+  z-0
+  min-w-0
+  overflow-visible
 
-        hover:z-30
-      "
+  hover:z-30
+  focus-within:z-30
+"
     >
       <motion.div
         initial={false}
@@ -182,20 +184,22 @@ export default function ProjectsGridCard({
           transitionColor={project.hoverText}
           aria-label={`Open project ${project.title}`}
           className="
-            group
-            relative
-            isolate
-            block
+  group
+  relative
+  isolate
+  block
 
-            aspect-[16/10]
-            w-full
+  aspect-[16/10]
+  w-full
 
-            cursor-pointer
-            overflow-visible
-            outline-none
-    focus:outline-none
-    focus-visible:outline-none
-          "
+  cursor-pointer
+  overflow-visible
+
+  outline-none
+  focus-visible:outline-2
+  focus-visible:outline-offset-[5px]
+  focus-visible:outline-[#ecdfcc]
+"
         >
           <ProjectPreviewThreeImage
             src={project.src}
@@ -262,10 +266,15 @@ export default function ProjectsGridCard({
             href={`/project/${project.id}`}
             transitionColor={project.hoverText}
             className="
-              block
-              w-fit
-              max-w-full
-            "
+  block
+  w-fit
+  max-w-full
+
+  outline-none
+  focus-visible:underline
+  focus-visible:decoration-2
+  focus-visible:underline-offset-[5px]
+"
           >
             <h2
               className="

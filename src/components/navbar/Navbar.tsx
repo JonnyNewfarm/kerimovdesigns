@@ -181,32 +181,41 @@ const Navbar = () => {
 
     return [
       `
-        relative
-        inline-block
+      relative
+      inline-block
 
-        -mt-1
+      -mt-1
 
-        text-[clamp(1.15rem,1.55vw,1.5rem)]
+      text-[clamp(1.15rem,1.55vw,1.5rem)]
 
-        transition-opacity
-        duration-300
+      transition-opacity
+      duration-300
 
-        outline-none
+      outline-none
+      focus:outline-none
+      focus-visible:outline-none
 
-        after:absolute
-        after:left-0
-        after:-bottom-[3px]
-        after:h-[2px]
-        after:w-full
-        after:origin-left
-        after:scale-x-0
-        after:bg-current
-        after:transition-transform
-        after:duration-300
+      focus-visible:opacity-100
 
-        focus-visible:opacity-100
-        focus-visible:after:scale-x-100
-      `,
+      [&::after]:pointer-events-none
+      [&::after]:absolute
+      [&::after]:left-0
+      [&::after]:bottom-0
+
+      [&::after]:h-[2px]
+      [&::after]:w-full
+
+      [&::after]:bg-current
+      [&::after]:content-['']
+
+      [&::after]:origin-left
+      [&::after]:scale-x-0
+
+      [&::after]:transition-transform
+      [&::after]:duration-300
+
+      focus-visible:[&::after]:scale-x-100
+    `,
       isActive ? "opacity-100" : "opacity-80 hover:opacity-100",
     ].join(" ");
   };

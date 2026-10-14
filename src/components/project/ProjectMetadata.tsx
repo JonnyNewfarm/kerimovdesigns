@@ -86,53 +86,67 @@ export default function ProjectMetadata({
                   key={tag}
                   href={`/projects?tags=${encodeURIComponent(tag)}`}
                   className="
-                    group
-                    relative
-                    w-fit
-                    whitespace-nowrap
-                  "
+    group
+    relative
+    w-fit
+    whitespace-nowrap
+
+    outline-none
+    focus-visible:outline-none
+    focus-visible:text-white
+  "
                 >
                   <p>{formatProjectTag(tag)}</p>
 
                   <span
+                    aria-hidden="true"
                     className="
-                      pointer-events-none
-                      absolute
-                      bottom-1
-                      left-0
-                      h-px
-                      w-full
-                      overflow-hidden
-                    "
+      pointer-events-none
+      absolute
+      bottom-1
+      left-0
+      h-px
+      w-full
+
+      transition-[height]
+      duration-300
+
+      group-focus-visible:h-[2px]
+    "
                   >
                     <span
                       className="
-                        absolute
-                        inset-0
-                        origin-right
-                        scale-x-100
-                        bg-current
-                        transition-transform
-                        duration-500
-                        ease-[cubic-bezier(0.76,0,0.24,1)]
-                        group-hover:scale-x-0
-                      "
+        absolute
+        inset-0
+        origin-right
+        scale-x-100
+        bg-current
+        transition-transform
+        duration-500
+        ease-[cubic-bezier(0.76,0,0.24,1)]
+
+        group-hover:scale-x-0
+        group-focus-visible:scale-x-100
+      "
                     />
 
                     <span
                       className="
-                        absolute
-                        inset-0
-                        origin-left
-                        scale-x-0
-                        bg-current
-                        transition-transform
-                        duration-500
-                        delay-0
-                        ease-[cubic-bezier(0.76,0,0.24,1)]
-                        group-hover:scale-x-100
-                        group-hover:delay-[180ms]
-                      "
+        absolute
+        inset-0
+        origin-left
+        scale-x-0
+        bg-current
+        transition-transform
+        duration-500
+        delay-0
+        ease-[cubic-bezier(0.76,0,0.24,1)]
+
+        group-hover:scale-x-100
+        group-hover:delay-[180ms]
+
+        group-focus-visible:scale-x-0
+      "
                     />
                   </span>
                 </Link>

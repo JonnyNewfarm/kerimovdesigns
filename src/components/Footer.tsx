@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
+import { useContactOverlay } from "@/components/contact/ContactOverlayProvider";
+
 import WaveLinkText from "./WaveLink";
 import TextReveal from "@/components/TextReveal";
 import TransitionLink from "./TransitionLink";
@@ -46,12 +48,79 @@ function LocalTime() {
   return <p suppressHydrationWarning>{time ?? "GMT+1 (--:--, NO)"}</p>;
 }
 
-const Footer = () => {
+const FOOTER_LINK_BASE = `
+  relative
+  block
+  w-fit
+  max-w-full
+
+  pb-[5px]
+
+  md:ml-auto
+
+  outline-none
+  focus:outline-none
+  focus-visible:outline-none
+
+  transition-opacity
+  duration-300
+
+  after:pointer-events-none
+  after:absolute
+  after:bottom-0
+  after:left-0
+
+  after:h-[2px]
+  after:w-full
+
+  after:bg-current
+  after:content-['']
+
+  after:origin-left
+  after:scale-x-0
+
+  after:transition-transform
+  after:duration-300
+  after:ease-[cubic-bezier(0.22,1,0.36,1)]
+
+  focus-visible:after:scale-x-100
+  focus-visible:opacity-100
+`;
+
+const FOOTER_CREDIT_LINK_CLASS = `
+  ${FOOTER_LINK_BASE}
+
+  md:ml-0
+
+  opacity-80
+  hover:opacity-100
+`;
+
+function getFooterLinkClass(active: boolean) {
+  return `
+    ${FOOTER_LINK_BASE}
+
+    ${active ? "opacity-100" : "opacity-60 hover:opacity-100"}
+  `;
+}
+
+export default function Footer() {
   const pathname = usePathname();
+
+  const { isContactOpen, openContact } = useContactOverlay();
 
   if (pathname === "/") {
     return null;
   }
+
+  const isHomeActive = pathname === "/";
+
+  const isWorkActive =
+    pathname === "/projects" ||
+    pathname.startsWith("/projects/") ||
+    pathname.startsWith("/project/");
+
+  const isContactActive = pathname === "/contact" || isContactOpen;
 
   return (
     <footer className="relative overflow-hidden bg-dark px-4 py-10 text-color md:px-10 lg:px-16">
@@ -93,7 +162,8 @@ ideas into visuals.`}
                 <TransitionLink
                   href="/"
                   transitionLabel="Index"
-                  className="transition hover:text-color"
+                  aria-current={isHomeActive ? "page" : undefined}
+                  className={getFooterLinkClass(isHomeActive)}
                 >
                   <WaveLinkText text="Home" />
                 </TransitionLink>
@@ -101,18 +171,35 @@ ideas into visuals.`}
                 <TransitionLink
                   href="/projects"
                   transitionLabel="Selected Work"
-                  className="transition hover:text-color"
+                  aria-current={isWorkActive ? "page" : undefined}
+                  className={getFooterLinkClass(isWorkActive)}
                 >
                   <WaveLinkText text="My work" />
                 </TransitionLink>
 
-                <TransitionLink
-                  href="/contact"
-                  transitionLabel="Let's Collaborate"
-                  className="transition hover:text-color"
+                <button
+                  type="button"
+                  onClick={openContact}
+                  aria-haspopup="dialog"
+                  aria-expanded={isContactOpen}
+                  className={`
+                    ${getFooterLinkClass(isContactActive)}
+
+                    cursor-pointer
+                    border-0
+                    bg-transparent
+                    p-0
+                    pb-[5px]
+
+                    text-left
+                    font-inherit
+                    uppercase
+
+                    md:text-right
+                  `}
                 >
                   <WaveLinkText text="Contact" />
-                </TransitionLink>
+                </button>
               </div>
             </div>
 
@@ -131,7 +218,7 @@ ideas into visuals.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   href="https://www.instagram.com/rustam.kerim0v?igsh=MTlhcjl5YzV0bm15cQ%3D%3D&utm_source=qr"
-                  className="transition hover:text-color"
+                  className={getFooterLinkClass(false)}
                 >
                   <WaveLinkText text="Instagram" />
                 </a>
@@ -140,7 +227,7 @@ ideas into visuals.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   href="https://linkedin.com/in/rustam-kerimov-75bb5a331"
-                  className="transition hover:text-color"
+                  className={getFooterLinkClass(false)}
                 >
                   <WaveLinkText text="LinkedIn" />
                 </a>
@@ -164,7 +251,7 @@ ideas into visuals.`}
               target="_blank"
               rel="noopener noreferrer"
               href="https://www.jonasnygaard.com/"
-              className="transition hover:text-color"
+              className={FOOTER_CREDIT_LINK_CLASS}
             >
               <WaveLinkText text="Newfarm Studio" />
             </a>
@@ -212,6 +299,4 @@ ideas into visuals.`}
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

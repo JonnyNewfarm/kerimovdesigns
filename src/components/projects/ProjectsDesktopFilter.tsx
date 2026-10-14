@@ -847,10 +847,37 @@ export default function ProjectsDesktopFilter({
               hover:text-white
 
               xl:text-[12px]
+              outline-none
+focus:outline-none
+focus-visible:outline-none
+
+focus-visible:text-white
             "
           >
-            <span>View all filters</span>
+            <span
+              className="
+    relative
+    block
+    pb-[3px]
 
+    after:pointer-events-none
+    after:absolute
+    after:bottom-0
+    after:left-0
+    after:h-[2px]
+    after:w-full
+    after:origin-left
+    after:scale-x-0
+    after:bg-current
+    after:content-['']
+    after:transition-transform
+    after:duration-300
+
+    group-focus-visible:after:scale-x-100
+  "
+            >
+              View all filters
+            </span>
             <span
               className="
                 relative
@@ -954,35 +981,59 @@ function FilterButton({
         },
       }}
       className={`
-        group
+  group
+  relative
 
-        flex
-        min-w-0
-        items-center
+  flex
+  min-w-0
+  items-center
 
-        py-[5px]
+  py-[5px]
 
-        text-left
-        text-[11px]
-        font-black
-        uppercase
-        tracking-[0.15em]
+  text-left
+  text-[11px]
+  font-black
+  uppercase
+  tracking-[0.15em]
 
-        xl:text-[12px]
+  xl:text-[12px]
 
-        ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
-      `}
+  outline-none
+  focus:outline-none
+  focus-visible:outline-none
+
+  ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
+`}
     >
       <span
         className={`
-          block
-          truncate
+  relative
+  block
+  truncate
 
-          transition-colors
-          duration-300
+  pb-[3px]
 
-          ${active ? "text-white" : "text-white/35 group-hover:text-white"}
-        `}
+  transition-colors
+  duration-300
+
+  after:pointer-events-none
+  after:absolute
+  after:bottom-0
+  after:left-0
+  after:h-[2px]
+  after:w-full
+  after:origin-left
+  after:scale-x-0
+  after:bg-current
+  after:content-['']
+  after:transition-transform
+  after:duration-300
+
+  group-focus-visible:after:scale-x-100
+  group-focus-visible:text-white
+
+  ${active ? "text-white" : "text-white/35 group-hover:text-white"}
+`}
       >
         <TextReveal
           as="span"
