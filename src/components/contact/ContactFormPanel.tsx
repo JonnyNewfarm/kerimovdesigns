@@ -16,22 +16,47 @@ type ContactFormPanelProps = {
 };
 
 const PANEL_EASE = [0.22, 1, 0.36, 1] as const;
-
 const PANEL_ROTATE_Y = 10;
+
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
+function getFocusableElements(container: HTMLElement) {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((element) => {
+    return (
+      element.getClientRects().length > 0 &&
+      !element.closest("[inert]") &&
+      element.getAttribute("aria-hidden") !== "true"
+    );
+  });
+}
 
 export default function ContactFormPanel({
   isOpen,
   onClose,
 }: ContactFormPanelProps) {
   const [mounted, setMounted] = useState(false);
-
   const [isMobile, setIsMobile] = useState(false);
-
   const [isPanelHovered, setIsPanelHovered] = useState(false);
-
   const [threeReady, setThreeReady] = useState(false);
 
+  const dialogRef = useRef<HTMLDivElement | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     setMounted(true);
@@ -56,40 +81,112 @@ export default function ContactFormPanel({
   useEffect(() => {
     if (!isOpen) {
       setThreeReady(false);
-
       return;
     }
 
     setThreeReady(false);
-
     setIsPanelHovered(false);
   }, [isOpen]);
 
+  // Focus management
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+    if (!isOpen || !mounted) return;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    previousFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    const focusInitialElement = () => {
+      const nameField =
+        dialog.querySelector<HTMLInputElement>('input[name="name"]');
+
+      if (nameField) {
+        nameField.focus({ preventScroll: true });
+      } else {
+        dialog.focus({ preventScroll: true });
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    const frame = requestAnimationFrame(focusInitialElement);
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        onCloseRef.current();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const focusable = getFocusableElements(dialog);
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog.focus({ preventScroll: true });
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (!active || !dialog.contains(active)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+        return;
+      }
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    const handleFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+
+      if (target instanceof Node && !dialog.contains(target)) {
+        const focusable = getFocusableElements(dialog);
+
+        (focusable[0] ?? dialog).focus({
+          preventScroll: true,
+        });
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("focusin", handleFocusIn);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+      cancelAnimationFrame(frame);
 
+      document.removeEventListener("keydown", handleKeyDown, true);
+
+      document.removeEventListener("focusin", handleFocusIn);
+
+      const previousFocus = previousFocusRef.current;
+
+      if (previousFocus?.isConnected) {
+        requestAnimationFrame(() => {
+          previousFocus.focus({ preventScroll: true });
+        });
+      }
+    };
+  }, [isOpen, mounted]);
+
+  // Scroll lock
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+    if (!isOpen) return;
 
     const body = document.body;
-
     const html = document.documentElement;
 
     const scrollY = window.scrollY;
@@ -133,77 +230,42 @@ export default function ContactFormPanel({
     };
   }, [isOpen]);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return createPortal(
     <AnimatePresence mode="wait">
       {isOpen ? (
         <motion.div
           key="contact-modal"
-          onPointerDown={(event) => {
-            event.stopPropagation();
-          }}
-          onPointerMove={(event) => {
-            event.stopPropagation();
-          }}
-          onWheel={(event) => {
-            event.stopPropagation();
-          }}
-          onTouchMove={(event) => {
-            event.stopPropagation();
-          }}
-          className="
-            fixed
-            inset-0
-            z-[300]
-            overflow-hidden
-          "
+          onPointerDown={(event) => event.stopPropagation()}
+          onPointerMove={(event) => event.stopPropagation()}
+          onWheel={(event) => event.stopPropagation()}
+          onTouchMove={(event) => event.stopPropagation()}
+          className="fixed inset-0 z-[300] overflow-hidden"
         >
           <motion.button
             type="button"
+            tabIndex={-1}
             aria-label="Close contact form"
             onClick={onClose}
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            exit={{
-              opacity: 0,
-            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{
               duration: 0.35,
               ease: PANEL_EASE,
             }}
             className="
-              absolute
-              inset-0
-
-              cursor-default
-
-              bg-[#0b0e0a]/45
-
-              backdrop-blur-[5px]
+              absolute inset-0 cursor-default
+              bg-[#0b0e0a]/45 backdrop-blur-[5px]
             "
           />
 
           <div
             className="
-              pointer-events-none
-
-              absolute
-              inset-0
-
-              flex
-              items-center
-              justify-center
-
-              p-3
-
-              md:p-6
+              pointer-events-none absolute inset-0
+              flex items-center justify-center
+              p-3 md:p-6
             "
             style={{
               perspective: isMobile ? "none" : "1050px",
@@ -211,38 +273,24 @@ export default function ContactFormPanel({
             }}
           >
             <motion.div
+              ref={dialogRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="contact-form-title"
+              tabIndex={-1}
               data-lenis-prevent
               data-lenis-prevent-wheel
               data-lenis-prevent-touch
               onPointerEnter={() => {
-                if (isMobile) {
-                  return;
-                }
-
-                setIsPanelHovered(true);
+                if (!isMobile) setIsPanelHovered(true);
               }}
               onPointerLeave={() => {
-                if (isMobile) {
-                  return;
-                }
-
-                setIsPanelHovered(false);
+                if (!isMobile) setIsPanelHovered(false);
               }}
-              onPointerDown={(event) => {
-                event.stopPropagation();
-              }}
-              onPointerMove={(event) => {
-                event.stopPropagation();
-              }}
-              onWheel={(event) => {
-                event.stopPropagation();
-              }}
-              onTouchMove={(event) => {
-                event.stopPropagation();
-              }}
+              onPointerDown={(event) => event.stopPropagation()}
+              onPointerMove={(event) => event.stopPropagation()}
+              onWheel={(event) => event.stopPropagation()}
+              onTouchMove={(event) => event.stopPropagation()}
               initial={{
                 opacity: 0,
                 y: 14,
@@ -283,39 +331,23 @@ export default function ContactFormPanel({
                 width: isMobile
                   ? "calc(100vw - 24px)"
                   : "min(580px, calc(100vw - 48px))",
-
                 maxHeight: isMobile
                   ? "calc(100dvh - 24px)"
                   : "min(620px, calc(100dvh - 64px))",
-
                 transformStyle: isMobile ? "flat" : "preserve-3d",
-
                 transformOrigin: "50% 50%",
-
                 backfaceVisibility: "hidden",
-
                 WebkitBackfaceVisibility: "hidden",
               }}
               className="
-                pointer-events-auto
-
-                relative
-                isolate
-
-                flex
-                flex-col
-
-                overflow-hidden
-
-                text-[#ecdfcc]
-
-                will-change-transform
+                pointer-events-auto relative isolate
+                flex flex-col overflow-hidden
+                text-[#ecdfcc] will-change-transform
+                outline-none
               "
             >
               <ContactPopupThreeBackground
-                onReady={() => {
-                  setThreeReady(true);
-                }}
+                onReady={() => setThreeReady(true)}
               />
 
               <motion.div
@@ -337,30 +369,15 @@ export default function ContactFormPanel({
                   },
                 }}
                 className="
-                  relative
-                  z-10
-
-                  flex
-                  min-h-0
-                  flex-1
-                  flex-col
+                  relative z-10 flex min-h-0
+                  flex-1 flex-col
                 "
               >
                 <div
                   className="
-                    flex
-                    shrink-0
-                    items-start
-                    justify-between
-                    gap-4
-
-                    px-4
-                    pb-3
-                    pt-4
-
-                    sm:px-5
-                    sm:pb-6
-                    sm:pt-6
+                    flex shrink-0 items-start justify-between
+                    gap-4 px-4 pb-3 pt-4
+                    sm:px-5 sm:pb-6 sm:pt-6
                   "
                 >
                   <div className="min-w-0">
@@ -374,21 +391,10 @@ export default function ContactFormPanel({
                         y="105%"
                         rotate={0.6}
                         className="
-                          block
-
-                          mb-6
-                          mt-2
-
-                          font-bueno
-
+                          mb-6 mt-2 block font-bueno
                           text-[clamp(1.4rem,3.7vw,1.9rem)]
-                          font-black
-
-                          uppercase
-                          leading-[0.88]
-                          tracking-[-0.025em]
-
-                          text-white
+                          font-black uppercase leading-[0.88]
+                          tracking-[-0.025em] text-white
                         "
                       >
                         Send a message
@@ -408,37 +414,18 @@ export default function ContactFormPanel({
                       opacity: 1,
                       y: 0,
                     }}
-                    whileTap={{
-                      scale: 0.97,
-                    }}
+                    whileTap={{ scale: 0.97 }}
                     transition={{
                       delay: 0.08,
                       duration: 0.4,
                       ease: contactEase,
                     }}
                     className="
-                      group
-                      relative
-
-                      mt-1.5
-                      shrink-0
-
-                      cursor-pointer
-
-                      border-0
-                      bg-transparent
-                      p-0
-
-                      text-[9px]
-                      font-black
-                      uppercase
-                      tracking-[0.16em]
-
-                      text-white/70
-
-                      transition-colors
-                      duration-300
-
+                      group relative mt-1.5 shrink-0
+                      cursor-pointer border-0 bg-transparent
+                      p-0 text-[9px] font-black uppercase
+                      tracking-[0.16em] text-white/70
+                      transition-colors duration-300
                       hover:text-white
                     "
                   >
@@ -447,22 +434,11 @@ export default function ContactFormPanel({
                       <span
                         aria-hidden="true"
                         className="
-                          absolute
-                          -bottom-[4px]
-                          left-0
-
-                          h-px
-                          w-full
-
-                          origin-right
-                          scale-x-0
-
-                          bg-current
-
-                          transition-transform
+                          absolute -bottom-[4px] left-0
+                          h-px w-full origin-right scale-x-0
+                          bg-current transition-transform
                           duration-500
                           ease-[cubic-bezier(0.76,0,0.24,1)]
-
                           group-hover:origin-left
                           group-hover:scale-x-100
                         "
@@ -476,32 +452,18 @@ export default function ContactFormPanel({
                   data-lenis-prevent
                   data-lenis-prevent-wheel
                   data-lenis-prevent-touch
-                  onWheel={(event) => {
-                    event.stopPropagation();
-                  }}
-                  onTouchMove={(event) => {
-                    event.stopPropagation();
-                  }}
+                  onWheel={(event) => event.stopPropagation()}
+                  onTouchMove={(event) => event.stopPropagation()}
                   style={{
                     touchAction: "pan-y",
                     WebkitOverflowScrolling: "touch",
                   }}
                   className="
-                    min-h-0
-                    flex-1
-
-                    overflow-x-hidden
-                    overflow-y-auto
-
-                    overscroll-contain
-
-                    px-4
-                    pb-5
-
+                    min-h-0 flex-1 overflow-x-hidden
+                    overflow-y-auto overscroll-contain
+                    px-4 pb-5
                     [scrollbar-width:none]
-
                     [&::-webkit-scrollbar]:hidden
-
                     sm:px-5
                   "
                 >
@@ -519,11 +481,7 @@ export default function ContactFormPanel({
                       delay: 0.18,
                       ease: PANEL_EASE,
                     }}
-                    className="
-                      mb-2
-                      min-w-0
-                      w-full
-                    "
+                    className="mb-2 min-w-0 w-full"
                   >
                     <ContactForm />
                   </motion.div>

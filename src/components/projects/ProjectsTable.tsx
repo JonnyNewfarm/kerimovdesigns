@@ -141,11 +141,12 @@ export default function ProjectsTable({
   return (
     <section
       className="
-        min-h-screen
-        w-full
-        bg-dark
-        text-color
-      "
+      min-h-screen
+      w-full
+      overflow-x-clip
+      bg-dark
+      text-color
+    "
     >
       <PageTransitionGate className="min-h-screen">
         <div

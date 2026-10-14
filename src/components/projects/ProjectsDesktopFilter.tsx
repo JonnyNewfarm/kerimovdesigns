@@ -1,11 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import TextReveal from "@/components/TextReveal";
-
 import FilterPopupThreeBackground from "./FilterPopupThreeBackground";
 import { useProjectsReveal } from "./ProjectsLoadingGate";
 
@@ -14,27 +13,42 @@ type ProjectsDesktopFilterProps = {
   selectedTags: string[];
   totalCount: number;
   resultCount: number;
-
   onChange: (tags: string[]) => void;
-
   onPopupOpenChange?: (open: boolean) => void;
 };
 
 const MAX_SELECTED_TAGS = 3;
-
 const COLLAPSED_TAG_COUNT = 5;
-
 const POPUP_WIDTH = 380;
-
 const VIEWPORT_PADDING = 24;
-
 const POPUP_ROTATE_Y = 13;
 
 const FILTER_EASE = [0.22, 1, 0.36, 1] as const;
 
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
 const formatTag = (tag: string) => {
   return tag.replaceAll("-", " ");
 };
+
+function getFocusableElements(container: HTMLElement) {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((element) => {
+    return (
+      element.getClientRects().length > 0 &&
+      !element.closest("[inert]") &&
+      element.getAttribute("aria-hidden") !== "true"
+    );
+  });
+}
 
 export default function ProjectsDesktopFilter({
   availableTags,
@@ -45,38 +59,45 @@ export default function ProjectsDesktopFilter({
   const { revealStarted } = useProjectsReveal();
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
   const [mounted, setMounted] = useState(false);
-
   const [threeReady, setThreeReady] = useState(false);
-
   const [isPanelHovered, setIsPanelHovered] = useState(false);
-
   const [popupLeft, setPopupLeft] = useState(VIEWPORT_PADDING);
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const firstFilterRef = useRef<HTMLButtonElement | null>(null);
+
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const closePopupRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const openPopup = () => {
+    previousFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : triggerRef.current;
+
     setThreeReady(false);
-
     setIsPanelHovered(false);
-
     setIsPopupOpen(true);
 
     onPopupOpenChange?.(true);
   };
 
-  const closePopup = () => {
+  const closePopup = useCallback(() => {
     setIsPanelHovered(false);
-
     setIsPopupOpen(false);
 
     onPopupOpenChange?.(false);
-  };
+  }, [onPopupOpenChange]);
+
+  useEffect(() => {
+    closePopupRef.current = closePopup;
+  }, [closePopup]);
 
   useEffect(() => {
     return () => {
@@ -106,9 +127,7 @@ export default function ProjectsDesktopFilter({
     const params = new URLSearchParams(window.location.search);
 
     params.delete("page");
-
     params.delete("tag");
-
     params.delete("tags");
 
     if (nextTags.length > 0) {
@@ -127,7 +146,6 @@ export default function ProjectsDesktopFilter({
 
   const commitTags = (nextTags: string[]) => {
     onChange(nextTags);
-
     updateUrl(nextTags);
   };
 
@@ -153,6 +171,7 @@ export default function ProjectsDesktopFilter({
     commitTags(nextTags);
   };
 
+  // Popup positioning
   useEffect(() => {
     if (!isPopupOpen) {
       return;
@@ -186,23 +205,125 @@ export default function ProjectsDesktopFilter({
     };
   }, [isPopupOpen]);
 
+  // Focus management
   useEffect(() => {
-    if (!isPopupOpen) {
+    if (!isPopupOpen || !mounted) {
       return;
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closePopup();
+    const dialog = dialogRef.current;
+
+    if (!dialog) {
+      return;
+    }
+
+    const focusInitialElement = () => {
+      if (firstFilterRef.current) {
+        firstFilterRef.current.focus({
+          preventScroll: true,
+        });
+      } else {
+        dialog.focus({
+          preventScroll: true,
+        });
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    const frame = requestAnimationFrame(focusInitialElement);
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+
+        closePopupRef.current();
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusable = getFocusableElements(dialog);
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+
+        dialog.focus({
+          preventScroll: true,
+        });
+
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (!active || !dialog.contains(active)) {
+        event.preventDefault();
+
+        (event.shiftKey ? last : first).focus({
+          preventScroll: true,
+        });
+
+        return;
+      }
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+
+        last.focus({
+          preventScroll: true,
+        });
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+
+        first.focus({
+          preventScroll: true,
+        });
+      }
+    };
+
+    const handleFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+
+      if (target instanceof Node && !dialog.contains(target)) {
+        const focusable = getFocusableElements(dialog);
+
+        (focusable[0] ?? dialog).focus({
+          preventScroll: true,
+        });
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown, true);
+
+    document.addEventListener("focusin", handleFocusIn);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      cancelAnimationFrame(frame);
+
+      document.removeEventListener("keydown", handleKeyDown, true);
+
+      document.removeEventListener("focusin", handleFocusIn);
+
+      const previousFocus = previousFocusRef.current;
+      const trigger = triggerRef.current;
+
+      requestAnimationFrame(() => {
+        if (previousFocus?.isConnected) {
+          previousFocus.focus({
+            preventScroll: true,
+          });
+        } else if (trigger?.isConnected) {
+          trigger.focus({
+            preventScroll: true,
+          });
+        }
+      });
     };
-  }, [isPopupOpen]);
+  }, [isPopupOpen, mounted]);
 
   const popup = mounted
     ? createPortal(
@@ -211,6 +332,7 @@ export default function ProjectsDesktopFilter({
             <>
               <motion.button
                 type="button"
+                tabIndex={-1}
                 aria-label="Close filters"
                 onClick={closePopup}
                 initial={{
@@ -242,9 +364,7 @@ export default function ProjectsDesktopFilter({
               <div
                 style={{
                   position: "fixed",
-
                   top: "50%",
-
                   left: popupLeft,
 
                   width: `min(${POPUP_WIDTH}px, calc(100vw - ${
@@ -254,7 +374,6 @@ export default function ProjectsDesktopFilter({
                   transform: "translateY(-50%)",
 
                   perspective: "900px",
-
                   perspectiveOrigin: "50% 50%",
 
                   pointerEvents: threeReady ? "auto" : "none",
@@ -263,9 +382,11 @@ export default function ProjectsDesktopFilter({
                 }}
               >
                 <motion.div
+                  ref={dialogRef}
                   role="dialog"
                   aria-modal="true"
                   aria-label="All project filters"
+                  tabIndex={-1}
                   onPointerEnter={() => {
                     setIsPanelHovered(true);
                   }}
@@ -275,20 +396,14 @@ export default function ProjectsDesktopFilter({
                   initial={false}
                   animate={{
                     opacity: threeReady ? 1 : 0,
-
                     y: threeReady ? 0 : 14,
-
                     scale: threeReady ? 1 : 0.985,
-
                     rotateY: isPanelHovered ? 0 : POPUP_ROTATE_Y,
                   }}
                   exit={{
                     opacity: 0,
-
                     y: 8,
-
                     scale: 0.99,
-
                     rotateY: 2,
                   }}
                   transition={{
@@ -296,17 +411,14 @@ export default function ProjectsDesktopFilter({
                       duration: 0.48,
                       ease: FILTER_EASE,
                     },
-
                     y: {
                       duration: 0.6,
                       ease: FILTER_EASE,
                     },
-
                     scale: {
                       duration: 0.62,
                       ease: FILTER_EASE,
                     },
-
                     rotateY: {
                       duration: isPanelHovered ? 0.7 : 0.9,
                       ease: FILTER_EASE,
@@ -314,13 +426,9 @@ export default function ProjectsDesktopFilter({
                   }}
                   style={{
                     width: "100%",
-
                     transformOrigin: "50% 50%",
-
                     transformStyle: "preserve-3d",
-
                     backfaceVisibility: "hidden",
-
                     WebkitBackfaceVisibility: "hidden",
                   }}
                   className="
@@ -367,14 +475,14 @@ export default function ProjectsDesktopFilter({
                       },
                     }}
                     className="
-    relative
-    z-10
+                      relative
+                      z-10
 
-    flex
-    min-h-0
-    flex-1
-    flex-col
-  "
+                      flex
+                      min-h-0
+                      flex-1
+                      flex-col
+                    "
                   >
                     <div
                       className="
@@ -409,8 +517,8 @@ export default function ProjectsDesktopFilter({
 
                             text-[1.9rem]
                             font-black
-
                             uppercase
+
                             leading-[0.92]
                             tracking-[-0.025em]
 
@@ -444,7 +552,6 @@ export default function ProjectsDesktopFilter({
                         className="
                           group
                           relative
-
                           shrink-0
 
                           cursor-pointer
@@ -506,7 +613,6 @@ export default function ProjectsDesktopFilter({
                         pb-6
 
                         [scrollbar-width:none]
-
                         [&::-webkit-scrollbar]:hidden
                       "
                     >
@@ -514,12 +620,12 @@ export default function ProjectsDesktopFilter({
                         className="
                           grid
                           grid-cols-2
-
                           gap-x-5
                           gap-y-1
                         "
                       >
                         <PopupFilterButton
+                          buttonRef={firstFilterRef}
                           label="All work"
                           active={selectedTags.length === 0}
                           disabled={false}
@@ -552,6 +658,7 @@ export default function ProjectsDesktopFilter({
                         flex
                         min-h-[54px]
                         shrink-0
+
                         items-center
                         justify-between
 
@@ -624,7 +731,6 @@ export default function ProjectsDesktopFilter({
             </>
           ) : null}
         </AnimatePresence>,
-
         document.body,
       )
     : null;
@@ -691,10 +797,11 @@ export default function ProjectsDesktopFilter({
             ref={triggerRef}
             type="button"
             onClick={openPopup}
+            aria-haspopup="dialog"
+            aria-expanded={isPopupOpen}
             initial={false}
             animate={{
               opacity: revealStarted ? 1 : 0,
-
               y: revealStarted ? 0 : 6,
             }}
             whileHover={{
@@ -703,33 +810,26 @@ export default function ProjectsDesktopFilter({
             transition={{
               opacity: {
                 duration: 0.5,
-
                 delay: 0.8,
-
                 ease: FILTER_EASE,
               },
-
               y: {
                 duration: 0.65,
-
                 delay: 0.8,
-
                 ease: FILTER_EASE,
               },
-
               x: {
                 duration: 0.35,
-
                 ease: FILTER_EASE,
               },
             }}
             className="
               group
-
               mt-5
 
               flex
               w-fit
+
               cursor-pointer
               items-center
               gap-2.5
@@ -755,6 +855,7 @@ export default function ProjectsDesktopFilter({
               className="
                 relative
                 block
+
                 h-[9px]
                 w-[9px]
                 shrink-0
@@ -802,15 +903,10 @@ export default function ProjectsDesktopFilter({
 
 type FilterButtonProps = {
   label: string;
-
   active: boolean;
-
   disabled: boolean;
-
   onClick: () => void;
-
   revealStarted: boolean;
-
   revealDelay: number;
 };
 
@@ -831,7 +927,6 @@ function FilterButton({
       initial={false}
       animate={{
         opacity: disabled ? 0.15 : 1,
-
         x: 0,
       }}
       whileHover={
@@ -851,13 +946,10 @@ function FilterButton({
       transition={{
         x: {
           duration: 0.38,
-
           ease: FILTER_EASE,
         },
-
         opacity: {
           duration: 0.3,
-
           ease: FILTER_EASE,
         },
       }}
@@ -871,7 +963,6 @@ function FilterButton({
         py-[5px]
 
         text-left
-
         text-[11px]
         font-black
         uppercase
@@ -912,14 +1003,11 @@ function FilterButton({
 
 type PopupFilterButtonProps = {
   label: string;
-
   active: boolean;
-
   disabled: boolean;
-
   onClick: () => void;
-
   index: number;
+  buttonRef?: React.Ref<HTMLButtonElement>;
 };
 
 function PopupFilterButton({
@@ -928,21 +1016,21 @@ function PopupFilterButton({
   disabled,
   onClick,
   index,
+  buttonRef,
 }: PopupFilterButtonProps) {
   return (
     <motion.button
+      ref={buttonRef}
       type="button"
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
       initial={{
         opacity: 0,
-
         y: 5,
       }}
       animate={{
         opacity: disabled ? 0.22 : 1,
-
         y: 0,
       }}
       whileHover={
@@ -955,65 +1043,63 @@ function PopupFilterButton({
       transition={{
         opacity: {
           duration: 0.4,
-
           delay: Math.min(index, 10) * 0.018,
-
           ease: FILTER_EASE,
         },
-
         y: {
           duration: 0.45,
-
           delay: Math.min(index, 10) * 0.018,
-
           ease: FILTER_EASE,
         },
-
         x: {
           duration: 0.32,
-
           ease: FILTER_EASE,
         },
       }}
       className={`
-        group
+  group
 
-        flex
-        min-h-[34px]
-        w-full
-        min-w-0
-        items-center
+  flex
+  min-h-[34px]
+  w-full
+  min-w-0
+  items-center
 
-        px-2
+  px-2
 
-        text-left
+  text-left
+  text-[9px]
+  font-black
+  uppercase
+  tracking-[0.14em]
 
-        text-[9px]
-        font-black
-        uppercase
-        tracking-[0.14em]
+  outline-none
+  focus:outline-none
+  focus-visible:outline-none
+  focus-visible:ring-0
+  focus-visible:bg-black/20
 
-        ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
+  ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
 
-        ${
-          active
-            ? `
-              bg-black/[0.22]
-              text-white
-            `
-            : `
-              text-white/60
-
-              hover:bg-black/[0.10]
-              hover:text-white
-            `
-        }
-      `}
+  ${
+    active
+      ? `
+        bg-black/[0.22]
+        text-white
+      `
+      : `
+        text-white/60
+        hover:bg-black/[0.10]
+        hover:text-white
+      `
+  }
+`}
     >
       <span className="truncate">{label}</span>
 
       {active ? (
         <span
+          aria-hidden="true"
           className="
             ml-auto
             pl-3
