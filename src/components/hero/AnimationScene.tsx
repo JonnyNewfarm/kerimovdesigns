@@ -384,6 +384,7 @@ export default function AnimationScene({
 
       <WorldButton
         label="ANIMATIONS"
+        focusId="animations"
         width={1.8}
         position={[1.65, -1.55, 0.4]}
         onClick={onOpen}

@@ -421,27 +421,56 @@ export default function ContactFormPanel({
                       ease: contactEase,
                     }}
                     className="
-                      group relative mt-1.5 shrink-0
-                      cursor-pointer border-0 bg-transparent
-                      p-0 text-[9px] font-black uppercase
-                      tracking-[0.16em] text-white/70
-                      transition-colors duration-300
-                      hover:text-white
-                    "
+    group
+    relative
+    mt-1.5
+    shrink-0
+    cursor-pointer
+    border-0
+    bg-transparent
+    p-0
+
+    text-[9px]
+    font-black
+    uppercase
+    tracking-[0.16em]
+    text-white/70
+
+    outline-none
+    focus-visible:outline-none
+    focus-visible:text-white
+
+    transition-colors
+    duration-300
+    hover:text-white
+  "
                   >
                     <span className="relative block">
                       Close
                       <span
                         aria-hidden="true"
                         className="
-                          absolute -bottom-[4px] left-0
-                          h-px w-full origin-right scale-x-0
-                          bg-current transition-transform
-                          duration-500
-                          ease-[cubic-bezier(0.76,0,0.24,1)]
-                          group-hover:origin-left
-                          group-hover:scale-x-100
-                        "
+        pointer-events-none
+        absolute
+        -bottom-[4px]
+        left-0
+        h-[2px]
+        w-full
+
+        origin-right
+        scale-x-0
+        bg-current
+
+        transition-transform
+        duration-500
+        ease-[cubic-bezier(0.76,0,0.24,1)]
+
+        group-hover:origin-left
+        group-hover:scale-x-100
+
+        group-focus-visible:origin-left
+        group-focus-visible:scale-x-100
+      "
                       />
                     </span>
                   </motion.button>

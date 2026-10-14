@@ -15,11 +15,8 @@ export default function VisualScene({
   onOpen,
 }: {
   scale: number;
-
   textures: Texture[];
-
   isMobile: boolean;
-
   onOpen: () => void;
 }) {
   const angle = WORLD_SECTIONS[1].angle;
@@ -48,6 +45,7 @@ export default function VisualScene({
 
       <WorldButton
         label="VISUAL IDENTITIES"
+        focusId="visual-identity"
         width={1.91}
         position={[1.35, -1.65, 0.45]}
         onClick={onOpen}

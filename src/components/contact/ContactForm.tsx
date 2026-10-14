@@ -461,10 +461,32 @@ export default function ContactForm() {
             target="_blank"
             rel="noreferrer"
             className="
-        transition-opacity
-        duration-300
-        hover:opacity-50
-      "
+  relative
+  group
+  inline-block
+
+  transition-opacity
+  duration-300
+  hover:opacity-50
+
+  outline-none
+  focus-visible:outline-none
+
+  after:pointer-events-none
+  after:absolute
+  after:-bottom-[3px]
+  after:left-0
+  after:h-[2px]
+  after:w-full
+  after:origin-left
+  after:scale-x-0
+  after:bg-current
+  after:content-['']
+  after:transition-transform
+  after:duration-300
+
+  focus-visible:after:scale-x-100
+"
           >
             LinkedIn
           </a>
@@ -474,10 +496,32 @@ export default function ContactForm() {
             target="_blank"
             rel="noreferrer"
             className="
-        transition-opacity
-        duration-300
-        hover:opacity-50
-      "
+  relative
+  group
+  inline-block
+
+  transition-opacity
+  duration-300
+  hover:opacity-50
+
+  outline-none
+  focus-visible:outline-none
+
+  after:pointer-events-none
+  after:absolute
+  after:-bottom-[3px]
+  after:left-0
+  after:h-[2px]
+  after:w-full
+  after:origin-left
+  after:scale-x-0
+  after:bg-current
+  after:content-['']
+  after:transition-transform
+  after:duration-300
+
+  focus-visible:after:scale-x-100
+"
           >
             Instagram
           </a>
@@ -485,12 +529,32 @@ export default function ContactForm() {
           <a
             href="mailto:rustam-98@hotmail.com"
             className="
-        tracking-normal
+  relative
+  group
+  inline-block
 
-        transition-opacity
-        duration-300
-        hover:opacity-50
-      "
+  transition-opacity
+  duration-300
+  hover:opacity-50
+
+  outline-none
+  focus-visible:outline-none
+
+  after:pointer-events-none
+  after:absolute
+  after:-bottom-[3px]
+  after:left-0
+  after:h-[2px]
+  after:w-full
+  after:origin-left
+  after:scale-x-0
+  after:bg-current
+  after:content-['']
+  after:transition-transform
+  after:duration-300
+
+  focus-visible:after:scale-x-100
+"
           >
             rustam-98@hotmail.com
           </a>

@@ -15,11 +15,8 @@ export default function TypographyScene({
   onOpen,
 }: {
   scale: number;
-
   textures: Texture[];
-
   isMobile: boolean;
-
   onOpen: () => void;
 }) {
   const angle = WORLD_SECTIONS[4].angle;
@@ -48,6 +45,7 @@ export default function TypographyScene({
 
       <WorldButton
         label="TYPOGRAPHY"
+        focusId="typography"
         width={1.75}
         position={[1.8, -1.82, 0.5]}
         onClick={onOpen}

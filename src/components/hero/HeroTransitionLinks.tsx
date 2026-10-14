@@ -73,7 +73,6 @@ const focusLinkClassName = `
 
 export default function HeroTransitionLinks({
   enabled,
-
   scrollToSection,
 
   contactTransitionRef,
@@ -105,6 +104,7 @@ export default function HeroTransitionLinks({
         ref={visualIdentityTransitionRef}
         href="/projects?tags=visual-identity"
         transitionLabel="Visual Identity"
+        data-hero-focus="visual-identity"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -118,6 +118,7 @@ export default function HeroTransitionLinks({
         ref={posterTransitionRef}
         href="/projects?tags=posters"
         transitionLabel="Posters"
+        data-hero-focus="posters"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -131,6 +132,7 @@ export default function HeroTransitionLinks({
         ref={animationTransitionRef}
         href="/projects?tags=animations"
         transitionLabel="Animations"
+        data-hero-focus="animations"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -144,6 +146,7 @@ export default function HeroTransitionLinks({
         ref={typographyTransitionRef}
         href="/projects?tags=typography"
         transitionLabel="Typography"
+        data-hero-focus="typography"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -158,6 +161,7 @@ export default function HeroTransitionLinks({
         href="/project/69300cd7a94f6af6c6b7d9d8"
         transitionLabel="DRØMMENES MELODI"
         transitionColor={PROJECT_TRANSITION_COLORS.DREAM_PROJECT}
+        data-hero-focus="dream-project"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -172,6 +176,7 @@ export default function HeroTransitionLinks({
         href="/project/6a738fe5c50ff327148b02f9"
         transitionLabel="POSTERS BUNDLE #1"
         transitionColor={PROJECT_TRANSITION_COLORS.POSTERS_BUNDLE}
+        data-hero-focus="posters-bundle"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -186,6 +191,7 @@ export default function HeroTransitionLinks({
         href="/project/6a873e144aea474cdeae7a76"
         transitionLabel="KISTEFOSS MUSEUM"
         transitionColor={PROJECT_TRANSITION_COLORS.KISTEFOSS}
+        data-hero-focus="kistefoss"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -200,6 +206,7 @@ export default function HeroTransitionLinks({
         href="/project/6a873ba44aea474cdeae7a75"
         transitionLabel="AURELIS CAPITAL"
         transitionColor={PROJECT_TRANSITION_COLORS.AURELIS}
+        data-hero-focus="aurelis"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -214,6 +221,7 @@ export default function HeroTransitionLinks({
         href="/project/6930b50f931d3caa254b3237"
         transitionLabel="ART EXHIBITION"
         transitionColor={PROJECT_TRANSITION_COLORS.ART_EXHIBITION}
+        data-hero-focus="art-exhibition"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {
@@ -227,6 +235,7 @@ export default function HeroTransitionLinks({
         ref={contactTransitionRef}
         href="/projects"
         transitionLabel="All Projects"
+        data-hero-focus="all-projects"
         tabIndex={tabIndex}
         className={focusLinkClassName}
         onFocus={() => {

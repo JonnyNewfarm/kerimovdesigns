@@ -4,7 +4,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 
 import React, { useMemo, useRef } from "react";
 
-import { Group, ShaderMaterial, Vector2 } from "three";
+import { Group, MeshBasicMaterial, ShaderMaterial, Vector2 } from "three";
 
 import * as THREE from "three";
 
@@ -29,9 +29,7 @@ function BendColorPlane({
 }: {
   width: number;
   height: number;
-
   bendStrength?: number;
-
   hoverBendRef: React.MutableRefObject<Vector2>;
 }) {
   const materialRef = useRef<ShaderMaterial | null>(null);
@@ -43,15 +41,12 @@ function BendColorPlane({
       uTime: {
         value: 0,
       },
-
       uSpeed: {
         value: 0.7,
       },
-
       uDelta: {
         value: new Vector2(0, 0),
       },
-
       uAmplitude: {
         value: 0.0026,
       },
@@ -72,7 +67,6 @@ function BendColorPlane({
 
     material.uniforms.uDelta.value.set(
       scrollX * bendStrength + hoverBendRef.current.x,
-
       scrollY * bendStrength + hoverBendRef.current.y,
     );
 
@@ -96,31 +90,31 @@ function BendColorPlane({
   );
 }
 
-export default function WorldButton({
-  label,
-  position,
-
-  width = 2,
-
-  height = 0.48,
-
-  fontSize = 220,
-
-  onClick,
-}: {
+type WorldButtonProps = {
   label: string;
-
   position: Position;
 
   width?: number;
-
   height?: number;
-
   fontSize?: number;
 
+  focusId?: string;
+
   onClick: () => void;
-}) {
+};
+
+export default function WorldButton({
+  label,
+  position,
+  width = 2,
+  height = 0.48,
+  fontSize = 220,
+  focusId,
+  onClick,
+}: WorldButtonProps) {
   const ref = useRef<Group>(null);
+
+  const focusBorderMaterialRef = useRef<MeshBasicMaterial | null>(null);
 
   const pointerTarget = useRef(new Vector2(0.5, 0.5));
 
@@ -142,6 +136,10 @@ export default function WorldButton({
 
   const scaleVelocity = useRef(0);
 
+  const zCurrent = useRef(0);
+
+  const zVelocity = useRef(0);
+
   useFrame((_, rawDelta) => {
     const group = ref.current;
 
@@ -151,6 +149,16 @@ export default function WorldButton({
 
     const delta = Math.min(rawDelta, 1 / 30);
 
+    // The matching HTML link owns keyboard focus.
+    const activeElement = document.activeElement;
+
+    const isKeyboardFocused =
+      Boolean(focusId) &&
+      activeElement instanceof HTMLElement &&
+      activeElement.dataset.heroFocus === focusId &&
+      activeElement.matches(":focus-visible");
+
+    // Existing pointer smoothing.
     const pointerFollow = 1 - Math.exp(-delta * 7);
 
     smoothPointer.current.lerp(pointerTarget.current, pointerFollow);
@@ -160,7 +168,6 @@ export default function WorldButton({
     const rawDifferenceY = pointerTarget.current.y - smoothPointer.current.y;
 
     const bendStrengthX = 55;
-
     const bendStrengthY = 35;
 
     const targetBendX = hovered.current ? rawDifferenceX * bendStrengthX : 0;
@@ -168,7 +175,6 @@ export default function WorldButton({
     const targetBendY = hovered.current ? rawDifferenceY * bendStrengthY : 0;
 
     const bendStiffness = hovered.current ? 100 : 75;
-
     const bendDamping = hovered.current ? 17 : 13;
 
     bendVelocity.current.x +=
@@ -185,18 +191,16 @@ export default function WorldButton({
 
     hoverBend.current.y = THREE.MathUtils.clamp(hoverBend.current.y, -32, 32);
 
+    // Existing mouse-follow position.
     const maxFollowX = 0.1;
-
     const maxFollowY = 0.055;
 
     positionTarget.current.set(
       hovered.current ? (pointerTarget.current.x - 0.5) * maxFollowX * 2 : 0,
-
       hovered.current ? (pointerTarget.current.y - 0.5) * maxFollowY * 2 : 0,
     );
 
     const positionStiffness = hovered.current ? 28 : 55;
-
     const positionDamping = hovered.current ? 8 : 10;
 
     positionVelocity.current.x +=
@@ -213,18 +217,11 @@ export default function WorldButton({
 
     positionCurrent.current.addScaledVector(positionVelocity.current, delta);
 
-    group.position.set(
-      position[0] + positionCurrent.current.x,
-
-      position[1] + positionCurrent.current.y,
-
-      position[2],
-    );
-
-    const scaleTarget = hovered.current ? 1.1 : 1;
+    // Keyboard focus gets stronger scale.
+    // Mouse hover keeps its original scale.
+    const scaleTarget = isKeyboardFocused ? 1.14 : hovered.current ? 1.1 : 1;
 
     const scaleStiffness = 65;
-
     const scaleDamping = 13;
 
     scaleVelocity.current +=
@@ -234,7 +231,37 @@ export default function WorldButton({
 
     scaleCurrent.current += scaleVelocity.current * delta;
 
+    // Move the button slightly forward when focused.
+    const targetZ = isKeyboardFocused ? 0.14 : 0;
+
+    const zStiffness = 65;
+    const zDamping = 13;
+
+    zVelocity.current += (targetZ - zCurrent.current) * zStiffness * delta;
+
+    zVelocity.current *= Math.exp(-zDamping * delta);
+
+    zCurrent.current += zVelocity.current * delta;
+
+    group.position.set(
+      position[0] + positionCurrent.current.x,
+      position[1] + positionCurrent.current.y,
+      position[2] + zCurrent.current,
+    );
+
     group.scale.setScalar(scaleCurrent.current);
+
+    // Thin, visible keyboard-focus border.
+    const borderMaterial = focusBorderMaterialRef.current;
+
+    if (borderMaterial) {
+      borderMaterial.opacity = THREE.MathUtils.damp(
+        borderMaterial.opacity,
+        isKeyboardFocused ? 0.9 : 0,
+        12,
+        delta,
+      );
+    }
   });
 
   function handleEnter(event: ThreeEvent<PointerEvent>) {
@@ -244,7 +271,6 @@ export default function WorldButton({
 
     if (event.uv) {
       pointerTarget.current.copy(event.uv);
-
       smoothPointer.current.copy(event.uv);
     }
 
@@ -288,6 +314,20 @@ export default function WorldButton({
       onPointerLeave={handleLeave}
       onClick={handleClick}
     >
+      {/* Thin focus border behind the button */}
+      <mesh position={[0, 0, -0.015]}>
+        <planeGeometry args={[width + 0.045, height + 0.045]} />
+
+        <meshBasicMaterial
+          ref={focusBorderMaterialRef}
+          color="#ece7dc"
+          transparent
+          opacity={0}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+
       <BendColorPlane
         width={width}
         height={height}

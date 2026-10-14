@@ -15,11 +15,8 @@ export default function PostersScene({
   onOpen,
 }: {
   scale: number;
-
   textures: Texture[];
-
   isMobile: boolean;
-
   onOpen: () => void;
 }) {
   const angle = WORLD_SECTIONS[2].angle;
@@ -48,6 +45,7 @@ export default function PostersScene({
 
       <WorldButton
         label="POSTERS DESIGN"
+        focusId="posters"
         width={1.9}
         position={[1.75, -1.55, 0.42]}
         onClick={onOpen}

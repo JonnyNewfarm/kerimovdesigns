@@ -25,19 +25,108 @@ const infoVariants = {
     x: 12,
     filter: "blur(5px)",
   },
-
   visible: {
     opacity: 1,
     x: 0,
     scale: 1,
     filter: "blur(0px)",
-
     transition: {
       duration: 0.58,
       ease: [0.16, 1, 0.3, 1],
     },
   },
 } as const;
+
+type HeroBottomInfoProps = {
+  title: string;
+  color: string;
+  href: string;
+  showWorld: boolean;
+  isBottomInfoOpen: boolean;
+  isBottomInfoClosing: boolean;
+  openBottomInfo: () => void;
+};
+
+function LatestProjectLink({
+  title,
+  color,
+  href,
+}: {
+  title: string;
+  color: string;
+  href: string;
+}) {
+  return (
+    <TransitionLink
+      href={`/project/${href}`}
+      transitionColor={color}
+      className="
+        group
+        relative
+        inline-block
+        w-fit
+        whitespace-nowrap
+
+        outline-none
+        focus:outline-none
+        focus-visible:outline-none
+      "
+    >
+      <span>{title}</span>
+
+      <span
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          bottom-0
+          left-0
+          h-px
+          w-full
+          overflow-hidden
+
+          group-focus-visible:h-[2px]
+        "
+      >
+        <span
+          className="
+            absolute
+            inset-0
+
+            origin-right
+            scale-x-100
+            bg-current
+
+            transition-transform
+            duration-500
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+
+            group-hover:scale-x-0
+          "
+        />
+
+        <span
+          className="
+            absolute
+            inset-0
+
+            origin-left
+            scale-x-0
+            bg-current
+
+            transition-transform
+            duration-500
+            delay-0
+            ease-[cubic-bezier(0.76,0,0.24,1)]
+
+            group-hover:scale-x-100
+            group-hover:delay-[180ms]
+          "
+        />
+      </span>
+    </TransitionLink>
+  );
+}
 
 export default function HeroBottomInfo({
   title,
@@ -47,15 +136,7 @@ export default function HeroBottomInfo({
   isBottomInfoOpen,
   isBottomInfoClosing,
   openBottomInfo,
-}: {
-  title: string;
-  color: string;
-  href: string;
-  showWorld: boolean;
-  isBottomInfoOpen: boolean;
-  isBottomInfoClosing: boolean;
-  openBottomInfo: () => void;
-}) {
+}: HeroBottomInfoProps) {
   return (
     <motion.div
       initial={false}
@@ -82,25 +163,14 @@ export default function HeroBottomInfo({
         lg:px-[clamp(2.5rem,4.5vw,5rem)]
       "
     >
-      <div
-        className="
-          flex
-          w-full
-          items-end
-          justify-end
-
-          lg:hidden
-        "
-      >
+      {/* Mobile */}
+      <div className="flex w-full items-end justify-end lg:hidden">
         <div
           className="
             flex
             items-center
-
             gap-x-1
-
             whitespace-nowrap
-
             text-[12px]
           "
         >
@@ -108,85 +178,12 @@ export default function HeroBottomInfo({
 
           <span>/</span>
 
-          <TransitionLink
-            href={`/project/${href}`}
-            transitionColor={color}
-            className="
-              group
-              relative
-              w-fit
-              whitespace-nowrap
-            "
-          >
-            <span>{title}</span>
-
-            <span
-              className="
-                pointer-events-none
-
-                absolute
-                bottom-0
-                left-0
-
-                h-px
-                w-full
-
-                overflow-hidden
-              "
-            >
-              <span
-                className="
-                  absolute
-                  inset-0
-
-                  origin-right
-                  scale-x-100
-
-                  bg-current
-
-                  transition-transform
-                  duration-500
-                  ease-[cubic-bezier(0.76,0,0.24,1)]
-
-                  group-hover:scale-x-0
-                "
-              />
-
-              <span
-                className="
-                  absolute
-                  inset-0
-
-                  origin-left
-                  scale-x-0
-
-                  bg-current
-
-                  transition-transform
-                  duration-500
-                  delay-0
-                  ease-[cubic-bezier(0.76,0,0.24,1)]
-
-                  group-hover:scale-x-100
-                  group-hover:delay-[180ms]
-                "
-              />
-            </span>
-          </TransitionLink>
+          <LatestProjectLink title={title} color={color} href={href} />
         </div>
       </div>
 
-      <div
-        className="
-          hidden
-          w-full
-          min-w-0
-
-          items-end
-
-          lg:flex
-        "
-      >
+      {/* Desktop */}
+      <div className="hidden w-full min-w-0 items-end lg:flex">
         <motion.div
           initial={false}
           animate={{
@@ -194,15 +191,12 @@ export default function HeroBottomInfo({
           }}
           transition={{
             duration: isBottomInfoClosing || !isBottomInfoOpen ? 0.9 : 0.75,
-
             ease: [0.76, 0, 0.24, 1],
           }}
           style={{
             transformOrigin: "left bottom",
           }}
-          className="
-            shrink-0
-          "
+          className="shrink-0"
         >
           <TextReveal
             as="h1"
@@ -216,15 +210,10 @@ export default function HeroBottomInfo({
             rotate={BOTTOM_REVEAL_ROTATE}
             className="
               satoshi-black
-
               whitespace-nowrap
               lg:text-[clamp(1.7rem,2.2vw,2rem)]
-
-
-
               leading-[0.95]
               tracking-[-0.02em]
-
               text-color
             "
           >
@@ -235,8 +224,7 @@ export default function HeroBottomInfo({
         <div
           className="
             relative
-
-ml-[clamp(5rem,7vw,8rem)]
+            ml-[clamp(5rem,7vw,8rem)]
             min-w-0
             flex-1
           "
@@ -249,20 +237,17 @@ ml-[clamp(5rem,7vw,8rem)]
                 animate={isBottomInfoClosing ? "exit" : "visible"}
                 exit={{
                   opacity: 0,
-
                   transition: {
                     duration: 0.01,
                   },
                 }}
                 variants={{
                   hidden: {},
-
                   visible: {
                     transition: {
                       staggerChildren: 0.085,
                     },
                   },
-
                   exit: {
                     transition: {
                       delayChildren: 0.7,
@@ -272,47 +257,38 @@ ml-[clamp(5rem,7vw,8rem)]
                   },
                 }}
                 className="
+                  ml-2
                   flex
                   w-full
                   min-w-0
-                  ml-2
-
                   items-end
                   justify-between
-
                   gap-x-[clamp(1.5rem,3vw,5rem)]
                 "
               >
+                {/* Latest project */}
                 <motion.div
-                  className="
-                    shrink-0
-                    whitespace-nowrap
-                  "
+                  className="shrink-0 whitespace-nowrap"
                   variants={{
                     ...infoVariants,
-
                     exit: {
                       opacity: 0,
                       x: 46,
                       scale: 0.975,
                       filter: "blur(6px)",
-
                       transition: {
                         x: {
                           duration: 0.72,
                           ease: [0.16, 1, 0.3, 1],
                         },
-
                         opacity: {
                           duration: 0.52,
                           ease: "easeOut",
                         },
-
                         scale: {
                           duration: 0.7,
                           ease: [0.16, 1, 0.3, 1],
                         },
-
                         filter: {
                           duration: 0.58,
                           ease: "easeOut",
@@ -332,11 +308,8 @@ ml-[clamp(5rem,7vw,8rem)]
                       className="
                         flex
                         items-center
-
                         gap-x-1
-
                         whitespace-nowrap
-
                         text-[clamp(0.7rem,0.9vw,0.875rem)]
                       "
                     >
@@ -346,105 +319,38 @@ ml-[clamp(5rem,7vw,8rem)]
 
                       <span>/</span>
 
-                      <TransitionLink
-                        href={`/project/${href}`}
-                        transitionColor={color}
-                        className="
-                          group
-                          relative
-                          w-fit
-                          whitespace-nowrap
-                        "
-                      >
-                        <span>{title}</span>
-
-                        <span
-                          className="
-                            pointer-events-none
-
-                            absolute
-                            bottom-0
-                            left-0
-
-                            h-px
-                            w-full
-
-                            overflow-hidden
-                          "
-                        >
-                          <span
-                            className="
-                              absolute
-                              inset-0
-
-                              origin-right
-                              scale-x-100
-
-                              bg-current
-
-                              transition-transform
-                              duration-500
-                              ease-[cubic-bezier(0.76,0,0.24,1)]
-
-                              group-hover:scale-x-0
-                            "
-                          />
-
-                          <span
-                            className="
-                              absolute
-                              inset-0
-
-                              origin-left
-                              scale-x-0
-
-                              bg-current
-
-                              transition-transform
-                              duration-500
-                              delay-0
-                              ease-[cubic-bezier(0.76,0,0.24,1)]
-
-                              group-hover:scale-x-100
-                              group-hover:delay-[180ms]
-                            "
-                          />
-                        </span>
-                      </TransitionLink>
+                      <LatestProjectLink
+                        title={title}
+                        color={color}
+                        href={href}
+                      />
                     </div>
                   </LinkReveal>
                 </motion.div>
 
+                {/* Status */}
                 <motion.div
-                  className="
-                    shrink-0
-                    whitespace-nowrap
-                  "
+                  className="shrink-0 whitespace-nowrap"
                   variants={{
                     ...infoVariants,
-
                     exit: {
                       opacity: 0,
                       x: 52,
                       scale: 0.975,
                       filter: "blur(6px)",
-
                       transition: {
                         x: {
                           duration: 0.72,
                           ease: [0.16, 1, 0.3, 1],
                         },
-
                         opacity: {
                           duration: 0.52,
                           ease: "easeOut",
                         },
-
                         scale: {
                           duration: 0.7,
                           ease: [0.16, 1, 0.3, 1],
                         },
-
                         filter: {
                           duration: 0.58,
                           ease: "easeOut",
@@ -465,11 +371,8 @@ ml-[clamp(5rem,7vw,8rem)]
                     rotate={BOTTOM_REVEAL_ROTATE}
                     className="
                       satoshi-black
-
                       whitespace-nowrap
-
                       text-[clamp(0.7rem,0.9vw,0.875rem)]
-
                       text-color
                     "
                   >
@@ -477,36 +380,29 @@ ml-[clamp(5rem,7vw,8rem)]
                   </TextReveal>
                 </motion.div>
 
+                {/* Local time */}
                 <motion.div
-                  className="
-                    shrink-0
-                    whitespace-nowrap
-                  "
+                  className="shrink-0 whitespace-nowrap"
                   variants={{
                     ...infoVariants,
-
                     exit: {
                       opacity: 0,
                       x: 58,
                       scale: 0.975,
                       filter: "blur(6px)",
-
                       transition: {
                         x: {
                           duration: 0.72,
                           ease: [0.16, 1, 0.3, 1],
                         },
-
                         opacity: {
                           duration: 0.52,
                           ease: "easeOut",
                         },
-
                         scale: {
                           duration: 0.7,
                           ease: [0.16, 1, 0.3, 1],
                         },
-
                         filter: {
                           duration: 0.58,
                           ease: "easeOut",
@@ -525,11 +421,8 @@ ml-[clamp(5rem,7vw,8rem)]
                     <p
                       className="
                         satoshi-black
-
                         whitespace-nowrap
-
                         text-[clamp(0.7rem,0.9vw,0.875rem)]
-
                         text-color
                       "
                     >
@@ -565,23 +458,48 @@ ml-[clamp(5rem,7vw,8rem)]
                 }}
                 className="
                   satoshi-black
+                  group
 
                   absolute
                   bottom-0
                   right-0
 
                   cursor-pointer
-
                   whitespace-nowrap
-
                   uppercase
 
                   text-[clamp(0.7rem,0.9vw,0.875rem)]
-
                   text-color
+
+                  outline-none
+                  focus:outline-none
+                  focus-visible:outline-none
                 "
               >
-                Open info
+                <span
+                  className="
+                    relative
+                    inline-block
+                    pb-[3px]
+
+                    after:pointer-events-none
+                    after:absolute
+                    after:bottom-0
+                    after:left-0
+                    after:h-[2px]
+                    after:w-full
+                    after:origin-left
+                    after:scale-x-0
+                    after:bg-current
+                    after:content-['']
+                    after:transition-transform
+                    after:duration-300
+
+                    group-focus-visible:after:scale-x-100
+                  "
+                >
+                  Open info
+                </span>
               </motion.button>
             )}
           </AnimatePresence>

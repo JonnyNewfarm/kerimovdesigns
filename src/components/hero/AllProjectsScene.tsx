@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Color, Group, ShaderMaterial, Texture, Vector2 } from "three";
 import * as THREE from "three";
 
@@ -12,58 +12,37 @@ import {
 } from "./portfolioImageShaders";
 
 import { WORLD_SECTIONS } from "./portfolioWorldConstants";
-
 import type { Position } from "./portfolioWorldTypes";
-
 import { getCoverUv, SceneShell, TextPlane } from "./PortfolioPrimitives";
-
 import { useRingMotion } from "./RingMotionContext";
-
 import WorldButton from "./WorldButton";
 
 function ProjectLabel({
   title,
-
   width,
   height,
-
   labelWidth,
-
   labelHeight = 0.26,
-
   labelInsetX = 0.1,
   labelInsetY = 0.1,
-
   labelShaderColors,
-
   labelShaderSpeed = 0.7,
-
   labelTextColor,
-
   scaleRef,
 }: {
   title: string;
-
   width: number;
   height: number;
-
   labelWidth: number;
-
   labelHeight?: number;
-
   labelInsetX?: number;
   labelInsetY?: number;
-
   labelShaderColors: [string, string, string];
-
   labelShaderSpeed?: number;
-
   labelTextColor: string;
-
   scaleRef: React.MutableRefObject<number>;
 }) {
   const ref = useRef<Group | null>(null);
-
   const materialRef = useRef<ShaderMaterial | null>(null);
 
   const [colorA, colorB, colorC] = labelShaderColors;
@@ -73,19 +52,15 @@ function ProjectLabel({
       uTime: {
         value: 0,
       },
-
       uSpeed: {
         value: labelShaderSpeed,
       },
-
       uColorA: {
         value: new Color(colorA),
       },
-
       uColorB: {
         value: new Color(colorB),
       },
-
       uColorC: {
         value: new Color(colorC),
       },
@@ -98,7 +73,6 @@ function ProjectLabel({
       const scale = Math.max(0, scaleRef.current);
 
       ref.current.scale.set(scale, scale, 1);
-
       ref.current.visible = scale > 0.001;
     }
 
@@ -110,7 +84,6 @@ function ProjectLabel({
   const actualLabelWidth = Math.min(labelWidth, width - labelInsetX * 2);
 
   const x = -width / 2 + labelInsetX + actualLabelWidth / 2;
-
   const y = height / 2 - labelInsetY - labelHeight / 2;
 
   return (
@@ -130,10 +103,7 @@ function ProjectLabel({
               gl_Position =
                 projectionMatrix *
                 modelViewMatrix *
-                vec4(
-                  position,
-                  1.0
-                );
+                vec4(position, 1.0);
             }
           `}
           fragmentShader={projectLabelFragmentShader}
@@ -165,123 +135,76 @@ function ProjectLabel({
 
 function ProjectHoverImage({
   title,
-
   texture,
-
   position,
-
   width,
   height,
-
   labelWidth = 1.1,
-
   labelHeight = 0.26,
-
   labelInsetX = 0.1,
-
   labelInsetY = 0.1,
-
   labelShaderColors = ["#41413d", "#5b5b55", "#77776f"],
-
   labelShaderSpeed = 0.9,
-
   labelTextColor = "#ffffff",
-
   rotationZ = 0,
-
   bendStrength = 1,
-
   hoverScale = 1.08,
-
   hoverZ = 1.15,
-
   renderOrder = 0,
-
   isMobile,
-
   isActive,
-
+  isKeyboardFocused,
   isDimmed,
-
   onHoverChange,
-
   onClick,
 }: {
   title: string;
-
   texture: Texture;
-
   position: Position;
-
   width: number;
   height: number;
-
   labelWidth?: number;
-
   labelHeight?: number;
-
   labelInsetX?: number;
-
   labelInsetY?: number;
-
   labelBgColor?: string;
-
   labelTextColor?: string;
-
   rotationZ?: number;
-
   bendStrength?: number;
-
   labelShaderColors?: [string, string, string];
-
   labelShaderSpeed?: number;
-
   hoverScale?: number;
-
   hoverZ?: number;
-
   renderOrder?: number;
-
   isMobile: boolean;
-
   isActive: boolean;
-
+  isKeyboardFocused: boolean;
   isDimmed: boolean;
-
   onHoverChange: (hovered: boolean) => void;
-
   onClick: () => void;
 }) {
   const groupRef = useRef<Group | null>(null);
-
   const materialRef = useRef<ShaderMaterial | null>(null);
 
   const hovered = useRef(false);
 
   const pointerTarget = useRef(new Vector2(0.5, 0.5));
-
   const smoothPointer = useRef(new Vector2(0.5, 0.5));
 
   const hoverBend = useRef(new Vector2(0, 0));
-
   const hoverBendVelocity = useRef(new Vector2(0, 0));
 
   const positionTarget = useRef(new Vector2(0, 0));
-
   const positionCurrent = useRef(new Vector2(0, 0));
-
   const positionVelocity = useRef(new Vector2(0, 0));
 
   const scaleCurrent = useRef(1);
-
   const scaleVelocity = useRef(0);
 
   const zCurrent = useRef(0);
-
   const zVelocity = useRef(0);
 
   const labelScale = useRef(0);
-
   const labelVelocity = useRef(0);
 
   const { difference } = useRingMotion();
@@ -296,19 +219,15 @@ function ProjectHoverImage({
       uTexture: {
         value: texture,
       },
-
       uDelta: {
         value: new Vector2(0, 0),
       },
-
       uAmplitude: {
         value: 0.00145,
       },
-
       uUvScale: {
         value: cover.scale,
       },
-
       uUvOffset: {
         value: cover.offset,
       },
@@ -318,7 +237,6 @@ function ProjectHoverImage({
 
   useFrame((_, rawDelta) => {
     const group = groupRef.current;
-
     const material = materialRef.current;
 
     if (!group || !material) {
@@ -331,31 +249,24 @@ function ProjectHoverImage({
       hovered.current = false;
 
       pointerTarget.current.set(0.5, 0.5);
-
       smoothPointer.current.set(0.5, 0.5);
 
       hoverBend.current.set(0, 0);
-
       hoverBendVelocity.current.set(0, 0);
 
       positionTarget.current.set(0, 0);
-
       positionCurrent.current.set(0, 0);
-
       positionVelocity.current.set(0, 0);
 
       scaleCurrent.current = 1;
-
       scaleVelocity.current = 0;
 
       group.scale.set(1, 1, 1);
 
       zCurrent.current = 0;
-
       zVelocity.current = 0;
 
       labelScale.current = 0;
-
       labelVelocity.current = 0;
 
       group.position.set(position[0], position[1], position[2]);
@@ -370,7 +281,6 @@ function ProjectHoverImage({
 
       material.uniforms.uDelta.value.set(
         scrollX * bendStrength,
-
         scrollY * bendStrength,
       );
 
@@ -390,7 +300,6 @@ function ProjectHoverImage({
     const targetHoverBendY = hovered.current ? diffY * 65 : 0;
 
     const bendStiffness = 90;
-
     const bendDamping = 16;
 
     hoverBendVelocity.current.x +=
@@ -409,22 +318,18 @@ function ProjectHoverImage({
 
     material.uniforms.uDelta.value.set(
       scrollX * bendStrength + hoverBend.current.x,
-
       scrollY * bendStrength + hoverBend.current.y,
     );
 
     const maxFollowX = width * 0.055;
-
     const maxFollowY = height * 0.035;
 
     positionTarget.current.set(
       hovered.current ? (pointerTarget.current.x - 0.5) * maxFollowX * 2 : 0,
-
       hovered.current ? (pointerTarget.current.y - 0.5) * maxFollowY * 2 : 0,
     );
 
     const positionStiffness = hovered.current ? 32 : 58;
-
     const positionDamping = hovered.current ? 8.5 : 11;
 
     positionVelocity.current.x +=
@@ -441,6 +346,7 @@ function ProjectHoverImage({
 
     positionCurrent.current.addScaledVector(positionVelocity.current, delta);
 
+    // Same spring animation for hover and keyboard focus.
     const scaleTarget = isActive ? hoverScale : isDimmed ? 0.985 : 1;
 
     scaleVelocity.current += (scaleTarget - scaleCurrent.current) * 70 * delta;
@@ -461,13 +367,12 @@ function ProjectHoverImage({
 
     group.position.set(
       position[0] + positionCurrent.current.x,
-
       position[1] + positionCurrent.current.y,
-
       position[2] + zCurrent.current,
     );
 
-    const labelTarget = hovered.current ? 1 : 0;
+    // Show the animated label on hover or keyboard focus.
+    const labelTarget = hovered.current || isKeyboardFocused ? 1 : 0;
 
     labelVelocity.current += (labelTarget - labelScale.current) * 85 * delta;
 
@@ -480,12 +385,10 @@ function ProjectHoverImage({
     event.stopPropagation();
 
     hovered.current = true;
-
     onHoverChange(true);
 
     if (event.uv) {
       pointerTarget.current.copy(event.uv);
-
       smoothPointer.current.copy(event.uv);
     }
 
@@ -506,7 +409,6 @@ function ProjectHoverImage({
     event.stopPropagation();
 
     hovered.current = false;
-
     onHoverChange(false);
 
     pointerTarget.current.set(0.5, 0.5);
@@ -539,6 +441,7 @@ function ProjectHoverImage({
         <planeGeometry
           args={[width, height, isMobile ? 14 : 28, isMobile ? 16 : 32]}
         />
+
         <shaderMaterial
           ref={materialRef}
           uniforms={uniforms}
@@ -573,29 +476,18 @@ function ProjectHoverImage({
 
 export default function AllProjectsScene({
   scale,
-
   textures,
-
   onOpen,
-
   isMobile,
-
   dreamProjectTransitionRef,
-
   postersBundleTransitionRef,
-
   kistefossTransitionRef,
-
   aurelisTransitionRef,
-
   artExhibitionTransitionRef,
 }: {
   scale: number;
-
   textures: Texture[];
-
   onOpen: () => void;
-
   isMobile: boolean;
 
   dreamProjectTransitionRef: React.RefObject<HTMLAnchorElement | null>;
@@ -610,14 +502,63 @@ export default function AllProjectsScene({
 }) {
   const angle = WORLD_SECTIONS[5].angle;
 
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
+  // Keyboard focus takes priority over mouse hover.
+  const activeIndex = focusedIndex ?? hoveredIndex;
+
+  useEffect(() => {
+    const focusIds: Record<string, number> = {
+      "dream-project": 0,
+      kistefoss: 1,
+      "posters-bundle": 2,
+      aurelis: 3,
+      "art-exhibition": 4,
+    };
+
+    const updateFocus = () => {
+      const element = document.activeElement;
+
+      const id =
+        element instanceof HTMLElement && element.matches(":focus-visible")
+          ? element.dataset.heroFocus
+          : undefined;
+
+      const nextIndex =
+        id && Object.prototype.hasOwnProperty.call(focusIds, id)
+          ? focusIds[id]
+          : null;
+
+      setFocusedIndex((previous) =>
+        previous === nextIndex ? previous : nextIndex,
+      );
+    };
+
+    const handleFocusChange = () => {
+      queueMicrotask(updateFocus);
+    };
+
+    document.addEventListener("focusin", handleFocusChange);
+    document.addEventListener("focusout", handleFocusChange);
+
+    updateFocus();
+
+    return () => {
+      document.removeEventListener("focusin", handleFocusChange);
+      document.removeEventListener("focusout", handleFocusChange);
+    };
+  }, []);
 
   function setProjectHover(index: number, hovered: boolean) {
     if (isMobile) {
       return;
     }
 
-    setActiveIndex(hovered ? index : null);
+    setHoveredIndex((previous) =>
+      hovered ? index : previous === index ? null : previous,
+    );
   }
 
   return (
@@ -642,6 +583,7 @@ export default function AllProjectsScene({
           rotationZ={-0.035}
           isMobile={isMobile}
           isActive={!isMobile && activeIndex === 0}
+          isKeyboardFocused={!isMobile && focusedIndex === 0}
           isDimmed={!isMobile && activeIndex !== null && activeIndex !== 0}
           onHoverChange={(hovered) => {
             setProjectHover(0, hovered);
@@ -668,6 +610,7 @@ export default function AllProjectsScene({
           rotationZ={0.025}
           isMobile={isMobile}
           isActive={!isMobile && activeIndex === 2}
+          isKeyboardFocused={!isMobile && focusedIndex === 2}
           isDimmed={!isMobile && activeIndex !== null && activeIndex !== 2}
           onHoverChange={(hovered) => {
             setProjectHover(2, hovered);
@@ -694,6 +637,7 @@ export default function AllProjectsScene({
           rotationZ={-0.018}
           isMobile={isMobile}
           isActive={!isMobile && activeIndex === 1}
+          isKeyboardFocused={!isMobile && focusedIndex === 1}
           isDimmed={!isMobile && activeIndex !== null && activeIndex !== 1}
           onHoverChange={(hovered) => {
             setProjectHover(1, hovered);
@@ -720,6 +664,7 @@ export default function AllProjectsScene({
           rotationZ={0.028}
           isMobile={isMobile}
           isActive={!isMobile && activeIndex === 3}
+          isKeyboardFocused={!isMobile && focusedIndex === 3}
           isDimmed={!isMobile && activeIndex !== null && activeIndex !== 3}
           onHoverChange={(hovered) => {
             setProjectHover(3, hovered);
@@ -749,6 +694,7 @@ export default function AllProjectsScene({
           rotationZ={-0.045}
           isMobile={isMobile}
           isActive={!isMobile && activeIndex === 4}
+          isKeyboardFocused={!isMobile && focusedIndex === 4}
           isDimmed={!isMobile && activeIndex !== null && activeIndex !== 4}
           onHoverChange={(hovered) => {
             setProjectHover(4, hovered);
@@ -760,6 +706,7 @@ export default function AllProjectsScene({
 
         <WorldButton
           label="ALL PROJECTS"
+          focusId="all-projects"
           width={1.25}
           height={0.4}
           fontSize={210}
