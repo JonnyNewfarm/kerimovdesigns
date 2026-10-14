@@ -713,22 +713,47 @@ export default function ProjectsDesktopFilter({
                               ease: FILTER_EASE,
                             }}
                             className="
-                              cursor-pointer
+    group
+    cursor-pointer
 
-                              text-[10px]
-                              font-black
-                              uppercase
-                              tracking-[0.18em]
+    text-[10px]
+    font-black
+    uppercase
+    tracking-[0.18em]
+    text-white/75
 
-                              text-white/75
+    outline-none
+    focus-visible:outline-none
+    focus-visible:text-white
 
-                              transition-colors
-                              duration-300
-
-                              hover:text-white
-                            "
+    transition-colors
+    duration-300
+    hover:text-white
+  "
                           >
-                            Clear
+                            <span
+                              className="
+      relative
+      inline-block
+
+      after:pointer-events-none
+      after:absolute
+      after:-bottom-[4px]
+      after:left-0
+      after:h-[2px]
+      after:w-full
+      after:origin-left
+      after:scale-x-0
+      after:bg-current
+      after:content-['']
+      after:transition-transform
+      after:duration-300
+
+      group-focus-visible:after:scale-x-100
+    "
+                            >
+                              Clear
+                            </span>
                           </motion.button>
                         ) : null}
                       </AnimatePresence>
