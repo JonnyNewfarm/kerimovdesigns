@@ -6,7 +6,6 @@
 html, body {
   scrollbar-width: none; 
   -ms-overflow-style: none; 
-  background: #181c14; 
   
   
 }
@@ -81,11 +80,11 @@ body {
 
 
   .bg-dark {
-    background-color:#181c14
+    background-color:#0e100c
   }
 
   .text-color {
-    color: #ecdfcc;
+    color: #ebe8e4;
   }
 .pagination-arrow-icon {
   display: block;

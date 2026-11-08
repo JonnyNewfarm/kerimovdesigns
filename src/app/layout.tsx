@@ -3,12 +3,10 @@ import "./globals.css";
 
 import Navbar from "@/components/navbar/Navbar";
 import NavbarMobile from "@/components/navbar/NavbarMobile";
-import Footer from "@/components/Footer";
 
 import PageTransitionProvider from "@/components/ClientPageTransitionWrapper";
 import { ProjectNavProvider } from "@/components/ProjectNavContext";
 import { HeroIntroProvider } from "@/components/HeroIntroContext";
-import ContactOverlayProvider from "@/components/contact/ContactOverlayProvider";
 
 import { Toaster } from "react-hot-toast";
 
@@ -30,17 +28,11 @@ export default function RootLayout({
       <body>
         <PageTransitionProvider>
           <HeroIntroProvider>
-            <ContactOverlayProvider>
-              <ProjectNavProvider>
-                <Navbar />
+            <ProjectNavProvider>
+              <Navbar />
 
-                <NavbarMobile />
-
-                {children}
-              </ProjectNavProvider>
-
-              <Footer />
-            </ContactOverlayProvider>
+              {children}
+            </ProjectNavProvider>
           </HeroIntroProvider>
         </PageTransitionProvider>
 

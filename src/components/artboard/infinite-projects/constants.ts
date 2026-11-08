@@ -1,0 +1,13 @@
+export const OPENING_WARMUP_MS = 100;
+export const OPEN_DURATION = 0.9;
+export const CLOSE_DURATION = 0.9;
+export const CLOSE_MORPH_DURATION = 1.08;
+export const SCROLL_SMOOTHING = 9;
+export const HOVER_Z_FACTOR = 0.12;
+export const HOVER_SCALE = 1.25;
+export const HOVER_RISE = 0.14;
+export const HOVER_RISE_SPEED = 4.5;
+export const HOVER_SPEED = 5.5;
+export const MOVE_SPEED = 8.5;
+export const EDGE_BEND_STRENGTH = 6;
+export const EDGE_MORPH_STRENGTH = 0.22;
