@@ -1,16 +1,18 @@
 "use client";
 
-import type { RefObject } from "react";
+import type { MutableRefObject } from "react";
 
 type Props = {
-  titleRef: RefObject<HTMLDivElement | null>;
+  titleRef: MutableRefObject<HTMLDivElement | null>;
   title: string;
 };
 
 export default function ProjectTitle({ titleRef, title }: Props) {
   return (
     <div
-      ref={titleRef}
+      ref={(element) => {
+        titleRef.current = element;
+      }}
       aria-hidden="true"
       className="pointer-events-none absolute left-0 top-0 z-[40] max-w-[90vw] break-words font-bueno font-bold uppercase leading-[1.02] tracking-[0.005em] text-white mix-blend-difference"
       style={{

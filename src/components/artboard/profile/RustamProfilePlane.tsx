@@ -299,7 +299,9 @@ export default function RustamProfilePlane({
         }
       },
     });
-    return () => tween.kill();
+    return () => {
+      tween.kill();
+    };
   }, [open, onReadyChange, onClosed]);
   useFrame((state) => {
     const mesh = portraitRef.current;

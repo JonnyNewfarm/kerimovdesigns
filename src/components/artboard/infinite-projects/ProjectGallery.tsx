@@ -657,7 +657,7 @@ export default function ProjectGallery({
       }
 
       // OPEN / CLOSE TRANSFORMATION
-      if (isFocused && transitionStart.current) {
+      if (isFocused && selected && transitionStart.current) {
         const start = transitionStart.current;
 
         const coverAspect = plane.width / plane.height;
@@ -990,7 +990,11 @@ export default function ProjectGallery({
         title.style.opacity = String(
           closingRef.current
             ? 0
-            : THREE.MathUtils.smoothstep(start.hover, 0.015, 0.42) *
+            : THREE.MathUtils.smoothstep(
+                transitionStart.current.hover,
+                0.015,
+                0.42,
+              ) *
                 (1 - THREE.MathUtils.smoothstep(rawProgress, 0, 0.24)),
         );
       } else if (!selected && !mobile) {
