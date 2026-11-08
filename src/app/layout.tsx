@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import Navbar from "@/components/navbar/Navbar";
-import NavbarMobile from "@/components/navbar/NavbarMobile";
 
 import PageTransitionProvider from "@/components/ClientPageTransitionWrapper";
 import { ProjectNavProvider } from "@/components/ProjectNavContext";
