@@ -10,6 +10,7 @@ import {
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import type { InfiniteProject } from "../infinite-projects/types";
+import SitePreloader from "../scene/SitePreloader";
 
 type Props = {
   projects: InfiniteProject[];
@@ -575,7 +576,21 @@ export default function MobilePortfolio({ projects }: Props) {
 
   const [path, setPath] = useState(() => normalizePath(pathname));
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    const previousHtmlOverflow = html.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+
+    html.style.overflow = "auto";
+    body.style.overflow = "auto";
+
+    return () => {
+      html.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+    };
+  }, []);
 
   useEffect(() => {
     setPath(normalizePath(pathname));
@@ -584,47 +599,13 @@ export default function MobilePortfolio({ projects }: Props) {
   useEffect(() => {
     const onPopState = () => {
       setPath(normalizePath(window.location.pathname));
-
-      scrollRef.current?.scrollTo(0, 0);
+      window.scrollTo(0, 0);
     };
 
     window.addEventListener("popstate", onPopState);
 
     return () => {
       window.removeEventListener("popstate", onPopState);
-    };
-  }, []);
-
-  useEffect(() => {
-    const onWheel = (event: WheelEvent) => {
-      const scroller = scrollRef.current;
-
-      if (!scroller || event.ctrlKey) return;
-
-      if (!(event.target instanceof Node) || !scroller.contains(event.target)) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-
-      const unit =
-        event.deltaMode === 1
-          ? 16
-          : event.deltaMode === 2
-            ? scroller.clientHeight
-            : 1;
-
-      scroller.scrollTop += event.deltaY * unit;
-    };
-
-    window.addEventListener("wheel", onWheel, {
-      capture: true,
-      passive: false,
-    });
-
-    return () => {
-      window.removeEventListener("wheel", onWheel, true);
     };
   }, []);
 
@@ -636,8 +617,7 @@ export default function MobilePortfolio({ projects }: Props) {
     }
 
     setPath(next);
-
-    scrollRef.current?.scrollTo(0, 0);
+    window.scrollTo(0, 0);
 
     window.dispatchEvent(new PopStateEvent("popstate"));
   }, []);
@@ -653,46 +633,46 @@ export default function MobilePortfolio({ projects }: Props) {
   const isHome = !isAbout && projectId === null;
 
   return (
-    <div
-      ref={scrollRef}
-      data-lenis-prevent
-      data-lenis-prevent-wheel
-      className="
-        relative h-dvh w-full
-        overflow-x-hidden overflow-y-auto
-        overscroll-y-contain
-        bg-[#0b0c09] text-[#e7e3dd]
-        [touch-action:pan-y]
-        [-webkit-overflow-scrolling:touch]
-      "
-    >
-      <div className={`w-full px-[5%] ${isAbout ? "pt-0" : "pt-[72px]"}`}>
-        <main key={path}>
-          {isHome ? (
-            <MobileHome projects={projects} navigate={navigate} />
-          ) : isAbout ? (
-            <MobileAbout />
-          ) : project ? (
-            <MobileProject project={project} />
-          ) : (
-            <div className="py-24">
-              <h1 className="font-bueno text-3xl font-bold uppercase">
-                Project not found
-              </h1>
+    <>
+      <SitePreloader threeReady={true} />
 
-              <button
-                type="button"
-                className="mt-6 underline"
-                onClick={() => navigate("/")}
-              >
-                Back to work
-              </button>
-            </div>
-          )}
-        </main>
+      <div
+        data-lenis-prevent
+        data-lenis-prevent-wheel
+        className="
+          relative min-h-svh w-full
+          overflow-x-clip
+          bg-[#0b0c09] text-[#e7e3dd]
+        "
+      >
+        <div className={`w-full px-[5%] ${isAbout ? "pt-0" : "pt-[72px]"}`}>
+          <main key={path}>
+            {isHome ? (
+              <MobileHome projects={projects} navigate={navigate} />
+            ) : isAbout ? (
+              <MobileAbout />
+            ) : project ? (
+              <MobileProject project={project} />
+            ) : (
+              <div className="py-24">
+                <h1 className="font-bueno text-3xl font-bold uppercase">
+                  Project not found
+                </h1>
 
-        <MobileFooter />
+                <button
+                  type="button"
+                  className="mt-6 underline"
+                  onClick={() => navigate("/")}
+                >
+                  Back to work
+                </button>
+              </div>
+            )}
+          </main>
+
+          <MobileFooter />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

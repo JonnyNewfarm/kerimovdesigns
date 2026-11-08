@@ -2,7 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useProgress } from "@react-three/drei";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const COUNT_SPEED = 95;
@@ -49,6 +49,7 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
   const { progress, active, loaded, total } = useProgress();
 
   const [dismissed, setDismissed] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   const fillRef = useRef<HTMLSpanElement>(null);
 
@@ -58,7 +59,6 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
   const callbackRef = useRef(onRevealStart);
 
   const assetsReady = !active && (total === 0 || loaded >= total);
-
   const fullyReady = threeReady && assetsReady;
 
   useEffect(() => {
@@ -105,7 +105,6 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
         currentRef.current + COUNT_SPEED * delta,
       );
 
-      // Fill the letters from left to right.
       if (fillRef.current) {
         fillRef.current.style.clipPath = `inset(0 ${100 - currentRef.current}% 0 0)`;
       }
@@ -114,6 +113,8 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
         finished = true;
 
         callbackRef.current?.();
+
+        // Start slide-up animation.
         setDismissed(true);
         return;
       }
@@ -128,40 +129,56 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
     };
   }, []);
 
-  return (
-    <AnimatePresence>
-      {!dismissed && (
-        <motion.div
-          key="site-preloader"
-          initial={false}
-          exit={{
-            y: "-100%",
-          }}
-          transition={{
-            duration: 0.85,
-            ease,
-          }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[#0e100c] text-[#e7e3dd]"
-          role="status"
-          aria-label="Loading portfolio"
-          aria-live="off"
-        >
-          <div className="relative inline-block select-none font-bueno text-xl font-medium uppercase leading-none tracking-[0.22em]">
-            <span className="text-[#e7e3dd]/20">KERIMOV DESIGNS</span>
+  if (hidden) return null;
 
-            <span
-              ref={fillRef}
-              aria-hidden="true"
-              className="absolute inset-0 whitespace-nowrap text-[#e7e3dd]"
-              style={{
-                clipPath: "inset(0 100% 0 0)",
-              }}
-            >
-              KERIMOV DESIGNS
-            </span>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+  return (
+    <motion.div
+      initial={false}
+      animate={{
+        y: dismissed ? "-100%" : "0%",
+      }}
+      transition={{
+        duration: 0.85,
+        ease,
+      }}
+      onAnimationComplete={() => {
+        if (dismissed) {
+          setHidden(true);
+        }
+      }}
+      className="
+        fixed inset-0 z-[9999]
+        flex items-center justify-center
+        overflow-hidden
+        bg-[#0e100c] text-[#e7e3dd]
+      "
+      role="status"
+      aria-label="Loading portfolio"
+      aria-live="off"
+    >
+      <div
+        className="
+          relative inline-block select-none
+          font-bueno text-xl font-medium
+          uppercase leading-none tracking-[0.22em]
+        "
+      >
+        <span className="text-[#e7e3dd]/20">KERIMOV DESIGNS</span>
+
+        <span
+          ref={fillRef}
+          aria-hidden="true"
+          className="
+            absolute inset-0 whitespace-nowrap
+            text-[#e7e3dd]
+          "
+          style={{
+            clipPath: "inset(0 100% 0 0)",
+          }}
+        >
+          KERIMOV DESIGNS
+        </span>
+      </div>
+    </motion.div>
   );
 }
