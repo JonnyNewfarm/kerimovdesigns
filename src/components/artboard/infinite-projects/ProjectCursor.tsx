@@ -18,7 +18,7 @@ const SPREAD_AT_SPEED = 15;
 const KINETIC_DAMPING = 11;
 const BASE_SPACING_EM = 0.11;
 
-type CursorLabel = "BACK" | "NEXT";
+type CursorLabel = "RETURN" | "NEXT";
 
 export default function ProjectCursor({
   active,
@@ -33,7 +33,7 @@ export default function ProjectCursor({
   const textRef = useRef<HTMLSpanElement>(null);
   const squareRef = useRef<HTMLSpanElement>(null);
 
-  const [label, setLabel] = useState<CursorLabel>("BACK");
+  const [label, setLabel] = useState<CursorLabel>("RETURN");
 
   const latestRef = useRef({
     hasMultipleMedia,
@@ -45,7 +45,7 @@ export default function ProjectCursor({
     isOverImage,
   };
 
-  // ORIGINAL BACK / NEXT TEXT REVEAL
+  // RETURN / NEXT TEXT REVEAL
   useEffect(() => {
     const text = textRef.current;
 
@@ -85,7 +85,6 @@ export default function ProjectCursor({
     const duration = reducedMotion ? 0 : 0.3;
 
     if (menuHovered) {
-      // BACK / NEXT disappears.
       gsap.to(text, {
         autoAlpha: 0,
         scale: 0.75,
@@ -95,7 +94,6 @@ export default function ProjectCursor({
         overwrite: true,
       });
 
-      // Small square appears.
       gsap.to(square, {
         autoAlpha: 1,
         scale: 1,
@@ -105,7 +103,6 @@ export default function ProjectCursor({
         overwrite: true,
       });
     } else {
-      // Square disappears.
       gsap.to(square, {
         autoAlpha: 0,
         scale: 0.35,
@@ -114,7 +111,6 @@ export default function ProjectCursor({
         overwrite: true,
       });
 
-      // BACK / NEXT returns.
       gsap.to(text, {
         autoAlpha: 1,
         scale: 1,
@@ -182,7 +178,7 @@ export default function ProjectCursor({
         latestRef.current.hasMultipleMedia &&
         latestRef.current.isOverImage.current?.(targetX, targetY)
           ? "NEXT"
-          : "BACK";
+          : "RETURN";
 
       if (next !== previousLabel) {
         previousLabel = next;
@@ -210,7 +206,6 @@ export default function ProjectCursor({
       currentY += (targetY - currentY) * follow;
 
       const motionX = (currentX - lastX) / 60 / seconds;
-
       const motionY = (currentY - lastY) / 60 / seconds;
 
       const speed = Math.hypot(motionX, motionY);
@@ -231,7 +226,6 @@ export default function ProjectCursor({
         : 1 - Math.exp(-KINETIC_DAMPING * seconds);
 
       tilt += (desiredTilt - tilt) * damping;
-
       spacing += (desiredSpacing - spacing) * damping;
 
       const positionSettled =
@@ -368,6 +362,7 @@ export default function ProjectCursor({
       gsap.to(press, {
         scale: 1,
         duration: reducedMotion ? 0 : 0.2,
+        ease: "power2.out",
         overwrite: true,
       });
     };
@@ -379,13 +374,9 @@ export default function ProjectCursor({
     };
 
     window.addEventListener("pointermove", onPointerMove, true);
-
     window.addEventListener("mousemove", onMouseMove, true);
-
     window.addEventListener("pointerdown", onPointerDown, true);
-
     window.addEventListener("pointerup", onPointerUp, true);
-
     window.addEventListener("pointercancel", onCancel, true);
 
     document.addEventListener("mouseout", onMouseOut, true);
@@ -415,13 +406,9 @@ export default function ProjectCursor({
       window.cancelAnimationFrame(labelFrame);
 
       window.removeEventListener("pointermove", onPointerMove, true);
-
       window.removeEventListener("mousemove", onMouseMove, true);
-
       window.removeEventListener("pointerdown", onPointerDown, true);
-
       window.removeEventListener("pointerup", onPointerUp, true);
-
       window.removeEventListener("pointercancel", onCancel, true);
 
       document.removeEventListener("mouseout", onMouseOut, true);
@@ -459,7 +446,6 @@ export default function ProjectCursor({
               ref={pressRef}
               className="relative flex items-center justify-center origin-center will-change-transform"
             >
-              {/*  BACK / NEXT */}
               <span
                 ref={textRef}
                 className="block whitespace-nowrap font-sans text-[14px] font-semibold uppercase leading-none tracking-[0.11em] text-white will-change-transform"
@@ -467,7 +453,6 @@ export default function ProjectCursor({
                 {label}
               </span>
 
-              {/* SMALL SQUARE — MENU HOVER ONLY */}
               <span
                 ref={squareRef}
                 className="pointer-events-none absolute left-1/2 top-1/2 h-[8px] w-[8px] -translate-x-1/2 -translate-y-1/2 bg-white opacity-0"
