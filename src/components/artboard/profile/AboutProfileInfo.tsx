@@ -261,7 +261,8 @@ export default function AboutProfileInfo({
             className="absolute left-[5%] top-[10%] w-[90%] lg:left-[3.5%] lg:top-[27%] lg:w-[21%]"
           >
             <div className="grid grid-cols-1">
-              <AnimatePresence mode="sync" initial={false}>
+              <AnimatePresence mode="sync">
+                {" "}
                 <motion.div
                   key={`about-content-${mediaIndex}`}
                   variants={currentContentVariants}
@@ -282,7 +283,7 @@ export default function AboutProfileInfo({
 
                   <motion.div
                     variants={sectionVariants}
-                    className="mt-9 hidden font-bueno text-[clamp(15px,1.08vw,19px)] leading-[1.55] text-[#e7e3dd]/80 lg:block"
+                    className="mt-5 hidden font-bueno text-[clamp(15px,1.08vw,19px)] leading-[1.55] text-[#e7e3dd]/80 lg:block"
                   >
                     <p>
                       <RevealText
@@ -305,13 +306,14 @@ export default function AboutProfileInfo({
             </div>
           </motion.div>
 
+          {/* DESKTOP MENU — BOTTOM RIGHT */}
           <motion.div
             variants={sectionVariants}
             onPointerEnter={() => onMenuHoverChange?.(true)}
             onPointerLeave={() => onMenuHoverChange?.(false)}
             onPointerDown={(event) => event.stopPropagation()}
             onPointerUp={(event) => event.stopPropagation()}
-            className="pointer-events-auto absolute right-[3.1%] top-[55%] hidden w-[22%] text-right lg:block"
+            className="pointer-events-auto absolute bottom-[5%] right-[3.1%] hidden w-[22%] text-right lg:block"
           >
             <div className="flex flex-col items-end font-bueno text-[clamp(16px,1.1vw,19px)] font-medium leading-[1.4]">
               {SECTIONS.map((section, index) => (
@@ -339,6 +341,7 @@ export default function AboutProfileInfo({
             </div>
           </motion.div>
 
+          {/* MOBILE DESCRIPTION — UNCHANGED */}
           <motion.div
             variants={sectionVariants}
             className="absolute bottom-[12%] left-[5%] right-[5%] lg:hidden"
@@ -372,9 +375,10 @@ export default function AboutProfileInfo({
             </div>
           </motion.div>
 
+          {/* BOTTOM LEFT — EXPLORE / LOCATION / AGE */}
           <motion.div
             variants={sectionVariants}
-            className="absolute bottom-[4%] left-[5%] right-[5%] grid grid-cols-2 items-end gap-2 lg:bottom-[5%] lg:left-[5.3%] lg:right-[4%]"
+            className="absolute bottom-[4%] left-[5%] right-[5%] grid grid-cols-2 items-end gap-2 lg:bottom-[5%] lg:left-[5.3%] lg:right-auto lg:flex lg:items-end lg:gap-7"
           >
             <div className="min-w-0">
               <p className="font-sans text-[9px] font-medium uppercase leading-[1.4] tracking-[0.16em] text-[#e7e3dd]/80 md:text-[10px]">
@@ -386,7 +390,7 @@ export default function AboutProfileInfo({
               </p>
             </div>
 
-            <div className="flex min-w-0 flex-col items-end gap-1 text-right font-sans text-[9px] font-medium uppercase leading-[1.4] tracking-[0.16em] text-[#e7e3dd]/80 md:flex-row md:justify-end md:gap-3 md:text-[10px]">
+            <div className="flex min-w-0 flex-col items-end gap-1 text-right font-sans text-[9px] font-medium uppercase leading-[1.4] tracking-[0.16em] text-[#e7e3dd]/80 md:flex-row md:justify-end md:gap-3 md:text-[10px] lg:justify-start">
               <span className="whitespace-nowrap">
                 <RevealText
                   text="Oslo, Norway"
