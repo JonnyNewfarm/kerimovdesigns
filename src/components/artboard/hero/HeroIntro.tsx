@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   AnimatePresence,
   motion,
@@ -97,107 +99,182 @@ function RevealWords({
 
 export default function HeroIntro({ visible }: Props) {
   const reducedMotion = useReducedMotion() ?? false;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          key="hero-intro"
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          variants={containerVariants}
-          className="pointer-events-none absolute inset-0 z-[20] text-color"
-        >
-          {/* LEFT HERO HEADING */}
+    <>
+      <AnimatePresence>
+        {visible && (
           <motion.div
-            className="
-              absolute
-              left-[5%]
-              top-[105px]
-              w-[90%]
-              lg:left-[3.1%]
-              lg:top-[32%]
-              lg:w-[70%]
-            "
-            variants={{
-              hidden: {},
-              visible: {
-                transition: {
-                  staggerChildren: 0.12,
-                },
-              },
-            }}
+            key="hero-intro"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={containerVariants}
+            className="pointer-events-none absolute inset-0 z-[20] text-color"
           >
-            <h1
+            {/* LEFT HERO HEADING */}
+            <motion.div
               className="
-                text-[clamp(22px,4.2vw,32px)]
-                font-bold
-                leading-[1.1]
-                tracking-[-0.035em]
-                lg:text-[clamp(25px,2.15vw,38px)]
+                absolute
+                left-[5%]
+                top-[105px]
+                w-[90%]
+                lg:left-[3.1%]
+                lg:top-[32%]
+                lg:w-[70%]
               "
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.12,
+                  },
+                },
+              }}
             >
-              <div className="lg:whitespace-nowrap">
-                <RevealWords
-                  text="GRAPHIC DESIGNER"
-                  stagger={0.06}
-                  reducedMotion={reducedMotion}
-                />
-              </div>
+              <h1
+                className="
+                  text-[clamp(22px,4.2vw,32px)]
+                  font-bold
+                  leading-[1.1]
+                  tracking-[-0.035em]
+                  lg:text-[clamp(25px,2.15vw,38px)]
+                "
+              >
+                <div className="lg:whitespace-nowrap">
+                  <RevealWords
+                    text="GRAPHIC DESIGNER"
+                    stagger={0.06}
+                    reducedMotion={reducedMotion}
+                  />
+                </div>
 
-              <div className="lg:whitespace-nowrap">
-                <RevealWords
-                  text="CRAFTING VISUAL IDENTITIES,"
-                  stagger={0.045}
-                  reducedMotion={reducedMotion}
-                />
-              </div>
+                <div className="lg:whitespace-nowrap">
+                  <RevealWords
+                    text="CRAFTING VISUAL IDENTITIES,"
+                    stagger={0.045}
+                    reducedMotion={reducedMotion}
+                  />
+                </div>
 
-              <div className="lg:whitespace-nowrap">
-                <RevealWords
-                  text="TYPOGRAPHY AND MOTION."
-                  stagger={0.045}
-                  reducedMotion={reducedMotion}
-                />
-              </div>
-            </h1>
-          </motion.div>
+                <div className="lg:whitespace-nowrap">
+                  <RevealWords
+                    text="TYPOGRAPHY AND MOTION."
+                    stagger={0.045}
+                    reducedMotion={reducedMotion}
+                  />
+                </div>
+              </h1>
+            </motion.div>
 
-          {/* RIGHT PORTRAIT AND DESCRIPTION */}
-          <motion.div
-            className="
-              absolute
-              right-[5%]
-              top-[225px]
-              w-[clamp(104px,28vw,140px)]
-              lg:bottom-0
-              lg:right-[3.1%]
-              lg:top-0
-              lg:w-[clamp(150px,12vw,210px)]
-            "
-            variants={{
-              hidden: {},
-              visible: {
-                transition: {
-                  delayChildren: reducedMotion ? 0 : 0.4,
-                },
-              },
-            }}
-          >
-            {/* PORTRAIT SPACE */}
-            <div
+            {/* RIGHT PORTRAIT AND DESCRIPTION */}
+            <motion.div
               className="
-                aspect-[4/5]
-                lg:absolute
-                lg:left-0
-                lg:top-[150px]
-                lg:w-full
+                absolute
+                right-[5%]
+                top-[225px]
+                w-[clamp(104px,28vw,140px)]
+                lg:bottom-0
+                lg:right-[3.1%]
+                lg:top-0
+                lg:w-[clamp(150px,12vw,210px)]
               "
-            />
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    delayChildren: reducedMotion ? 0 : 0.4,
+                  },
+                },
+              }}
+            >
+              {/* PORTRAIT SPACE */}
+              <div
+                className="
+                  aspect-[4/5]
+                  lg:absolute
+                  lg:left-0
+                  lg:top-[150px]
+                  lg:w-full
+                "
+              />
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+
+      {/* DESIGN & DEVELOPMENT CREDIT */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {visible && (
+              <motion.div
+                key="design-credit"
+                initial={{
+                  opacity: 0,
+                  y: reducedMotion ? 0 : 8,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: reducedMotion ? 0 : 8,
+                }}
+                transition={{
+                  duration: reducedMotion ? 0.2 : 0.8,
+                  delay: reducedMotion ? 0 : 0.8,
+                  ease,
+                }}
+                className="
+                  pointer-events-auto
+                  fixed
+                  bottom-[calc(21svh+32px)]
+                  left-[3.1%]
+                  z-[9999]
+                  hidden
+                  lg:block
+                  text-color
+                "
+              >
+                <a
+                  href="https://www.jonasnygaard.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onPointerUp={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("JONAS LINK CLICKED");
+                  }}
+                  className="
+    pointer-events-auto
+    relative
+    z-[99999]
+    inline-block
+    cursor-pointer
+    text-[13px]
+    tracking-[-0.025em]
+    text-color
+    opacity-60
+    transition-opacity
+    duration-300
+    hover:opacity-100
+  "
+                >
+                  Website by Jonas Nygaard ↗
+                </a>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
+    </>
   );
 }
