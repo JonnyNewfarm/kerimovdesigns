@@ -37,7 +37,7 @@ export const PROFILE_SLIDES = [
     discipline: "Art Direction",
   },
   {
-    src: "/bylarm-new.mp4",
+    src: "/anim.mp4",
     discipline: "Motion & Animation",
   },
   {
@@ -371,11 +371,14 @@ export default function RustamProfilePlane({
     // IMAGE FITTING
     const fitImage = (aspect: number) => {
       const maxWidth = Math.min(
-        size.width * (layout.mobile ? 0.86 : 0.48),
+        size.width * (layout.mobile ? 0.86 : 0.42),
         size.height * 1.25,
       );
-      const maxHeight = size.height * (layout.mobile ? 0.62 : 0.72);
+
+      const maxHeight = size.height * (layout.mobile ? 0.62 : 0.63);
+
       const width = Math.min(maxWidth, maxHeight * aspect);
+
       return {
         width,
         height: width / aspect,
@@ -415,9 +418,9 @@ export default function RustamProfilePlane({
     const targetScaleY =
       (targetHeight * depthCorrection) / layout.thumbnailHeight;
     const targetY = layout.mobile ? -size.height * 0.025 * depthCorrection : 0;
-    // POSITION
+    const targetX = layout.mobile ? 0 : size.width * 0.2 * depthCorrection; // POSITION
     mesh.position.set(
-      THREE.MathUtils.lerp(layout.thumbnailX, 0, t),
+      THREE.MathUtils.lerp(layout.thumbnailX, targetX, t),
       THREE.MathUtils.lerp(layout.thumbnailY, targetY, t),
       THREE.MathUtils.lerp(0, targetZ, t),
     );
@@ -435,7 +438,9 @@ export default function RustamProfilePlane({
     // No smoothing state and no separate closing strength.
     const speedShape = (6 * raw * (1 - raw)) / Math.max(OPEN_DURATION, 0.001);
     const lagX = THREE.MathUtils.clamp(
-      (Math.abs(layout.thumbnailX) * speedShape * PROFILE_TRAIL_TIME) /
+      (Math.abs(layout.thumbnailX - targetX) *
+        speedShape *
+        PROFILE_TRAIL_TIME) /
         Math.max(mesh.scale.x, 0.001),
       0,
       layout.thumbnailWidth * PROFILE_TRAIL_MAX_X,

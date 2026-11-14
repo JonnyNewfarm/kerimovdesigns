@@ -236,11 +236,6 @@ export default function AboutProfileInfo({
 
   const activeSection = SECTIONS[mediaIndex] ?? SECTIONS[0];
 
-  const titleClassName =
-    activeSection.title.length > 15
-      ? "text-[clamp(15px,1.35vw,24px)]"
-      : "text-[clamp(20px,1.7vw,32px)]";
-
   const currentContentVariants = reducedMotion
     ? reducedContentVariants
     : contentVariants;
@@ -256,13 +251,21 @@ export default function AboutProfileInfo({
           variants={detailsVariants}
           className="pointer-events-none absolute inset-0 z-[50] text-[#e7e3dd]"
         >
+          {/* LOCATION / AGE — TOP LEFT */}
           <motion.div
             variants={sectionVariants}
-            className="absolute left-[5%] top-[10%] w-[90%] lg:left-[3.5%] lg:top-[27%] lg:w-[21%]"
+            className="absolute left-[5%] top-[5%] flex items-center gap-3 font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-[#e7e3dd]/80 lg:left-[3.5%] lg:top-[5%]"
+          >
+            <span>Oslo, Norway</span>
+            <span className="opacity-40">/</span>
+            <span>Age: 27</span>
+          </motion.div>
+          <motion.div
+            variants={sectionVariants}
+            className="absolute left-[3.5%] top-[26%] hidden w-[39%] lg:block"
           >
             <div className="grid grid-cols-1">
               <AnimatePresence mode="sync">
-                {" "}
                 <motion.div
                   key={`about-content-${mediaIndex}`}
                   variants={currentContentVariants}
@@ -271,19 +274,9 @@ export default function AboutProfileInfo({
                   exit="exit"
                   className="col-start-1 row-start-1 min-w-0"
                 >
-                  <h2
-                    className={`font-bueno whitespace-nowrap font-bold uppercase leading-[1.05] tracking-[-0.025em] ${titleClassName}`}
-                  >
-                    <RevealText
-                      text={activeSection.title}
-                      stagger={0.025}
-                      reducedMotion={reducedMotion}
-                    />
-                  </h2>
-
                   <motion.div
                     variants={sectionVariants}
-                    className="mt-5 hidden font-bueno text-[clamp(15px,1.08vw,19px)] leading-[1.55] text-[#e7e3dd]/80 lg:block"
+                    className="text-[clamp(28px,2.3vw,46px)] leading-[1.32] tracking-[-0.015em] text-[#e7e3dd]"
                   >
                     <p>
                       <RevealText
@@ -293,7 +286,7 @@ export default function AboutProfileInfo({
                       />
                     </p>
 
-                    <p className="mt-6">
+                    <p className="mt-7">
                       <RevealText
                         text={activeSection.description}
                         stagger={0.016}
@@ -306,16 +299,16 @@ export default function AboutProfileInfo({
             </div>
           </motion.div>
 
-          {/* DESKTOP MENU — BOTTOM RIGHT */}
+          {/* DESKTOP MENU — HORIZONTAL BOTTOM */}
           <motion.div
             variants={sectionVariants}
             onPointerEnter={() => onMenuHoverChange?.(true)}
             onPointerLeave={() => onMenuHoverChange?.(false)}
             onPointerDown={(event) => event.stopPropagation()}
             onPointerUp={(event) => event.stopPropagation()}
-            className="pointer-events-auto absolute bottom-[5%] right-[3.1%] hidden w-[22%] text-right lg:block"
+            className="pointer-events-auto absolute bottom-[4.5%] left-[3.5%] right-[3.5%] hidden lg:block"
           >
-            <div className="flex flex-col items-end font-bueno text-[clamp(16px,1.1vw,19px)] font-medium leading-[1.4]">
+            <div className="flex w-full flex-row items-center justify-between gap-4 font-bueno text-[clamp(13px,1.1vw,18px)] font-medium leading-[1.4]">
               {SECTIONS.map((section, index) => (
                 <button
                   key={section.label}
@@ -325,7 +318,7 @@ export default function AboutProfileInfo({
                     event.stopPropagation();
                     onSelectMedia(index);
                   }}
-                  className="cursor-pointer whitespace-nowrap text-right transition-opacity duration-500 ease-in-out hover:!opacity-100 focus-visible:!opacity-100 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#e7e3dd]"
+                  className="cursor-pointer whitespace-nowrap text-left transition-opacity duration-500 ease-in-out hover:!opacity-100 focus-visible:!opacity-100 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#e7e3dd]"
                   style={{
                     opacity: mediaIndex === index ? 1 : 0.3,
                   }}
@@ -372,42 +365,6 @@ export default function AboutProfileInfo({
                   </p>
                 </motion.div>
               </AnimatePresence>
-            </div>
-          </motion.div>
-
-          {/* BOTTOM LEFT — EXPLORE / LOCATION / AGE */}
-          <motion.div
-            variants={sectionVariants}
-            className="absolute bottom-[4%] left-[5%] right-[5%] grid grid-cols-2 items-end gap-2 lg:bottom-[5%] lg:left-[5.3%] lg:right-auto lg:flex lg:items-end lg:gap-7"
-          >
-            <div className="min-w-0">
-              <p className="font-sans text-[9px] font-medium uppercase leading-[1.4] tracking-[0.16em] text-[#e7e3dd]/80 md:text-[10px]">
-                <RevealText
-                  text="Scroll or click to explore"
-                  stagger={0.016}
-                  reducedMotion={reducedMotion}
-                />
-              </p>
-            </div>
-
-            <div className="flex min-w-0 flex-col items-end gap-1 text-right font-sans text-[9px] font-medium uppercase leading-[1.4] tracking-[0.16em] text-[#e7e3dd]/80 md:flex-row md:justify-end md:gap-3 md:text-[10px] lg:justify-start">
-              <span className="whitespace-nowrap">
-                <RevealText
-                  text="Oslo, Norway"
-                  inline
-                  reducedMotion={reducedMotion}
-                />
-              </span>
-
-              <span className="hidden opacity-40 md:inline">/</span>
-
-              <span className="whitespace-nowrap">
-                <RevealText
-                  text="Age: 27"
-                  inline
-                  reducedMotion={reducedMotion}
-                />
-              </span>
             </div>
           </motion.div>
         </motion.div>
