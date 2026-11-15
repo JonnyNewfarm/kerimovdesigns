@@ -1,6 +1,6 @@
 export const OPENING_WARMUP_MS = 100;
-export const OPEN_DURATION = 0.9;
-export const CLOSE_DURATION = 0.9;
+export const OPEN_DURATION = 0.8;
+export const CLOSE_DURATION = 0.8;
 export const CLOSE_MORPH_DURATION = 1.08;
 export const SCROLL_SMOOTHING = 9;
 export const HOVER_Z_FACTOR = 0.12;

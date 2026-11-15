@@ -15,7 +15,7 @@ import {
 } from "../infinite-projects/constants";
 import { smoothstep } from "../infinite-projects/projectMath";
 // SAME BEND SETTINGS FOR OPENING AND CLOSING
-const PROFILE_TRAIL_TIME = 0.14;
+const PROFILE_TRAIL_TIME = 0.12;
 const PROFILE_TRAIL_MAX_X = 0.35;
 const PROFILE_TRAIL_MAX_Y = 0.28;
 const PROFILE_DEPTH_STRENGTH = 0.92;
@@ -371,7 +371,7 @@ export default function RustamProfilePlane({
     // IMAGE FITTING
     const fitImage = (aspect: number) => {
       const maxWidth = Math.min(
-        size.width * (layout.mobile ? 0.86 : 0.42),
+        size.width * (layout.mobile ? 0.86 : 0.3),
         size.height * 1.25,
       );
 
