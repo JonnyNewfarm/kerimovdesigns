@@ -276,7 +276,7 @@ export default function AboutProfileInfo({
                 >
                   <motion.div
                     variants={sectionVariants}
-                    className="text-[clamp(28px,2.3vw,46px)] leading-[1.32] tracking-[-0.015em] text-[#e7e3dd]"
+                    className="text-[clamp(28px,2.3vw,46px)] leading-[1.1] tracking-[-0.015em] text-[#e7e3dd]"
                   >
                     <p>
                       <RevealText

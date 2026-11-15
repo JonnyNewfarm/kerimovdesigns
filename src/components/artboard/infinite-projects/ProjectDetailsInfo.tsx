@@ -176,7 +176,7 @@ export default function ProjectDetailsInfo({
             variants={sectionVariants}
             className="absolute left-[5%] top-[7%] z-30 w-[88%] md:left-[3.5%] md:top-[27%] md:w-[20.5%]"
           >
-            <h2 className="break-words font-bueno text-[clamp(21px,4.5vw,28px)] font-bold uppercase leading-[1.08] tracking-[-0.012em] text-[#e7e3dd] md:text-[clamp(22px,1.45vw,27px)]">
+            <h2 className="break-words text-[clamp(21px,4.5vw,28px)] font-bold uppercase leading-[1.08] tracking-[-0.012em] text-[#e7e3dd] md:text-[clamp(22px,1.45vw,27px)]">
               <RevealText
                 text={project.title?.trim() || "Untitled"}
                 stagger={0.025}

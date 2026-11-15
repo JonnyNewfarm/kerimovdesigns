@@ -140,10 +140,10 @@ export default function HeroIntro({ visible }: Props) {
               <h1
                 className="
                   text-[clamp(22px,4.2vw,32px)]
-                  font-bold
+                  font-semibold
                   leading-[1.1]
-                  tracking-[-0.035em]
-                  lg:text-[clamp(25px,2.15vw,38px)]
+                  tracking-[-0.01em]
+                  lg:text-[clamp(25px,1.8vw,38px)]
                 "
               >
                 <div className="lg:whitespace-nowrap">

@@ -664,7 +664,7 @@ export default function ProjectGallery({
 
         const fitImage = (aspect: number) => {
           const maxWidth = Math.min(
-            size.width * (mobile ? 0.86 : 0.48),
+            size.width * (mobile ? 0.86 : 0.44),
             size.height * 1.25,
           );
 
