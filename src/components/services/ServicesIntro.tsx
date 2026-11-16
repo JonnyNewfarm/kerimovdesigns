@@ -27,7 +27,8 @@ export default function ServicesIntro() {
         delay={0.1}
         className="
           max-w-[1220px]
-          text-[clamp(30px,3.1vw,54px)]
+          text-2xl
+          md:text-[clamp(30px,3.1vw,54px)]
           font-normal
           leading-[1.16]
           tracking-normal

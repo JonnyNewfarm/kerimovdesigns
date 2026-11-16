@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import {
   AnimatePresence,
   motion,
@@ -76,7 +74,14 @@ function RevealWords({
       {text.split(" ").map((word, index) => (
         <span
           key={`${word}-${index}`}
-          className="mr-[0.24em] inline-block overflow-hidden align-bottom pb-[0.1em] -mb-[0.1em]"
+          className="
+            mr-[0.24em]
+            inline-block
+            overflow-hidden
+            align-bottom
+            pb-[0.1em]
+            -mb-[0.1em]
+          "
         >
           <motion.span
             className="inline-block will-change-transform"
@@ -99,114 +104,92 @@ function RevealWords({
 
 export default function HeroIntro({ visible }: Props) {
   const reducedMotion = useReducedMotion() ?? false;
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
-    <>
-      <AnimatePresence>
-        {visible && (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          key="hero-intro"
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={containerVariants}
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+            z-[20]
+            text-color
+          "
+        >
+          {/* HERO HEADING */}
           <motion.div
-            key="hero-intro"
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            variants={containerVariants}
-            className="pointer-events-none absolute inset-0 z-[20] text-color"
+            className="
+              absolute
+              left-[5%]
+              top-[105px]
+              w-[90%]
+
+              lg:left-[3.1%]
+              lg:top-[32%]
+              lg:w-[90%]
+            "
           >
-            {/* LEFT HERO HEADING */}
-            <motion.div
+            <h1
               className="
-                absolute
-                left-[5%]
-                top-[105px]
-                w-[90%]
-                lg:left-[3.1%]
-                lg:top-[32%]
-                lg:w-[70%]
+                w-full
+                max-w-[630px]
+                text-[clamp(22px,4.2vw,32px)]
+                font-medium
+                leading-[1.15]
+                tracking-[-0.01em]
+
+                lg:text-[clamp(25px,1.8vw,38px)]
               "
-              variants={{
-                hidden: {},
-                visible: {
-                  transition: {
-                    staggerChildren: 0.12,
-                  },
-                },
-              }}
             >
-              <h1
-                className="
-                  text-[clamp(22px,4.2vw,32px)]
-                  font-semibold
-                  leading-[1.1]
-                  tracking-[-0.01em]
-                  lg:text-[clamp(25px,1.8vw,38px)]
-                "
-              >
-                <div className="lg:whitespace-nowrap">
-                  <RevealWords
-                    text="GRAPHIC DESIGNER"
-                    stagger={0.06}
-                    reducedMotion={reducedMotion}
-                  />
-                </div>
-
-                <div className="lg:whitespace-nowrap">
-                  <RevealWords
-                    text="CRAFTING VISUAL IDENTITIES,"
-                    stagger={0.045}
-                    reducedMotion={reducedMotion}
-                  />
-                </div>
-
-                <div className="lg:whitespace-nowrap">
-                  <RevealWords
-                    text="TYPOGRAPHY AND MOTION."
-                    stagger={0.045}
-                    reducedMotion={reducedMotion}
-                  />
-                </div>
-              </h1>
-            </motion.div>
-
-            {/* RIGHT PORTRAIT AND DESCRIPTION */}
-            <motion.div
-              className="
-                absolute
-                right-[5%]
-                top-[225px]
-                w-[clamp(104px,28vw,140px)]
-                lg:bottom-0
-                lg:right-[3.1%]
-                lg:top-0
-                lg:w-[clamp(150px,12vw,210px)]
-              "
-              variants={{
-                hidden: {},
-                visible: {
-                  transition: {
-                    delayChildren: reducedMotion ? 0 : 0.4,
-                  },
-                },
-              }}
-            >
-              {/* PORTRAIT SPACE */}
-              <div
-                className="
-                  aspect-[4/5]
-                  lg:absolute
-                  lg:left-0
-                  lg:top-[150px]
-                  lg:w-full
-                "
+              <RevealWords
+                text="Graphic designer crafting distinctive visual identities through thoughtful typography, art direction and expressive motion."
+                stagger={0.045}
+                reducedMotion={reducedMotion}
               />
-            </motion.div>
+            </h1>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+
+          {/* RIGHT PORTRAIT SPACE */}
+          <motion.div
+            className="
+              absolute
+              right-[5%]
+              top-[225px]
+              w-[clamp(104px,28vw,140px)]
+
+              lg:bottom-0
+              lg:right-[3.1%]
+              lg:top-0
+              lg:w-[clamp(150px,12vw,210px)]
+            "
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  delayChildren: reducedMotion ? 0 : 0.4,
+                },
+              },
+            }}
+          >
+            <div
+              className="
+                aspect-[4/5]
+
+                lg:absolute
+                lg:left-0
+                lg:top-[150px]
+                lg:w-full
+              "
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

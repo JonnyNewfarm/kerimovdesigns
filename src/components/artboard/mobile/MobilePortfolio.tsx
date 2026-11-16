@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import type { InfiniteProject } from "../infinite-projects/types";
 import SitePreloader from "../scene/SitePreloader";
+import ScrollSection from "@/components/SmoothScroll";
 
 type Props = {
   projects: InfiniteProject[];
@@ -231,63 +232,89 @@ function MobileFooter() {
     }, 2200);
   };
 
+  const linkClass = "transition-opacity duration-300 hover:opacity-50";
+
   return (
-    <footer className="pb-12 pt-16 font-bueno">
-      <div className="grid grid-cols-2 gap-x-6 text-[15px] font-medium leading-[1.25]">
-        <div className="flex flex-col items-start">
-          <span className="mb-4">Services:</span>
+    <footer
+      className="
+        grid
+        grid-cols-2
+        items-start
+        gap-x-5
+        gap-y-16
+        pb-8
+        pt-16
+        text-[15px]
+        font-medium
+        leading-[1.3]
+        tracking-[-0.025em]
+      "
+    >
+      {/* CONNECT — TOP LEFT */}
+      <div className="flex min-w-0 flex-col items-start">
+        <button
+          type="button"
+          onClick={copyEmail}
+          className={`${linkClass} cursor-pointer text-left`}
+        >
+          <span aria-live="polite">
+            {copyStatus === "copied"
+              ? "Copied!"
+              : copyStatus === "error"
+                ? "Copy failed"
+                : "Copy Email"}
+          </span>
+        </button>
 
-          {services.map((service) => (
-            <span key={service.title}>{service.title}</span>
-          ))}
-        </div>
+        <a
+          href={LINKEDIN_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
+          LinkedIn
+        </a>
 
-        <div className="flex flex-col items-start">
-          <span className="mb-4">Connect:</span>
-
-          <button
-            type="button"
-            onClick={copyEmail}
-            className="text-left transition-opacity duration-300 hover:opacity-50"
-          >
-            <span aria-live="polite">
-              {copyStatus === "copied"
-                ? "Copied!"
-                : copyStatus === "error"
-                  ? "Copy failed"
-                  : "Copy Email"}
-            </span>
-          </button>
-
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-opacity duration-300 hover:opacity-50"
-          >
-            Instagram
-          </a>
-
-          <a
-            href={LINKEDIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-opacity duration-300 hover:opacity-50"
-          >
-            LinkedIn
-          </a>
-        </div>
+        <a
+          href={INSTAGRAM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
+          Instagram
+        </a>
       </div>
 
-      <div>
-        <p className="mt-16 text-[13px] font-medium leading-[1.25]">
-          Design / Development:
+      {/* NAVIGATION — TOP RIGHT */}
+      <nav
+        aria-label="Footer navigation"
+        className="flex min-w-0 flex-col items-end"
+      >
+        <a href="/" className={linkClass}>
+          Home
+        </a>
+
+        <a href="/services" className={linkClass}>
+          Services
+        </a>
+      </nav>
+
+      {/* COPYRIGHT — BOTTOM LEFT */}
+      <div className="min-w-0 self-end">
+        <p className="text-[12px] leading-[1.3]">
+          © {new Date().getFullYear()} Rustam Kerimov
         </p>
+      </div>
+
+      {/* CREDITS — BOTTOM RIGHT */}
+      <div className="min-w-0 self-end text-right">
+        <p>Design &amp; Dev:</p>
+
         <a
           href="https://www.jonasnygaard.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="transition-opacity  underline duration-300 hover:opacity-50"
+          className={linkClass}
         >
           Jonas Nygaard
         </a>
@@ -309,7 +336,7 @@ function ProjectGrid({
         id="mobile-selected-work"
         className="mb-5 font-bueno text-[16px] font-bold  leading-none tracking-[-0.025em]"
       >
-        Selected Work:
+        Selected Work
       </h2>
 
       <div className="grid grid-cols-2 items-start gap-x-3 gap-y-8">
@@ -351,33 +378,21 @@ function MobileHome({
   return (
     <>
       <section className="pt-16 sm:pt-20">
-        <h1 className="max-w-[560px] font-bueno text-[clamp(28px,7.3vw,46px)] font-bold uppercase leading-[1.04] tracking-[-0.035em]">
+        <h1 className="mt-10 w-full text-xl font-medium leading-[1.3] tracking-[-0.01em]">
           <RevealText
-            text={
-              "Graphic Designer\n" +
-              "Crafting Visual Identities,\n" +
-              "Typography and Motion."
-            }
+            text="Graphic Designer Crafting Visual Identities, Typography and Motion."
             delay={0.12}
             stagger={0.045}
           />
         </h1>
 
-        <div className="mt-9 flex justify-end sm:mt-12">
-          <MobileLink
-            href="/about"
-            navigate={navigate}
-            ariaLabel="About Rustam Kerimov"
-            className="block w-[48%] max-w-[240px] outline-offset-4"
-          >
-            <img
-              src="/rk-portrait.jpg"
-              alt="Portrait of Rustam Kerimov"
-              className="aspect-[4/5] w-full object-cover"
-              decoding="async"
-            />
-          </MobileLink>
-        </div>
+        <p className="mt-10 w-full text-xl font-medium leading-[1.3] tracking-[-0.01em]">
+          <RevealText
+            text="Take a look at my selected projects below to see what I've been working on. I'm always open to new projects, fresh ideas and creative collaborations, so feel free to get in touch."
+            delay={0.12}
+            stagger={0.045}
+          />
+        </p>
       </section>
 
       <div className="mt-16 sm:mt-20">
@@ -441,10 +456,10 @@ function MobileProject({ project }: { project: InfiniteProject }) {
           {project.description?.trim() && (
             <div className="col-span-2">
               <p className="mb-3  text-[12px]  tracking-[0.14em] text-[#e7e3dd]">
-                About the project:
+                About the project
               </p>
 
-              <p className="whitespace-pre-line font-bueno text-[17px] leading-[1.45] text-[#e7e3dd]/85">
+              <p className="whitespace-pre-line  text-[19px] leading-[1.45] text-[#e7e3dd]">
                 {project.description}
               </p>
             </div>
@@ -632,47 +647,52 @@ export default function MobilePortfolio({ projects }: Props) {
 
   const isHome = !isAbout && projectId === null;
 
+  const content = (
+    <div
+      className="
+        relative
+        min-h-svh
+        w-full
+        overflow-x-clip
+        bg-[#0b0c09]
+        text-[#e7e3dd]
+      "
+    >
+      <div className={`w-full px-[5%] ${isAbout ? "pt-0" : "pt-[72px]"}`}>
+        <main key={path}>
+          {isHome ? (
+            <MobileHome projects={projects} navigate={navigate} />
+          ) : isAbout ? (
+            <MobileAbout />
+          ) : project ? (
+            <MobileProject project={project} />
+          ) : (
+            <div className="py-24">
+              <h1 className="font-bueno text-3xl font-bold uppercase">
+                Project not found
+              </h1>
+
+              <button
+                type="button"
+                className="mt-6 underline"
+                onClick={() => navigate("/")}
+              >
+                Back to work
+              </button>
+            </div>
+          )}
+        </main>
+
+        <MobileFooter />
+      </div>
+    </div>
+  );
+
   return (
     <>
       <SitePreloader threeReady={true} />
 
-      <div
-        data-lenis-prevent
-        data-lenis-prevent-wheel
-        className="
-          relative min-h-svh w-full
-          overflow-x-clip
-          bg-[#0b0c09] text-[#e7e3dd]
-        "
-      >
-        <div className={`w-full px-[5%] ${isAbout ? "pt-0" : "pt-[72px]"}`}>
-          <main key={path}>
-            {isHome ? (
-              <MobileHome projects={projects} navigate={navigate} />
-            ) : isAbout ? (
-              <MobileAbout />
-            ) : project ? (
-              <MobileProject project={project} />
-            ) : (
-              <div className="py-24">
-                <h1 className="font-bueno text-3xl font-bold uppercase">
-                  Project not found
-                </h1>
-
-                <button
-                  type="button"
-                  className="mt-6 underline"
-                  onClick={() => navigate("/")}
-                >
-                  Back to work
-                </button>
-              </div>
-            )}
-          </main>
-
-          <MobileFooter />
-        </div>
-      </div>
+      {isHome ? <ScrollSection>{content}</ScrollSection> : content}
     </>
   );
 }

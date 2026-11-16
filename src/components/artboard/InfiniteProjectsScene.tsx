@@ -83,6 +83,22 @@ export default function InfiniteProjectsScene({ projects }: Props) {
 
   const [threeReady, setThreeReady] = useState(false);
   const [imageRevealStarted, setImageRevealStarted] = useState(false);
+  const [mountCanvas, setMountCanvas] = useState(false);
+
+  useEffect(() => {
+    let secondFrame = 0;
+
+    const firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => {
+        setMountCanvas(true);
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+    };
+  }, []);
 
   const handleImageRevealStart = useCallback(() => {
     setImageRevealStarted(true);
@@ -458,49 +474,51 @@ export default function InfiniteProjectsScene({ projects }: Props) {
       <ProjectIntro visible={imageRevealStarted && !selected && !closing} />
 
       {/* THREE.JS PROJECTS */}
-      <Canvas
-        className="!absolute !inset-0 !z-10"
-        camera={{
-          position: [0, 0, 1200],
-          fov: 38,
-          near: 0.1,
-          far: 20000,
-        }}
-        dpr={[1, 1.5]}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: "high-performance",
-        }}
-      >
-        <PixelPerspectiveCamera />
+      {mountCanvas && (
+        <Canvas
+          className="!absolute !inset-0 !z-10"
+          camera={{
+            position: [0, 0, 1200],
+            fov: 38,
+            near: 0.1,
+            far: 20000,
+          }}
+          dpr={[1, 1.5]}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance",
+          }}
+        >
+          <PixelPerspectiveCamera />
 
-        <Suspense fallback={null}>
-          <ProjectGallery
-            projects={projects}
-            scrollTarget={scrollTarget}
-            selected={selected}
-            progress={progress}
-            onHoverChange={handleProjectHoverChange}
-            pressedPlaneRef={pressedPlaneRef}
-            titleRef={titleRef}
-            closingRef={closingRef}
-            profileActive={false}
-            backdropRef={backdropRef}
-            imageProgress={imageProgress}
-            mediaJump={projectMediaJump}
-            coverMorph={coverMorph}
-            imageHitTestRef={imageHitTestRef}
-            listHitTestRef={listHitTestRef}
-            pointerPositionRef={lastMousePosition}
-            initialProjectIndex={initialProjectIndexRef.current}
-          />
+          <Suspense fallback={null}>
+            <ProjectGallery
+              projects={projects}
+              scrollTarget={scrollTarget}
+              selected={selected}
+              progress={progress}
+              onHoverChange={handleProjectHoverChange}
+              pressedPlaneRef={pressedPlaneRef}
+              titleRef={titleRef}
+              closingRef={closingRef}
+              profileActive={false}
+              backdropRef={backdropRef}
+              imageProgress={imageProgress}
+              mediaJump={projectMediaJump}
+              coverMorph={coverMorph}
+              imageHitTestRef={imageHitTestRef}
+              listHitTestRef={listHitTestRef}
+              pointerPositionRef={lastMousePosition}
+              initialProjectIndex={initialProjectIndexRef.current}
+            />
 
-          <SceneReadySignal onReady={handleThreeReady} />
+            <SceneReadySignal onReady={handleThreeReady} />
 
-          <SceneImageReveal start={imageRevealStarted} />
-        </Suspense>
-      </Canvas>
+            <SceneImageReveal start={imageRevealStarted} />
+          </Suspense>
+        </Canvas>
+      )}
 
       <HeroIntro visible={imageRevealStarted && !selected && !closing} />
 

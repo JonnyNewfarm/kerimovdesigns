@@ -1,7 +1,7 @@
 import ScrollSection from "@/components/SmoothScroll";
 
 import ServicesIntro from "@/components/services/ServicesIntro";
-import ServicesShowcase from "@/components/services/ServicesShowcase";
+import ServicesShowcaseResponsive from "@/components/services/ServicesShowcaseResponsive";
 import ServicesContact from "@/components/services/ServicesContact";
 import ServicesFooter from "@/components/services/ServicesFooter";
 
@@ -11,7 +11,7 @@ export default function ServicesPage() {
       <main className="min-h-screen bg-dark text-color">
         <ServicesIntro />
 
-        <ServicesShowcase />
+        <ServicesShowcaseResponsive />
 
         <ServicesContact />
 

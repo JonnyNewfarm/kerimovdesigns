@@ -2,7 +2,8 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useProgress } from "@react-three/drei";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
+
 import {
   useCallback,
   useEffect,
@@ -14,14 +15,11 @@ import {
 const COUNT_SPEED = 95;
 const MIN_SPINNER_DURATION = 400;
 
-const ease = [0.76, 0, 0.24, 1] as const;
-
 const STORAGE_KEY = "kerimov-preloader-completed";
 
-type LoadingMode = "checking" | "preloader" | "spinner" | "none";
+const ease = [0.76, 0, 0.24, 1] as const;
 
-// Remembers whether Home has mounted in this document.
-let homeMountedInDocument = false;
+type LoadingMode = "checking" | "preloader" | "spinner" | "none";
 
 type SceneReadyProps = {
   onReady: () => void;
@@ -30,6 +28,7 @@ type SceneReadyProps = {
 export function SceneReadySignal({ onReady }: SceneReadyProps) {
   const frames = useRef(0);
   const notified = useRef(false);
+
   const scheduledFrame = useRef<number | null>(null);
 
   useFrame(() => {
@@ -65,15 +64,13 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
 
   const [mode, setMode] = useState<LoadingMode>("checking");
 
-  const [spinnerMinimumPassed, setSpinnerMinimumPassed] = useState(false);
+  const [spinnerReady, setSpinnerReady] = useState(false);
 
   const [revealStarted, setRevealStarted] = useState(false);
 
   const [dismissed, setDismissed] = useState(false);
 
   const [hidden, setHidden] = useState(false);
-
-  const modeRef = useRef<LoadingMode | null>(null);
 
   const fillRef = useRef<HTMLSpanElement>(null);
 
@@ -88,47 +85,25 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
 
   const fullyReady = threeReady && assetsReady;
 
-  // Decide which loading experience to use.
+  // Choose loading mode.
   useLayoutEffect(() => {
-    if (modeRef.current === null) {
-      let preloaderCompleted = false;
+    let completed = false;
 
-      try {
-        preloaderCompleted = window.sessionStorage.getItem(STORAGE_KEY) === "1";
-      } catch {
-        // Storage unavailable.
-      }
-
-      let fromAnotherRoute = homeMountedInDocument;
-
-      try {
-        const entry = performance.getEntriesByType("navigation")[0] as
-          | PerformanceNavigationTiming
-          | undefined;
-
-        if (entry?.name) {
-          const initialPath = new URL(entry.name).pathname;
-
-          if (initialPath !== window.location.pathname) {
-            fromAnotherRoute = true;
-          }
-        }
-      } catch {
-        // Navigation timing unavailable.
-      }
-
-      if (!preloaderCompleted) {
-        modeRef.current = "preloader";
-      } else if (fromAnotherRoute) {
-        modeRef.current = "spinner";
-      } else {
-        modeRef.current = "none";
-      }
-
-      homeMountedInDocument = true;
+    try {
+      completed = window.sessionStorage.getItem(STORAGE_KEY) === "1";
+    } catch {
+      // Storage may be unavailable.
     }
 
-    setMode(modeRef.current);
+    const desktop = window.matchMedia("(min-width: 1024px)").matches;
+
+    if (!completed) {
+      setMode("preloader");
+    } else if (desktop) {
+      setMode("spinner");
+    } else {
+      setMode("none");
+    }
   }, []);
 
   useEffect(() => {
@@ -154,32 +129,33 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
     revealStartedRef.current = true;
 
     callbackRef.current?.();
+
     setRevealStarted(true);
   }, []);
 
-  // Keep the spinner visible for at least 400ms.
+  // Desktop spinner: display for at least 700ms.
   useEffect(() => {
     if (mode !== "spinner") return;
 
-    const timeout = window.setTimeout(() => {
-      setSpinnerMinimumPassed(true);
+    const timer = window.setTimeout(() => {
+      setSpinnerReady(true);
     }, MIN_SPINNER_DURATION);
 
     return () => {
-      window.clearTimeout(timeout);
+      window.clearTimeout(timer);
     };
   }, [mode]);
 
-  // Returning from another route.
+  // Desktop refresh / route return.
   useEffect(() => {
     if (mode !== "spinner") return;
     if (!fullyReady) return;
-    if (!spinnerMinimumPassed) return;
+    if (!spinnerReady) return;
 
     startReveal();
-  }, [mode, fullyReady, spinnerMinimumPassed, startReveal]);
+  }, [mode, fullyReady, spinnerReady, startReveal]);
 
-  // Already visited Home, but this isn't a route return.
+  // Mobile return / refresh: no spinner.
   useEffect(() => {
     if (mode !== "none") return;
     if (!fullyReady) return;
@@ -187,7 +163,7 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
     startReveal();
   }, [mode, fullyReady, startReveal]);
 
-  // First visit: original full-screen preloader.
+  // Full preloader on first visit.
   useEffect(() => {
     if (mode !== "preloader") return;
 
@@ -246,7 +222,7 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
     try {
       window.sessionStorage.setItem(STORAGE_KEY, "1");
     } catch {
-      // Storage unavailable.
+      // Storage may be unavailable.
     }
 
     setHidden(true);
@@ -254,55 +230,55 @@ export default function SitePreloader({ threeReady, onRevealStart }: Props) {
 
   return (
     <>
-      {/* SPINNER — RETURNING FROM ANOTHER ROUTE */}
-      <AnimatePresence>
-        {mode === "spinner" && !revealStarted && (
-          <motion.div
-            key="scene-spinner"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: 0.15,
-            }}
-            className="
-              pointer-events-none
-              fixed
-              bottom-7
-              right-[5%]
-              z-[9999]
-              flex
-              items-center
-              justify-center
-              text-color
+      <style>
+        {`
+          @keyframes kerimov-spinner-rotate {
+            from {
+              transform: rotate(0deg);
+            }
 
-              lg:bottom-9
-              lg:right-[3.1%]
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        `}
+      </style>
+
+      {/* DESKTOP SPINNER */}
+      {mode === "spinner" && !revealStarted && (
+        <div
+          role="status"
+          aria-label="Loading scene"
+          className="
+            pointer-events-none
+            fixed
+            bottom-9
+            right-[3.1%]
+            z-[9999]
+            hidden
+            items-center
+            justify-center
+            text-[#e7e3dd]
+            lg:flex
+          "
+        >
+          <div
+            className="
+              h-6
+              w-6
+              rounded-full
+              border-2
+              border-current
+              border-t-transparent
             "
-            role="status"
-            aria-label="Loading scene"
-          >
-            <motion.div
-              animate={{
-                rotate: 360,
-              }}
-              transition={{
-                duration: 0.8,
-                ease: "linear",
-                repeat: Infinity,
-              }}
-              className="
-                h-6
-                w-6
-                rounded-full
-                border-2
-                border-current
-                border-t-transparent
-              "
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+            style={{
+              animation: "kerimov-spinner-rotate 0.7s linear infinite",
+              transformOrigin: "center",
+              willChange: "transform",
+            }}
+          />
+        </div>
+      )}
 
       {/* FULL PRELOADER — FIRST VISIT */}
       {mode === "preloader" && !hidden && (
