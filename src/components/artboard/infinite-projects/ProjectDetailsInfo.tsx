@@ -6,6 +6,7 @@ import {
   useReducedMotion,
   type Variants,
 } from "framer-motion";
+
 import type { ActivePlane, InfiniteProject } from "./types";
 
 type Props = {
@@ -172,43 +173,76 @@ export default function ProjectDetailsInfo({
           variants={detailsVariants}
           className="pointer-events-none absolute inset-0 z-20 text-[#e7e3dd]"
         >
-          <motion.div
-            variants={sectionVariants}
-            className="absolute left-[5%] top-[7%] z-30 w-[88%] md:left-[3.5%] md:top-[27%] md:w-[20.5%]"
-          >
-            <h2 className="break-words text-[clamp(21px,4.5vw,28px)] font-bold uppercase leading-[1.08] tracking-[-0.012em] text-[#e7e3dd] md:text-[clamp(22px,1.45vw,27px)]">
-              <RevealText
-                text={project.title?.trim() || "Untitled"}
-                stagger={0.025}
-                reducedMotion={reducedMotion}
-              />
-            </h2>
+          {/* TAGS — TOP RIGHT */}
+          {project.tags?.some((tag) => tag.trim()) && (
+            <motion.div
+              variants={sectionVariants}
+              className="
+                absolute
+                right-[5%]
+                top-[7%]
+                z-30
+                max-w-[65%]
+                text-right
 
-            {project.description?.trim() && (
+                md:right-[4%]
+                md:max-w-[30%]
+              "
+            >
+              <motion.p
+                variants={reducedMotion ? reducedMaskVariants : maskVariants}
+                className="
+                  font-sans
+                  text-[9px]
+                  font-medium
+                  uppercase
+                  leading-[1.5]
+                  tracking-[0.12em]
+                  text-[#e7e3dd]/80
+
+                  md:text-[10px]
+                  md:tracking-[0.16em]
+                "
+              >
+                {project.tags
+                  .filter((tag) => tag.trim().length > 0)
+                  .join(" / ")}
+              </motion.p>
+            </motion.div>
+          )}
+
+          {/* DESCRIPTION — VERTICALLY CENTERED LEFT */}
+          {project.description?.trim() && (
+            <>
               <motion.div
                 variants={sectionVariants}
                 className="
-      mt-8 hidden md:block lg:mt-11
+                  absolute
+                  left-[3.5%]
+                  top-1/2
+                  z-30
+                  hidden
+                  w-[20.5%]
+                  -translate-y-1/2
 
-      [@media(max-height:800px)]:!mt-6
-      [@media(max-height:650px)]:!mt-4
-    "
+                  md:block
+                "
               >
                 <p
                   className="
-        whitespace-pre-line
-        break-words
-        font-bueno
-        text-[clamp(15px,1.05vw,18px)]
-        leading-[1.55]
-        text-[#e7e3dd]/78
+                    whitespace-pre-line
+                    break-words
+                    font-bueno
+                    text-[clamp(15px,1.05vw,18px)]
+                    leading-[1.55]
+                    text-[#e7e3dd]/78
 
-        [@media(max-height:800px)]:text-[15px]
-        [@media(max-height:800px)]:leading-[1.45]
+                    [@media(max-height:800px)]:text-[15px]
+                    [@media(max-height:800px)]:leading-[1.45]
 
-        [@media(max-height:650px)]:text-[14px]
-        [@media(max-height:650px)]:leading-[1.4]
-      "
+                    [@media(max-height:650px)]:text-[14px]
+                    [@media(max-height:650px)]:leading-[1.4]
+                  "
                 >
                   <RevealText
                     text={project.description}
@@ -216,33 +250,71 @@ export default function ProjectDetailsInfo({
                   />
                 </p>
               </motion.div>
-            )}
-          </motion.div>
 
-          {project.description?.trim() && (
-            <motion.div
-              variants={sectionVariants}
-              className="absolute bottom-[28%] left-[5%] right-[5%] md:hidden"
-            >
-              <InfoField
-                label="Description"
-                value={project.description}
-                reducedMotion={reducedMotion}
-                labelClassName="mb-2 font-sans text-[9px] font-medium uppercase tracking-[0.2em] text-[#e7e3dd]/45"
-                valueClassName="line-clamp-3 whitespace-pre-line break-words font-bueno text-[13px] leading-[1.38] text-[#e7e3dd]/85"
-              />
-            </motion.div>
+              {/* MOBILE DESCRIPTION */}
+              <motion.div
+                variants={sectionVariants}
+                className="
+                  absolute
+                  left-[5%]
+                  right-[5%]
+                  top-1/2
+                  -translate-y-1/2
+
+                  md:hidden
+                "
+              >
+                <InfoField
+                  label="Description"
+                  value={project.description}
+                  reducedMotion={reducedMotion}
+                  labelClassName="mb-2 font-sans text-[9px] font-medium uppercase tracking-[0.2em] text-[#e7e3dd]/45"
+                  valueClassName="line-clamp-3 whitespace-pre-line break-words font-bueno text-[13px] leading-[1.38] text-[#e7e3dd]/85"
+                />
+              </motion.div>
+            </>
           )}
 
+          {/* YEAR & TOOLS — TOP LEFT, HORIZONTAL */}
           {(project.type?.trim() || project.tools?.trim()) && (
-            <div className="absolute bottom-[26%] right-[3.8%] hidden w-[18.5%] flex-col items-start gap-6 md:flex">
+            <motion.div
+              variants={sectionVariants}
+              className="
+      absolute
+      left-[5%]
+      top-[7%]
+      z-30
+      flex
+      max-w-[65%]
+      items-start
+      gap-6
+      text-left
+
+      md:left-[3.5%]
+      md:max-w-[45%]
+      md:gap-12
+    "
+            >
               {project.type?.trim() && (
                 <InfoField
                   label="Year:"
                   value={project.type}
                   reducedMotion={reducedMotion}
-                  labelClassName="mb-3 font-sans text-[10px] font-medium  tracking-[0.18em] text-[#e7e3dd]"
-                  valueClassName="break-words font-bueno text-[clamp(16px,1.1vw,19px)] font-medium leading-[1.3] text-[#e7e3dd]/90"
+                  labelClassName="
+          mb-2
+          font-sans
+          text-[10px]
+          font-medium
+          tracking-[0.18em]
+          text-[#e7e3dd]
+        "
+                  valueClassName="
+          font-bueno
+          text-[clamp(14px,1.1vw,19px)]
+          font-medium
+          leading-[1.3]
+          text-[#e7e3dd]/90
+        "
                 />
               )}
 
@@ -251,67 +323,110 @@ export default function ProjectDetailsInfo({
                   label="Tools:"
                   value={project.tools}
                   reducedMotion={reducedMotion}
-                  labelClassName="mb-3 font-sans text-[10px] font-medium  tracking-[0.18em] text-[#e7e3dd]"
-                  valueClassName="whitespace-pre-line break-words font-bueno text-[clamp(16px,1.1vw,19px)] font-medium leading-[1.3] text-[#e7e3dd]/90"
+                  labelClassName="
+          mb-2
+          font-sans
+          text-[10px]
+          font-medium
+          tracking-[0.18em]
+          text-[#e7e3dd]
+        "
+                  valueClassName="
+          whitespace-pre-line
+          break-words
+          font-bueno
+          text-[clamp(14px,1.1vw,19px)]
+          font-medium
+          leading-[1.3]
+          text-[#e7e3dd]/90
+        "
                 />
               )}
-            </div>
+            </motion.div>
           )}
 
-          {(project.type?.trim() || project.tools?.trim()) && (
-            <div className="absolute bottom-[10%] left-[5%] right-[5%] flex flex-col items-start gap-3 md:hidden">
-              {project.type?.trim() && (
-                <InfoField
-                  label="Year"
-                  value={project.type}
-                  reducedMotion={reducedMotion}
-                  labelClassName="mb-1 text-[9px] uppercase tracking-[0.2em] text-[#e7e3dd]/55"
-                  valueClassName="break-words font-bueno text-[12px] leading-[1.25]"
-                />
-              )}
-
-              {project.tools?.trim() && (
-                <InfoField
-                  label="Tools"
-                  value={project.tools}
-                  reducedMotion={reducedMotion}
-                  labelClassName="mb-1 text-[9px] uppercase tracking-[0.2em] text-[#e7e3dd]/55"
-                  valueClassName="line-clamp-2 break-words font-bueno text-[12px] leading-[1.25]"
-                />
-              )}
-            </div>
-          )}
-
+          {/* BOTTOM ROW */}
           <motion.div
             variants={sectionVariants}
-            className="absolute bottom-[3.5%] left-[5%] right-[5%] grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] items-end gap-2 md:bottom-[5%] md:left-[5.3%] md:right-[4%]"
+            className="
+              absolute
+              bottom-[3.5%]
+              left-[5%]
+              right-[5%]
+              grid
+              grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]
+              items-end
+              gap-2
+
+              md:bottom-[5%]
+              md:left-[5.3%]
+              md:right-[4%]
+            "
           >
+            {/* TITLE — BOTTOM LEFT */}
             <div className="min-w-0 overflow-hidden">
+              <h2
+                className="
+                  break-words
+                  text-[clamp(21px,4.5vw,28px)]
+                  font-bold
+                  uppercase
+                  leading-[1.08]
+                  tracking-[-0.012em]
+                  text-[#e7e3dd]
+
+                  md:text-[clamp(22px,1.45vw,27px)]
+                "
+              >
+                <RevealText
+                  text={project.title?.trim() || "Untitled"}
+                  stagger={0.025}
+                  reducedMotion={reducedMotion}
+                />
+              </h2>
+            </div>
+
+            {/* EXPLORE TEXT — CENTER */}
+            <div className="min-w-0 overflow-hidden text-center">
               <motion.p
                 variants={reducedMotion ? reducedMaskVariants : maskVariants}
-                className="text-[9px] font-medium uppercase leading-[1.4] tracking-[0.16em] text-[#e7e3dd]/80 md:text-[10px]"
+                className="
+                  text-[9px]
+                  font-medium
+                  uppercase
+                  leading-[1.4]
+                  tracking-[0.16em]
+                  text-[#e7e3dd]/80
+
+                  md:text-[10px]
+                "
               >
                 Scroll or click to explore
               </motion.p>
             </div>
 
-            <div className="min-w-0 overflow-hidden text-center">
-              {project.tags.length > 0 && (
-                <motion.p
-                  variants={reducedMotion ? reducedMaskVariants : maskVariants}
-                  className="truncate whitespace-nowrap font-sans text-[8px] font-medium uppercase leading-[1.4] tracking-[0.12em] text-[#e7e3dd]/80 md:text-[10px] md:tracking-[0.16em]"
-                  title={project.tags.join(" / ")}
-                >
-                  {project.tags
-                    .filter((tag) => tag.trim().length > 0)
-                    .join(" / ")}
-                </motion.p>
-              )}
-            </div>
-
+            {/* MEDIA NAVIGATION — RIGHT */}
             <nav
               aria-label="Project media navigation"
-              className="pointer-events-auto flex w-max max-w-full min-w-0 justify-self-end items-center justify-end gap-[clamp(9px,1.2vw,20px)] overflow-x-auto whitespace-nowrap font-bueno text-[clamp(15px,1.15vw,19px)] font-medium tabular-nums [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="
+                pointer-events-auto
+                flex
+                w-max
+                max-w-full
+                min-w-0
+                items-center
+                justify-end
+                justify-self-end
+                gap-[clamp(9px,1.2vw,20px)]
+                overflow-x-auto
+                whitespace-nowrap
+                font-bueno
+                text-[clamp(15px,1.15vw,19px)]
+                font-medium
+                tabular-nums
+                [scrollbar-width:none]
+                [&::-webkit-scrollbar]:hidden
+              "
               onPointerEnter={(event) => {
                 if (event.pointerType === "mouse") {
                   onMenuHoverChange(true);
