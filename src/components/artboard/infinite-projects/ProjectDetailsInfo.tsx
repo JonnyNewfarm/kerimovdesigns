@@ -92,7 +92,7 @@ function RevealText({
 
   return (
     <motion.span
-      className="block whitespace-pre-line"
+      className="inline"
       variants={{
         hidden: {},
         visible: {
@@ -124,28 +124,36 @@ function RevealText({
   );
 }
 
-function InfoField({
+function InlineInfoField({
   label,
   value,
-  labelClassName,
-  valueClassName,
   reducedMotion,
 }: {
   label: string;
   value: string;
-  labelClassName: string;
-  valueClassName: string;
   reducedMotion: boolean;
 }) {
   return (
-    <motion.div variants={sectionVariants}>
-      <p className={labelClassName}>
+    <motion.div
+      variants={sectionVariants}
+      className="
+        flex
+        items-baseline
+        gap-2
+        whitespace-nowrap
+        text-[clamp(13px,1.1vw,19px)]
+        font-medium
+        leading-[1.3]
+        text-[#e7e3dd]
+      "
+    >
+      <span>
         <RevealText text={label} stagger={0} reducedMotion={reducedMotion} />
-      </p>
+      </span>
 
-      <p className={valueClassName}>
+      <span>
         <RevealText text={value} reducedMotion={reducedMotion} />
-      </p>
+      </span>
     </motion.div>
   );
 }
@@ -173,109 +181,7 @@ export default function ProjectDetailsInfo({
           variants={detailsVariants}
           className="pointer-events-none absolute inset-0 z-20 text-[#e7e3dd]"
         >
-          {/* TAGS — TOP RIGHT */}
-          {project.tags?.some((tag) => tag.trim()) && (
-            <motion.div
-              variants={sectionVariants}
-              className="
-                absolute
-                right-[5%]
-                top-[7%]
-                z-30
-                max-w-[65%]
-                text-right
-
-                md:right-[4%]
-                md:max-w-[30%]
-              "
-            >
-              <motion.p
-                variants={reducedMotion ? reducedMaskVariants : maskVariants}
-                className="
-                  font-sans
-                  text-[9px]
-                  font-medium
-                  uppercase
-                  leading-[1.5]
-                  tracking-[0.12em]
-                  text-[#e7e3dd]/80
-
-                  md:text-[10px]
-                  md:tracking-[0.16em]
-                "
-              >
-                {project.tags
-                  .filter((tag) => tag.trim().length > 0)
-                  .join(" / ")}
-              </motion.p>
-            </motion.div>
-          )}
-
-          {/* DESCRIPTION — VERTICALLY CENTERED LEFT */}
-          {project.description?.trim() && (
-            <>
-              <motion.div
-                variants={sectionVariants}
-                className="
-                  absolute
-                  left-[3.5%]
-                  top-1/2
-                  z-30
-                  hidden
-                  w-[20.5%]
-                  -translate-y-1/2
-
-                  md:block
-                "
-              >
-                <p
-                  className="
-                    whitespace-pre-line
-                    break-words
-                    font-bueno
-                    text-[clamp(15px,1.05vw,18px)]
-                    leading-[1.55]
-                    text-[#e7e3dd]/78
-
-                    [@media(max-height:800px)]:text-[15px]
-                    [@media(max-height:800px)]:leading-[1.45]
-
-                    [@media(max-height:650px)]:text-[14px]
-                    [@media(max-height:650px)]:leading-[1.4]
-                  "
-                >
-                  <RevealText
-                    text={project.description}
-                    reducedMotion={reducedMotion}
-                  />
-                </p>
-              </motion.div>
-
-              {/* MOBILE DESCRIPTION */}
-              <motion.div
-                variants={sectionVariants}
-                className="
-                  absolute
-                  left-[5%]
-                  right-[5%]
-                  top-1/2
-                  -translate-y-1/2
-
-                  md:hidden
-                "
-              >
-                <InfoField
-                  label="Description"
-                  value={project.description}
-                  reducedMotion={reducedMotion}
-                  labelClassName="mb-2 font-sans text-[9px] font-medium uppercase tracking-[0.2em] text-[#e7e3dd]/45"
-                  valueClassName="line-clamp-3 whitespace-pre-line break-words font-bueno text-[13px] leading-[1.38] text-[#e7e3dd]/85"
-                />
-              </motion.div>
-            </>
-          )}
-
-          {/* YEAR & TOOLS — TOP LEFT, HORIZONTAL */}
+          {/* YEAR & TOOLS — TOP LEFT */}
           {(project.type?.trim() || project.tools?.trim()) && (
             <motion.div
               variants={sectionVariants}
@@ -285,61 +191,25 @@ export default function ProjectDetailsInfo({
       top-[7%]
       z-30
       flex
-      max-w-[65%]
-      items-start
-      gap-6
-      text-left
-
+      items-center
+      gap-8
+      whitespace-nowrap
       md:left-[3.5%]
-      md:max-w-[45%]
-      md:gap-12
     "
             >
               {project.type?.trim() && (
-                <InfoField
+                <InlineInfoField
                   label="Year:"
-                  value={project.type}
+                  value={project.type.trim()}
                   reducedMotion={reducedMotion}
-                  labelClassName="
-          mb-2
-          font-sans
-          text-[10px]
-          font-medium
-          tracking-[0.18em]
-          text-[#e7e3dd]
-        "
-                  valueClassName="
-          font-bueno
-          text-[clamp(14px,1.1vw,19px)]
-          font-medium
-          leading-[1.3]
-          text-[#e7e3dd]/90
-        "
                 />
               )}
 
               {project.tools?.trim() && (
-                <InfoField
+                <InlineInfoField
                   label="Tools:"
-                  value={project.tools}
+                  value={project.tools.trim().replace(/\s+/g, " ")}
                   reducedMotion={reducedMotion}
-                  labelClassName="
-          mb-2
-          font-sans
-          text-[10px]
-          font-medium
-          tracking-[0.18em]
-          text-[#e7e3dd]
-        "
-                  valueClassName="
-          whitespace-pre-line
-          break-words
-          font-bueno
-          text-[clamp(14px,1.1vw,19px)]
-          font-medium
-          leading-[1.3]
-          text-[#e7e3dd]/90
-        "
                 />
               )}
             </motion.div>
@@ -357,7 +227,6 @@ export default function ProjectDetailsInfo({
               grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]
               items-end
               gap-2
-
               md:bottom-[5%]
               md:left-[5.3%]
               md:right-[4%]
@@ -374,7 +243,6 @@ export default function ProjectDetailsInfo({
                   leading-[1.08]
                   tracking-[-0.012em]
                   text-[#e7e3dd]
-
                   md:text-[clamp(22px,1.45vw,27px)]
                 "
               >
@@ -386,7 +254,7 @@ export default function ProjectDetailsInfo({
               </h2>
             </div>
 
-            {/* EXPLORE TEXT — CENTER */}
+            {/* SCROLL — CENTER */}
             <div className="min-w-0 overflow-hidden text-center">
               <motion.p
                 variants={reducedMotion ? reducedMaskVariants : maskVariants}
@@ -397,11 +265,10 @@ export default function ProjectDetailsInfo({
                   leading-[1.4]
                   tracking-[0.16em]
                   text-[#e7e3dd]/80
-
                   md:text-[10px]
                 "
               >
-                Scroll or click to explore
+                Scroll
               </motion.p>
             </div>
 

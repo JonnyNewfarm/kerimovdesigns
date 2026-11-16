@@ -13,7 +13,7 @@ export default function ProjectBackdrop({
         backdropRef.current = element;
       }}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[15] bg-[#0e0d0c]/97 backdrop-blur-[24px] opacity-0"
+      className="pointer-events-none fixed inset-0 z-[15] bg-[#0e0d0c]/99 backdrop-blur-[24px] opacity-0"
     />
   );
 }
