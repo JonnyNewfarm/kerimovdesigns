@@ -25,10 +25,9 @@ import { smoothstep, titleMetrics } from "./projectMath";
 import { useProjectVideo } from "./useProjectVideo";
 import { updateBackdropMask } from "../scene/updateBackdropMask";
 
-const IMAGE_HEIGHTS = [0.14, 0.18, 0.13, 0.16, 0.15, 0.19];
-const MOBILE_HEIGHT_SCALE = 0.13 / 0.15;
+const IMAGE_HEIGHTS = [0.161, 0.207, 0.15, 0.184, 0.173, 0.219];
+const MOBILE_HEIGHT_SCALE = 0.75;
 const GALLERY_BOTTOM = 0.48;
-
 export type ProjectMediaJump = {
   from: number;
   to: number;

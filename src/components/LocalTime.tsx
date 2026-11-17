@@ -28,6 +28,6 @@ export default function LocalTime() {
   }, []);
 
   return (
-    <span className="whitespace-nowrap">LOCAL TIME / {time || "--:--"}</span>
+    <span className="whitespace-nowrap tabular-nums">{time || "--:--"}</span>
   );
 }

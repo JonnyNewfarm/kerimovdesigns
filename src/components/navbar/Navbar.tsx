@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import LocalTime from "../LocalTime";
 
 const LINKEDIN_URL = "https://www.linkedin.com/in/rustam-kerimov-75bb5a331/";
 
@@ -55,7 +56,6 @@ export default function Navbar() {
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(EMAIL_ADDRESS);
-
       setCopyStatus("copied");
     } catch {
       setCopyStatus("error");
@@ -71,7 +71,7 @@ export default function Navbar() {
   };
 
   const baseText =
-    "font-bueno text-[15px] font-medium leading-[1.18] tracking-[-0.025em] lg:text-[clamp(15px,1.1vw,20px)]";
+    "font-bueno text-[15px] font-medium leading-[1.18] tracking-[-0.025em] lg:text-[18px]";
 
   const linkClass =
     "w-fit whitespace-nowrap transition-opacity duration-300 hover:opacity-50";
@@ -108,55 +108,36 @@ export default function Navbar() {
       >
         {/* NAME */}
         <Reveal delay={0}>
-          <Link
-            href="/"
-            className={`
-              whitespace-nowrap
-              text-left
-              lg:hidden
-            `}
-          >
+          <Link href="/" className="whitespace-nowrap">
             Rustam Kerimov
           </Link>
-
-          <div className="hidden flex-col items-start lg:flex">
-            <span className="text-sm">Name:</span>
-
-            <span className="whitespace-nowrap">Rustam Kerimov</span>
-          </div>
         </Reveal>
 
         {/* OCCUPATION */}
         <Reveal delay={0.08} className="hidden lg:block">
-          <div className="flex flex-col items-start">
-            <span className="text-sm">Occupation:</span>
-
-            <span className="whitespace-nowrap">Graphic Designer</span>
-          </div>
+          <span className="whitespace-nowrap">Graphic Designer</span>
         </Reveal>
+
+        {/* LOCATION */}
 
         {/* LOCATION */}
         <Reveal delay={0.16} className="hidden lg:block">
           <div className="flex flex-col items-start">
-            <span className="text-sm">Location:</span>
-
             <span className="whitespace-nowrap">Oslo, Norway</span>
+            <span className="whitespace-nowrap">59.9139° N, 10.7522° E</span>
+            <span>
+              <LocalTime />
+            </span>
           </div>
         </Reveal>
 
         {/* CONNECT */}
         <Reveal delay={0.24} className="hidden lg:block">
           <div className="flex flex-col items-start">
-            <span className="text-sm">Connect:</span>
-
             <button
               type="button"
               onClick={copyEmail}
-              className={`
-                ${linkClass}
-                cursor-pointer
-                text-left
-              `}
+              className={`${linkClass} cursor-pointer text-left`}
               aria-label="Copy email address"
             >
               <span aria-live="polite">
@@ -191,8 +172,6 @@ export default function Navbar() {
         {/* NAVIGATION */}
         <Reveal delay={0.32}>
           <div className="flex flex-col items-start text-left">
-            <span className="hidden text-sm lg:block">Navigation:</span>
-
             <Link href="/" className={linkClass}>
               Home
             </Link>

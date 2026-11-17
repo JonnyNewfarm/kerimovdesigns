@@ -131,62 +131,28 @@ export default function HeroIntro({ visible }: Props) {
               w-[90%]
 
               lg:left-[3.1%]
-              lg:top-[32%]
+              lg:top-[35%]
               lg:w-[90%]
             "
           >
             <h1
               className="
                 w-full
-                max-w-[630px]
+                max-w-[600px]
                 text-[clamp(22px,4.2vw,32px)]
                 font-medium
                 leading-[1.15]
                 tracking-[-0.01em]
 
-                lg:text-[clamp(25px,1.8vw,38px)]
+                lg:text-[30px]
               "
             >
               <RevealWords
-                text="Graphic designer crafting distinctive visual identities through thoughtful typography, art direction and expressive motion."
+                text="Independent graphic designer creating visual identities, typography and motion with character."
                 stagger={0.045}
                 reducedMotion={reducedMotion}
               />
             </h1>
-          </motion.div>
-
-          {/* RIGHT PORTRAIT SPACE */}
-          <motion.div
-            className="
-              absolute
-              right-[5%]
-              top-[225px]
-              w-[clamp(104px,28vw,140px)]
-
-              lg:bottom-0
-              lg:right-[3.1%]
-              lg:top-0
-              lg:w-[clamp(150px,12vw,210px)]
-            "
-            variants={{
-              hidden: {},
-              visible: {
-                transition: {
-                  delayChildren: reducedMotion ? 0 : 0.4,
-                },
-              },
-            }}
-          >
-            <div
-              className="
-                aspect-[4/5]
-
-                lg:absolute
-                lg:left-0
-                lg:top-[150px]
-                lg:w-full
-              "
-            />
           </motion.div>
         </motion.div>
       )}

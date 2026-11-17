@@ -549,7 +549,7 @@ export default function InfiniteProjectsScene({ projects }: Props) {
   "
       >
         <motion.div
-          className="relative h-full w-full"
+          className="relative hidden h-full w-full"
           initial={{ scale: 1.08 }}
           animate={{
             scale: imageRevealStarted ? 1 : 1.08,

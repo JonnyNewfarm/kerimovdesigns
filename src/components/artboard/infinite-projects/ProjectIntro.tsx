@@ -124,6 +124,7 @@ export default function ProjectIntro({ visible }: Props) {
               right-[5%]
               top-[225px]
               w-[clamp(104px,28vw,140px)]
+              hidden
 
               lg:top-auto
               lg:bottom-[calc(21svh+32px)]
