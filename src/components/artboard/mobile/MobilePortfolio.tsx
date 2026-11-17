@@ -377,8 +377,8 @@ function MobileHome({
 }) {
   return (
     <>
-      <section className="pt-16 sm:pt-20">
-        <h1 className="mt-10 w-full text-xl font-medium leading-[1.3] tracking-[-0.01em]">
+      <section className="pt-5 sm:pt-15">
+        <h1 className="mt-10 w-full text-2xl sm:text-3xl font-medium leading-[1.3] tracking-[-0.01em]">
           <RevealText
             text="Graphic Designer Crafting Visual Identities, Typography and Motion."
             delay={0.12}
@@ -386,7 +386,7 @@ function MobileHome({
           />
         </h1>
 
-        <p className="mt-10 w-full text-xl font-medium leading-[1.3] tracking-[-0.01em]">
+        <p className="mt-10 w-full text-2xl sm:text-3xl font-medium leading-[1.3] tracking-[-0.01em]">
           <RevealText
             text="Take a look at my selected projects below to see what I've been working on. I'm always open to new projects, fresh ideas and creative collaborations, so feel free to get in touch."
             delay={0.12}

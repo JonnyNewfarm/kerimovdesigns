@@ -170,8 +170,9 @@ export default function Navbar() {
         </Reveal>
 
         {/* NAVIGATION */}
+        {/* NAVIGATION */}
         <Reveal delay={0.32}>
-          <div className="flex flex-col items-start text-left">
+          <div className="flex flex-row items-start gap-x-5 text-left lg:flex-col lg:gap-x-0">
             <Link href="/" className={linkClass}>
               Home
             </Link>
