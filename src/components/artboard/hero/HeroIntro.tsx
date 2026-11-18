@@ -15,13 +15,13 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 const containerVariants: Variants = {
   hidden: {
-    opacity: 0,
+    opacity: 1,
   },
   visible: {
     opacity: 1,
     transition: {
-      duration: 0.4,
-      staggerChildren: 0.08,
+      staggerChildren: 0.16,
+      delayChildren: 0.15,
     },
   },
   exit: {
@@ -33,77 +33,33 @@ const containerVariants: Variants = {
   },
 };
 
-const wordVariants: Variants = {
+const lineVariants: Variants = {
   hidden: {
-    y: "115%",
+    y: "105%",
     opacity: 0,
-    filter: "blur(3px)",
   },
   visible: {
     y: "0%",
     opacity: 1,
-    filter: "blur(0px)",
     transition: {
-      duration: 0.85,
+      duration: 1.05,
       ease,
     },
   },
 };
 
-function RevealWords({
-  text,
-  stagger = 0.045,
-  reducedMotion,
-}: {
-  text: string;
-  stagger?: number;
-  reducedMotion: boolean;
-}) {
-  return (
-    <motion.span
-      className="block"
-      variants={{
-        hidden: {},
-        visible: {
-          transition: {
-            staggerChildren: reducedMotion ? 0 : stagger,
-          },
-        },
-      }}
-    >
-      {text.split(" ").map((word, index) => (
-        <span
-          key={`${word}-${index}`}
-          className="
-            mr-[0.24em]
-            inline-block
-            overflow-hidden
-            align-bottom
-            pb-[0.1em]
-            -mb-[0.1em]
-          "
-        >
-          <motion.span
-            className="inline-block will-change-transform"
-            variants={
-              reducedMotion
-                ? {
-                    hidden: { opacity: 0 },
-                    visible: { opacity: 1 },
-                  }
-                : wordVariants
-            }
-          >
-            {word}
-          </motion.span>
-        </span>
-      ))}
-    </motion.span>
-  );
-}
+const reducedVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.5 },
+  },
+};
 
 export default function HeroIntro({ visible }: Props) {
   const reducedMotion = useReducedMotion() ?? false;
+
+  const variants = reducedMotion ? reducedVariants : lineVariants;
 
   return (
     <AnimatePresence>
@@ -119,41 +75,52 @@ export default function HeroIntro({ visible }: Props) {
             absolute
             inset-0
             z-[20]
+            flex
+            items-center
+            justify-start
             text-color
           "
         >
-          {/* HERO HEADING */}
-          <motion.div
+          <div
             className="
-              absolute
-              left-[5%]
-              top-[105px]
-              w-[90%]
-
-              lg:left-[3.1%]
-              lg:top-[35%]
-              lg:w-[90%]
+              ml-[5%]
+              flex
+              flex-col
+              items-start
+              text-left
+              lg:ml-[3.1%]
             "
           >
-            <h1
-              className="
-                w-full
-                max-w-[600px]
-                text-[clamp(22px,4.2vw,32px)]
-                font-medium
-                leading-[1.15]
-                tracking-[-0.01em]
+            <div className="overflow-hidden">
+              <motion.p
+                variants={variants}
+                className="
+                  text-[clamp(19px,2.8vw,36px)]
+                  font-medium
+                  leading-[1.2]
+                  tracking-normal
+                  will-change-transform
+                "
+              >
+                Creative Direction
+              </motion.p>
+            </div>
 
-                lg:text-[30px]
-              "
-            >
-              <RevealWords
-                text="Independent graphic designer creating visual identities, typography and motion with character."
-                stagger={0.045}
-                reducedMotion={reducedMotion}
-              />
-            </h1>
-          </motion.div>
+            <div className="overflow-hidden">
+              <motion.h1
+                variants={variants}
+                className="
+                  text-[clamp(19px,2.8vw,36px)]
+                  font-black
+                  leading-[1.2]
+                  tracking-normal
+                  will-change-transform
+                "
+              >
+                Portfolio (2024–2026)
+              </motion.h1>
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
