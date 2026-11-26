@@ -1,35 +1,19 @@
-import Image from "next/image";
 import { SECTIONS } from "./servicesData";
 
 export default function ServicesMobile() {
   return (
     <section className="w-full pb-20">
-      <div className="mx-auto w-full px-5 sm:px-8">
-        {SECTIONS.map((service, index) => {
+      <div className="mx-auto w-full space-y-20 px-[5%] sm:space-y-28">
+        {SECTIONS.map((service) => {
           const isVideo = /\.(mp4|webm)$/i.test(service.src);
 
           return (
             <article
               key={service.src}
-              className="
-                flex
-                min-h-[85svh]
-                w-full
-                flex-col
-                items-start
-                justify-center
-                gap-10
-                py-16
-              "
+              className="flex w-full flex-col items-start"
             >
-              {/* IMAGE — LEFT, ORIGINAL ASPECT RATIO */}
-              <div
-                className="
-                  w-[58%]
-                  max-w-[260px]
-                  self-start
-                "
-              >
+              {/* MEDIA */}
+              <div className="relative w-full overflow-hidden">
                 {isVideo ? (
                   <video
                     src={service.src}
@@ -38,33 +22,55 @@ export default function ServicesMobile() {
                     loop
                     playsInline
                     preload="metadata"
+                    aria-label={service.title}
                     className="block h-auto w-full"
                   />
                 ) : (
-                  <Image
+                  <img
                     src={service.src}
-                    alt={`Design work ${index + 1}`}
-                    width={1200}
-                    height={1200}
-                    sizes="(max-width: 640px) 58vw, 260px"
-                    quality={90}
+                    alt={service.title}
+                    loading="lazy"
+                    decoding="async"
                     className="block h-auto w-full"
                   />
                 )}
               </div>
 
-              {/* DESCRIPTION — BELOW IMAGE */}
-              <p
+              {/* TITLE & DESCRIPTION */}
+              <div
                 className="
+                  mt-5
+                  grid
                   w-full
-                  text-[clamp(20px,6vw,42px)]
-                  font-normal
-                  leading-[1.14]
-                  tracking-normal
+                  grid-cols-[32%_minmax(0,1fr)]
+                  items-baseline
+                  gap-4
                 "
               >
-                {service.description}
-              </p>
+                <h2
+                  className="
+                    text-[14px]
+                    font-medium
+                    leading-[1.3]
+                    tracking-[-0.015em]
+                    text-[#e7e3dd]
+                  "
+                >
+                  {service.title}
+                </h2>
+
+                <p
+                  className="
+                    text-[clamp(16px,4.8vw,21px)]
+                    font-normal
+                    leading-[1.4]
+                    tracking-[-0.015em]
+                    text-[#e7e3dd]/90
+                  "
+                >
+                  {service.description}
+                </p>
+              </div>
             </article>
           );
         })}

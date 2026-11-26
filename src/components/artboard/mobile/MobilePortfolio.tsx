@@ -348,11 +348,11 @@ function ProjectGrid({
             ariaLabel={`View ${project.title}`}
             className="group block min-w-0 outline-offset-4"
           >
-            <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#1e211b]">
+            <div className="relative w-full overflow-hidden">
               <img
                 src={project.src}
                 alt={project.title}
-                className="h-full w-full object-cover"
+                className="block h-auto w-full"
                 loading="lazy"
                 decoding="async"
               />
@@ -378,7 +378,16 @@ function MobileHome({
   return (
     <>
       <section className="pt-5 sm:pt-15">
-        <h1 className="mt-10 w-full text-2xl sm:text-3xl font-medium leading-[1.3] tracking-[-0.01em]">
+        <h1
+          className="
+            mt-10
+            w-full
+            text-[clamp(26px,6.4vw,32px)]
+            font-medium
+            leading-[1.25]
+            tracking-[-0.02em]
+          "
+        >
           <RevealText
             text="Graphic Designer Crafting Visual Identities, Typography and Motion."
             delay={0.12}
@@ -386,16 +395,27 @@ function MobileHome({
           />
         </h1>
 
-        <p className="mt-10 w-full text-2xl sm:text-3xl font-medium leading-[1.3] tracking-[-0.01em]">
+        <p
+          className="
+            mt-7
+            w-full
+            max-w-[420px]
+            text-[clamp(18px,4.2vw,20px)]
+            font-medium
+            leading-[1.45]
+            tracking-[-0.01em]
+            text-[#e7e3dd]/80
+          "
+        >
           <RevealText
-            text="Take a look at my selected projects below to see what I've been working on. I'm always open to new projects, fresh ideas and creative collaborations, so feel free to get in touch."
-            delay={0.12}
-            stagger={0.045}
+            text="Explore my selected work below. Always open to new projects, ideas and creative collaborations."
+            delay={0.3}
+            stagger={0.025}
           />
         </p>
       </section>
 
-      <div className="mt-16 sm:mt-20">
+      <div className="mt-14 sm:mt-16">
         <ProjectGrid projects={projects} navigate={navigate} />
       </div>
     </>

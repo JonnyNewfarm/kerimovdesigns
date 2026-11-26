@@ -534,7 +534,11 @@ export default function ProjectGallery({
     }
 
     const t = smoothstep(rawProgress);
-    const openingBend = Math.sin(Math.PI * rawProgress);
+    const isClosing = closingRef.current;
+
+    const bendStrength = isClosing ? -0.65 : 1;
+
+    const openingBend = Math.sin(Math.PI * rawProgress) * bendStrength;
     const hovered = profileActive
       ? null
       : selected

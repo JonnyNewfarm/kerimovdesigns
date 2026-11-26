@@ -5,26 +5,31 @@ export const INTRO =
 
 export const SECTIONS = [
   {
+    title: "Visual Identities",
     src: "/visual-identity.jpg",
     description:
       "From typography and color to composition and visual direction, every element works together to create a cohesive identity.",
   },
   {
+    title: "Logo Design",
     src: "/logo-design.jpg",
     description:
       "Exploring shape, proportion and typography to develop logos that feel purposeful, distinctive and versatile.",
   },
   {
+    title: "Art Direction",
     src: "/art-direction.jpg",
     description:
       "Connecting imagery, typography and composition to establish a distinctive direction and bring creative ideas together.",
   },
   {
+    title: "Motion",
     src: "/anim.mp4",
     description:
       "Exploring how motion can add character, energy and an entirely new dimension to visual communication.",
   },
   {
+    title: "Editorial Design",
     src: "/editorial-design.jpg",
     description:
       "Creating expressive editorial layouts that balance visual structure, storytelling and experimental design.",

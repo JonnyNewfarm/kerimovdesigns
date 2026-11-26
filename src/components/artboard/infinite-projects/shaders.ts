@@ -1,4 +1,3 @@
-
 export const VERTEX_SHADER = `
   uniform float uTime, uHover, uWorldScale, uEdgeBend, uTransitionBend, uMorph, uCoverReturn, uEdgeMorphStrength;
   uniform vec2 uPointer, uMotion, uImageSize;
@@ -36,9 +35,19 @@ export const VERTEX_SHADER = `
     float verticalProfile =
       0.85 + 0.15 * cos((uv.y - 0.5) * PI);
 
+    // Reduce Z-axis deformation during closing only.
+    float closingDepthStrength = 0.7;
+
+    float edgeDepthStrength =
+      uEdgeBend < 0.0 ? closingDepthStrength : 1.0;
+
+    float transitionDepthStrength =
+      uTransitionBend < 0.0 ? closingDepthStrength : 1.0;
+
     p.z += uEdgeBend *
       (edge * 0.56 + side * edge * 0.17) *
-      verticalProfile;
+      verticalProfile *
+      edgeDepthStrength;
 
     p.x += uEdgeBend * side * edge * 0.11;
 
@@ -55,7 +64,8 @@ export const VERTEX_SHADER = `
     p.z += uTransitionBend *
       sin(uv.x * PI) *
       sin(uv.y * PI) *
-      0.16 * uWorldScale;
+      0.16 * uWorldScale *
+      transitionDepthStrength;
 
     float morphPulse = max(
       sin(PI * uMorph) * (1.0 - uCoverReturn),

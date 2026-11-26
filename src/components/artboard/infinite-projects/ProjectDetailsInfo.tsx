@@ -77,6 +77,21 @@ const reducedMaskVariants: Variants = {
   },
 };
 
+const thumbnailVariants: Variants = {
+  hidden: {
+    y: "110%",
+    opacity: 0,
+  },
+  visible: {
+    y: "0%",
+    opacity: 1,
+    transition: {
+      duration: 0.65,
+      ease,
+    },
+  },
+};
+
 function RevealText({
   text,
   delay = 0,
@@ -170,6 +185,29 @@ export default function ProjectDetailsInfo({
 }: Props) {
   const reducedMotion = useReducedMotion() ?? false;
 
+  const thumbnails = project
+    ? [
+        {
+          src: project.src,
+          isVideo: false,
+        },
+        ...(project.images ?? [])
+          .filter((src) => src && src !== project.src)
+          .map((src) => ({
+            src,
+            isVideo: false,
+          })),
+        ...(project.srcVideo?.trim()
+          ? [
+              {
+                src: project.src,
+                isVideo: true,
+              },
+            ]
+          : []),
+      ].slice(0, mediaCount)
+    : [];
+
   return (
     <AnimatePresence>
       {selected && !closing && ready && project && (
@@ -179,23 +217,33 @@ export default function ProjectDetailsInfo({
           animate="visible"
           exit="exit"
           variants={detailsVariants}
-          className="pointer-events-none absolute inset-0 z-20 text-[#e7e3dd]"
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+            z-20
+            text-[#e7e3dd]
+          "
         >
           {/* YEAR & TOOLS — TOP LEFT */}
+
           {(project.type?.trim() || project.tools?.trim()) && (
             <motion.div
               variants={sectionVariants}
               className="
-      absolute
-      left-[5%]
-      top-[7%]
-      z-30
-      flex
-      items-center
-      gap-8
-      whitespace-nowrap
-      md:left-[3.5%]
-    "
+                absolute
+                left-[5%]
+                top-[7%]
+                z-30
+                flex
+                max-w-[75%]
+                flex-wrap
+                items-center
+                gap-x-4
+                gap-y-1
+                md:left-[3.5%]
+                md:gap-x-8
+              "
             >
               {project.type?.trim() && (
                 <InlineInfoField
@@ -215,7 +263,36 @@ export default function ProjectDetailsInfo({
             </motion.div>
           )}
 
+          {/* SCROLL — TOP RIGHT */}
+
+          <motion.div
+            variants={sectionVariants}
+            className="
+              absolute
+              right-[5%]
+              top-[7%]
+              overflow-hidden
+              md:right-[4%]
+            "
+          >
+            <motion.p
+              variants={reducedMotion ? reducedMaskVariants : maskVariants}
+              className="
+                text-[9px]
+                font-medium
+                uppercase
+                leading-[1.4]
+                tracking-[0.16em]
+                text-[#e7e3dd]/80
+                md:text-[10px]
+              "
+            >
+              Scroll
+            </motion.p>
+          </motion.div>
+
           {/* BOTTOM ROW */}
+
           <motion.div
             variants={sectionVariants}
             className="
@@ -224,15 +301,18 @@ export default function ProjectDetailsInfo({
               left-[5%]
               right-[5%]
               grid
-              grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]
+              grid-cols-1
               items-end
-              gap-2
+              gap-4
               md:bottom-[5%]
               md:left-[5.3%]
               md:right-[4%]
+              md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]
+              md:gap-8
             "
           >
             {/* TITLE — BOTTOM LEFT */}
+
             <div className="min-w-0 overflow-hidden">
               <h2
                 className="
@@ -254,43 +334,18 @@ export default function ProjectDetailsInfo({
               </h2>
             </div>
 
-            {/* SCROLL — CENTER */}
-            <div className="min-w-0 overflow-hidden text-center">
-              <motion.p
-                variants={reducedMotion ? reducedMaskVariants : maskVariants}
-                className="
-                  text-[9px]
-                  font-medium
-                  uppercase
-                  leading-[1.4]
-                  tracking-[0.16em]
-                  text-[#e7e3dd]/80
-                  md:text-[10px]
-                "
-              >
-                Scroll
-              </motion.p>
-            </div>
+            {/* MEDIA THUMBNAILS — BOTTOM RIGHT */}
 
-            {/* MEDIA NAVIGATION — RIGHT */}
-            <nav
+            <motion.nav
+              variants={sectionVariants}
               aria-label="Project media navigation"
               className="
                 pointer-events-auto
-                flex
                 w-max
-                max-w-full
                 min-w-0
-                items-center
-                justify-end
+                max-w-full
                 justify-self-end
-                gap-[clamp(9px,1.2vw,20px)]
                 overflow-x-auto
-                whitespace-nowrap
-                font-bueno
-                text-[clamp(15px,1.15vw,19px)]
-                font-medium
-                tabular-nums
                 [scrollbar-width:none]
                 [&::-webkit-scrollbar]:hidden
               "
@@ -307,25 +362,119 @@ export default function ProjectDetailsInfo({
                 }
               }}
             >
-              {Array.from({ length: mediaCount }, (_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  aria-label={`Show project media ${index + 1}`}
-                  aria-current={
-                    index === currentMediaIndex ? "true" : undefined
-                  }
-                  onClick={() => onSelectMedia(index)}
-                  className={`shrink-0 border-0 bg-transparent px-1 py-2 leading-none outline-offset-4 transition-opacity duration-300 ease-in-out focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#e7e3dd] ${
-                    currentMediaIndex === index
-                      ? "text-[#e7e3dd] opacity-100"
-                      : "text-[#e7e3dd] opacity-30 hover:opacity-100"
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-            </nav>
+              <div
+                className="
+                  flex
+                  w-max
+                  items-center
+                  gap-[6px]
+                  py-1
+                  md:gap-[8px]
+                "
+              >
+                {thumbnails.map((thumbnail, index) => {
+                  const active = currentMediaIndex === index;
+
+                  return (
+                    <div
+                      key={`${thumbnail.src}-${index}`}
+                      className="shrink-0 overflow-hidden"
+                    >
+                      <motion.button
+                        type="button"
+                        variants={
+                          reducedMotion
+                            ? reducedMaskVariants
+                            : thumbnailVariants
+                        }
+                        aria-label={
+                          thumbnail.isVideo
+                            ? "Show project video"
+                            : `Show project image ${index + 1}`
+                        }
+                        aria-current={active ? "true" : undefined}
+                        onClick={() => onSelectMedia(index)}
+                        className="
+                          relative
+                          block
+                          aspect-[4/3]
+                          w-[38px]
+                          cursor-pointer
+                          overflow-hidden
+                          border-0
+                          bg-transparent
+                          p-0
+                          focus-visible:outline
+                          focus-visible:outline-1
+                          focus-visible:-outline-offset-1
+                          focus-visible:outline-[#e7e3dd]
+                          md:w-[clamp(42px,3.2vw,62px)]
+                        "
+                      >
+                        <div
+                          className={`
+                            relative
+                            h-full
+                            w-full
+                            overflow-hidden
+                            bg-[#f1f0f0]
+                            transition-opacity
+                            duration-300
+                            ease-out
+                            ${
+                              active
+                                ? "opacity-100"
+                                : "opacity-35 hover:opacity-100"
+                            }
+                          `}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={thumbnail.src}
+                            alt=""
+                            draggable={false}
+                            className="
+                              pointer-events-none
+                              h-full
+                              w-full
+                              select-none
+                              object-cover
+                            "
+                          />
+
+                          {thumbnail.isVideo && (
+                            <div
+                              className="
+                                pointer-events-none
+                                absolute
+                                inset-0
+                                flex
+                                items-center
+                                justify-center
+                                bg-black/25
+                              "
+                            >
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 12 12"
+                                fill="none"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M3 1.5L10 6L3 10.5V1.5Z"
+                                  fill="white"
+                                />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                      </motion.button>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.nav>
           </motion.div>
         </motion.div>
       )}
